@@ -18,5 +18,6 @@
             ]
         }
     },
-    "updateRemoteUserUID": true
+    "updateRemoteUserUID": true,
+    "forwardPorts": [5173]
 }
