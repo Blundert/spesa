@@ -1,0 +1,22 @@
+{
+    "name": "PWA Spesa Dev Container",
+    "dockerComposeFile": "docker-compose.yml",
+    "service": "app",
+    "workspaceFolder": "/workspace",
+    "initializeCommand": "cd ${localWorkspaceFolder}/.devcontainer && node generate-compose.js",
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "dbaeumer.vscode-eslint",
+                "esbenp.prettier-vscode",
+                "ms-azuretools.vscode-docker",
+                "ms-vsliveshare.vsliveshare",
+                "ms-vsliveshare.vsliveshare-audio",
+                "ms-vsliveshare.vsliveshare-pack",
+                "redhat.vscode-yaml",
+                "anthropic.claude-code"
+            ]
+        }
+    },
+    "updateRemoteUserUID": true
+}

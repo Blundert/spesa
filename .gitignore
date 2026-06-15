@@ -1,0 +1,5 @@
+.devcontainer/docker-compose.yml.template
+node_modules
+dist
+.DS_Store
+*.local
