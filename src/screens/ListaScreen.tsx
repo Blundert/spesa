@@ -3,6 +3,7 @@ import { Link } from '@tanstack/react-router'
 import { currentISOWeek } from '../lib/date'
 import { formatCentsPlain } from '../lib/money'
 import { useListItems, useAddNewItemToList } from '../hooks/useListItems'
+import { useSessionsByWeek } from '../hooks/useShopping'
 import { useCategories } from '../hooks/useItems'
 import { qk } from '../db/queryKeys'
 import { db } from '../db/db'
@@ -31,10 +32,19 @@ export function ListaScreen() {
   const { data: listItems = [] } = useListItems()
   const { data: categories = [] } = useCategories()
   const { data: purchases = [] } = usePurchasesForWeek()
+  const { data: sessions = [] } = useSessionsByWeek(isoWeek)
 
   const addNewItem = useAddNewItemToList(categories.find((c) => c.name === 'Altro')?.id ?? 0)
 
-  const purchasedItemIds = new Set(purchases.map((p) => p.itemId))
+  // "Preso" solo per gli acquisti della spesa in corso (sessione non finita): senza
+  // questa restrizione un item già comprato prima in settimana risulterebbe subito preso,
+  // perché gli item sono deduplicati e riusano lo stesso id.
+  const activeSession = sessions.find((s) => s.finishedAt === null)
+  const purchasedItemIds = new Set(
+    activeSession
+      ? purchases.filter((p) => p.sessionId === activeSession.id).map((p) => p.itemId)
+      : [],
+  )
 
   // Build category map id → name
   const catMap = Object.fromEntries(categories.map((c) => [c.id ?? 0, c.name]))
