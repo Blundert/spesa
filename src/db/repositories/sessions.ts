@@ -24,8 +24,8 @@ export async function createSession(isoWeek: string, supermarketId: number): Pro
   return id as number
 }
 
-export async function finishSession(id: number): Promise<void> {
-  await db.sessions.update(id, { finishedAt: Date.now() })
+export async function finishSession(id: number, confirmedTotalCents: number): Promise<void> {
+  await db.sessions.update(id, { finishedAt: Date.now(), confirmedTotalCents })
 }
 
 export async function deleteSession(id: number): Promise<void> {

@@ -25,7 +25,8 @@ export function SessioneScreen() {
   })
 
   const storeName = supermarkets.find((s) => s.id === session?.supermarketId)?.name ?? '?'
-  const totalCents = purchases.reduce((acc, p) => acc + p.priceCents * p.quantity, 0)
+  const computedCents = purchases.reduce((acc, p) => acc + p.priceCents * p.quantity, 0)
+  const totalCents = session?.confirmedTotalCents ?? computedCents
   const itemMap = Object.fromEntries(items.map((it) => [it.id ?? 0, it.name]))
 
   return (

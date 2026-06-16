@@ -68,10 +68,17 @@ export function useCreateSession(isoWeek: string) {
 export function useFinishSession(isoWeek: string) {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: (sessionId: number) => finishSession(sessionId),
+    mutationFn: ({
+      sessionId,
+      confirmedTotalCents,
+    }: {
+      sessionId: number
+      confirmedTotalCents: number
+    }) => finishSession(sessionId, confirmedTotalCents),
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: qk.sessions(isoWeek) })
       void qc.invalidateQueries({ queryKey: qk.allSessions() })
+      void qc.invalidateQueries({ queryKey: qk.purchasesForWeek(isoWeek) })
     },
   })
 }
