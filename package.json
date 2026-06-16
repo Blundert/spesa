@@ -15,7 +15,9 @@
     "@tanstack/react-router": "^1.170.15",
     "dexie": "^4.4.3",
     "react": "^19.2.6",
-    "react-dom": "^19.2.6"
+    "react-dom": "^19.2.6",
+    "sonner": "^2.0.7",
+    "vaul": "^1.1.2"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
