@@ -37,16 +37,8 @@ export function SupermercatiScreen() {
   return (
     <>
       <div className="flex-1 overflow-y-auto px-5 pb-[120px]">
-        <div className="flex items-baseline justify-between px-1 pt-2 pb-[18px]">
+        <div className="px-1 pt-2 pb-[18px]">
           <span className="text-[26px] font-normal tracking-[-0.5px] text-[#2A2A2C]">Supermercati</span>
-          <button
-            onClick={() => setSheetOpen(true)}
-            className="active:opacity-50"
-          >
-            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#2A2A2C" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M12 5v14M5 12h14" />
-            </svg>
-          </button>
         </div>
 
         {supermarkets.length === 0 && (
@@ -87,9 +79,20 @@ export function SupermercatiScreen() {
             </div>
           )
         })}
+
+        <button
+          onClick={() => setSheetOpen(true)}
+          className="w-full flex items-center gap-3 bg-white rounded-[20px] px-5 py-[18px] active:bg-[#F6F6F4] transition-colors"
+        >
+          <div className="w-[42px] h-[42px] rounded-[13px] bg-[#F2F2F0] flex items-center justify-center flex-none">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2A2A2C" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 5v14M5 12h14" />
+            </svg>
+          </div>
+          <span className="text-base text-[#9B9B9F]">Aggiungi supermercato</span>
+        </button>
       </div>
 
-      {/* Add sheet */}
       <BottomSheet open={sheetOpen} onClose={() => setSheetOpen(false)}>
         <div className="text-[20px] font-normal text-[#2A2A2C] px-0.5 pb-[6px]">Nuovo supermercato</div>
         <input
