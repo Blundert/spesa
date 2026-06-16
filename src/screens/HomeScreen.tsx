@@ -1,9 +1,10 @@
 import { Link } from '@tanstack/react-router'
-import { currentISOWeek, formatWeekLabel } from '../lib/date'
+import { currentISOWeek, formatWeekLabel, formatShortDate } from '../lib/date'
 import { formatCentsPlain } from '../lib/money'
 import { computeBudgetSummary } from '../lib/budgetSelectors'
 import { useWeekBudget, useSessionsByWeek } from '../hooks/useShopping'
 import { useListItems } from '../hooks/useListItems'
+import { useSupermarkets } from '../hooks/useItems'
 import { useMealPlan } from '../hooks/useMealPlan'
 import { qk } from '../db/queryKeys'
 import { db } from '../db/db'
@@ -31,6 +32,7 @@ export function HomeScreen() {
   const { data: sessions = [] } = useSessionsByWeek(isoWeek)
   const { data: purchases = [] } = usePurchasesForWeek(isoWeek)
   const { data: listItems = [] } = useListItems()
+  const { data: supermarkets = [] } = useSupermarkets()
   const { data: mealDays = [] } = useMealPlan(isoWeek)
   const mealCount = mealDays.reduce((n, d) => n + (d.pranzo ? 1 : 0) + (d.cena ? 1 : 0), 0)
 
@@ -38,10 +40,34 @@ export function HomeScreen() {
     ? computeBudgetSummary(budget, sessions, purchases)
     : { totalCents: 0, spentCents: 0, remainingCents: 0, outOfPocketCents: 0, isOver: false }
 
-  const takenCount = listItems.filter((li) =>
-    purchases.some((p) => p.itemId === li.itemId),
-  ).length
+  // "Presi": solo gli acquisti della spesa in corso (sessione non ancora finita).
+  const activeSession = sessions.find((s) => s.finishedAt === null)
+  const activeItemIds = new Set(
+    activeSession
+      ? purchases.filter((p) => p.sessionId === activeSession.id).map((p) => p.itemId)
+      : [],
+  )
+  const takenCount = listItems.filter((li) => activeItemIds.has(li.itemId)).length
   const totalCount = listItems.length
+
+  // Recap delle spese finite della settimana (importo confermato, fallback calcolato).
+  const computedBySession = new Map<number, number>()
+  for (const p of purchases) {
+    computedBySession.set(
+      p.sessionId,
+      (computedBySession.get(p.sessionId) ?? 0) + p.priceCents * p.quantity,
+    )
+  }
+  const supermarketMap = Object.fromEntries(supermarkets.map((s) => [s.id ?? 0, s.name]))
+  const weekSpese = sessions
+    .filter((s) => s.finishedAt !== null && s.id !== undefined)
+    .sort((a, b) => (b.finishedAt ?? 0) - (a.finishedAt ?? 0))
+    .map((s) => ({
+      id: s.id as number,
+      store: supermarketMap[s.supermarketId] ?? '?',
+      date: s.startedAt,
+      amountCents: s.confirmedTotalCents ?? computedBySession.get(s.id as number) ?? 0,
+    }))
 
   return (
     <div className="flex-1 overflow-y-auto px-5 pb-[120px]">
@@ -104,6 +130,34 @@ export function HomeScreen() {
             <div className="text-[11px] text-[#9B9B9F] mt-0.5 tracking-[.3px]">BUDGET</div>
           </div>
         </div>
+
+        {/* Spese di questa settimana */}
+        {weekSpese.length > 0 && (
+          <div className="mb-7">
+            <div className="text-[12px] font-normal tracking-[1.2px] text-[#9B9B9F] uppercase px-1.5 pb-[13px]">
+              Spese di questa settimana
+            </div>
+            <div className="bg-white rounded-[22px] overflow-hidden">
+              {weekSpese.map((sp, i) => (
+                <Link
+                  key={sp.id}
+                  to="/storico/$sessionId"
+                  params={{ sessionId: String(sp.id) }}
+                  className="flex items-center gap-[14px] px-5 py-[17px] active:bg-[#F6F6F4] transition-colors"
+                  style={{ borderBottom: i < weekSpese.length - 1 ? '1px solid #ECECEC' : 'none' }}
+                >
+                  <div className="flex-1">
+                    <div className="text-base font-normal text-[#2A2A2C]">{sp.store}</div>
+                    <div className="text-[13px] text-[#9B9B9F] mt-0.5">{formatShortDate(sp.date)}</div>
+                  </div>
+                  <span className="text-[17px] font-normal text-[#2A2A2C] tabular-nums">
+                    €{formatCentsPlain(sp.amountCents)}
+                  </span>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Actions */}
         <div className="bg-white rounded-[22px] overflow-hidden mb-[14px]">
