@@ -31,3 +31,7 @@ body {
 ::-webkit-scrollbar {
   display: none;
 }
+
+[data-sonner-toast] [data-description] {
+  color: rgba(255, 255, 255, 0.72) !important;
+}
