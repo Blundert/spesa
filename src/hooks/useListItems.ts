@@ -9,67 +9,67 @@ import {
 } from '../db/repositories/listItems'
 import { upsertItem } from '../db/repositories/items'
 
-export function useListItems(isoWeek: string) {
+export function useListItems() {
   return useQuery({
-    queryKey: qk.listItems(isoWeek),
-    queryFn: () => getListItems(isoWeek),
+    queryKey: qk.listItems(),
+    queryFn: () => getListItems(),
   })
 }
 
-export function useAddToList(isoWeek: string) {
+export function useAddToList() {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: ({ itemId }: { itemId: number }) => addToList(isoWeek, itemId),
+    mutationFn: ({ itemId }: { itemId: number }) => addToList(itemId),
     onSuccess: () => {
-      void qc.invalidateQueries({ queryKey: qk.listItems(isoWeek) })
+      void qc.invalidateQueries({ queryKey: qk.listItems() })
     },
   })
 }
 
 /** Crea un nuovo item (se non esiste) e lo aggiunge alla lista. */
-export function useAddNewItemToList(isoWeek: string, defaultCategoryId: number) {
+export function useAddNewItemToList(defaultCategoryId: number) {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: async ({ name, categoryId }: { name: string; categoryId?: number }) => {
       const catId = categoryId ?? defaultCategoryId
       const itemId = await upsertItem(name, catId)
-      await addToList(isoWeek, itemId)
+      await addToList(itemId)
       return itemId
     },
     onSuccess: () => {
-      void qc.invalidateQueries({ queryKey: qk.listItems(isoWeek) })
+      void qc.invalidateQueries({ queryKey: qk.listItems() })
       void qc.invalidateQueries({ queryKey: qk.items() })
     },
   })
 }
 
-export function useRemoveFromList(isoWeek: string) {
+export function useRemoveFromList() {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: (id: number) => removeFromList(id),
     onSuccess: () => {
-      void qc.invalidateQueries({ queryKey: qk.listItems(isoWeek) })
+      void qc.invalidateQueries({ queryKey: qk.listItems() })
     },
   })
 }
 
-export function useUpdateListQuantity(isoWeek: string) {
+export function useUpdateListQuantity() {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: ({ id, quantity }: { id: number; quantity: number }) =>
       updateListItemQuantity(id, quantity),
     onSuccess: () => {
-      void qc.invalidateQueries({ queryKey: qk.listItems(isoWeek) })
+      void qc.invalidateQueries({ queryKey: qk.listItems() })
     },
   })
 }
 
-export function useClearList(isoWeek: string) {
+export function useClearList() {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: () => clearList(isoWeek),
+    mutationFn: () => clearList(),
     onSuccess: () => {
-      void qc.invalidateQueries({ queryKey: qk.listItems(isoWeek) })
+      void qc.invalidateQueries({ queryKey: qk.listItems() })
     },
   })
 }

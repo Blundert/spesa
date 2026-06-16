@@ -34,7 +34,7 @@ export function SpesaScreen() {
   const { data: budget } = useWeekBudget(isoWeek)
   const { data: sessions = [] } = useSessionsByWeek(isoWeek)
   const { data: supermarkets = [] } = useSupermarkets()
-  const { data: listItems = [] } = useListItems(isoWeek)
+  const { data: listItems = [] } = useListItems()
   const { data: categories = [] } = useCategories()
   const catMap = Object.fromEntries(categories.map((c) => [c.id ?? 0, c.name]))
 

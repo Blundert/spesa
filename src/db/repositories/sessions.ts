@@ -19,6 +19,7 @@ export async function createSession(isoWeek: string, supermarketId: number): Pro
     supermarketId,
     startedAt: Date.now(),
     finishedAt: null,
+    confirmedTotalCents: null,
   })
   return id as number
 }
