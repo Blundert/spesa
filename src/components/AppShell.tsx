@@ -126,10 +126,10 @@ export function AppShell() {
         {/* Menu button */}
         <button
           onClick={() => setNavOpen(true)}
-          className="absolute top-[64px] right-[20px] z-[30] w-10 h-10 flex items-center justify-center active:opacity-50 transition-opacity"
+          className="absolute top-[64px] right-[20px] z-[30] w-10 h-10 rounded-full bg-[#2A2A2C] flex items-center justify-center shadow-[0_6px_18px_rgba(0,0,0,.22)] active:scale-[.94] transition-transform"
           aria-label="Apri menu"
         >
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2A2A2C" strokeWidth="2" strokeLinecap="round">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round">
             <path d="M4 9h16M4 15h16" />
           </svg>
         </button>
