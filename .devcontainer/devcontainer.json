@@ -3,7 +3,7 @@
     "dockerComposeFile": "docker-compose.yml",
     "service": "app",
     "workspaceFolder": "/workspace",
-    "initializeCommand": "cd ${localWorkspaceFolder}/.devcontainer && node generate-compose.js",
+    "initializeCommand": "cd ${localWorkspaceFolder}/.devcontainer && node generate-compose.cjs",
     "customizations": {
         "vscode": {
             "extensions": [
@@ -19,5 +19,7 @@
         }
     },
     "updateRemoteUserUID": true,
-    "forwardPorts": [5173]
+    "forwardPorts": [
+        5173
+    ]
 }
