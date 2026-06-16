@@ -67,11 +67,16 @@ export interface Purchase {
   quantity: number
 }
 
-/** Pianificazione pasto (un pranzo per giorno della settimana). */
+/** 0 = pranzo, 1 = cena */
+export type MealType = 0 | 1
+
+/** Pianificazione pasto (pranzo e cena per ogni giorno della settimana). */
 export interface MealPlan {
   id?: number
   isoWeek: string
   /** 0=Lunedì … 6=Domenica */
   dayIndex: number
+  /** 0=pranzo, 1=cena */
+  mealType: MealType
   dish: string
 }
