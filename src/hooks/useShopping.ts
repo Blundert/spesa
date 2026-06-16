@@ -1,0 +1,156 @@
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { qk } from '../db/queryKeys'
+import { getWeekBudget, updateWeekBudget } from '../db/repositories/weekBudget'
+import { getSessionsByWeek, createSession, finishSession } from '../db/repositories/sessions'
+import {
+  getPurchasesBySession,
+  addPurchase,
+  updatePurchasePrice,
+  updatePurchaseQuantity,
+  removePurchase,
+} from '../db/repositories/purchases'
+import { updateItemPrices } from '../db/repositories/items'
+import { db } from '../db/db'
+import type { Purchase } from '../db/types'
+
+// ── Budget ──────────────────────────────────────────────────────────────────
+
+export function useWeekBudget(isoWeek: string) {
+  return useQuery({
+    queryKey: qk.weekBudget(isoWeek),
+    queryFn: () => getWeekBudget(isoWeek),
+  })
+}
+
+export function useUpdateWeekBudget(isoWeek: string) {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: ({
+      buoniCount,
+      buoniValueCents,
+    }: {
+      buoniCount: number
+      buoniValueCents: number
+    }) => updateWeekBudget(isoWeek, buoniCount, buoniValueCents),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: qk.weekBudget(isoWeek) })
+    },
+  })
+}
+
+// ── Sessions ─────────────────────────────────────────────────────────────────
+
+export function useSessionsByWeek(isoWeek: string) {
+  return useQuery({
+    queryKey: qk.sessions(isoWeek),
+    queryFn: () => getSessionsByWeek(isoWeek),
+  })
+}
+
+export function useAllSessions() {
+  return useQuery({
+    queryKey: qk.allSessions(),
+    queryFn: () => db.sessions.orderBy('startedAt').reverse().toArray(),
+  })
+}
+
+export function useCreateSession(isoWeek: string) {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (supermarketId: number) => createSession(isoWeek, supermarketId),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: qk.sessions(isoWeek) })
+      void qc.invalidateQueries({ queryKey: qk.allSessions() })
+    },
+  })
+}
+
+export function useFinishSession(isoWeek: string) {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (sessionId: number) => finishSession(sessionId),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: qk.sessions(isoWeek) })
+      void qc.invalidateQueries({ queryKey: qk.allSessions() })
+    },
+  })
+}
+
+// ── Purchases ────────────────────────────────────────────────────────────────
+
+export function usePurchasesBySession(sessionId: number) {
+  return useQuery({
+    queryKey: qk.purchases(sessionId),
+    queryFn: () => getPurchasesBySession(sessionId),
+  })
+}
+
+interface AddPurchaseArgs {
+  sessionId: number
+  itemId: number
+  /** Prezzo in centesimi. */
+  priceCents: number
+  /** Default 1. */
+  quantity?: number
+}
+
+/**
+ * Aggiunge un acquisto e aggiorna lastPriceCents/suggestedPriceCents sull'item.
+ * Calcola la media mobile come suggestedPrice.
+ */
+export function useAddPurchase(isoWeek: string) {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async ({ sessionId, itemId, priceCents, quantity = 1 }: AddPurchaseArgs) => {
+      await addPurchase(sessionId, itemId, priceCents, quantity)
+
+      // Aggiorna prezzi sull'item: media mobile sugli ultimi acquisti
+      const allPurchases: Purchase[] = await db.purchases
+        .where('itemId')
+        .equals(itemId)
+        .toArray()
+      const avg = Math.round(
+        allPurchases.reduce((acc, p) => acc + p.priceCents, 0) / allPurchases.length,
+      )
+      await updateItemPrices(itemId, priceCents, avg)
+    },
+    onSuccess: (_data, { sessionId }) => {
+      void qc.invalidateQueries({ queryKey: qk.purchases(sessionId) })
+      void qc.invalidateQueries({ queryKey: qk.sessions(isoWeek) })
+      void qc.invalidateQueries({ queryKey: qk.items() })
+      void qc.invalidateQueries({ queryKey: qk.priceHistory(0) }) // broad invalidation
+    },
+  })
+}
+
+export function useUpdatePurchase(sessionId: number) {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: ({
+      id,
+      priceCents,
+      quantity,
+    }: {
+      id: number
+      priceCents?: number
+      quantity?: number
+    }) =>
+      Promise.all([
+        priceCents !== undefined ? updatePurchasePrice(id, priceCents) : Promise.resolve(),
+        quantity !== undefined ? updatePurchaseQuantity(id, quantity) : Promise.resolve(),
+      ]),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: qk.purchases(sessionId) })
+    },
+  })
+}
+
+export function useRemovePurchase(sessionId: number) {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (id: number) => removePurchase(id),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: qk.purchases(sessionId) })
+    },
+  })
+}
