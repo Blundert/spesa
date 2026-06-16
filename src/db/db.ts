@@ -31,7 +31,12 @@ class SpesaDb extends Dexie {
       listItems: '++id, isoWeek, itemId, [isoWeek+itemId]',
       sessions: '++id, isoWeek, supermarketId, startedAt',
       purchases: '++id, sessionId, itemId, [sessionId+itemId]',
-      mealPlans: '++id, isoWeek, [isoWeek+dayIndex]',
+      mealPlans: '++id, isoWeek',
+    })
+
+    // v2: mealType field added — compound index updated to [isoWeek+dayIndex+mealType]
+    this.version(2).stores({
+      mealPlans: '++id, isoWeek, [isoWeek+dayIndex+mealType]',
     })
   }
 }
