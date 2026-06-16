@@ -2,11 +2,7 @@
   "mcpServers": {
     "browser-tools": {
       "command": "npx",
-      "args": ["-y", "@agentdeskai/browser-tools-mcp@latest"],
-      "env": {
-        "BROWSER_TOOLS_SERVER_HOST": "host.docker.internal",
-        "BROWSER_TOOLS_SERVER_PORT": "3025"
-      }
+      "args": ["-y", "@agentdeskai/browser-tools-mcp@latest"]
     }
   }
 }
