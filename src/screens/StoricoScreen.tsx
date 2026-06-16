@@ -39,6 +39,7 @@ export function StoricoScreen() {
           sessionId={s.id!}
           storeName={supermarketMap[s.supermarketId] ?? '?'}
           date={s.startedAt}
+          confirmedTotalCents={s.confirmedTotalCents}
         />
       ))}
     </div>
@@ -49,16 +50,19 @@ function SessionCard({
   sessionId,
   storeName,
   date,
+  confirmedTotalCents,
 }: {
   sessionId: number
   storeName: string
   date: number
+  confirmedTotalCents: number | null
 }) {
-  const { data: totalCents = 0 } = useSessionTotal(sessionId)
+  const { data: computedCents = 0 } = useSessionTotal(sessionId)
   const { data: purchases = [] } = useQuery({
     queryKey: ['purchases', sessionId],
     queryFn: () => db.purchases.where('sessionId').equals(sessionId).toArray(),
   })
+  const totalCents = confirmedTotalCents ?? computedCents
 
   return (
     <Link

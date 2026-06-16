@@ -15,7 +15,7 @@ import {
   useFinishSession,
   useAddPurchase,
 } from '../hooks/useShopping'
-import { useListItems } from '../hooks/useListItems'
+import { useListItems, useClearList } from '../hooks/useListItems'
 import { useSupermarkets, useCategories } from '../hooks/useItems'
 import { PriceKeypad } from '../components/PriceKeypad'
 import { BottomSheet } from '../components/BottomSheet'
@@ -30,6 +30,7 @@ export function SpesaScreen() {
   const [showStorePicker, setShowStorePicker] = useState(false)
   const [showNewItem, setShowNewItem] = useState(false)
   const [newItemName, setNewItemName] = useState('')
+  const [showFinishConfirm, setShowFinishConfirm] = useState(false)
 
   const { data: budget } = useWeekBudget(isoWeek)
   const { data: sessions = [] } = useSessionsByWeek(isoWeek)
@@ -49,6 +50,7 @@ export function SpesaScreen() {
   const createSession = useCreateSession(isoWeek)
   const finishSession = useFinishSession(isoWeek)
   const addPurchase = useAddPurchase(isoWeek)
+  const clearList = useClearList()
   const qc = useQueryClient()
 
   const summary = budget
@@ -120,14 +122,23 @@ export function SpesaScreen() {
     [activeSession, handleStartSession, qc],
   )
 
-  const handleFinish = useCallback(async () => {
+  const handleFinish = useCallback(() => {
     if (!activeSession?.id) return
-    await finishSession.mutateAsync(activeSession.id)
-    toast('Sessione salvata', {
-      description: `${supermarketName} · €${formatCentsPlain(summary.spentCents)}`,
-    })
-    void navigate({ to: '/storico' })
-  }, [activeSession, finishSession, navigate, supermarketName, summary.spentCents])
+    setShowFinishConfirm(true)
+  }, [activeSession])
+
+  const handleConfirmFinish = useCallback(
+    async (cents: number) => {
+      if (!activeSession?.id) return
+      await finishSession.mutateAsync({ sessionId: activeSession.id, confirmedTotalCents: cents })
+      await clearList.mutateAsync()
+      toast('Spesa salvata', {
+        description: `${supermarketName} · €${formatCentsPlain(cents)}`,
+      })
+      void navigate({ to: '/storico' })
+    },
+    [activeSession, finishSession, clearList, navigate, supermarketName],
+  )
 
   // Divide lista in da prendere / nel carrello
   const purchasedItemIds = new Set(purchases.map((p) => p.itemId))
@@ -354,6 +365,17 @@ export function SpesaScreen() {
         label={newItemTarget?.name ?? ''}
         confirmLabel="Aggiungi al carrello"
         onConfirm={handleConfirmPrice}
+      />
+
+      {/* Conferma importo a fine spesa — pre-compilato col totale calcolato,
+          modificabile. Lo swipe-down annulla senza chiudere la spesa. */}
+      <PriceKeypad
+        open={showFinishConfirm}
+        onClose={() => setShowFinishConfirm(false)}
+        label="Quanto hai speso?"
+        confirmLabel="Conferma spesa"
+        initialCents={summary.spentCents}
+        onConfirm={handleConfirmFinish}
       />
     </div>
   )
