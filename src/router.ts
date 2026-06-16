@@ -1,4 +1,5 @@
 import { createRouter, createRootRoute, createRoute, Outlet } from '@tanstack/react-router'
+import { AppShell } from './components/AppShell'
 import { HomeScreen } from './screens/HomeScreen'
 import { SpesaScreen } from './screens/SpesaScreen'
 import { ListaScreen } from './screens/ListaScreen'
@@ -10,34 +11,43 @@ import { ItemDetailScreen } from './screens/ItemDetailScreen'
 
 const rootRoute = createRootRoute({ component: Outlet })
 
-const homeRoute = createRoute({
+// Layout route: persists across navigations between main screens,
+// keeping navOpen state alive so the push animation plays correctly.
+const shellRoute = createRoute({
   getParentRoute: () => rootRoute,
+  id: 'shell',
+  component: AppShell,
+})
+
+const homeRoute = createRoute({
+  getParentRoute: () => shellRoute,
   path: '/',
   component: HomeScreen,
 })
 
-const spesaRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: '/spesa',
-  component: SpesaScreen,
-})
-
 const listaRoute = createRoute({
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => shellRoute,
   path: '/lista',
   component: ListaScreen,
 })
 
 const storicoRoute = createRoute({
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => shellRoute,
   path: '/storico',
   component: StoricoScreen,
 })
 
 const supermercatiRoute = createRoute({
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => shellRoute,
   path: '/supermercati',
   component: SupermercatiScreen,
+})
+
+// Standalone routes (no shell nav)
+const spesaRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/spesa',
+  component: SpesaScreen,
 })
 
 const pastiRoute = createRoute({
@@ -59,11 +69,8 @@ const itemDetailRoute = createRoute({
 })
 
 const routeTree = rootRoute.addChildren([
-  homeRoute,
+  shellRoute.addChildren([homeRoute, listaRoute, storicoRoute, supermercatiRoute]),
   spesaRoute,
-  listaRoute,
-  storicoRoute,
-  supermercatiRoute,
   pastiRoute,
   sessioneRoute,
   itemDetailRoute,

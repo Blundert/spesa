@@ -8,16 +8,21 @@
 }
 
 html,
-body,
-#root {
+body {
   height: 100%;
   margin: 0;
+  background: #f2f2f0;
+}
+
+#root {
+  height: 100%;
+  display: flex;
+  justify-content: center;
 }
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Hanken Grotesk',
     'Segoe UI', system-ui, sans-serif;
-  background: #f2f2f0;
   color: #2a2a2c;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;

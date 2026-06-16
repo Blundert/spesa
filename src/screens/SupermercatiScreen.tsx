@@ -3,32 +3,10 @@ import { toast } from 'sonner'
 import { formatCentsPlain } from '../lib/money'
 import { useSupermarkets } from '../hooks/useItems'
 import { useSupermarketStats } from '../hooks/usePriceHistory'
-import { AppLayout } from '../components/AppLayout'
 import { BottomSheet } from '../components/BottomSheet'
 import { upsertSupermarket, deleteSupermarket } from '../db/repositories/supermarkets'
 import { useQueryClient } from '@tanstack/react-query'
 import { qk } from '../db/queryKeys'
-import { currentISOWeek } from '../lib/date'
-import { useWeekBudget, useSessionsByWeek } from '../hooks/useShopping'
-import { computeBudgetSummary } from '../lib/budgetSelectors'
-import { useQuery } from '@tanstack/react-query'
-import { db } from '../db/db'
-
-const isoWeek = currentISOWeek()
-
-function usePurchasesForWeek() {
-  return useQuery({
-    queryKey: ['purchasesForWeek', isoWeek],
-    queryFn: async () => {
-      const sessions = await db.sessions.where('isoWeek').equals(isoWeek).toArray()
-      if (!sessions.length) return []
-      const all = await Promise.all(
-        sessions.map((s) => db.purchases.where('sessionId').equals(s.id as number).toArray()),
-      )
-      return all.flat()
-    },
-  })
-}
 
 export function SupermercatiScreen() {
   const [sheetOpen, setSheetOpen] = useState(false)
@@ -37,13 +15,6 @@ export function SupermercatiScreen() {
   const qc = useQueryClient()
   const { data: supermarkets = [] } = useSupermarkets()
   const { data: stats = [] } = useSupermarketStats()
-  const { data: budget } = useWeekBudget(isoWeek)
-  const { data: sessions = [] } = useSessionsByWeek(isoWeek)
-  const { data: purchases = [] } = usePurchasesForWeek()
-
-  const summary = budget
-    ? computeBudgetSummary(budget, sessions, purchases)
-    : { totalCents: 0, spentCents: 0, remainingCents: 0, outOfPocketCents: 0, isOver: false }
 
   const statsMap = Object.fromEntries(stats.map((s) => [s.supermarket.id ?? 0, s]))
 
@@ -64,18 +35,7 @@ export function SupermercatiScreen() {
   }
 
   return (
-    <AppLayout
-      showBottomBar
-      bottomBar={{
-        remainingCents: Math.abs(summary.remainingCents),
-        isOver: summary.isOver,
-        spentCents: summary.spentCents,
-        takenCount: 0,
-        totalCount: 0,
-        onOpenSheet: () => {},
-      }}
-    >
-      <div className="h-[54px] flex-none" />
+    <>
       <div className="flex-1 overflow-y-auto px-5 pb-[120px]">
         <div className="flex items-baseline justify-between px-1 pt-2 pb-[18px]">
           <span className="text-[26px] font-normal tracking-[-0.5px] text-[#2A2A2C]">Supermercati</span>
@@ -147,6 +107,6 @@ export function SupermercatiScreen() {
           Aggiungi
         </button>
       </BottomSheet>
-    </AppLayout>
+    </>
   )
 }
