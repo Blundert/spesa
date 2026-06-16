@@ -109,6 +109,7 @@ export function HomeScreen() {
         <div className="bg-white rounded-[22px] overflow-hidden mb-[14px]">
           <Link
             to="/pasti"
+            search={{ week: isoWeek }}
             className="flex items-center gap-[14px] px-5 py-[19px] border-b border-[#ECECEC] active:bg-[#F6F6F4] transition-colors"
           >
             <div className="w-[38px] h-[38px] rounded-[11px] bg-[#F2F2F0] flex items-center justify-center flex-none">

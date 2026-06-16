@@ -1,17 +1,17 @@
-import { useNavigate } from '@tanstack/react-router'
-import { toast } from 'sonner'
-import { currentISOWeek, dayShort } from '../lib/date'
+import { useNavigate, useSearch } from '@tanstack/react-router'
+import { dayShort, formatWeekLabel, shiftISOWeek } from '../lib/date'
 import { useMealPlan, useUpdateMealSlot } from '../hooks/useMealPlan'
-
-const isoWeek = currentISOWeek()
 
 export function PastiScreen() {
   const navigate = useNavigate()
-  const { data: days = [] } = useMealPlan(isoWeek)
-  const updateSlot = useUpdateMealSlot(isoWeek)
+  const { week } = useSearch({ from: '/pasti' })
+  const { data: days = [] } = useMealPlan(week)
+  const updateSlot = useUpdateMealSlot(week)
+
+  const goToWeek = (delta: number) =>
+    void navigate({ to: '/pasti', search: { week: shiftISOWeek(week, delta) } })
 
   const handleGenerate = () => {
-    toast('Lista aggiornata', { description: 'Voci dai pasti aggiunte' })
     void navigate({ to: '/lista' })
   }
 
@@ -30,6 +30,29 @@ export function PastiScreen() {
             </svg>
           </button>
           <span className="text-[26px] font-normal tracking-[-0.5px] text-[#2A2A2C]">Pianifica i pasti</span>
+        </div>
+
+        {/* Selettore settimana */}
+        <div className="flex items-center justify-between bg-white rounded-[18px] px-2 py-2 mb-[14px]">
+          <button
+            onClick={() => goToWeek(-1)}
+            aria-label="Settimana precedente"
+            className="w-9 h-9 flex items-center justify-center active:opacity-50"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2A2A2C" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M15 5l-7 7 7 7" />
+            </svg>
+          </button>
+          <span className="text-[15px] text-[#2A2A2C] tabular-nums">{formatWeekLabel(week)}</span>
+          <button
+            onClick={() => goToWeek(1)}
+            aria-label="Settimana successiva"
+            className="w-9 h-9 flex items-center justify-center active:opacity-50"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2A2A2C" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M9 6l6 6-6 6" />
+            </svg>
+          </button>
         </div>
 
         <p className="text-sm text-[#9B9B9F] leading-relaxed mx-1 mb-[18px]">
@@ -70,7 +93,7 @@ export function PastiScreen() {
           onClick={handleGenerate}
           className="w-full mt-4 bg-[#2A2A2C] text-white text-[17px] font-normal py-[18px] rounded-[22px] active:scale-[.98] transition-transform"
         >
-          Genera la lista della spesa
+          Vai alla lista della spesa
         </button>
       </div>
     </div>
