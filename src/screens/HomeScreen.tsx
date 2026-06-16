@@ -1,10 +1,10 @@
-import { useState } from 'react'
 import { Link } from '@tanstack/react-router'
 import { currentISOWeek, formatWeekLabel } from '../lib/date'
 import { formatCentsPlain } from '../lib/money'
 import { computeBudgetSummary } from '../lib/budgetSelectors'
 import { useWeekBudget, useSessionsByWeek } from '../hooks/useShopping'
 import { useListItems } from '../hooks/useListItems'
+import { useMealPlan } from '../hooks/useMealPlan'
 import { db } from '../db/db'
 import { useQuery } from '@tanstack/react-query'
 
@@ -30,7 +30,8 @@ export function HomeScreen() {
   const { data: sessions = [] } = useSessionsByWeek(isoWeek)
   const { data: purchases = [] } = usePurchasesForWeek(isoWeek)
   const { data: listItems = [] } = useListItems(isoWeek)
-  const [mealCount] = useState(0) // placeholder, filled in Task 16
+  const { data: mealDays = [] } = useMealPlan(isoWeek)
+  const mealCount = mealDays.reduce((n, d) => n + (d.pranzo ? 1 : 0) + (d.cena ? 1 : 0), 0)
 
   const summary = budget
     ? computeBudgetSummary(budget, sessions, purchases)
