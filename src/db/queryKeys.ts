@@ -29,4 +29,7 @@ export const qk = {
   priceHistory: (itemId: number) => ['priceHistory', itemId] as const,
 
   mealPlan: (isoWeek: string) => ['mealPlan', isoWeek] as const,
+
+  /** Settimane con almeno un pasto pianificato (storico pianificazioni). */
+  plannedWeeks: () => ['plannedWeeks'] as const,
 } as const

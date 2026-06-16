@@ -1,4 +1,4 @@
-import { useNavigate, useSearch } from '@tanstack/react-router'
+import { Link, useNavigate, useSearch } from '@tanstack/react-router'
 import { dayShort, formatWeekLabel, shiftISOWeek } from '../lib/date'
 import { useMealPlan, useUpdateMealSlot } from '../hooks/useMealPlan'
 
@@ -29,7 +29,10 @@ export function PastiScreen() {
               <path d="M15 5l-7 7 7 7" />
             </svg>
           </button>
-          <span className="text-[26px] font-normal tracking-[-0.5px] text-[#2A2A2C]">Pianifica i pasti</span>
+          <span className="flex-1 text-[26px] font-normal tracking-[-0.5px] text-[#2A2A2C]">Pianifica i pasti</span>
+          <Link to="/pasti/storico" className="text-[15px] text-[#9B9B9F] px-1 active:opacity-50">
+            Storico
+          </Link>
         </div>
 
         {/* Selettore settimana */}
