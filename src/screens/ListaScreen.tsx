@@ -89,7 +89,7 @@ export function ListaScreen() {
           onChange={(e) => setAddInput(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && handleAdd()}
           placeholder="Aggiungi un oggetto…"
-          className="flex-1 border-none outline-none bg-transparent text-base text-[#2A2A2C] placeholder:text-[#C5C5C9]"
+          className="flex-1 border-none outline-none bg-transparent text-base text-[#2A2A2C] placeholder:text-[#9B9B9F]"
         />
       </div>
 
