@@ -16,7 +16,7 @@ import {
   useAddPurchase,
 } from '../hooks/useShopping'
 import { useListItems, useClearList } from '../hooks/useListItems'
-import { useSupermarkets, useCategories } from '../hooks/useItems'
+import { useSupermarkets, useCategories, useItems } from '../hooks/useItems'
 import { PriceKeypad } from '../components/PriceKeypad'
 import { BottomSheet } from '../components/BottomSheet'
 
@@ -37,7 +37,9 @@ export function SpesaScreen() {
   const { data: supermarkets = [] } = useSupermarkets()
   const { data: listItems = [] } = useListItems()
   const { data: categories = [] } = useCategories()
+  const { data: items = [] } = useItems()
   const catMap = Object.fromEntries(categories.map((c) => [c.id ?? 0, c.name]))
+  const itemNameMap = Object.fromEntries(items.map((it) => [it.id ?? 0, it.name]))
 
   // Usa la sessione più recente non finita, o quella attiva manualmente
   const activeSession =
@@ -145,7 +147,10 @@ export function SpesaScreen() {
   const todoItems = listItems.filter((li) => !purchasedItemIds.has(li.itemId))
   const doneItems = purchases.map((p) => ({
     ...p,
-    name: listItems.find((li) => li.itemId === p.itemId)?.itemName ?? `item ${p.itemId}`,
+    name:
+      itemNameMap[p.itemId] ??
+      listItems.find((li) => li.itemId === p.itemId)?.itemName ??
+      `item ${p.itemId}`,
   }))
 
   // Raggruppa todo per categoria
