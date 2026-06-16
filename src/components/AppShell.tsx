@@ -5,6 +5,7 @@ import { formatCentsPlain } from '../lib/money'
 import { computeBudgetSummary } from '../lib/budgetSelectors'
 import { useWeekBudget, useSessionsByWeek, useUpdateWeekBudget } from '../hooks/useShopping'
 import { useListItems } from '../hooks/useListItems'
+import { qk } from '../db/queryKeys'
 import { useQuery } from '@tanstack/react-query'
 import { db } from '../db/db'
 import { BottomSheet } from './BottomSheet'
@@ -13,7 +14,7 @@ const isoWeek = currentISOWeek()
 
 function usePurchasesForWeek() {
   return useQuery({
-    queryKey: ['purchasesForWeek', isoWeek],
+    queryKey: qk.purchasesForWeek(isoWeek),
     queryFn: async () => {
       const sessions = await db.sessions.where('isoWeek').equals(isoWeek).toArray()
       if (!sessions.length) return []
@@ -35,7 +36,7 @@ export function AppShell() {
   const { data: budget } = useWeekBudget(isoWeek)
   const { data: sessions = [] } = useSessionsByWeek(isoWeek)
   const { data: purchases = [] } = usePurchasesForWeek()
-  const { data: listItems = [] } = useListItems(isoWeek)
+  const { data: listItems = [] } = useListItems()
   const { mutate: updateBudget } = useUpdateWeekBudget(isoWeek)
 
   const summary = budget

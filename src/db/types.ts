@@ -37,10 +37,12 @@ export interface WeekBudget {
   buoniValueCents: number
 }
 
-/** Voce della lista della spesa per una settimana. */
+/**
+ * Voce della lista della spesa. La lista è unica e globale (non più legata a una
+ * settimana): si svuota al termine di ogni spesa.
+ */
 export interface ListItem {
   id?: number
-  isoWeek: string
   itemId: number
   quantity: number
   addedAt: number // timestamp ms
@@ -55,6 +57,12 @@ export interface Session {
   startedAt: number
   /** Timestamp fine sessione (null se in corso). */
   finishedAt: number | null
+  /**
+   * Importo confermato a fine spesa, in centesimi. null finché non confermato.
+   * Quando valorizzato è autoritativo per il recap (il totale calcolato dagli
+   * acquisti resta come dettaglio).
+   */
+  confirmedTotalCents: number | null
 }
 
 /** Acquisto singolo all'interno di una sessione. */

@@ -4,6 +4,7 @@ import { currentISOWeek } from '../lib/date'
 import { formatCentsPlain } from '../lib/money'
 import { useListItems, useAddNewItemToList } from '../hooks/useListItems'
 import { useCategories } from '../hooks/useItems'
+import { qk } from '../db/queryKeys'
 import { db } from '../db/db'
 import { useQuery } from '@tanstack/react-query'
 
@@ -11,7 +12,7 @@ const isoWeek = currentISOWeek()
 
 function usePurchasesForWeek() {
   return useQuery({
-    queryKey: ['purchasesForWeek', isoWeek],
+    queryKey: qk.purchasesForWeek(isoWeek),
     queryFn: async () => {
       const sessions = await db.sessions.where('isoWeek').equals(isoWeek).toArray()
       if (!sessions.length) return []
@@ -27,11 +28,11 @@ export function ListaScreen() {
   const [addInput, setAddInput] = useState('')
   const inputRef = useRef<HTMLInputElement>(null)
 
-  const { data: listItems = [] } = useListItems(isoWeek)
+  const { data: listItems = [] } = useListItems()
   const { data: categories = [] } = useCategories()
   const { data: purchases = [] } = usePurchasesForWeek()
 
-  const addNewItem = useAddNewItemToList(isoWeek, categories.find((c) => c.name === 'Altro')?.id ?? 0)
+  const addNewItem = useAddNewItemToList(categories.find((c) => c.name === 'Altro')?.id ?? 0)
 
   const purchasedItemIds = new Set(purchases.map((p) => p.itemId))
 

@@ -38,6 +38,25 @@ class SpesaDb extends Dexie {
     this.version(2).stores({
       mealPlans: '++id, isoWeek, [isoWeek+dayIndex+mealType]',
     })
+
+    // v3: la lista diventa globale (rimosso isoWeek da listItems); le sessioni
+    // guadagnano confirmedTotalCents. weekBudgets/mealPlans restano invariati.
+    this.version(3)
+      .stores({
+        listItems: '++id, itemId',
+        sessions: '++id, isoWeek, supermarketId, startedAt',
+      })
+      .upgrade(async (tx) => {
+        // Le voci di lista sono effimere (si svuotano a ogni spesa): si azzerano.
+        await tx.table('listItems').clear()
+        // Backfill esplicito così il tipo number|null resta veritiero.
+        await tx
+          .table('sessions')
+          .toCollection()
+          .modify((s: { confirmedTotalCents?: number | null }) => {
+            s.confirmedTotalCents = null
+          })
+      })
   }
 }
 

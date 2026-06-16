@@ -5,6 +5,7 @@ import { computeBudgetSummary } from '../lib/budgetSelectors'
 import { useWeekBudget, useSessionsByWeek } from '../hooks/useShopping'
 import { useListItems } from '../hooks/useListItems'
 import { useMealPlan } from '../hooks/useMealPlan'
+import { qk } from '../db/queryKeys'
 import { db } from '../db/db'
 import { useQuery } from '@tanstack/react-query'
 
@@ -12,7 +13,7 @@ const isoWeek = currentISOWeek()
 
 function usePurchasesForWeek(isoWeek: string) {
   return useQuery({
-    queryKey: ['purchasesForWeek', isoWeek],
+    queryKey: qk.purchasesForWeek(isoWeek),
     queryFn: async () => {
       const sessions = await db.sessions.where('isoWeek').equals(isoWeek).toArray()
       const sessionIds = sessions.map((s) => s.id as number)
@@ -29,7 +30,7 @@ export function HomeScreen() {
   const { data: budget } = useWeekBudget(isoWeek)
   const { data: sessions = [] } = useSessionsByWeek(isoWeek)
   const { data: purchases = [] } = usePurchasesForWeek(isoWeek)
-  const { data: listItems = [] } = useListItems(isoWeek)
+  const { data: listItems = [] } = useListItems()
   const { data: mealDays = [] } = useMealPlan(isoWeek)
   const mealCount = mealDays.reduce((n, d) => n + (d.pranzo ? 1 : 0) + (d.cena ? 1 : 0), 0)
 
