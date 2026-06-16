@@ -53,7 +53,7 @@ invece una floating bottom bar fissa che apre un bottom sheet di riepilogo setti
 
 ### Fase 0 — Fondamenta
 1. ✅ Scaffold Vite + React + TS + TanStack Router + Tailwind + lint
-2. Setup PWA con vite-plugin-pwa (manifest, app shell offline)
+2. ✅ Setup PWA con vite-plugin-pwa (manifest, app shell offline)
 3. Utility: importi in centesimi, helper data e ISO week
 4. Database Dexie: schema, tipi entità, seed categorie
 
@@ -79,4 +79,4 @@ invece una floating bottom bar fissa che apre un bottom sheet di riepilogo setti
 19. Supermercati
 
 ### Fase 4 — Rifinitura
-20. Polish PWA (icone, splash, install prompt, verifica offline)
+20. ✅ Polish PWA (icone, splash, install prompt, verifica offline)
