@@ -48,6 +48,23 @@ export function weekRange(isoWeek: string): { monday: Date; sunday: Date } {
   return { monday, sunday }
 }
 
+/**
+ * Sposta una settimana ISO di `delta` settimane (negativo = indietro).
+ * Calcolo interamente in UTC per evitare scivolamenti di fuso, gestisce i confini d'anno.
+ */
+export function shiftISOWeek(isoWeek: string, delta: number): string {
+  const { monday } = weekRange(isoWeek)
+  const d = new Date(monday)
+  d.setUTCDate(d.getUTCDate() + delta * 7)
+  // Ricalcola la settimana ISO (giovedì della settimana = anno ISO di riferimento).
+  const thursday = new Date(d)
+  thursday.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7))
+  const year = thursday.getUTCFullYear()
+  const yearStart = new Date(Date.UTC(year, 0, 1))
+  const week = Math.ceil(((thursday.getTime() - yearStart.getTime()) / 86_400_000 + 1) / 7)
+  return `${year}-W${String(week).padStart(2, '0')}`
+}
+
 const DAY_NAMES_SHORT = ['Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab', 'Dom'] as const
 const DAY_NAMES_FULL = [
   'Lunedì',

@@ -259,6 +259,7 @@ function BudgetSheetPanel({
       <div className="bg-[#F6F6F4] rounded-[18px] overflow-hidden">
         <Link
           to="/pasti"
+          search={{ week: isoWeek }}
           onClick={onClose}
           className="flex items-center justify-between px-[18px] py-4 border-b border-[#E6E6E2] active:opacity-50"
         >
