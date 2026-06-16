@@ -4,10 +4,17 @@ import { currentISOWeek } from '../lib/date'
 import { formatCentsPlain } from '../lib/money'
 import { useListItems, useAddNewItemToList } from '../hooks/useListItems'
 import { useSessionsByWeek } from '../hooks/useShopping'
-import { useCategories } from '../hooks/useItems'
+import { useCategories, useItems } from '../hooks/useItems'
+import { normalizeName } from '../lib/normalize'
+import { BASE_ITEMS } from '../lib/baseItems'
 import { qk } from '../db/queryKeys'
 import { db } from '../db/db'
 import { useQuery } from '@tanstack/react-query'
+
+interface Suggestion {
+  name: string
+  categoryId: number
+}
 
 const isoWeek = currentISOWeek()
 
@@ -31,10 +38,12 @@ export function ListaScreen() {
 
   const { data: listItems = [] } = useListItems()
   const { data: categories = [] } = useCategories()
+  const { data: items = [] } = useItems()
   const { data: purchases = [] } = usePurchasesForWeek()
   const { data: sessions = [] } = useSessionsByWeek(isoWeek)
 
-  const addNewItem = useAddNewItemToList(categories.find((c) => c.name === 'Altro')?.id ?? 0)
+  const altroId = categories.find((c) => c.name === 'Altro')?.id ?? 0
+  const addNewItem = useAddNewItemToList(altroId)
 
   // "Preso" solo per gli acquisti della spesa in corso (sessione non finita): senza
   // questa restrizione un item già comprato prima in settimana risulterebbe subito preso,
@@ -70,17 +79,58 @@ export function ListaScreen() {
     grouped.push({ cat: { id: 0, name: 'Altro', sortOrder: 99 }, items: otherItems })
   }
 
-  const handleAdd = () => {
-    const name = addInput.trim()
-    if (!name) return
-    addNewItem.mutate({ name })
-    setAddInput('')
+  // Pool autocomplete: articoli base predefiniti + già usati, deduplicati per nome
+  // normalizzato. Gli item esistenti sovrascrivono i base (mantengono la loro categoria).
+  const catIdByName = new Map(categories.map((c) => [c.name, c.id ?? 0]))
+  const pool = new Map<string, Suggestion>()
+  for (const b of BASE_ITEMS) {
+    pool.set(normalizeName(b.name), {
+      name: b.name,
+      categoryId: catIdByName.get(b.category) ?? altroId,
+    })
+  }
+  for (const it of items) {
+    pool.set(normalizeName(it.name), { name: it.name, categoryId: it.categoryId })
   }
 
-  // Suggestions from existing items not in list
-  const SUGGESTIONS = ['Caffè', 'Tonno', 'Biscotti', 'Detersivo', 'Carta igienica']
-  const listItemNames = new Set(listItems.map((li) => li.itemName.toLowerCase()))
-  const suggestions = SUGGESTIONS.filter((s) => !listItemNames.has(s.toLowerCase()))
+  const inListNorm = new Set(listItems.map((li) => normalizeName(li.itemName)))
+  const query = normalizeName(addInput)
+
+  // Match per l'autocomplete (input non vuoto): prima chi inizia col testo, poi alfabetico.
+  const matches: Suggestion[] = query
+    ? Array.from(pool.values())
+        .filter((p) => {
+          const n = normalizeName(p.name)
+          return !inListNorm.has(n) && n.includes(query)
+        })
+        .sort((a, b) => {
+          const an = normalizeName(a.name)
+          const bn = normalizeName(b.name)
+          const aStarts = an.startsWith(query) ? 0 : 1
+          const bStarts = bn.startsWith(query) ? 0 : 1
+          if (aStarts !== bStarts) return aStarts - bStarts
+          return an.localeCompare(bn)
+        })
+        .slice(0, 8)
+    : []
+
+  // Chip rapide quando l'input è vuoto: qualche suggerimento non ancora in lista.
+  const quick: Suggestion[] = addInput
+    ? []
+    : Array.from(pool.values())
+        .filter((p) => !inListNorm.has(normalizeName(p.name)))
+        .slice(0, 6)
+
+  const exactInPool = pool.has(query)
+
+  const handleAdd = (name?: string, categoryId?: number) => {
+    const finalName = (name ?? addInput).trim()
+    if (!finalName) return
+    const match = categoryId === undefined ? pool.get(normalizeName(finalName)) : undefined
+    addNewItem.mutate({ name: finalName, categoryId: categoryId ?? match?.categoryId })
+    setAddInput('')
+    inputRef.current?.focus()
+  }
 
   return (
     <div className="flex-1 overflow-y-auto px-5 pb-[120px]">
@@ -104,16 +154,43 @@ export function ListaScreen() {
         />
       </div>
 
-      {/* Suggestions */}
-      {suggestions.length > 0 && (
-        <div className="flex gap-2 overflow-x-auto pb-4 -mx-5 px-5">
-          {suggestions.map((s) => (
+      {/* Autocomplete (input non vuoto) */}
+      {addInput.trim() && (
+        <div className="bg-white rounded-2xl overflow-hidden mb-3 divide-y divide-[#ECECEC] shadow-[0_2px_12px_rgba(0,0,0,.05)]">
+          {matches.map((p) => (
             <button
-              key={s}
-              onClick={() => addNewItem.mutate({ name: s })}
+              key={p.name}
+              onClick={() => handleAdd(p.name, p.categoryId)}
+              className="w-full flex items-center justify-between px-[18px] py-[13px] text-left active:bg-[#F6F6F4]"
+            >
+              <span className="text-base text-[#2A2A2C]">{p.name}</span>
+              <span className="text-[12px] text-[#9B9B9F]">{catMap[p.categoryId] ?? 'Altro'}</span>
+            </button>
+          ))}
+          {!exactInPool && (
+            <button
+              onClick={() => handleAdd()}
+              className="w-full flex items-center justify-between px-[18px] py-[13px] text-left active:bg-[#F6F6F4]"
+            >
+              <span className="text-base text-[#2A2A2C]">Aggiungi “{addInput.trim()}”</span>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9B9B9F" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 5v14M5 12h14" />
+              </svg>
+            </button>
+          )}
+        </div>
+      )}
+
+      {/* Suggerimenti rapidi (input vuoto) */}
+      {quick.length > 0 && (
+        <div className="flex gap-2 overflow-x-auto pb-4 -mx-5 px-5">
+          {quick.map((p) => (
+            <button
+              key={p.name}
+              onClick={() => handleAdd(p.name, p.categoryId)}
               className="flex-none px-[14px] py-2 bg-white border border-[#ECECEC] rounded-full text-sm text-[#5A5A5E] active:bg-[#F0F0EE]"
             >
-              {s}
+              {p.name}
             </button>
           ))}
         </div>
