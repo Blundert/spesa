@@ -14,8 +14,10 @@ if (!rootEl) throw new Error('Root element not found')
 createRoot(rootEl).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
-      <RouterProvider router={router} />
-      <InstallPrompt />
+      <div data-vaul-drawer-wrapper style={{ height: '100dvh', width: '100%', maxWidth: '430px', overflow: 'hidden', background: '#F2F2F0', position: 'relative' }}>
+        <RouterProvider router={router} />
+        <InstallPrompt />
+      </div>
       <Toaster
         position="bottom-center"
         offset={108}
@@ -32,3 +34,4 @@ createRoot(rootEl).render(
     </QueryClientProvider>
   </StrictMode>,
 )
+

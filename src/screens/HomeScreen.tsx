@@ -3,10 +3,8 @@ import { Link } from '@tanstack/react-router'
 import { currentISOWeek, formatWeekLabel } from '../lib/date'
 import { formatCentsPlain } from '../lib/money'
 import { computeBudgetSummary } from '../lib/budgetSelectors'
-import { useWeekBudget, useSessionsByWeek, useUpdateWeekBudget } from '../hooks/useShopping'
+import { useWeekBudget, useSessionsByWeek } from '../hooks/useShopping'
 import { useListItems } from '../hooks/useListItems'
-import { BottomSheet } from '../components/BottomSheet'
-import { AppLayout } from '../components/AppLayout'
 import { db } from '../db/db'
 import { useQuery } from '@tanstack/react-query'
 
@@ -28,7 +26,6 @@ function usePurchasesForWeek(isoWeek: string) {
 }
 
 export function HomeScreen() {
-  const [sheetOpen, setSheetOpen] = useState(false)
   const { data: budget } = useWeekBudget(isoWeek)
   const { data: sessions = [] } = useSessionsByWeek(isoWeek)
   const { data: purchases = [] } = usePurchasesForWeek(isoWeek)
@@ -45,24 +42,10 @@ export function HomeScreen() {
   const totalCount = listItems.length
 
   return (
-    <AppLayout
-      showBottomBar
-      bottomBar={{
-        remainingCents: Math.abs(summary.remainingCents),
-        isOver: summary.isOver,
-        spentCents: summary.spentCents,
-        takenCount,
-        totalCount,
-        onOpenSheet: () => setSheetOpen(true),
-      }}
-    >
-      {/* Status bar area */}
-      <div className="h-[54px] flex-none" />
-
-      {/* Scroll content */}
-      <div className="flex-1 overflow-y-auto px-5 pb-[120px]">
+    <div className="flex-1 overflow-y-auto px-5 pb-[120px]">
         {/* Header */}
-        <div className="flex items-baseline justify-between px-1 py-[10px] pb-7">
+        <div className="px-1 py-[10px] pb-7">
+          <div className="text-[13px] text-[#9B9B9F] mb-1 tabular-nums">{formatWeekLabel(isoWeek)}</div>
           <span className="text-[26px] font-normal tracking-[-0.5px] text-[#2A2A2C]">
             La mia settimana
           </span>
@@ -166,22 +149,7 @@ export function HomeScreen() {
           </svg>
           Inizia la spesa
         </Link>
-      </div>
-
-      {/* Week label overlay in menu button area */}
-      <div className="absolute top-[66px] left-5 z-[29] text-[14px] text-[#9B9B9F] tabular-nums">
-        {formatWeekLabel(isoWeek)}
-      </div>
-
-      {/* Budget sheet */}
-      <BudgetSheet
-        open={sheetOpen}
-        onClose={() => setSheetOpen(false)}
-        isoWeek={isoWeek}
-        takenCount={takenCount}
-        totalCount={totalCount}
-      />
-    </AppLayout>
+    </div>
   )
 }
 
@@ -189,130 +157,6 @@ function ChevronRight() {
   return (
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#C5C5C9" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <path d="M9 6l6 6-6 6" />
-    </svg>
-  )
-}
-
-function BudgetSheet({
-  open,
-  onClose,
-  isoWeek,
-  takenCount,
-  totalCount,
-}: {
-  open: boolean
-  onClose: () => void
-  isoWeek: string
-  takenCount: number
-  totalCount: number
-}) {
-  const { data: budget, isLoading } = useWeekBudget(isoWeek)
-  const { mutate: updateBudget } = useUpdateWeekBudget(isoWeek)
-
-  if (isLoading || !budget) return null
-
-  const totalCents = budget.buoniCount * budget.buoniValueCents
-
-  return (
-    <BottomSheet open={open} onClose={onClose}>
-      <div className="text-[12px] font-normal tracking-[1.4px] text-[#9B9B9F] uppercase px-0.5 pb-[14px]">
-        Questa settimana
-      </div>
-      <div className="bg-[#F6F6F4] rounded-[18px] px-4 mb-[14px]">
-        <div className="flex items-center justify-between py-[14px] border-b border-[#E6E6E2]">
-          <span className="text-base text-[#2A2A2C]">Buoni pasto</span>
-          <div className="flex items-center gap-4">
-            <StepperBtn onClick={() => updateBudget({ buoniCount: Math.max(1, budget.buoniCount - 1), buoniValueCents: budget.buoniValueCents })}>
-              <MinusIcon />
-            </StepperBtn>
-            <span className="text-[18px] font-normal text-[#2A2A2C] min-w-[20px] text-center tabular-nums">
-              {budget.buoniCount}
-            </span>
-            <StepperBtn onClick={() => updateBudget({ buoniCount: Math.min(20, budget.buoniCount + 1), buoniValueCents: budget.buoniValueCents })}>
-              <PlusIcon />
-            </StepperBtn>
-          </div>
-        </div>
-        <div className="flex items-center justify-between py-[14px]">
-          <span className="text-base text-[#2A2A2C]">Valore unitario</span>
-          <div className="flex items-center gap-4">
-            <StepperBtn onClick={() => updateBudget({ buoniCount: budget.buoniCount, buoniValueCents: Math.max(50, budget.buoniValueCents - 50) })}>
-              <MinusIcon />
-            </StepperBtn>
-            <span className="text-[18px] font-normal text-[#2A2A2C] min-w-[54px] text-center tabular-nums">
-              €{formatCentsPlain(budget.buoniValueCents)}
-            </span>
-            <StepperBtn onClick={() => updateBudget({ buoniCount: budget.buoniCount, buoniValueCents: budget.buoniValueCents + 50 })}>
-              <PlusIcon />
-            </StepperBtn>
-          </div>
-        </div>
-      </div>
-      <div className="flex items-baseline justify-between px-1.5 pb-[18px]">
-        <span className="text-sm text-[#9B9B9F]">Budget totale</span>
-        <span className="text-2xl font-normal text-[#2A2A2C] tracking-[-0.5px] tabular-nums">
-          €{formatCentsPlain(totalCents)}
-        </span>
-      </div>
-      <Link
-        to="/spesa"
-        onClick={onClose}
-        className="w-full bg-[#2A2A2C] text-white text-[17px] font-normal py-[17px] rounded-[18px] flex items-center justify-center gap-2 mb-[14px] active:scale-[.98] transition-transform"
-      >
-        Inizia la spesa
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M5 12h14M13 6l6 6-6 6" />
-        </svg>
-      </Link>
-      <div className="bg-[#F6F6F4] rounded-[18px] overflow-hidden">
-        <Link
-          to="/pasti"
-          onClick={onClose}
-          className="flex items-center justify-between px-[18px] py-4 border-b border-[#E6E6E2] active:opacity-50"
-        >
-          <span className="text-base text-[#2A2A2C]">Pianifica i pasti</span>
-          <ChevronRight />
-        </Link>
-        <Link
-          to="/lista"
-          onClick={onClose}
-          className="flex items-center justify-between px-[18px] py-4 active:opacity-50"
-        >
-          <span className="text-base text-[#2A2A2C]">Lista della spesa</span>
-          <span className="flex items-center gap-2">
-            <span className="text-sm text-[#9B9B9F] tabular-nums">{takenCount}/{totalCount}</span>
-            <ChevronRight />
-          </span>
-        </Link>
-      </div>
-    </BottomSheet>
-  )
-}
-
-
-function StepperBtn({ children, onClick }: { children: React.ReactNode; onClick: () => void }) {
-  return (
-    <button
-      onClick={onClick}
-      className="w-8 h-8 rounded-full bg-white flex items-center justify-center shadow-[0_1px_3px_rgba(0,0,0,.08)] active:opacity-50"
-    >
-      {children}
-    </button>
-  )
-}
-
-function MinusIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2A2A2C" strokeWidth="2.4" strokeLinecap="round">
-      <path d="M5 12h14" />
-    </svg>
-  )
-}
-
-function PlusIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2A2A2C" strokeWidth="2.4" strokeLinecap="round">
-      <path d="M12 5v14M5 12h14" />
     </svg>
   )
 }
