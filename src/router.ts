@@ -7,6 +7,7 @@ import { ListaScreen } from './screens/ListaScreen'
 import { StoricoScreen } from './screens/StoricoScreen'
 import { SupermercatiScreen } from './screens/SupermercatiScreen'
 import { PastiScreen } from './screens/PastiScreen'
+import { PianificazioniScreen } from './screens/PianificazioniScreen'
 import { SessioneScreen } from './screens/SessioneScreen'
 import { ItemDetailScreen } from './screens/ItemDetailScreen'
 
@@ -60,6 +61,12 @@ const pastiRoute = createRoute({
   }),
 })
 
+const pianificazioniRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/pasti/storico',
+  component: PianificazioniScreen,
+})
+
 const sessioneRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/storico/$sessionId',
@@ -76,6 +83,7 @@ const routeTree = rootRoute.addChildren([
   shellRoute.addChildren([homeRoute, listaRoute, storicoRoute, supermercatiRoute]),
   spesaRoute,
   pastiRoute,
+  pianificazioniRoute,
   sessioneRoute,
   itemDetailRoute,
 ])

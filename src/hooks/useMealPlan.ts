@@ -1,12 +1,24 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { qk } from '../db/queryKeys'
-import { getMealPlan, upsertMealPlan, clearMealPlan } from '../db/repositories/mealPlan'
+import {
+  getMealPlan,
+  upsertMealPlan,
+  clearMealPlan,
+  getPlannedWeeks,
+} from '../db/repositories/mealPlan'
 import type { MealType } from '../db/types'
 
 export function useMealPlan(isoWeek: string) {
   return useQuery({
     queryKey: qk.mealPlan(isoWeek),
     queryFn: () => getMealPlan(isoWeek),
+  })
+}
+
+export function usePlannedWeeks() {
+  return useQuery({
+    queryKey: qk.plannedWeeks(),
+    queryFn: () => getPlannedWeeks(),
   })
 }
 
@@ -24,6 +36,7 @@ export function useUpdateMealSlot(isoWeek: string) {
     }) => upsertMealPlan(isoWeek, dayIndex, mealType, dish),
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: qk.mealPlan(isoWeek) })
+      void qc.invalidateQueries({ queryKey: qk.plannedWeeks() })
     },
   })
 }
@@ -34,6 +47,7 @@ export function useClearMealPlan(isoWeek: string) {
     mutationFn: () => clearMealPlan(isoWeek),
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: qk.mealPlan(isoWeek) })
+      void qc.invalidateQueries({ queryKey: qk.plannedWeeks() })
     },
   })
 }

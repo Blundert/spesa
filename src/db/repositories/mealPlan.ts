@@ -66,3 +66,23 @@ export async function getMealDishes(isoWeek: string): Promise<string[]> {
   const rows = await db.mealPlans.where('isoWeek').equals(isoWeek).toArray()
   return rows.map((r) => r.dish).filter(Boolean)
 }
+
+export interface PlannedWeek {
+  isoWeek: string
+  mealCount: number
+}
+
+/**
+ * Elenco delle settimane che hanno almeno un pasto pianificato, con il numero di pasti,
+ * ordinate dalla più recente. Volumi piccoli (app personale) → riduzione in JS.
+ */
+export async function getPlannedWeeks(): Promise<PlannedWeek[]> {
+  const rows = await db.mealPlans.toArray()
+  const counts = new Map<string, number>()
+  for (const r of rows) {
+    counts.set(r.isoWeek, (counts.get(r.isoWeek) ?? 0) + 1)
+  }
+  return Array.from(counts, ([isoWeek, mealCount]) => ({ isoWeek, mealCount })).sort((a, b) =>
+    b.isoWeek.localeCompare(a.isoWeek),
+  )
+}
