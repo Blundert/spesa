@@ -43,7 +43,14 @@ export function AppShell() {
     ? computeBudgetSummary(budget, sessions, purchases)
     : { totalCents: 0, spentCents: 0, remainingCents: 0, outOfPocketCents: 0, isOver: false }
 
-  const takenCount = listItems.filter((li) => purchases.some((p) => p.itemId === li.itemId)).length
+  // "Presi": solo gli acquisti della spesa in corso (sessione non ancora finita).
+  const activeSession = sessions.find((s) => s.finishedAt === null)
+  const activeItemIds = new Set(
+    activeSession
+      ? purchases.filter((p) => p.sessionId === activeSession.id).map((p) => p.itemId)
+      : [],
+  )
+  const takenCount = listItems.filter((li) => activeItemIds.has(li.itemId)).length
   const totalCount = listItems.length
 
   const handleNavShopGo = () => {
