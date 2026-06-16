@@ -1,5 +1,8 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { useNavigate } from '@tanstack/react-router'
+import { useQueryClient } from '@tanstack/react-query'
+import { db } from '../db/db'
+import { qk } from '../db/queryKeys'
 import { toast } from 'sonner'
 import { currentISOWeek } from '../lib/date'
 import { formatCentsPlain } from '../lib/money'
@@ -13,7 +16,7 @@ import {
   useAddPurchase,
 } from '../hooks/useShopping'
 import { useListItems } from '../hooks/useListItems'
-import { useSupermarkets } from '../hooks/useItems'
+import { useSupermarkets, useCategories } from '../hooks/useItems'
 import { PriceKeypad } from '../components/PriceKeypad'
 import { BottomSheet } from '../components/BottomSheet'
 
@@ -32,6 +35,8 @@ export function SpesaScreen() {
   const { data: sessions = [] } = useSessionsByWeek(isoWeek)
   const { data: supermarkets = [] } = useSupermarkets()
   const { data: listItems = [] } = useListItems(isoWeek)
+  const { data: categories = [] } = useCategories()
+  const catMap = Object.fromEntries(categories.map((c) => [c.id ?? 0, c.name]))
 
   // Usa la sessione più recente non finita, o quella attiva manualmente
   const activeSession =
@@ -44,6 +49,7 @@ export function SpesaScreen() {
   const createSession = useCreateSession(isoWeek)
   const finishSession = useFinishSession(isoWeek)
   const addPurchase = useAddPurchase(isoWeek)
+  const qc = useQueryClient()
 
   const summary = budget
     ? computeLiveBudgetSummary(budget, purchases)
@@ -52,6 +58,13 @@ export function SpesaScreen() {
   const supermarketName = activeSession
     ? (supermarkets.find((s) => s.id === activeSession.supermarketId)?.name ?? '?')
     : '—'
+
+  // Auto-open store picker if active session has no valid supermarket
+  useEffect(() => {
+    if (activeSession && supermarketName === '?' && supermarkets.length > 0) {
+      setShowStorePicker(true)
+    }
+  }, [activeSession, supermarketName, supermarkets.length])
 
   const handleStartSession = useCallback(
     async (supermarketId: number) => {
@@ -92,6 +105,19 @@ export function SpesaScreen() {
       }
     },
     [activeSession, priceTarget, newItemTarget, addPurchase, summary.remainingCents],
+  )
+
+  const handleChangeStore = useCallback(
+    async (supermarketId: number) => {
+      if (!activeSession?.id) {
+        await handleStartSession(supermarketId)
+        return
+      }
+      await db.sessions.update(activeSession.id, { supermarketId })
+      void qc.invalidateQueries({ queryKey: qk.sessions(isoWeek) })
+      setShowStorePicker(false)
+    },
+    [activeSession, handleStartSession, qc],
   )
 
   const handleFinish = useCallback(async () => {
@@ -209,7 +235,7 @@ export function SpesaScreen() {
         {Object.entries(todoByCategory).map(([_catId, items]) => (
           <div key={_catId} className="mb-4">
             <div className="text-[12px] font-normal tracking-[1.2px] text-[#9B9B9F] uppercase px-1.5 pb-[13px]">
-              {items[0]?.itemCategoryId ? getCatName(items[0].itemCategoryId) : 'Altro'}
+              {catMap[items[0]?.itemCategoryId ?? 0] ?? 'Altro'}
             </div>
             <div className="bg-white rounded-[20px] overflow-hidden">
               {items.map((li, i) => (
@@ -281,7 +307,7 @@ export function SpesaScreen() {
         onClose={() => setShowStorePicker(false)}
         supermarkets={supermarkets}
         currentId={activeSession.supermarketId}
-        onPick={handleStartSession}
+        onPick={handleChangeStore}
       />
 
       {/* Price keypad — da lista */}
@@ -333,11 +359,6 @@ export function SpesaScreen() {
   )
 }
 
-// ── Helpers ──────────────────────────────────────────────────────────────────
-
-function getCatName(_id: number): string {
-  return 'Altro'
-}
 
 interface StorePickerSheetProps {
   open: boolean
