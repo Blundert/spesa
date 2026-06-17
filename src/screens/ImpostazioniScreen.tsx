@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
+import type { PWAInstallElement } from '@khmyznikov/pwa-install'
 import { LANG_KEY, type Lang } from '../i18n'
 import { wipeAllData } from '../db/db'
 import { BottomSheet } from '../components/BottomSheet'
@@ -27,6 +28,10 @@ export function ImpostazioniScreen() {
     qc.clear()
     setShowWipe(false)
     toast(t('settings.cleared'))
+  }
+
+  const handleInstall = () => {
+    document.querySelector<PWAInstallElement>('pwa-install')?.showDialog(true)
   }
 
   return (
@@ -59,6 +64,17 @@ export function ImpostazioniScreen() {
             </button>
           ))}
         </div>
+
+        {/* Installa */}
+        <button
+          onClick={handleInstall}
+          className="w-full flex items-center justify-between bg-white rounded-[20px] px-5 py-[17px] mb-7 active:bg-[#F6F6F4] transition-colors text-left"
+        >
+          <span className="text-base text-[#2A2A2C]">{t('install.title')}</span>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9B9B9F" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M12 3v13M8 12l4 4 4-4M5 19h14" />
+          </svg>
+        </button>
 
         {/* Versione */}
         <div className="bg-white rounded-[20px] px-5 py-[17px] flex items-center justify-between mb-7">
