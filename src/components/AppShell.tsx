@@ -65,15 +65,15 @@ export function AppShell() {
         {/* Screen content */}
         <Outlet />
 
-        {/* Footer fisso: riepilogo + menu. Sempre ancorato in basso, a tutta larghezza,
-            piatto (niente ombre/aloni, una sola superficie); il contenuto scorre SOTTO. */}
+        {/* Barra in basso: arrotondata e piatta (niente ombre), fissa; il contenuto scorre SOTTO.
+            Riepilogo a sinistra, menu a cerchio scuro a destra. */}
         <div
-          className="absolute left-0 right-0 bottom-0 z-[20] flex items-stretch bg-white border-t border-[#ECECEC]"
-          style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
+          className="absolute left-0 right-0 z-[20] flex items-stretch gap-2.5 px-[18px]"
+          style={{ bottom: 'calc(18px + env(safe-area-inset-bottom))' }}
         >
           <button
             onClick={() => setSheetOpen(true)}
-            className="flex-1 flex items-center justify-between px-5 py-3 active:bg-[#F6F6F4] transition-colors text-left"
+            className="flex-1 bg-white rounded-3xl px-5 py-3 flex items-center justify-between active:scale-[.99] transition-transform text-left"
           >
             <div>
               <div className="flex items-baseline text-[#2A2A2C]">
@@ -94,9 +94,9 @@ export function AppShell() {
           <button
             onClick={() => setMenuOpen(true)}
             aria-label={t('nav.openMenu')}
-            className="flex-none w-[64px] flex items-center justify-center border-l border-[#ECECEC] active:bg-[#F6F6F4] transition-colors"
+            className="flex-none self-center w-14 h-14 rounded-full bg-[#2A2A2C] flex items-center justify-center active:scale-[.95] transition-transform"
           >
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2A2A2C" strokeWidth="2" strokeLinecap="round">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round">
               <path d="M4 7h16M4 12h16M4 17h16" />
             </svg>
           </button>
