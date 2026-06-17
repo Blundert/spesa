@@ -68,7 +68,7 @@ export function AppShell() {
         {/* Barra in basso fissa: pill riepilogo + cerchio menu su sfondo pieno, con sfumatura
             in cima così il contenuto sfuma e sparisce pulito dietro (niente bordi che sbucano). */}
         <div className="absolute left-0 right-0 bottom-0 z-[20] pointer-events-none">
-          <div className="h-7 bg-gradient-to-t from-[#F2F2F0] to-transparent" />
+          <div className="h-4 bg-gradient-to-t from-[#F2F2F0] to-transparent" />
           <div
             className="pointer-events-auto bg-[#F2F2F0] px-[18px] pt-2 flex items-stretch gap-2.5"
             style={{ paddingBottom: 'calc(18px + env(safe-area-inset-bottom))' }}
