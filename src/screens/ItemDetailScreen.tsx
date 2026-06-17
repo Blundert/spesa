@@ -1,4 +1,5 @@
 import { useNavigate, useParams } from '@tanstack/react-router'
+import { useTranslation } from 'react-i18next'
 import { formatCentsPlain } from '../lib/money'
 import { formatShortDate } from '../lib/date'
 import { useItemPriceHistory, useItemPriceByStore } from '../hooks/usePriceHistory'
@@ -6,6 +7,7 @@ import { useQuery } from '@tanstack/react-query'
 import { db } from '../db/db'
 
 export function ItemDetailScreen() {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const { itemId: itemIdStr } = useParams({ from: '/item/$itemId' })
   const itemId = parseInt(itemIdStr, 10)
@@ -75,7 +77,7 @@ export function ItemDetailScreen() {
         <div className="bg-white rounded-[22px] px-[22px] pt-[22px] pb-2 mb-[14px]">
           <div className="flex items-end justify-between">
             <div>
-              <div className="text-[12px] font-normal tracking-[1px] text-[#9B9B9F] uppercase">Prezzo medio</div>
+              <div className="text-[12px] font-normal tracking-[1px] text-[#9B9B9F] uppercase">{t('item.avgPrice')}</div>
               <div className="flex items-baseline text-[#2A2A2C] mt-1.5">
                 <span className="text-[26px] font-normal text-[#B5B5BA] mr-0.5">€</span>
                 <span className="text-[52px] font-light tracking-[-1px] leading-[.95] tabular-nums">
@@ -84,7 +86,7 @@ export function ItemDetailScreen() {
               </div>
             </div>
             <div className="text-right pb-1.5">
-              <div className="text-[13px] text-[#9B9B9F]">ultimo</div>
+              <div className="text-[13px] text-[#9B9B9F]">{t('item.last')}</div>
               <div className="text-[18px] font-normal text-[#2A2A2C] tabular-nums">
                 {stats ? `€${formatCentsPlain(stats.lastCents)}` : '—'}
               </div>
@@ -104,9 +106,9 @@ export function ItemDetailScreen() {
         {/* Min / Max / Acquisti */}
         <div className="flex gap-2.5 mb-[14px]">
           {[
-            { label: 'MIN', value: stats ? `€${formatCentsPlain(stats.minCents)}` : '—' },
-            { label: 'MAX', value: stats ? `€${formatCentsPlain(stats.maxCents)}` : '—' },
-            { label: 'ACQUISTI', value: String(stats?.buyCount ?? 0) },
+            { label: t('item.min'), value: stats ? `€${formatCentsPlain(stats.minCents)}` : '—' },
+            { label: t('item.max'), value: stats ? `€${formatCentsPlain(stats.maxCents)}` : '—' },
+            { label: t('item.buys'), value: String(stats?.buyCount ?? 0) },
           ].map((s) => (
             <div key={s.label} className="flex-1 bg-white rounded-2xl p-[14px] text-center">
               <div className="text-[11px] text-[#9B9B9F] tracking-[.4px]">{s.label}</div>
@@ -118,7 +120,7 @@ export function ItemDetailScreen() {
         {/* Per store */}
         {byStore.length > 0 && (
           <>
-            <div className="text-[12px] font-normal tracking-[1.2px] text-[#9B9B9F] uppercase px-1 pt-2 pb-2">Per supermercato</div>
+            <div className="text-[12px] font-normal tracking-[1.2px] text-[#9B9B9F] uppercase px-1 pt-2 pb-2">{t('item.byStore')}</div>
             <div className="bg-white rounded-[20px] overflow-hidden mb-[14px]">
               {byStore.map((s, i) => (
                 <div
@@ -147,7 +149,7 @@ export function ItemDetailScreen() {
         {/* Price history */}
         {stats && stats.history.length > 0 && (
           <>
-            <div className="text-[12px] font-normal tracking-[1.2px] text-[#9B9B9F] uppercase px-1 pt-2 pb-2">Storico prezzi</div>
+            <div className="text-[12px] font-normal tracking-[1.2px] text-[#9B9B9F] uppercase px-1 pt-2 pb-2">{t('item.priceHistory')}</div>
             <div className="bg-white rounded-[20px] overflow-hidden">
               {[...stats.history].reverse().map((h, i) => (
                 <div
@@ -169,7 +171,7 @@ export function ItemDetailScreen() {
         )}
 
         {(!stats || stats.history.length === 0) && (
-          <div className="text-center py-10 text-[#9B9B9F] text-sm">Nessun acquisto registrato.</div>
+          <div className="text-center py-10 text-[#9B9B9F] text-sm">{t('item.noPurchases')}</div>
         )}
       </div>
     </div>

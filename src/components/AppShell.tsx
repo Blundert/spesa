@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Outlet, Link, useRouter, useNavigate } from '@tanstack/react-router'
 import { currentISOWeek } from '../lib/date'
 import { formatCentsPlain } from '../lib/money'
@@ -27,6 +28,7 @@ function usePurchasesForWeek() {
 }
 
 export function AppShell() {
+  const { t } = useTranslation()
   const [navOpen, setNavOpen] = useState(false)
   const [sheetOpen, setSheetOpen] = useState(false)
   const router = useRouter()
@@ -63,18 +65,18 @@ export function AppShell() {
       {/* ── SIDE NAV ── */}
       <div className="absolute inset-0 bg-[#F6F6F4] z-[2] flex flex-col items-end px-[26px] pt-[72px] pb-[38px]">
         <nav className="w-[246px] flex flex-col">
-          <NavItem label="Settimana" to="/" active={pathname === '/'} onClick={() => setNavOpen(false)} />
-          <NavItem label="Lista" to="/lista" active={pathname === '/lista'} onClick={() => setNavOpen(false)} className="mt-[2px]" />
+          <NavItem label={t('nav.week')} to="/" active={pathname === '/'} onClick={() => setNavOpen(false)} />
+          <NavItem label={t('nav.list')} to="/lista" active={pathname === '/lista'} onClick={() => setNavOpen(false)} className="mt-[2px]" />
           <div className="h-px bg-[#E1E1DD] mx-[18px] my-[18px]" />
-          <NavItem label="Storico" to="/storico" active={pathname === '/storico'} onClick={() => setNavOpen(false)} />
-          <NavItem label="Supermercati" to="/supermercati" active={pathname === '/supermercati'} onClick={() => setNavOpen(false)} className="mt-[2px]" />
+          <NavItem label={t('nav.history')} to="/storico" active={pathname === '/storico'} onClick={() => setNavOpen(false)} />
+          <NavItem label={t('nav.supermarkets')} to="/supermercati" active={pathname === '/supermercati'} onClick={() => setNavOpen(false)} className="mt-[2px]" />
         </nav>
         <div className="mt-auto w-[246px]">
           <button
             onClick={handleNavShopGo}
             className="w-full bg-[#2A2A2C] text-white text-base py-4 rounded-2xl flex items-center justify-center gap-2 active:scale-[.97] transition-transform"
           >
-            Inizia la spesa
+            {t('nav.startShopping')}
             <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M5 12h14M13 6l6 6-6 6" />
             </svg>
@@ -113,12 +115,12 @@ export function AppShell() {
                 </span>
               </div>
               <div className="text-[11px] text-[#9B9B9F] mt-0.5">
-                {summary.isOver ? 'da pagare a parte' : 'rimanente'}
+                {summary.isOver ? t('budget.toPayExtra') : t('budget.remaining')}
               </div>
             </div>
             <div className="text-right">
-              <div className="text-[13px] text-[#6E6E72] tabular-nums">€{formatCentsPlain(summary.spentCents)} spesi</div>
-              <div className="text-[13px] text-[#9B9B9F] mt-0.5 tabular-nums">{takenCount}/{totalCount} presi</div>
+              <div className="text-[13px] text-[#6E6E72] tabular-nums">€{formatCentsPlain(summary.spentCents)} {t('common.spentWord')}</div>
+              <div className="text-[13px] text-[#9B9B9F] mt-0.5 tabular-nums">{takenCount}/{totalCount} {t('common.takenWord')}</div>
             </div>
           </button>
         </div>
@@ -127,7 +129,7 @@ export function AppShell() {
         <button
           onClick={() => setNavOpen(true)}
           className="absolute top-[64px] right-[20px] z-[30] w-10 h-10 rounded-full bg-[#2A2A2C] flex items-center justify-center shadow-[0_6px_18px_rgba(0,0,0,.22)] active:scale-[.94] transition-transform"
-          aria-label="Apri menu"
+          aria-label={t('nav.openMenu')}
         >
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round">
             <path d="M4 9h16M4 15h16" />
@@ -211,16 +213,17 @@ function BudgetSheetPanel({
   totalCount: number
   onStartShopping: () => void
 }) {
+  const { t } = useTranslation()
   const totalCents = buoniCount * buoniValueCents
 
   return (
     <BottomSheet open={open} onClose={onClose}>
       <div className="text-[12px] font-normal tracking-[1.4px] text-[#9B9B9F] uppercase px-0.5 pb-[14px]">
-        Questa settimana
+        {t('budget.thisWeek')}
       </div>
       <div className="bg-[#F6F6F4] rounded-[18px] px-4 mb-[14px]">
         <div className="flex items-center justify-between py-[14px] border-b border-[#E6E6E2]">
-          <span className="text-base text-[#2A2A2C]">Buoni pasto</span>
+          <span className="text-base text-[#2A2A2C]">{t('budget.buoniPasto')}</span>
           <div className="flex items-center gap-4">
             <StepperBtn onClick={() => onUpdateBuoni(Math.max(1, buoniCount - 1))}>
               <MinusIcon />
@@ -234,7 +237,7 @@ function BudgetSheetPanel({
           </div>
         </div>
         <div className="flex items-center justify-between py-[14px]">
-          <span className="text-base text-[#2A2A2C]">Valore unitario</span>
+          <span className="text-base text-[#2A2A2C]">{t('budget.unitValue')}</span>
           <div className="flex items-center gap-4">
             <StepperBtn onClick={() => onUpdateValue(Math.max(50, buoniValueCents - 50))}>
               <MinusIcon />
@@ -249,7 +252,7 @@ function BudgetSheetPanel({
         </div>
       </div>
       <div className="flex items-baseline justify-between px-1.5 pb-[18px]">
-        <span className="text-sm text-[#9B9B9F]">Budget totale</span>
+        <span className="text-sm text-[#9B9B9F]">{t('budget.total')}</span>
         <span className="text-2xl font-normal text-[#2A2A2C] tracking-[-0.5px] tabular-nums">
           €{formatCentsPlain(totalCents)}
         </span>
@@ -258,7 +261,7 @@ function BudgetSheetPanel({
         onClick={onStartShopping}
         className="w-full bg-[#2A2A2C] text-white text-[17px] font-normal py-[17px] rounded-[18px] flex items-center justify-center gap-2 mb-[14px] active:scale-[.98] transition-transform"
       >
-        Inizia la spesa
+        {t('nav.startShopping')}
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <path d="M5 12h14M13 6l6 6-6 6" />
         </svg>
@@ -270,7 +273,7 @@ function BudgetSheetPanel({
           onClick={onClose}
           className="flex items-center justify-between px-[18px] py-4 border-b border-[#E6E6E2] active:opacity-50"
         >
-          <span className="text-base text-[#2A2A2C]">Pianifica i pasti</span>
+          <span className="text-base text-[#2A2A2C]">{t('home.planMeals')}</span>
           <ChevronRight />
         </Link>
         <Link
@@ -278,7 +281,7 @@ function BudgetSheetPanel({
           onClick={onClose}
           className="flex items-center justify-between px-[18px] py-4 active:opacity-50"
         >
-          <span className="text-base text-[#2A2A2C]">Lista della spesa</span>
+          <span className="text-base text-[#2A2A2C]">{t('home.shoppingList')}</span>
           <span className="flex items-center gap-2">
             <span className="text-sm text-[#9B9B9F] tabular-nums">{takenCount}/{totalCount}</span>
             <ChevronRight />

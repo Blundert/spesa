@@ -1,3 +1,5 @@
+import i18n from '../i18n'
+
 /**
  * Returns the ISO 8601 week number for a given date.
  * Week 1 is the week containing the first Thursday of the year.
@@ -65,42 +67,32 @@ export function shiftISOWeek(isoWeek: string, delta: number): string {
   return `${year}-W${String(week).padStart(2, '0')}`
 }
 
-const DAY_NAMES_SHORT = ['Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab', 'Dom'] as const
-const DAY_NAMES_FULL = [
-  'Lunedì',
-  'Martedì',
-  'Mercoledì',
-  'Giovedì',
-  'Venerdì',
-  'Sabato',
-  'Domenica',
-] as const
-const MONTH_NAMES = [
-  'gen',
-  'feb',
-  'mar',
-  'apr',
-  'mag',
-  'giu',
-  'lug',
-  'ago',
-  'set',
-  'ott',
-  'nov',
-  'dic',
-] as const
+const DAY_NAMES_SHORT = {
+  it: ['Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab', 'Dom'],
+  en: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+} as const
+const DAY_NAMES_FULL = {
+  it: ['Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato', 'Domenica'],
+  en: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+} as const
+const MONTH_NAMES = {
+  it: ['gen', 'feb', 'mar', 'apr', 'mag', 'giu', 'lug', 'ago', 'set', 'ott', 'nov', 'dic'],
+  en: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+} as const
 
-export type DayShort = (typeof DAY_NAMES_SHORT)[number]
-export type DayFull = (typeof DAY_NAMES_FULL)[number]
-
-/** Returns "LUN", "MAR" … "DOM" (3-letter, uppercase) for ISO day index 0=Mon … 6=Sun */
-export function dayShort(dayIndex: number): string {
-  return DAY_NAMES_SHORT[dayIndex] ?? ''
+/** Lingua attiva per la formattazione date (segue i18n). */
+function lang(): 'it' | 'en' {
+  return i18n.language?.startsWith('en') ? 'en' : 'it'
 }
 
-/** Returns "Lunedì", "Martedì" … for ISO day index 0=Mon … 6=Sun */
+/** Returns "Lun", "Mar" … for ISO day index 0=Mon … 6=Sun (lingua attiva) */
+export function dayShort(dayIndex: number): string {
+  return DAY_NAMES_SHORT[lang()][dayIndex] ?? ''
+}
+
+/** Returns "Lunedì", "Martedì" … for ISO day index 0=Mon … 6=Sun (lingua attiva) */
 export function dayFull(dayIndex: number): string {
-  return DAY_NAMES_FULL[dayIndex] ?? ''
+  return DAY_NAMES_FULL[lang()][dayIndex] ?? ''
 }
 
 /**
@@ -110,7 +102,7 @@ export function formatWeekLabel(isoWeek: string): string {
   const { monday, sunday } = weekRange(isoWeek)
   const d1 = monday.getUTCDate()
   const d2 = sunday.getUTCDate()
-  const month = MONTH_NAMES[sunday.getUTCMonth()]
+  const month = MONTH_NAMES[lang()][sunday.getUTCMonth()]
   return `${d1} – ${d2} ${month}`
 }
 
@@ -119,7 +111,7 @@ export function formatWeekLabel(isoWeek: string): string {
  */
 export function formatShortDate(ts: number): string {
   const d = new Date(ts)
-  return `${d.getDate()} ${MONTH_NAMES[d.getMonth()]}`
+  return `${d.getDate()} ${MONTH_NAMES[lang()][d.getMonth()]}`
 }
 
 /**
@@ -128,5 +120,5 @@ export function formatShortDate(ts: number): string {
 export function formatLongDate(ts: number): string {
   const d = new Date(ts)
   const dayIdx = (d.getDay() + 6) % 7 // convert Sun=0 to Mon=0
-  return `${DAY_NAMES_SHORT[dayIdx].toLowerCase()} ${d.getDate()} ${MONTH_NAMES[d.getMonth()]} ${d.getFullYear()}`
+  return `${DAY_NAMES_SHORT[lang()][dayIdx].toLowerCase()} ${d.getDate()} ${MONTH_NAMES[lang()][d.getMonth()]} ${d.getFullYear()}`
 }

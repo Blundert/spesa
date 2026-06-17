@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Drawer } from 'vaul'
 import { formatCentsPlain } from '../lib/money'
 
@@ -18,10 +19,12 @@ export function PriceKeypad({
   open,
   onClose,
   label,
-  confirmLabel = 'Conferma',
+  confirmLabel,
   initialCents = 0,
   onConfirm,
 }: PriceKeypadProps) {
+  const { t } = useTranslation()
+  const confirmText = confirmLabel ?? t('common.confirm')
   const [cents, setCents] = useState(initialCents)
 
   useEffect(() => {
@@ -82,7 +85,7 @@ export function PriceKeypad({
             onClick={() => { onConfirm(cents); onClose() }}
             className="w-full bg-[#2A2A2C] text-white text-[17px] font-normal py-[18px] rounded-[20px] active:scale-[.98] transition-transform"
           >
-            {confirmLabel} €{formatCentsPlain(cents)}
+            {confirmText} €{formatCentsPlain(cents)}
           </button>
         </Drawer.Content>
       </Drawer.Portal>

@@ -1,4 +1,5 @@
 import { Link } from '@tanstack/react-router'
+import { useTranslation } from 'react-i18next'
 import { currentISOWeek, formatWeekLabel, formatShortDate } from '../lib/date'
 import { formatCentsPlain } from '../lib/money'
 import { computeBudgetSummary } from '../lib/budgetSelectors'
@@ -28,6 +29,7 @@ function usePurchasesForWeek(isoWeek: string) {
 }
 
 export function HomeScreen() {
+  const { t } = useTranslation()
   const { data: budget } = useWeekBudget(isoWeek)
   const { data: sessions = [] } = useSessionsByWeek(isoWeek)
   const { data: purchases = [] } = usePurchasesForWeek(isoWeek)
@@ -75,7 +77,7 @@ export function HomeScreen() {
         <div className="px-1 py-[10px] pb-7">
           <div className="text-[13px] text-[#9B9B9F] mb-1 tabular-nums">{formatWeekLabel(isoWeek)}</div>
           <span className="text-[26px] font-normal tracking-[-0.5px] text-[#2A2A2C]">
-            La mia settimana
+            {t('home.title')}
           </span>
         </div>
 
@@ -83,7 +85,7 @@ export function HomeScreen() {
         {summary.isOver ? (
           <div className="bg-[#2A2A2C] rounded-[30px] px-[26px] py-[30px] mb-[14px]">
             <div className="text-[12px] font-normal tracking-[1.6px] text-white/55 uppercase mb-[14px]">
-              Da pagare a parte
+              {t('home.toPayExtra')}
             </div>
             <div className="flex items-baseline text-white">
               <span className="text-[40px] font-normal opacity-55 mr-1.5">€</span>
@@ -92,13 +94,13 @@ export function HomeScreen() {
               </span>
             </div>
             <div className="text-sm text-white/50 mt-[14px]">
-              oltre i {budget?.buoniCount ?? 0} buoni · di tasca tua
+              {t('home.overBuoni', { count: budget?.buoniCount ?? 0 })}
             </div>
           </div>
         ) : (
           <div className="px-1.5 pt-[18px] pb-9">
             <div className="text-[12px] font-normal tracking-[1.6px] text-[#9B9B9F] uppercase mb-5">
-              Rimanente settimana
+              {t('home.remainingWeek')}
             </div>
             <div className="flex items-baseline text-[#2A2A2C]">
               <span className="text-[42px] font-normal text-[#B5B5BA] mr-1.5">€</span>
@@ -115,19 +117,19 @@ export function HomeScreen() {
             <div className="text-xl font-normal text-[#2A2A2C] tabular-nums">
               €{formatCentsPlain(summary.spentCents)}
             </div>
-            <div className="text-[11px] text-[#9B9B9F] mt-0.5 tracking-[.3px]">SPESO</div>
+            <div className="text-[11px] text-[#9B9B9F] mt-0.5 tracking-[.3px]">{t('home.spent')}</div>
           </div>
           <div className="flex-1 text-center border-r border-[#ECECEC]">
             <div className="text-xl font-normal text-[#2A2A2C] tabular-nums">
               {takenCount}/{totalCount}
             </div>
-            <div className="text-[11px] text-[#9B9B9F] mt-0.5 tracking-[.3px]">OGGETTI</div>
+            <div className="text-[11px] text-[#9B9B9F] mt-0.5 tracking-[.3px]">{t('home.items')}</div>
           </div>
           <div className="flex-1 text-center">
             <div className="text-xl font-normal text-[#2A2A2C] tabular-nums">
               €{formatCentsPlain(summary.totalCents)}
             </div>
-            <div className="text-[11px] text-[#9B9B9F] mt-0.5 tracking-[.3px]">BUDGET</div>
+            <div className="text-[11px] text-[#9B9B9F] mt-0.5 tracking-[.3px]">{t('home.budget')}</div>
           </div>
         </div>
 
@@ -135,7 +137,7 @@ export function HomeScreen() {
         {weekSpese.length > 0 && (
           <div className="mb-7">
             <div className="text-[12px] font-normal tracking-[1.2px] text-[#9B9B9F] uppercase px-1.5 pb-[13px]">
-              Spese di questa settimana
+              {t('home.weekExpenses')}
             </div>
             <div className="bg-white rounded-[22px] overflow-hidden">
               {weekSpese.map((sp, i) => (
@@ -172,8 +174,8 @@ export function HomeScreen() {
               </svg>
             </div>
             <div className="flex-1">
-              <div className="text-base font-normal text-[#2A2A2C]">Pianifica i pasti</div>
-              <div className="text-[13px] text-[#9B9B9F] mt-0.5">{mealCount} pasti pianificati</div>
+              <div className="text-base font-normal text-[#2A2A2C]">{t('home.planMeals')}</div>
+              <div className="text-[13px] text-[#9B9B9F] mt-0.5">{t('home.mealsPlanned', { count: mealCount })}</div>
             </div>
             <ChevronRight />
           </Link>
@@ -187,9 +189,9 @@ export function HomeScreen() {
               </svg>
             </div>
             <div className="flex-1">
-              <div className="text-base font-normal text-[#2A2A2C]">Lista della spesa</div>
+              <div className="text-base font-normal text-[#2A2A2C]">{t('home.shoppingList')}</div>
               <div className="text-[13px] text-[#9B9B9F] mt-0.5">
-                {takenCount} / {totalCount} presi
+                {t('home.takenOfTotal', { taken: takenCount, total: totalCount })}
               </div>
             </div>
             <ChevronRight />
@@ -204,7 +206,7 @@ export function HomeScreen() {
             <circle cx="9" cy="20" r="1.4" /><circle cx="18" cy="20" r="1.4" />
             <path d="M2 3h2.5l2.2 12.5a1.5 1.5 0 0 0 1.5 1.2h8.8a1.5 1.5 0 0 0 1.5-1.2L21 7H5.2" />
           </svg>
-          Inizia la spesa
+          {t('home.startShopping')}
         </Link>
     </div>
   )

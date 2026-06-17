@@ -1,4 +1,5 @@
 import { Link } from '@tanstack/react-router'
+import { useTranslation } from 'react-i18next'
 import { formatCentsPlain } from '../lib/money'
 import { formatShortDate } from '../lib/date'
 import { useAllSessions } from '../hooks/useShopping'
@@ -18,6 +19,7 @@ function useSessionTotal(sessionId: number) {
 }
 
 export function StoricoScreen() {
+  const { t } = useTranslation()
   const { data: sessions = [] } = useAllSessions()
   const { data: supermarkets = [] } = useSupermarkets()
 
@@ -26,11 +28,11 @@ export function StoricoScreen() {
   return (
     <div className="flex-1 overflow-y-auto px-5 pb-[120px]">
       <div className="flex items-center justify-between px-1 pt-2 pb-[18px]">
-        <span className="text-[26px] font-normal tracking-[-0.5px] text-[#2A2A2C]">Storico</span>
+        <span className="text-[26px] font-normal tracking-[-0.5px] text-[#2A2A2C]">{t('storico.title')}</span>
       </div>
 
       {sessions.length === 0 && (
-        <div className="text-center py-16 text-[#9B9B9F] text-sm">Nessuna sessione salvata.</div>
+        <div className="text-center py-16 text-[#9B9B9F] text-sm">{t('storico.empty')}</div>
       )}
 
       {sessions.map((s) => (
@@ -57,6 +59,7 @@ function SessionCard({
   date: number
   confirmedTotalCents: number | null
 }) {
+  const { t } = useTranslation()
   const { data: computedCents = 0 } = useSessionTotal(sessionId)
   const { data: purchases = [] } = useQuery({
     queryKey: ['purchases', sessionId],
@@ -73,7 +76,7 @@ function SessionCard({
       <div className="flex-1">
         <div className="text-base font-normal text-[#2A2A2C]">{storeName}</div>
         <div className="text-[13px] text-[#9B9B9F] mt-0.5">
-          {formatShortDate(date)} · {purchases.length} oggetti
+          {formatShortDate(date)} · {t('storico.itemsCount', { count: purchases.length })}
         </div>
       </div>
       <span className="text-[22px] font-normal text-[#2A2A2C] tabular-nums">
