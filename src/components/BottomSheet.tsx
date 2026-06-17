@@ -9,7 +9,7 @@ interface BottomSheetProps {
 
 export function BottomSheet({ open, onClose, children, showHandle = true }: BottomSheetProps) {
   return (
-    <Drawer.Root open={open} onOpenChange={(v) => !v && onClose()} dismissible shouldScaleBackground>
+    <Drawer.Root open={open} onOpenChange={(v) => !v && onClose()} dismissible>
       <Drawer.Portal>
         <Drawer.Overlay className="fixed inset-0 bg-black/32 z-[80]" />
         <Drawer.Content className="fixed bottom-0 z-[90] bg-white rounded-t-[30px] px-[22px] pb-[calc(22px+env(safe-area-inset-bottom))] pt-[10px] shadow-[0_-12px_44px_rgba(0,0,0,.16)] outline-none w-full max-w-[430px] left-1/2 -translate-x-1/2">
