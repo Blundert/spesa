@@ -67,7 +67,7 @@ export function PastiScreen() {
         <div className="bg-white rounded-[22px] overflow-hidden">
           {days.map((day, i) => (
             <div
-              key={day.dayIndex}
+              key={`${week}-${day.dayIndex}`}
               className="border-b border-[#ECECEC] last:border-0"
             >
               {/* Day label row */}
@@ -123,7 +123,7 @@ function MealInput({
     >
       <span className="w-[42px] flex-none text-[12px] text-[#9B9B9F]">{label}</span>
       <input
-        value={value}
+        defaultValue={value}
         onChange={(e) => onChange(e.target.value)}
         onBlur={(e) => onChange(e.target.value)}
         placeholder="—"
