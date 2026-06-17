@@ -36,6 +36,16 @@ export function ImpostazioniScreen() {
     document.querySelector<PWAInstallElement>('pwa-install')?.showDialog(true)
   }
 
+  // Forza il check di un nuovo service worker e ricarica: con registerType
+  // 'autoUpdate' (skipWaiting) la nuova versione si attiva al reload.
+  const handleUpdate = async () => {
+    if ('serviceWorker' in navigator) {
+      const regs = await navigator.serviceWorker.getRegistrations()
+      await Promise.all(regs.map((r) => r.update()))
+    }
+    window.location.reload()
+  }
+
   return (
     <>
       <div className="flex-1 overflow-y-auto px-5 pb-[120px]">
@@ -75,6 +85,17 @@ export function ImpostazioniScreen() {
           <span className="text-base text-[#2A2A2C]">{t('install.title')}</span>
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9B9B9F" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
             <path d="M12 3v13M8 12l4 4 4-4M5 19h14" />
+          </svg>
+        </button>
+
+        {/* Aggiorna app (service worker) */}
+        <button
+          onClick={() => void handleUpdate()}
+          className="w-full flex items-center justify-between bg-white rounded-[20px] px-5 py-[17px] mb-7 active:bg-[#F6F6F4] transition-colors text-left"
+        >
+          <span className="text-base text-[#2A2A2C]">{t('settings.refresh')}</span>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9B9B9F" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M21 12a9 9 0 1 1-2.64-6.36M21 4v5h-5" />
           </svg>
         </button>
 
