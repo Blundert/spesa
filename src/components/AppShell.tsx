@@ -70,6 +70,7 @@ export function AppShell() {
           <div className="h-px bg-[#E1E1DD] mx-[18px] my-[18px]" />
           <NavItem label={t('nav.history')} to="/storico" active={pathname === '/storico'} onClick={() => setNavOpen(false)} />
           <NavItem label={t('nav.supermarkets')} to="/supermercati" active={pathname === '/supermercati'} onClick={() => setNavOpen(false)} className="mt-[2px]" />
+          <NavItem label={t('nav.settings')} to="/impostazioni" active={pathname === '/impostazioni'} onClick={() => setNavOpen(false)} className="mt-[2px]" />
         </nav>
         <div className="mt-auto w-[246px]">
           <button

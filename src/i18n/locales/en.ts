@@ -123,6 +123,11 @@ export const en: typeof it = {
     subtitle: 'Quick access from home',
     install: 'Install',
   },
+  settings: {
+    title: 'Settings',
+    language: 'Language',
+    version: 'Version',
+  },
   categories: {
     0: 'Fruit & veg',
     1: 'Fridge',
