@@ -18,8 +18,16 @@ createRoot(rootEl).render(
       <div data-vaul-drawer-wrapper style={{ height: '100dvh', width: '100%', maxWidth: '430px', overflow: 'hidden', background: '#F2F2F0', position: 'relative' }}>
         <RouterProvider router={router} />
         {/* Web component per l'installazione PWA (incl. istruzioni iOS). Manuale:
-            si apre solo dalla pagina Impostazioni via showDialog(). */}
-        <PWAInstall manualApple manualChrome useLocalStorage />
+            si apre solo dalla pagina Impostazioni via showDialog(). Nome/icona passati
+            espliciti così il dialog è corretto anche in dev (dove il manifest non è servito). */}
+        <PWAInstall
+          manualApple
+          manualChrome
+          useLocalStorage
+          name="Spesa"
+          description="App per la spesa con buoni pasto"
+          icon="/pwa-192x192.png"
+        />
       </div>
       <Toaster
         position="bottom-center"
