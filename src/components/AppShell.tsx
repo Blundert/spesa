@@ -29,7 +29,7 @@ function usePurchasesForWeek() {
 
 export function AppShell() {
   const { t } = useTranslation()
-  const [navOpen, setNavOpen] = useState(false)
+  const [menuOpen, setMenuOpen] = useState(false)
   const [sheetOpen, setSheetOpen] = useState(false)
   const router = useRouter()
   const navigate = useNavigate()
@@ -55,58 +55,21 @@ export function AppShell() {
   const takenCount = listItems.filter((li) => activeItemIds.has(li.itemId)).length
   const totalCount = listItems.length
 
-  const handleNavShopGo = () => {
-    setNavOpen(false)
-    setTimeout(() => void navigate({ to: '/spesa' }), 320)
-  }
-
   return (
     <div className="relative w-full h-full bg-[#F2F2F0] overflow-hidden">
-      {/* ── SIDE NAV ── */}
-      <div className="absolute inset-0 bg-[#F6F6F4] z-[2] flex flex-col items-end px-[26px] pt-[72px] pb-[38px]">
-        <nav className="w-[246px] flex flex-col">
-          <NavItem label={t('nav.week')} to="/" active={pathname === '/'} onClick={() => setNavOpen(false)} />
-          <NavItem label={t('nav.list')} to="/lista" active={pathname === '/lista'} onClick={() => setNavOpen(false)} className="mt-[2px]" />
-          <div className="h-px bg-[#E1E1DD] mx-[18px] my-[18px]" />
-          <NavItem label={t('nav.history')} to="/storico" active={pathname === '/storico'} onClick={() => setNavOpen(false)} />
-          <NavItem label={t('nav.supermarkets')} to="/supermercati" active={pathname === '/supermercati'} onClick={() => setNavOpen(false)} className="mt-[2px]" />
-          <NavItem label={t('nav.settings')} to="/impostazioni" active={pathname === '/impostazioni'} onClick={() => setNavOpen(false)} className="mt-[2px]" />
-        </nav>
-        <div className="mt-auto w-[246px]">
-          <button
-            onClick={handleNavShopGo}
-            className="w-full bg-[#2A2A2C] text-white text-base py-4 rounded-2xl flex items-center justify-center gap-2 active:scale-[.97] transition-transform"
-          >
-            {t('nav.startShopping')}
-            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M5 12h14M13 6l6 6-6 6" />
-            </svg>
-          </button>
-        </div>
-      </div>
-
-      {/* ── SCREEN INNER (push effect) ── */}
-      <div
-        className="absolute inset-0 bg-[#F2F2F0] flex flex-col overflow-hidden z-[10]"
-        style={{
-          transform: navOpen ? 'translateX(-74%) scale(0.88)' : 'scale(1)',
-          borderRadius: navOpen ? '30px' : '0px',
-          boxShadow: '-16px 0 50px rgba(0,0,0,.18)',
-          transformOrigin: 'top center',
-          transition: 'transform .5s cubic-bezier(.32,.72,0,1), border-radius .5s cubic-bezier(.32,.72,0,1)',
-        }}
-      >
+      {/* ── SCREEN ── */}
+      <div className="absolute inset-0 bg-[#F2F2F0] flex flex-col overflow-hidden">
         {/* Status bar spacer */}
         <div className="h-[54px] flex-none" />
 
         {/* Screen content */}
         <Outlet />
 
-        {/* Bottom bar */}
-        <div className="absolute left-0 right-0 bottom-[26px] px-[18px] z-[18]">
+        {/* Bottom bar + bottone menu */}
+        <div className="absolute left-0 right-0 bottom-[26px] px-[18px] z-[18] flex items-stretch gap-2.5">
           <button
             onClick={() => setSheetOpen(true)}
-            className="w-full bg-white rounded-3xl px-5 py-[13px] shadow-[0_12px_36px_rgba(0,0,0,.13)] flex items-center justify-between active:scale-[.985] transition-transform"
+            className="flex-1 bg-white rounded-3xl px-5 py-[13px] shadow-[0_12px_36px_rgba(0,0,0,.13)] flex items-center justify-between active:scale-[.985] transition-transform"
           >
             <div>
               <div className="flex items-baseline text-[#2A2A2C]">
@@ -124,27 +87,16 @@ export function AppShell() {
               <div className="text-[13px] text-[#9B9B9F] mt-0.5 tabular-nums">{takenCount}/{totalCount} {t('common.takenWord')}</div>
             </div>
           </button>
+          <button
+            onClick={() => setMenuOpen(true)}
+            aria-label={t('nav.openMenu')}
+            className="flex-none w-[60px] rounded-3xl bg-[#2A2A2C] flex items-center justify-center shadow-[0_12px_36px_rgba(0,0,0,.18)] active:scale-[.95] transition-transform"
+          >
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round">
+              <path d="M4 7h16M4 12h16M4 17h16" />
+            </svg>
+          </button>
         </div>
-
-        {/* Menu button */}
-        <button
-          onClick={() => setNavOpen(true)}
-          className="absolute top-[64px] right-[20px] z-[30] w-10 h-10 rounded-full bg-[#2A2A2C] flex items-center justify-center shadow-[0_6px_18px_rgba(0,0,0,.22)] active:scale-[.94] transition-transform"
-          aria-label={t('nav.openMenu')}
-        >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round">
-            <path d="M4 9h16M4 15h16" />
-          </svg>
-        </button>
-
-        {/* Nav close overlay — inside inner div so it transforms with the push */}
-        {navOpen && (
-          <div
-            className="absolute inset-0 z-[40] cursor-pointer"
-            style={{ background: 'rgba(40,40,42,.06)' }}
-            onClick={() => setNavOpen(false)}
-          />
-        )}
       </div>
 
       {/* Budget sheet */}
@@ -164,32 +116,61 @@ export function AppShell() {
           }}
         />
       )}
+
+      {/* Menu di navigazione (bottom sheet) */}
+      <MenuSheet open={menuOpen} onClose={() => setMenuOpen(false)} pathname={pathname} />
     </div>
   )
 }
 
-function NavItem({
-  label,
-  to,
-  active,
-  onClick,
-  className = '',
+function MenuSheet({
+  open,
+  onClose,
+  pathname,
 }: {
-  label: string
-  to: string
-  active: boolean
-  onClick: () => void
-  className?: string
+  open: boolean
+  onClose: () => void
+  pathname: string
 }) {
+  const { t } = useTranslation()
+  const items: { to: string; label: string }[] = [
+    { to: '/', label: t('nav.week') },
+    { to: '/lista', label: t('nav.list') },
+    { to: '/storico', label: t('nav.history') },
+    { to: '/supermercati', label: t('nav.supermarkets') },
+    { to: '/impostazioni', label: t('nav.settings') },
+  ]
   return (
-    <Link
-      to={to}
-      onClick={onClick}
-      className={`px-[18px] py-[13px] rounded-[14px] text-[25px] font-normal text-[#2A2A2C] tracking-[-0.4px] active:opacity-55 transition-opacity ${className}`}
-      style={{ background: active ? '#ECECEA' : 'transparent' }}
-    >
-      {label}
-    </Link>
+    <BottomSheet open={open} onClose={onClose}>
+      <div className="text-[12px] font-normal tracking-[1.4px] text-[#9B9B9F] uppercase px-0.5 pb-[14px]">
+        {t('nav.menu')}
+      </div>
+      <div className="bg-[#F6F6F4] rounded-[18px] overflow-hidden">
+        {items.map((item, i) => {
+          const active = pathname === item.to
+          return (
+            <Link
+              key={item.to}
+              to={item.to}
+              onClick={onClose}
+              className="flex items-center justify-between px-[18px] py-[15px] active:opacity-50"
+              style={{ borderBottom: i < items.length - 1 ? '1px solid #E6E6E2' : 'none' }}
+            >
+              <span className={`text-[17px] text-[#2A2A2C] ${active ? 'font-semibold' : 'font-normal'}`}>
+                {item.label}
+              </span>
+              {active ? (
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2A2A2C" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M5 12l4 4 10-10" />
+                </svg>
+              ) : (
+                <ChevronRight />
+              )}
+            </Link>
+          )
+        })}
+      </div>
+    </BottomSheet>
   )
 }
 

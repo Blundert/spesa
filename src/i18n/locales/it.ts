@@ -14,6 +14,7 @@ export const it = {
     settings: 'Impostazioni',
     startShopping: 'Inizia la spesa',
     openMenu: 'Apri menu',
+    menu: 'Menu',
   },
   budget: {
     remaining: 'rimanente',
