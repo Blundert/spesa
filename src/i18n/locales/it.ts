@@ -125,6 +125,13 @@ export const it = {
     title: 'Impostazioni',
     language: 'Lingua',
     version: 'Versione',
+    data: 'Dati',
+    deleteAll: 'Azzera tutti i dati',
+    confirmTitle: 'Sei sicuro?',
+    confirmBody:
+      'Verranno eliminati lista, spese, supermercati, budget e pasti. Le categorie restano. Non si può annullare.',
+    deleteConfirm: 'Elimina tutto',
+    cleared: 'Dati azzerati',
   },
   categories: {
     0: 'Frutta e verdura',
