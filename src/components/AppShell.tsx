@@ -226,7 +226,7 @@ function BudgetSheetPanel({
         <div className="flex items-center justify-between py-[14px] border-b border-[#E6E6E2]">
           <span className="text-base text-[#2A2A2C]">{t('budget.buoniPasto')}</span>
           <div className="flex items-center gap-4">
-            <StepperBtn onClick={() => onUpdateBuoni(Math.max(1, buoniCount - 1))}>
+            <StepperBtn onClick={() => onUpdateBuoni(Math.max(0, buoniCount - 1))}>
               <MinusIcon />
             </StepperBtn>
             <span className="text-[18px] font-normal text-[#2A2A2C] min-w-[20px] text-center tabular-nums">
