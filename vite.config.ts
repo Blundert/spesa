@@ -31,6 +31,9 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
+        // SPA: il service worker serve l'app shell per le navigazioni (anche offline)
+        // sulle route del router. Complementare al 404.html del deploy GitHub Pages.
+        navigateFallback: 'index.html',
         runtimeCaching: [
           {
             urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
