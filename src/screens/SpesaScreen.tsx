@@ -402,6 +402,7 @@ interface StorePickerSheetProps {
 
 function StorePickerSheet({ open, onClose, supermarkets, currentId, onPick }: StorePickerSheetProps) {
   const { t } = useTranslation()
+  const qc = useQueryClient()
   const [newName, setNewName] = useState('')
   const [showAdd, setShowAdd] = useState(false)
 
@@ -440,6 +441,9 @@ function StorePickerSheet({ open, onClose, supermarkets, currentId, onPick }: St
               if (!newName.trim()) return
               const { upsertSupermarket } = await import('../db/repositories/supermarkets')
               const id = await upsertSupermarket(newName.trim())
+              // Aggiorna la cache prima di selezionare, altrimenti l'header non trova
+              // il nuovo supermercato e mostra "?".
+              await qc.invalidateQueries({ queryKey: qk.supermarkets() })
               onPick(id)
               setNewName('')
               setShowAdd(false)
