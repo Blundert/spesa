@@ -65,41 +65,44 @@ export function AppShell() {
         {/* Screen content */}
         <Outlet />
 
-        {/* Barra in basso: arrotondata e piatta (niente ombre), fissa; il contenuto scorre SOTTO.
-            Riepilogo a sinistra, menu a cerchio scuro a destra. */}
-        <div
-          className="absolute left-0 right-0 z-[20] flex items-stretch gap-2.5 px-[18px]"
-          style={{ bottom: 'calc(18px + env(safe-area-inset-bottom))' }}
-        >
-          <button
-            onClick={() => setSheetOpen(true)}
-            className="flex-1 bg-white rounded-3xl px-5 py-3 flex items-center justify-between active:scale-[.99] transition-transform text-left"
+        {/* Barra in basso fissa: pill riepilogo + cerchio menu su sfondo pieno, con sfumatura
+            in cima così il contenuto sfuma e sparisce pulito dietro (niente bordi che sbucano). */}
+        <div className="absolute left-0 right-0 bottom-0 z-[20] pointer-events-none">
+          <div className="h-7 bg-gradient-to-t from-[#F2F2F0] to-transparent" />
+          <div
+            className="pointer-events-auto bg-[#F2F2F0] px-[18px] pt-2 flex items-stretch gap-2.5"
+            style={{ paddingBottom: 'calc(18px + env(safe-area-inset-bottom))' }}
           >
-            <div>
-              <div className="flex items-baseline text-[#2A2A2C]">
-                <span className="text-base text-[#B5B5BA] mr-0.5">€</span>
-                <span className="text-2xl font-normal tabular-nums tracking-tight">
-                  {formatCentsPlain(Math.abs(summary.remainingCents))}
-                </span>
+            <button
+              onClick={() => setSheetOpen(true)}
+              className="flex-1 bg-white rounded-3xl px-5 py-3 flex items-center justify-between active:scale-[.99] transition-transform text-left"
+            >
+              <div>
+                <div className="flex items-baseline text-[#2A2A2C]">
+                  <span className="text-base text-[#B5B5BA] mr-0.5">€</span>
+                  <span className="text-2xl font-normal tabular-nums tracking-tight">
+                    {formatCentsPlain(Math.abs(summary.remainingCents))}
+                  </span>
+                </div>
+                <div className="text-[11px] text-[#9B9B9F] mt-0.5">
+                  {summary.isOver ? t('budget.toPayExtra') : t('budget.remaining')}
+                </div>
               </div>
-              <div className="text-[11px] text-[#9B9B9F] mt-0.5">
-                {summary.isOver ? t('budget.toPayExtra') : t('budget.remaining')}
+              <div className="text-right">
+                <div className="text-[13px] text-[#6E6E72] tabular-nums">€{formatCentsPlain(summary.spentCents)} {t('common.spentWord')}</div>
+                <div className="text-[13px] text-[#9B9B9F] mt-0.5 tabular-nums">{takenCount}/{totalCount} {t('common.takenWord')}</div>
               </div>
-            </div>
-            <div className="text-right">
-              <div className="text-[13px] text-[#6E6E72] tabular-nums">€{formatCentsPlain(summary.spentCents)} {t('common.spentWord')}</div>
-              <div className="text-[13px] text-[#9B9B9F] mt-0.5 tabular-nums">{takenCount}/{totalCount} {t('common.takenWord')}</div>
-            </div>
-          </button>
-          <button
-            onClick={() => setMenuOpen(true)}
-            aria-label={t('nav.openMenu')}
-            className="flex-none self-center w-14 h-14 rounded-full bg-[#2A2A2C] flex items-center justify-center active:scale-[.95] transition-transform"
-          >
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round">
-              <path d="M4 7h16M4 12h16M4 17h16" />
-            </svg>
-          </button>
+            </button>
+            <button
+              onClick={() => setMenuOpen(true)}
+              aria-label={t('nav.openMenu')}
+              className="flex-none self-center w-14 h-14 rounded-full bg-[#2A2A2C] flex items-center justify-center active:scale-[.95] transition-transform"
+            >
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round">
+                <path d="M4 7h16M4 12h16M4 17h16" />
+              </svg>
+            </button>
+          </div>
         </div>
       </div>
 
