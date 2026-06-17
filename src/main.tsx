@@ -3,9 +3,9 @@ import { createRoot } from 'react-dom/client'
 import { RouterProvider } from '@tanstack/react-router'
 import { QueryClientProvider } from '@tanstack/react-query'
 import { Toaster } from 'sonner'
+import PWAInstall from '@khmyznikov/pwa-install/react-legacy'
 import { router } from './router'
 import { queryClient } from './lib/queryClient'
-import { InstallPrompt } from './components/InstallPrompt'
 import './i18n'
 import './index.css'
 
@@ -17,7 +17,9 @@ createRoot(rootEl).render(
     <QueryClientProvider client={queryClient}>
       <div data-vaul-drawer-wrapper style={{ height: '100dvh', width: '100%', maxWidth: '430px', overflow: 'hidden', background: '#F2F2F0', position: 'relative' }}>
         <RouterProvider router={router} />
-        <InstallPrompt />
+        {/* Web component per l'installazione PWA (incl. istruzioni iOS). Manuale:
+            si apre solo dalla pagina Impostazioni via showDialog(). */}
+        <PWAInstall manualApple manualChrome useLocalStorage />
       </div>
       <Toaster
         position="bottom-center"
