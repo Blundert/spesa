@@ -25,7 +25,9 @@ export function ImpostazioniScreen() {
 
   const handleWipe = async () => {
     await wipeAllData()
-    qc.clear()
+    // invalidateQueries (non clear): forza il refetch delle query ATTIVE, così la
+    // bottom bar in AppShell si aggiorna sul posto senza dover navigare.
+    await qc.invalidateQueries()
     setShowWipe(false)
     toast(t('settings.cleared'))
   }
