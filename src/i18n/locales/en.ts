@@ -127,6 +127,13 @@ export const en: typeof it = {
     title: 'Settings',
     language: 'Language',
     version: 'Version',
+    data: 'Data',
+    deleteAll: 'Clear all data',
+    confirmTitle: 'Are you sure?',
+    confirmBody:
+      'This will delete your list, shopping sessions, supermarkets, budgets and meals. Categories are kept. This cannot be undone.',
+    deleteConfirm: 'Delete everything',
+    cleared: 'Data cleared',
   },
   categories: {
     0: 'Fruit & veg',

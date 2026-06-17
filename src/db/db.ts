@@ -78,3 +78,36 @@ const SEED_CATEGORIES: Array<Omit<Category, 'id'>> = [
 db.on('populate', async () => {
   await db.categories.bulkAdd(SEED_CATEGORIES)
 })
+
+/**
+ * Azzera tutti i dati utente (lista, spese, acquisti, articoli, supermercati, budget, pasti)
+ * e ricrea le categorie seed. Le categorie restano perché sono struttura, non dati utente.
+ */
+export async function wipeAllData(): Promise<void> {
+  await db.transaction(
+    'rw',
+    [
+      db.categories,
+      db.items,
+      db.supermarkets,
+      db.weekBudgets,
+      db.listItems,
+      db.sessions,
+      db.purchases,
+      db.mealPlans,
+    ],
+    async () => {
+      await Promise.all([
+        db.items.clear(),
+        db.supermarkets.clear(),
+        db.weekBudgets.clear(),
+        db.listItems.clear(),
+        db.sessions.clear(),
+        db.purchases.clear(),
+        db.mealPlans.clear(),
+        db.categories.clear(),
+      ])
+      await db.categories.bulkAdd(SEED_CATEGORIES)
+    },
+  )
+}
