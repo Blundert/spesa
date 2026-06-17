@@ -1,4 +1,5 @@
 import { useNavigate, useParams } from '@tanstack/react-router'
+import { useTranslation } from 'react-i18next'
 import { formatCentsPlain } from '../lib/money'
 import { formatShortDate } from '../lib/date'
 import { useSupermarkets } from '../hooks/useItems'
@@ -6,6 +7,7 @@ import { useQuery } from '@tanstack/react-query'
 import { db } from '../db/db'
 
 export function SessioneScreen() {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const { sessionId: sessionIdStr } = useParams({ from: '/storico/$sessionId' })
   const sessionId = parseInt(sessionIdStr, 10)
@@ -79,7 +81,7 @@ export function SessioneScreen() {
             </div>
           ))}
           {purchases.length === 0 && (
-            <div className="text-center py-8 text-[#9B9B9F] text-sm">Nessun acquisto.</div>
+            <div className="text-center py-8 text-[#9B9B9F] text-sm">{t('sessione.noPurchases')}</div>
           )}
         </div>
       </div>

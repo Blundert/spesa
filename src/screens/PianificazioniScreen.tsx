@@ -1,8 +1,10 @@
 import { Link, useNavigate } from '@tanstack/react-router'
+import { useTranslation } from 'react-i18next'
 import { currentISOWeek, formatWeekLabel } from '../lib/date'
 import { usePlannedWeeks } from '../hooks/useMealPlan'
 
 export function PianificazioniScreen() {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const { data: weeks = [] } = usePlannedWeeks()
 
@@ -21,13 +23,13 @@ export function PianificazioniScreen() {
             </svg>
           </button>
           <span className="text-[26px] font-normal tracking-[-0.5px] text-[#2A2A2C]">
-            Storico pianificazioni
+            {t('pianificazioni.title')}
           </span>
         </div>
 
         {weeks.length === 0 && (
           <div className="text-center py-16 text-[#9B9B9F] text-sm">
-            Nessuna settimana pianificata.
+            {t('pianificazioni.empty')}
           </div>
         )}
 
@@ -43,7 +45,7 @@ export function PianificazioniScreen() {
                 {formatWeekLabel(w.isoWeek)}
               </div>
               <div className="text-[13px] text-[#9B9B9F] mt-0.5">
-                {w.mealCount} pasti pianificati
+                {t('home.mealsPlanned', { count: w.mealCount })}
               </div>
             </div>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#C5C5C9" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

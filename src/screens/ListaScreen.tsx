@@ -1,5 +1,7 @@
 import { useState, useRef } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Link } from '@tanstack/react-router'
+import { categoryLabel } from '../i18n'
 import { currentISOWeek } from '../lib/date'
 import { formatCentsPlain } from '../lib/money'
 import { useListItems, useAddNewItemToList } from '../hooks/useListItems'
@@ -33,6 +35,7 @@ function usePurchasesForWeek() {
 }
 
 export function ListaScreen() {
+  const { t } = useTranslation()
   const [addInput, setAddInput] = useState('')
   const inputRef = useRef<HTMLInputElement>(null)
 
@@ -56,7 +59,7 @@ export function ListaScreen() {
   )
 
   // Build category map id → name
-  const catMap = Object.fromEntries(categories.map((c) => [c.id ?? 0, c.name]))
+  const catMap = Object.fromEntries(categories.map((c) => [c.id ?? 0, categoryLabel(t, c.sortOrder)]))
 
   // Group by category, sorted items with checked last
   const grouped = categories
@@ -136,7 +139,7 @@ export function ListaScreen() {
     <div className="flex-1 overflow-y-auto px-5 pb-[120px]">
       {/* Header — menu button is in AppShell */}
       <div className="flex items-center justify-between px-1 pt-2 pb-[18px]">
-        <span className="text-[26px] font-normal tracking-[-0.5px] text-[#2A2A2C]">Lista</span>
+        <span className="text-[26px] font-normal tracking-[-0.5px] text-[#2A2A2C]">{t('lista.title')}</span>
       </div>
 
       {/* Add input */}
@@ -149,7 +152,7 @@ export function ListaScreen() {
           value={addInput}
           onChange={(e) => setAddInput(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && handleAdd()}
-          placeholder="Aggiungi un oggetto…"
+          placeholder={t('lista.addPlaceholder')}
           className="flex-1 border-none outline-none bg-transparent text-base text-[#2A2A2C] placeholder:text-[#9B9B9F]"
         />
       </div>
@@ -164,7 +167,7 @@ export function ListaScreen() {
               className="w-full flex items-center justify-between px-[18px] py-[13px] text-left active:bg-[#F6F6F4]"
             >
               <span className="text-base text-[#2A2A2C]">{p.name}</span>
-              <span className="text-[12px] text-[#9B9B9F]">{catMap[p.categoryId] ?? 'Altro'}</span>
+              <span className="text-[12px] text-[#9B9B9F]">{catMap[p.categoryId] ?? t('categories.5')}</span>
             </button>
           ))}
           {!exactInPool && (
@@ -172,7 +175,7 @@ export function ListaScreen() {
               onClick={() => handleAdd()}
               className="w-full flex items-center justify-between px-[18px] py-[13px] text-left active:bg-[#F6F6F4]"
             >
-              <span className="text-base text-[#2A2A2C]">Aggiungi “{addInput.trim()}”</span>
+              <span className="text-base text-[#2A2A2C]">{t('lista.addNamed', { name: addInput.trim() })}</span>
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9B9B9F" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M12 5v14M5 12h14" />
               </svg>
@@ -200,7 +203,7 @@ export function ListaScreen() {
       {grouped.map(({ cat, items }) => (
         <div key={cat.id} className="mb-[18px]">
           <div className="text-[12px] font-normal tracking-[1.2px] text-[#9B9B9F] uppercase px-1.5 pb-[13px]">
-            {catMap[cat.id ?? 0] ?? cat.name}
+            {categoryLabel(t, cat.sortOrder)}
           </div>
           <div className="bg-white rounded-[20px] overflow-hidden">
             {items.map((li, i) => {
@@ -234,10 +237,10 @@ export function ListaScreen() {
                     </div>
                     <div className="text-[12px] text-[#9B9B9F] mt-0.5">
                       {isChecked
-                        ? `Preso`
+                        ? t('lista.taken')
                         : li.suggestedPriceCents !== null
                         ? `~ €${formatCentsPlain(li.suggestedPriceCents)}`
-                        : 'da prendere'}
+                        : t('lista.toGet')}
                     </div>
                   </div>
 
@@ -260,7 +263,7 @@ export function ListaScreen() {
 
       {listItems.length === 0 && (
         <div className="text-center py-16 text-[#9B9B9F] text-sm">
-          La lista è vuota. Aggiungi qualcosa sopra.
+          {t('lista.empty')}
         </div>
       )}
     </div>

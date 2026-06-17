@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 
 interface BeforeInstallPromptEvent extends Event {
   prompt(): Promise<void>
@@ -6,6 +7,7 @@ interface BeforeInstallPromptEvent extends Event {
 }
 
 export function InstallPrompt() {
+  const { t } = useTranslation()
   const [prompt, setPrompt] = useState<BeforeInstallPromptEvent | null>(null)
   const [dismissed, setDismissed] = useState(() => {
     return localStorage.getItem('pwa-install-dismissed') === '1'
@@ -43,11 +45,11 @@ export function InstallPrompt() {
         </svg>
       </div>
       <div className="flex-1">
-        <div className="text-sm font-normal">Installa l'app</div>
-        <div className="text-xs text-white/60 mt-0.5">Accesso rapido dalla home</div>
+        <div className="text-sm font-normal">{t('install.title')}</div>
+        <div className="text-xs text-white/60 mt-0.5">{t('install.subtitle')}</div>
       </div>
       <button onClick={handleInstall} className="text-sm font-normal bg-white/15 px-3 py-1.5 rounded-xl active:bg-white/25">
-        Installa
+        {t('install.install')}
       </button>
       <button onClick={handleDismiss} className="text-white/50 active:text-white/80 ml-1">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">

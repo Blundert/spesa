@@ -1,8 +1,10 @@
 import { Link, useNavigate, useSearch } from '@tanstack/react-router'
+import { useTranslation } from 'react-i18next'
 import { dayShort, formatWeekLabel, shiftISOWeek } from '../lib/date'
 import { useMealPlan, useUpdateMealSlot } from '../hooks/useMealPlan'
 
 export function PastiScreen() {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const { week } = useSearch({ from: '/pasti' })
   const { data: days = [] } = useMealPlan(week)
@@ -29,9 +31,9 @@ export function PastiScreen() {
               <path d="M15 5l-7 7 7 7" />
             </svg>
           </button>
-          <span className="flex-1 text-[26px] font-normal tracking-[-0.5px] text-[#2A2A2C]">Pianifica i pasti</span>
+          <span className="flex-1 text-[26px] font-normal tracking-[-0.5px] text-[#2A2A2C]">{t('pasti.title')}</span>
           <Link to="/pasti/storico" className="text-[15px] text-[#9B9B9F] px-1 active:opacity-50">
-            Storico
+            {t('nav.history')}
           </Link>
         </div>
 
@@ -39,7 +41,7 @@ export function PastiScreen() {
         <div className="flex items-center justify-between bg-white rounded-[18px] px-2 py-2 mb-[14px]">
           <button
             onClick={() => goToWeek(-1)}
-            aria-label="Settimana precedente"
+            aria-label={t('pasti.prevWeek')}
             className="w-9 h-9 flex items-center justify-center active:opacity-50"
           >
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2A2A2C" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -49,7 +51,7 @@ export function PastiScreen() {
           <span className="text-[15px] text-[#2A2A2C] tabular-nums">{formatWeekLabel(week)}</span>
           <button
             onClick={() => goToWeek(1)}
-            aria-label="Settimana successiva"
+            aria-label={t('pasti.nextWeek')}
             className="w-9 h-9 flex items-center justify-center active:opacity-50"
           >
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2A2A2C" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -59,7 +61,7 @@ export function PastiScreen() {
         </div>
 
         <p className="text-sm text-[#9B9B9F] leading-relaxed mx-1 mb-[18px]">
-          Scrivi cosa cucini a pranzo e cena. Da qui costruisci la lista della spesa.
+          {t('pasti.intro')}
         </p>
 
         <div className="bg-white rounded-[22px] overflow-hidden">
@@ -76,14 +78,14 @@ export function PastiScreen() {
               </div>
               {/* Pranzo */}
               <MealInput
-                label="Pranzo"
+                label={t('pasti.lunch')}
                 value={day.pranzo}
                 onChange={(v) => updateSlot.mutate({ dayIndex: day.dayIndex, mealType: 0, dish: v })}
                 borderBottom
               />
               {/* Cena */}
               <MealInput
-                label="Cena"
+                label={t('pasti.dinner')}
                 value={day.cena}
                 onChange={(v) => updateSlot.mutate({ dayIndex: day.dayIndex, mealType: 1, dish: v })}
                 borderBottom={i < days.length - 1}
@@ -96,7 +98,7 @@ export function PastiScreen() {
           onClick={handleGenerate}
           className="w-full mt-4 bg-[#2A2A2C] text-white text-[17px] font-normal py-[18px] rounded-[22px] active:scale-[.98] transition-transform"
         >
-          Vai alla lista della spesa
+          {t('pasti.goToList')}
         </button>
       </div>
     </div>
