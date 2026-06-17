@@ -16,6 +16,7 @@ export const en: typeof it = {
     settings: 'Settings',
     startShopping: 'Start shopping',
     openMenu: 'Open menu',
+    menu: 'Menu',
   },
   budget: {
     remaining: 'remaining',
