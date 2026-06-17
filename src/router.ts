@@ -6,6 +6,7 @@ import { SpesaScreen } from './screens/SpesaScreen'
 import { ListaScreen } from './screens/ListaScreen'
 import { StoricoScreen } from './screens/StoricoScreen'
 import { SupermercatiScreen } from './screens/SupermercatiScreen'
+import { ImpostazioniScreen } from './screens/ImpostazioniScreen'
 import { PastiScreen } from './screens/PastiScreen'
 import { PianificazioniScreen } from './screens/PianificazioniScreen'
 import { SessioneScreen } from './screens/SessioneScreen'
@@ -45,6 +46,12 @@ const supermercatiRoute = createRoute({
   component: SupermercatiScreen,
 })
 
+const impostazioniRoute = createRoute({
+  getParentRoute: () => shellRoute,
+  path: '/impostazioni',
+  component: ImpostazioniScreen,
+})
+
 // Standalone routes (no shell nav)
 const spesaRoute = createRoute({
   getParentRoute: () => rootRoute,
@@ -80,7 +87,7 @@ const itemDetailRoute = createRoute({
 })
 
 const routeTree = rootRoute.addChildren([
-  shellRoute.addChildren([homeRoute, listaRoute, storicoRoute, supermercatiRoute]),
+  shellRoute.addChildren([homeRoute, listaRoute, storicoRoute, supermercatiRoute, impostazioniRoute]),
   spesaRoute,
   pastiRoute,
   pianificazioniRoute,

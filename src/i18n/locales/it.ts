@@ -121,6 +121,11 @@ export const it = {
     subtitle: 'Accesso rapido dalla home',
     install: 'Installa',
   },
+  settings: {
+    title: 'Impostazioni',
+    language: 'Lingua',
+    version: 'Versione',
+  },
   categories: {
     0: 'Frutta e verdura',
     1: 'Frigo',
