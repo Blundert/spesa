@@ -128,6 +128,7 @@ export const en: typeof it = {
     title: 'Settings',
     language: 'Language',
     version: 'Version',
+    refresh: 'Update app',
     data: 'Data',
     deleteAll: 'Clear all data',
     confirmTitle: 'Are you sure?',

@@ -126,6 +126,7 @@ export const it = {
     title: 'Impostazioni',
     language: 'Lingua',
     version: 'Versione',
+    refresh: 'Aggiorna app',
     data: 'Dati',
     deleteAll: 'Azzera tutti i dati',
     confirmTitle: 'Sei sicuro?',
