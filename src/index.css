@@ -32,6 +32,13 @@ body {
   display: none;
 }
 
+/* Fade del contenuto verso il fondo (stile Claude): sfuma l'opacità, così
+   qualsiasi contenuto svanisce nello sfondo dietro la barra fissa, senza macchie. */
+.scroll-fade-bottom {
+  -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 132px), transparent);
+  mask-image: linear-gradient(to bottom, #000 calc(100% - 132px), transparent);
+}
+
 [data-sonner-toast] [data-description] {
   color: rgba(255, 255, 255, 0.72) !important;
 }
