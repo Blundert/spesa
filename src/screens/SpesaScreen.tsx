@@ -18,7 +18,7 @@ import {
   useRemovePurchase,
   useUpdatePurchase,
 } from '../hooks/useShopping'
-import { useListItems, useClearList, useRemoveFromList } from '../hooks/useListItems'
+import { useListItems, useClearList, useRemoveFromList, useAddToList } from '../hooks/useListItems'
 import { useSupermarkets, useCategories, useItems } from '../hooks/useItems'
 import { PriceKeypad } from '../components/PriceKeypad'
 import { BottomSheet } from '../components/BottomSheet'
@@ -65,6 +65,7 @@ export function SpesaScreen() {
   const removePurchase = useRemovePurchase(activeSession?.id ?? 0)
   const updatePurchase = useUpdatePurchase(activeSession?.id ?? 0)
   const removeFromList = useRemoveFromList()
+  const addToList = useAddToList()
   const clearList = useClearList()
   const qc = useQueryClient()
 
@@ -163,6 +164,18 @@ export function SpesaScreen() {
       void navigate({ to: '/storico' })
     },
     [activeSession, finishSession, clearList, navigate, supermarketName, t],
+  )
+
+  // Depenna: annulla l'acquisto e rimette la voce tra "da prendere". Se era fuori lista
+  // (non presente in lista) la aggiunge alla lista, così ricompare come una voce normale.
+  const uncheckCart = useCallback(
+    async (purchaseId: number, itemId: number) => {
+      await removePurchase.mutateAsync(purchaseId)
+      if (!listItems.some((l) => l.itemId === itemId)) {
+        await addToList.mutateAsync({ itemId })
+      }
+    },
+    [removePurchase, addToList, listItems],
   )
 
   // Elimina del tutto una voce dal carrello: rimuove l'acquisto e, se era in lista,
@@ -330,7 +343,7 @@ export function SpesaScreen() {
                 >
                   {/* Spunta = depenna (rimette tra "da prendere") */}
                   <button
-                    onClick={() => p.id !== undefined && removePurchase.mutate(p.id)}
+                    onClick={() => p.id !== undefined && void uncheckCart(p.id, p.itemId)}
                     aria-label={t('spesa.uncheck')}
                     className="w-6 h-6 flex-none rounded-full bg-[#2A2A2C] flex items-center justify-center active:opacity-50"
                   >
