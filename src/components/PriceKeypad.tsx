@@ -12,7 +12,11 @@ interface PriceKeypadProps {
   confirmLabel?: string
   /** Valore iniziale in centesimi. */
   initialCents?: number
-  onConfirm: (cents: number) => void
+  /** Mostra lo stepper quantità. */
+  showQuantity?: boolean
+  /** Quantità iniziale (default 1). */
+  initialQuantity?: number
+  onConfirm: (cents: number, quantity: number) => void
 }
 
 export function PriceKeypad({
@@ -21,15 +25,21 @@ export function PriceKeypad({
   label,
   confirmLabel,
   initialCents = 0,
+  showQuantity = false,
+  initialQuantity = 1,
   onConfirm,
 }: PriceKeypadProps) {
   const { t } = useTranslation()
   const confirmText = confirmLabel ?? t('common.confirm')
   const [cents, setCents] = useState(initialCents)
+  const [quantity, setQuantity] = useState(initialQuantity)
 
   useEffect(() => {
-    if (open) setCents(initialCents)
-  }, [open, initialCents])
+    if (open) {
+      setCents(initialCents)
+      setQuantity(initialQuantity)
+    }
+  }, [open, initialCents, initialQuantity])
 
   const digit = (d: number) => setCents((c) => Math.min(c * 10 + d, 9_999_999))
   const dbl = () => setCents((c) => Math.min(c * 100, 9_999_999))
@@ -68,6 +78,36 @@ export function PriceKeypad({
             </div>
           </div>
 
+          {/* Quantità */}
+          {showQuantity && (
+            <div className="flex items-center justify-between bg-[#F2F2F0] rounded-2xl px-4 py-3 mb-[14px]">
+              <span className="text-base text-[#2A2A2C]">{t('common.quantity')}</span>
+              <div className="flex items-center gap-4">
+                <button
+                  onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+                  aria-label="-"
+                  className="w-8 h-8 rounded-full bg-white flex items-center justify-center shadow-[0_1px_3px_rgba(0,0,0,.08)] active:opacity-50"
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2A2A2C" strokeWidth="2.4" strokeLinecap="round">
+                    <path d="M5 12h14" />
+                  </svg>
+                </button>
+                <span className="text-[18px] font-normal text-[#2A2A2C] min-w-[20px] text-center tabular-nums">
+                  {quantity}
+                </span>
+                <button
+                  onClick={() => setQuantity((q) => q + 1)}
+                  aria-label="+"
+                  className="w-8 h-8 rounded-full bg-white flex items-center justify-center shadow-[0_1px_3px_rgba(0,0,0,.08)] active:opacity-50"
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2A2A2C" strokeWidth="2.4" strokeLinecap="round">
+                    <path d="M12 5v14M5 12h14" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          )}
+
           {/* Keys */}
           <div className="grid grid-cols-3 gap-[10px] mb-[14px]">
             {keys.map((k) => (
@@ -82,10 +122,14 @@ export function PriceKeypad({
           </div>
 
           <button
-            onClick={() => { onConfirm(cents); onClose() }}
+            onClick={() => {
+              onConfirm(cents, quantity)
+              onClose()
+            }}
             className="w-full bg-[#2A2A2C] text-white text-[17px] font-normal py-[18px] rounded-[20px] active:scale-[.98] transition-transform"
           >
             {confirmText} €{formatCentsPlain(cents)}
+            {quantity > 1 ? ` ×${quantity}` : ''}
           </button>
         </Drawer.Content>
       </Drawer.Portal>

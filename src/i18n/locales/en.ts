@@ -8,6 +8,8 @@ export const en: typeof it = {
     spentWord: 'spent',
     takenWord: 'taken',
     buoni: 'vouchers',
+    save: 'Save',
+    quantity: 'Quantity',
   },
   nav: {
     week: 'Week',
@@ -83,6 +85,8 @@ export const en: typeof it = {
     newTitle: 'New shopping',
     buoni: 'Meal vouchers',
     buonoValue: 'Voucher value',
+    removeItem: 'Remove',
+    uncheck: 'Move back to list',
   },
   storico: {
     title: 'History',
