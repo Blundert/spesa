@@ -30,8 +30,9 @@ createRoot(rootEl).render(
         />
       </div>
       <Toaster
-        position="bottom-center"
-        offset={108}
+        position="top-center"
+        offset="calc(env(safe-area-inset-top) + 12px)"
+        duration={2000}
         toastOptions={{
           style: {
             background: '#2A2A2C',
