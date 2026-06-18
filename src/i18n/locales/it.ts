@@ -5,6 +5,7 @@ export const it = {
     confirm: 'Conferma',
     spentWord: 'spesi',
     takenWord: 'presi',
+    buoni: 'buoni',
   },
   nav: {
     week: 'Settimana',
@@ -38,6 +39,9 @@ export const it = {
     shoppingList: 'Lista della spesa',
     takenOfTotal: '{{taken}} / {{total}} presi',
     startShopping: 'Inizia la spesa',
+    outOfPocket: 'Di tasca tua',
+    buoni: 'BUONI',
+    buoniLine: '{{spent}} buoni spesi · {{remaining}} rimanenti',
   },
   lista: {
     title: 'Lista',
@@ -72,7 +76,11 @@ export const it = {
     itemAdded: '{{name}} aggiunto',
     toPayExtraAmount: 'Da pagare a parte €{{amount}}',
     remainingAmount: 'Rimanente €{{amount}}',
+    outOfPocketAmount: 'Di tasca tua €{{amount}}',
     saved: 'Spesa salvata',
+    newTitle: 'Nuova spesa',
+    buoni: 'Buoni pasto',
+    buonoValue: 'Valore buono',
   },
   storico: {
     title: 'Storico',
@@ -90,6 +98,7 @@ export const it = {
     lunch: 'Pranzo',
     dinner: 'Cena',
     goToList: 'Vai alla lista della spesa',
+    buoniAvailable: 'Buoni disponibili',
   },
   pianificazioni: {
     title: 'Storico pianificazioni',

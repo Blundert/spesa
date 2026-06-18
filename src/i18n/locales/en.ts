@@ -7,6 +7,7 @@ export const en: typeof it = {
     confirm: 'Confirm',
     spentWord: 'spent',
     takenWord: 'taken',
+    buoni: 'vouchers',
   },
   nav: {
     week: 'Week',
@@ -40,6 +41,9 @@ export const en: typeof it = {
     shoppingList: 'Shopping list',
     takenOfTotal: '{{taken}} / {{total}} taken',
     startShopping: 'Start shopping',
+    outOfPocket: 'Out of pocket',
+    buoni: 'VOUCHERS',
+    buoniLine: '{{spent}} vouchers used · {{remaining}} left',
   },
   lista: {
     title: 'List',
@@ -74,7 +78,11 @@ export const en: typeof it = {
     itemAdded: '{{name}} added',
     toPayExtraAmount: 'Out of pocket €{{amount}}',
     remainingAmount: 'Remaining €{{amount}}',
+    outOfPocketAmount: 'Out of pocket €{{amount}}',
     saved: 'Shopping saved',
+    newTitle: 'New shopping',
+    buoni: 'Meal vouchers',
+    buonoValue: 'Voucher value',
   },
   storico: {
     title: 'History',
@@ -92,6 +100,7 @@ export const en: typeof it = {
     lunch: 'Lunch',
     dinner: 'Dinner',
     goToList: 'Go to shopping list',
+    buoniAvailable: 'Vouchers available',
   },
   pianificazioni: {
     title: 'Planning history',

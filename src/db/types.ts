@@ -26,16 +26,17 @@ export interface Supermarket {
   normalizedName: string
 }
 
-/** Budget buoni pasto per settimana ISO. */
+/** Buoni pasto disponibili in una settimana ISO (opzionale, non vincolante). */
 export interface WeekBudget {
   id?: number
   /** Es. "2026-W24" */
   isoWeek: string
-  /** Numero di buoni disponibili questa settimana. */
-  buoniCount: number
-  /** Valore unitario in centesimi (es. 800 = €8,00). */
-  buoniValueCents: number
+  /** Numero di buoni disponibili questa settimana (0 se non impostato). */
+  buoniAvailable: number
 }
+
+/** Valore di default di un buono pasto, in centesimi (€8,00). */
+export const DEFAULT_BUONO_VALUE_CENTS = 800
 
 /**
  * Voce della lista della spesa. La lista è unica e globale (non più legata a una
@@ -63,6 +64,10 @@ export interface Session {
    * acquisti resta come dettaglio).
    */
   confirmedTotalCents: number | null
+  /** Buoni pasto usati in questa spesa. */
+  buoniSpent: number
+  /** Valore unitario del buono usato in questa spesa, in centesimi. */
+  buoniValueCents: number
 }
 
 /** Acquisto singolo all'interno di una sessione. */

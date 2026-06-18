@@ -1,36 +1,24 @@
-import type { WeekBudget, Session, Purchase } from '../db/types'
+import type { Session, Purchase } from '../db/types'
 
-export interface BudgetSummary {
-  /** Budget totale in centesimi (buoniCount × buoniValueCents). */
-  totalCents: number
-  /**
-   * Quanto già speso nelle sessioni finite della settimana, in centesimi.
-   * Per ogni sessione vale l'importo confermato se presente, altrimenti la somma
-   * calcolata dai suoi acquisti.
-   */
-  spentCents: number
-  /** totalCents − spentCents. Può essere negativo. */
-  remainingCents: number
-  /** Se negativo: importo da pagare di tasca propria (abs di remainingCents). */
+/** Riepilogo di spesa di una settimana (recap, niente budget/rimanente). */
+export interface WeekSpendSummary {
+  /** Totale speso nelle spese finite (confirmedTotalCents ?? somma acquisti). */
+  totalSpentCents: number
+  /** Numero di buoni pasto usati nella settimana. */
+  buoniSpentCount: number
+  /** Valore coperto dai buoni (Σ buoniSpent × valore della sessione), in centesimi. */
+  buoniCoveredCents: number
+  /** Di tasca propria: max(0, totale − coperto dai buoni). */
   outOfPocketCents: number
-  /** true se la spesa supera il budget. */
-  isOver: boolean
+  /** Buoni rimanenti: max(0, disponibili − usati). */
+  buoniRemaining: number
 }
 
-/**
- * Calcola il riepilogo budget per una settimana.
- * @param budget  WeekBudget della settimana
- * @param sessions  Sessioni finite della settimana
- * @param purchases  Tutti gli acquisti delle sessioni
- */
-export function computeBudgetSummary(
-  budget: WeekBudget,
+export function weekSpendSummary(
   sessions: Session[],
   purchases: Purchase[],
-): BudgetSummary {
-  const totalCents = budget.buoniCount * budget.buoniValueCents
-
-  // Totale calcolato dagli acquisti, per sessione (fallback quando non confermato).
+  buoniAvailable: number,
+): WeekSpendSummary {
   const computedBySession = new Map<number, number>()
   for (const p of purchases) {
     computedBySession.set(
@@ -39,34 +27,39 @@ export function computeBudgetSummary(
     )
   }
 
-  // Speso = per ogni sessione finita, l'importo confermato se presente, altrimenti
-  // la somma calcolata dei suoi acquisti.
-  const spentCents = sessions
-    .filter((s) => s.finishedAt !== null && s.id !== undefined)
-    .reduce(
-      (acc, s) => acc + (s.confirmedTotalCents ?? computedBySession.get(s.id as number) ?? 0),
-      0,
-    )
+  let totalSpentCents = 0
+  let buoniSpentCount = 0
+  let buoniCoveredCents = 0
+  for (const s of sessions) {
+    if (s.finishedAt === null || s.id === undefined) continue
+    totalSpentCents += s.confirmedTotalCents ?? computedBySession.get(s.id) ?? 0
+    buoniSpentCount += s.buoniSpent
+    buoniCoveredCents += s.buoniSpent * s.buoniValueCents
+  }
 
-  const remainingCents = totalCents - spentCents
-  const isOver = remainingCents < 0
-  const outOfPocketCents = isOver ? -remainingCents : 0
-
-  return { totalCents, spentCents, remainingCents, outOfPocketCents, isOver }
+  return {
+    totalSpentCents,
+    buoniSpentCount,
+    buoniCoveredCents,
+    outOfPocketCents: Math.max(0, totalSpentCents - buoniCoveredCents),
+    buoniRemaining: Math.max(0, buoniAvailable - buoniSpentCount),
+  }
 }
 
-/**
- * Come computeBudgetSummary ma include anche gli acquisti della sessione corrente
- * (non ancora finalizzata) — usato nella modalità spesa live.
- */
-export function computeLiveBudgetSummary(
-  budget: WeekBudget,
-  allPurchases: Purchase[],
-): BudgetSummary {
-  const totalCents = budget.buoniCount * budget.buoniValueCents
-  const spentCents = allPurchases.reduce((acc, p) => acc + p.priceCents * p.quantity, 0)
-  const remainingCents = totalCents - spentCents
-  const isOver = remainingCents < 0
-  const outOfPocketCents = isOver ? -remainingCents : 0
-  return { totalCents, spentCents, remainingCents, outOfPocketCents, isOver }
+/** Riepilogo live della spesa in corso. */
+export interface LiveSpendSummary {
+  spentCents: number
+  outOfPocketCents: number
+}
+
+export function liveSpendSummary(
+  activePurchases: Purchase[],
+  buoniSpent: number,
+  buoniValueCents: number,
+): LiveSpendSummary {
+  const spentCents = activePurchases.reduce((acc, p) => acc + p.priceCents * p.quantity, 0)
+  return {
+    spentCents,
+    outOfPocketCents: Math.max(0, spentCents - buoniSpent * buoniValueCents),
+  }
 }

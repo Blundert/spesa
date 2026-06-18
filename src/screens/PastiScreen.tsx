@@ -2,6 +2,7 @@ import { Link, useNavigate, useSearch } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 import { dayShort, formatWeekLabel, shiftISOWeek } from '../lib/date'
 import { useMealPlan, useUpdateMealSlot } from '../hooks/useMealPlan'
+import { useWeekBudget, useSetBuoniAvailable } from '../hooks/useShopping'
 
 export function PastiScreen() {
   const { t } = useTranslation()
@@ -9,6 +10,9 @@ export function PastiScreen() {
   const { week } = useSearch({ from: '/pasti' })
   const { data: days = [] } = useMealPlan(week)
   const updateSlot = useUpdateMealSlot(week)
+  const { data: budget } = useWeekBudget(week)
+  const setBuoni = useSetBuoniAvailable(week)
+  const buoniAvailable = budget?.buoniAvailable ?? 0
 
   const goToWeek = (delta: number) =>
     void navigate({ to: '/pasti', search: { week: shiftISOWeek(week, delta) } })
@@ -58,6 +62,34 @@ export function PastiScreen() {
               <path d="M9 6l6 6-6 6" />
             </svg>
           </button>
+        </div>
+
+        {/* Buoni disponibili questa settimana (opzionale) */}
+        <div className="flex items-center justify-between bg-white rounded-[18px] px-4 py-[14px] mb-[14px]">
+          <span className="text-base text-[#2A2A2C]">{t('pasti.buoniAvailable')}</span>
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => setBuoni.mutate(Math.max(0, buoniAvailable - 1))}
+              aria-label="-"
+              className="w-8 h-8 rounded-full bg-[#F2F2F0] flex items-center justify-center active:opacity-50"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2A2A2C" strokeWidth="2.4" strokeLinecap="round">
+                <path d="M5 12h14" />
+              </svg>
+            </button>
+            <span className="text-[18px] font-normal text-[#2A2A2C] min-w-[20px] text-center tabular-nums">
+              {buoniAvailable}
+            </span>
+            <button
+              onClick={() => setBuoni.mutate(buoniAvailable + 1)}
+              aria-label="+"
+              className="w-8 h-8 rounded-full bg-[#F2F2F0] flex items-center justify-center active:opacity-50"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2A2A2C" strokeWidth="2.4" strokeLinecap="round">
+                <path d="M12 5v14M5 12h14" />
+              </svg>
+            </button>
+          </div>
         </div>
 
         <p className="text-sm text-[#9B9B9F] leading-relaxed mx-1 mb-[18px]">
