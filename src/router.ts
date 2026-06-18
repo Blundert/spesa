@@ -1,5 +1,6 @@
 import { createRouter, createRootRoute, createRoute, Outlet } from '@tanstack/react-router'
 import { currentISOWeek } from './lib/date'
+import { DEFAULT_BUONO_VALUE_CENTS } from './db/types'
 import { AppShell } from './components/AppShell'
 import { HomeScreen } from './screens/HomeScreen'
 import { SpesaScreen } from './screens/SpesaScreen'
@@ -57,6 +58,15 @@ const spesaRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/spesa',
   component: SpesaScreen,
+  // Buoni e valore scelti nel box d'avvio; passati alla nuova spesa.
+  validateSearch: (search: Record<string, unknown>): { buoni: number; val: number } => {
+    const buoni = Number(search.buoni)
+    const val = Number(search.val)
+    return {
+      buoni: Number.isFinite(buoni) && buoni >= 0 ? Math.floor(buoni) : 0,
+      val: Number.isFinite(val) && val > 0 ? Math.floor(val) : DEFAULT_BUONO_VALUE_CENTS,
+    }
+  },
 })
 
 const pastiRoute = createRoute({

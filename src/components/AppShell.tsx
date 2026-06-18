@@ -3,9 +3,9 @@ import { useTranslation } from 'react-i18next'
 import { Outlet, Link, useRouter, useNavigate } from '@tanstack/react-router'
 import { currentISOWeek } from '../lib/date'
 import { formatCentsPlain } from '../lib/money'
-import { computeBudgetSummary } from '../lib/budgetSelectors'
-import { useWeekBudget, useSessionsByWeek, useUpdateWeekBudget } from '../hooks/useShopping'
-import { useListItems } from '../hooks/useListItems'
+import { weekSpendSummary } from '../lib/budgetSelectors'
+import { useWeekBudget, useSessionsByWeek } from '../hooks/useShopping'
+import { DEFAULT_BUONO_VALUE_CENTS } from '../db/types'
 import { qk } from '../db/queryKeys'
 import { useQuery } from '@tanstack/react-query'
 import { db } from '../db/db'
@@ -31,6 +31,8 @@ export function AppShell() {
   const { t } = useTranslation()
   const [menuOpen, setMenuOpen] = useState(false)
   const [sheetOpen, setSheetOpen] = useState(false)
+  const [newBuoni, setNewBuoni] = useState(0)
+  const [newVal, setNewVal] = useState(DEFAULT_BUONO_VALUE_CENTS)
   const router = useRouter()
   const navigate = useNavigate()
   const pathname = router.state.location.pathname
@@ -38,22 +40,21 @@ export function AppShell() {
   const { data: budget } = useWeekBudget(isoWeek)
   const { data: sessions = [] } = useSessionsByWeek(isoWeek)
   const { data: purchases = [] } = usePurchasesForWeek()
-  const { data: listItems = [] } = useListItems()
-  const { mutate: updateBudget } = useUpdateWeekBudget(isoWeek)
 
-  const summary = budget
-    ? computeBudgetSummary(budget, sessions, purchases)
-    : { totalCents: 0, spentCents: 0, remainingCents: 0, outOfPocketCents: 0, isOver: false }
+  const summary = weekSpendSummary(sessions, purchases, budget?.buoniAvailable ?? 0)
 
-  // "Presi": solo gli acquisti della spesa in corso (sessione non ancora finita).
-  const activeSession = sessions.find((s) => s.finishedAt === null)
-  const activeItemIds = new Set(
-    activeSession
-      ? purchases.filter((p) => p.sessionId === activeSession.id).map((p) => p.itemId)
-      : [],
-  )
-  const takenCount = listItems.filter((li) => activeItemIds.has(li.itemId)).length
-  const totalCount = listItems.length
+  // Init della config nuova spesa nel click di apertura (no effetto → no lint).
+  const openNewShopping = () => {
+    setNewBuoni(summary.buoniRemaining)
+    setNewVal(DEFAULT_BUONO_VALUE_CENTS)
+    setSheetOpen(true)
+  }
+  const startShopping = () => {
+    setSheetOpen(false)
+    const buoni = newBuoni
+    const val = newVal
+    setTimeout(() => void navigate({ to: '/spesa', search: { buoni, val } }), 300)
+  }
 
   return (
     <div className="relative w-full h-full bg-[#F2F2F0] overflow-hidden">
@@ -67,30 +68,27 @@ export function AppShell() {
           <Outlet />
         </div>
 
-        {/* Barra fissa: pill riepilogo + cerchio menu, galleggianti. Il fade del contenuto
-            li "pulisce" dietro (niente sfondo/ombre). */}
+        {/* Barra fissa: pill riepilogo + cerchio menu, galleggianti. */}
         <div
           className="absolute left-0 right-0 z-[20] px-[18px] flex items-stretch gap-2.5"
           style={{ bottom: 'calc(18px + env(safe-area-inset-bottom))' }}
         >
           <button
-            onClick={() => setSheetOpen(true)}
+            onClick={openNewShopping}
             className="flex-1 bg-white rounded-3xl px-5 py-3 flex items-center justify-between active:scale-[.99] transition-transform text-left"
           >
             <div>
               <div className="flex items-baseline text-[#2A2A2C]">
                 <span className="text-base text-[#B5B5BA] mr-0.5">€</span>
                 <span className="text-2xl font-normal tabular-nums tracking-tight">
-                  {formatCentsPlain(Math.abs(summary.remainingCents))}
+                  {formatCentsPlain(summary.outOfPocketCents)}
                 </span>
               </div>
-              <div className="text-[11px] text-[#9B9B9F] mt-0.5">
-                {summary.isOver ? t('budget.toPayExtra') : t('budget.remaining')}
-              </div>
+              <div className="text-[11px] text-[#9B9B9F] mt-0.5">{t('home.outOfPocket')}</div>
             </div>
             <div className="text-right">
-              <div className="text-[13px] text-[#6E6E72] tabular-nums">€{formatCentsPlain(summary.spentCents)} {t('common.spentWord')}</div>
-              <div className="text-[13px] text-[#9B9B9F] mt-0.5 tabular-nums">{takenCount}/{totalCount} {t('common.takenWord')}</div>
+              <div className="text-[13px] text-[#6E6E72] tabular-nums">€{formatCentsPlain(summary.totalSpentCents)} {t('common.spentWord')}</div>
+              <div className="text-[13px] text-[#9B9B9F] mt-0.5 tabular-nums">{summary.buoniSpentCount} {t('common.buoni')}</div>
             </div>
           </button>
           <button
@@ -105,27 +103,86 @@ export function AppShell() {
         </div>
       </div>
 
-      {/* Budget sheet */}
-      {budget && (
-        <BudgetSheetPanel
-          open={sheetOpen}
-          onClose={() => setSheetOpen(false)}
-          buoniCount={budget.buoniCount}
-          buoniValueCents={budget.buoniValueCents}
-          onUpdateBuoni={(n) => updateBudget({ buoniCount: n, buoniValueCents: budget.buoniValueCents })}
-          onUpdateValue={(v) => updateBudget({ buoniCount: budget.buoniCount, buoniValueCents: v })}
-          takenCount={takenCount}
-          totalCount={totalCount}
-          onStartShopping={() => {
-            setSheetOpen(false)
-            setTimeout(() => void navigate({ to: '/spesa' }), 300)
-          }}
-        />
-      )}
+      {/* Box "Nuova spesa": buoni (pre-compilati coi rimanenti) + valore + Inizia */}
+      <NewShoppingSheet
+        open={sheetOpen}
+        onClose={() => setSheetOpen(false)}
+        buoni={newBuoni}
+        valueCents={newVal}
+        onBuoni={setNewBuoni}
+        onValue={setNewVal}
+        onStart={startShopping}
+      />
 
       {/* Menu di navigazione (bottom sheet) */}
       <MenuSheet open={menuOpen} onClose={() => setMenuOpen(false)} pathname={pathname} />
     </div>
+  )
+}
+
+function NewShoppingSheet({
+  open,
+  onClose,
+  buoni,
+  valueCents,
+  onBuoni,
+  onValue,
+  onStart,
+}: {
+  open: boolean
+  onClose: () => void
+  buoni: number
+  valueCents: number
+  onBuoni: (n: number) => void
+  onValue: (v: number) => void
+  onStart: () => void
+}) {
+  const { t } = useTranslation()
+  return (
+    <BottomSheet open={open} onClose={onClose}>
+      <div className="text-[12px] font-normal tracking-[1.4px] text-[#9B9B9F] uppercase px-0.5 pb-[14px]">
+        {t('spesa.newTitle')}
+      </div>
+      <div className="bg-[#F6F6F4] rounded-[18px] px-4 mb-[14px]">
+        <div className="flex items-center justify-between py-[14px] border-b border-[#E6E6E2]">
+          <span className="text-base text-[#2A2A2C]">{t('spesa.buoni')}</span>
+          <div className="flex items-center gap-4">
+            <StepperBtn onClick={() => onBuoni(Math.max(0, buoni - 1))}>
+              <MinusIcon />
+            </StepperBtn>
+            <span className="text-[18px] font-normal text-[#2A2A2C] min-w-[20px] text-center tabular-nums">
+              {buoni}
+            </span>
+            <StepperBtn onClick={() => onBuoni(buoni + 1)}>
+              <PlusIcon />
+            </StepperBtn>
+          </div>
+        </div>
+        <div className="flex items-center justify-between py-[14px]">
+          <span className="text-base text-[#2A2A2C]">{t('spesa.buonoValue')}</span>
+          <div className="flex items-center gap-4">
+            <StepperBtn onClick={() => onValue(Math.max(50, valueCents - 50))}>
+              <MinusIcon />
+            </StepperBtn>
+            <span className="text-[18px] font-normal text-[#2A2A2C] min-w-[54px] text-center tabular-nums">
+              €{formatCentsPlain(valueCents)}
+            </span>
+            <StepperBtn onClick={() => onValue(valueCents + 50)}>
+              <PlusIcon />
+            </StepperBtn>
+          </div>
+        </div>
+      </div>
+      <button
+        onClick={onStart}
+        className="w-full bg-[#2A2A2C] text-white text-[17px] font-normal py-[17px] rounded-[18px] flex items-center justify-center gap-2 active:scale-[.98] transition-transform"
+      >
+        {t('nav.startShopping')}
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M5 12h14M13 6l6 6-6 6" />
+        </svg>
+      </button>
+    </BottomSheet>
   )
 }
 
@@ -175,106 +232,6 @@ function MenuSheet({
             </Link>
           )
         })}
-      </div>
-    </BottomSheet>
-  )
-}
-
-function BudgetSheetPanel({
-  open,
-  onClose,
-  buoniCount,
-  buoniValueCents,
-  onUpdateBuoni,
-  onUpdateValue,
-  takenCount,
-  totalCount,
-  onStartShopping,
-}: {
-  open: boolean
-  onClose: () => void
-  buoniCount: number
-  buoniValueCents: number
-  onUpdateBuoni: (n: number) => void
-  onUpdateValue: (v: number) => void
-  takenCount: number
-  totalCount: number
-  onStartShopping: () => void
-}) {
-  const { t } = useTranslation()
-  const totalCents = buoniCount * buoniValueCents
-
-  return (
-    <BottomSheet open={open} onClose={onClose}>
-      <div className="text-[12px] font-normal tracking-[1.4px] text-[#9B9B9F] uppercase px-0.5 pb-[14px]">
-        {t('budget.thisWeek')}
-      </div>
-      <div className="bg-[#F6F6F4] rounded-[18px] px-4 mb-[14px]">
-        <div className="flex items-center justify-between py-[14px] border-b border-[#E6E6E2]">
-          <span className="text-base text-[#2A2A2C]">{t('budget.buoniPasto')}</span>
-          <div className="flex items-center gap-4">
-            <StepperBtn onClick={() => onUpdateBuoni(Math.max(0, buoniCount - 1))}>
-              <MinusIcon />
-            </StepperBtn>
-            <span className="text-[18px] font-normal text-[#2A2A2C] min-w-[20px] text-center tabular-nums">
-              {buoniCount}
-            </span>
-            <StepperBtn onClick={() => onUpdateBuoni(Math.min(20, buoniCount + 1))}>
-              <PlusIcon />
-            </StepperBtn>
-          </div>
-        </div>
-        <div className="flex items-center justify-between py-[14px]">
-          <span className="text-base text-[#2A2A2C]">{t('budget.unitValue')}</span>
-          <div className="flex items-center gap-4">
-            <StepperBtn onClick={() => onUpdateValue(Math.max(50, buoniValueCents - 50))}>
-              <MinusIcon />
-            </StepperBtn>
-            <span className="text-[18px] font-normal text-[#2A2A2C] min-w-[54px] text-center tabular-nums">
-              €{formatCentsPlain(buoniValueCents)}
-            </span>
-            <StepperBtn onClick={() => onUpdateValue(buoniValueCents + 50)}>
-              <PlusIcon />
-            </StepperBtn>
-          </div>
-        </div>
-      </div>
-      <div className="flex items-baseline justify-between px-1.5 pb-[18px]">
-        <span className="text-sm text-[#9B9B9F]">{t('budget.total')}</span>
-        <span className="text-2xl font-normal text-[#2A2A2C] tracking-[-0.5px] tabular-nums">
-          €{formatCentsPlain(totalCents)}
-        </span>
-      </div>
-      <button
-        onClick={onStartShopping}
-        className="w-full bg-[#2A2A2C] text-white text-[17px] font-normal py-[17px] rounded-[18px] flex items-center justify-center gap-2 mb-[14px] active:scale-[.98] transition-transform"
-      >
-        {t('nav.startShopping')}
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M5 12h14M13 6l6 6-6 6" />
-        </svg>
-      </button>
-      <div className="bg-[#F6F6F4] rounded-[18px] overflow-hidden">
-        <Link
-          to="/pasti"
-          search={{ week: isoWeek }}
-          onClick={onClose}
-          className="flex items-center justify-between px-[18px] py-4 border-b border-[#E6E6E2] active:opacity-50"
-        >
-          <span className="text-base text-[#2A2A2C]">{t('home.planMeals')}</span>
-          <ChevronRight />
-        </Link>
-        <Link
-          to="/lista"
-          onClick={onClose}
-          className="flex items-center justify-between px-[18px] py-4 active:opacity-50"
-        >
-          <span className="text-base text-[#2A2A2C]">{t('home.shoppingList')}</span>
-          <span className="flex items-center gap-2">
-            <span className="text-sm text-[#9B9B9F] tabular-nums">{takenCount}/{totalCount}</span>
-            <ChevronRight />
-          </span>
-        </Link>
       </div>
     </BottomSheet>
   )

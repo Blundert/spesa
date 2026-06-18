@@ -2,7 +2,8 @@ import { Link } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 import { currentISOWeek, formatWeekLabel, formatShortDate } from '../lib/date'
 import { formatCentsPlain } from '../lib/money'
-import { computeBudgetSummary } from '../lib/budgetSelectors'
+import { weekSpendSummary } from '../lib/budgetSelectors'
+import { DEFAULT_BUONO_VALUE_CENTS } from '../db/types'
 import { useWeekBudget, useSessionsByWeek } from '../hooks/useShopping'
 import { useListItems } from '../hooks/useListItems'
 import { useSupermarkets } from '../hooks/useItems'
@@ -38,9 +39,7 @@ export function HomeScreen() {
   const { data: mealDays = [] } = useMealPlan(isoWeek)
   const mealCount = mealDays.reduce((n, d) => n + (d.pranzo ? 1 : 0) + (d.cena ? 1 : 0), 0)
 
-  const summary = budget
-    ? computeBudgetSummary(budget, sessions, purchases)
-    : { totalCents: 0, spentCents: 0, remainingCents: 0, outOfPocketCents: 0, isOver: false }
+  const summary = weekSpendSummary(sessions, purchases, budget?.buoniAvailable ?? 0)
 
   // "Presi": solo gli acquisti della spesa in corso (sessione non ancora finita).
   const activeSession = sessions.find((s) => s.finishedAt === null)
@@ -81,41 +80,24 @@ export function HomeScreen() {
           </span>
         </div>
 
-        {/* Hero */}
-        {summary.isOver ? (
-          <div className="bg-[#2A2A2C] rounded-[30px] px-[26px] py-[30px] mb-[14px]">
-            <div className="text-[12px] font-normal tracking-[1.6px] text-white/55 uppercase mb-[14px]">
-              {t('home.toPayExtra')}
-            </div>
-            <div className="flex items-baseline text-white">
-              <span className="text-[40px] font-normal opacity-55 mr-1.5">€</span>
-              <span className="text-[84px] font-light leading-[.92] tabular-nums tracking-[-2px]">
-                {formatCentsPlain(summary.outOfPocketCents)}
-              </span>
-            </div>
-            <div className="text-sm text-white/50 mt-[14px]">
-              {t('home.overBuoni', { count: budget?.buoniCount ?? 0 })}
-            </div>
+        {/* Hero: di tasca tua (speso − valore buoni della settimana) */}
+        <div className="bg-[#2A2A2C] rounded-[30px] px-[26px] py-[30px] mb-[14px]">
+          <div className="text-[12px] font-normal tracking-[1.6px] text-white/55 uppercase mb-[14px]">
+            {t('home.outOfPocket')}
           </div>
-        ) : (
-          <div className="px-1.5 pt-[18px] pb-9">
-            <div className="text-[12px] font-normal tracking-[1.6px] text-[#9B9B9F] uppercase mb-5">
-              {t('home.remainingWeek')}
-            </div>
-            <div className="flex items-baseline text-[#2A2A2C]">
-              <span className="text-[42px] font-normal text-[#B5B5BA] mr-1.5">€</span>
-              <span className="text-[92px] font-light leading-[.92] tabular-nums tracking-[-2.5px]">
-                {formatCentsPlain(summary.remainingCents)}
-              </span>
-            </div>
+          <div className="flex items-baseline text-white">
+            <span className="text-[40px] font-normal opacity-55 mr-1.5">€</span>
+            <span className="text-[84px] font-light leading-[.92] tabular-nums tracking-[-2px]">
+              {formatCentsPlain(summary.outOfPocketCents)}
+            </span>
           </div>
-        )}
+        </div>
 
         {/* Stats strip */}
-        <div className="flex bg-white rounded-[22px] py-[22px] px-1 mb-7">
+        <div className="flex bg-white rounded-[22px] py-[22px] px-1 mb-3">
           <div className="flex-1 text-center border-r border-[#ECECEC]">
             <div className="text-xl font-normal text-[#2A2A2C] tabular-nums">
-              €{formatCentsPlain(summary.spentCents)}
+              €{formatCentsPlain(summary.totalSpentCents)}
             </div>
             <div className="text-[11px] text-[#9B9B9F] mt-0.5 tracking-[.3px]">{t('home.spent')}</div>
           </div>
@@ -127,10 +109,15 @@ export function HomeScreen() {
           </div>
           <div className="flex-1 text-center">
             <div className="text-xl font-normal text-[#2A2A2C] tabular-nums">
-              €{formatCentsPlain(summary.totalCents)}
+              {summary.buoniSpentCount}
             </div>
-            <div className="text-[11px] text-[#9B9B9F] mt-0.5 tracking-[.3px]">{t('home.budget')}</div>
+            <div className="text-[11px] text-[#9B9B9F] mt-0.5 tracking-[.3px]">{t('home.buoni')}</div>
           </div>
+        </div>
+
+        {/* Buoni: spesi / rimanenti questa settimana */}
+        <div className="text-[13px] text-[#9B9B9F] text-center mb-7">
+          {t('home.buoniLine', { spent: summary.buoniSpentCount, remaining: summary.buoniRemaining })}
         </div>
 
         {/* Spese di questa settimana */}
@@ -200,6 +187,7 @@ export function HomeScreen() {
 
         <Link
           to="/spesa"
+          search={{ buoni: summary.buoniRemaining, val: DEFAULT_BUONO_VALUE_CENTS }}
           className="w-full bg-[#2A2A2C] text-white text-[17px] font-normal py-[18px] rounded-[22px] flex items-center justify-center gap-2.5 active:scale-[.98] transition-transform"
         >
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">

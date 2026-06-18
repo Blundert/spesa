@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useNavigate } from '@tanstack/react-router'
+import { useNavigate, useSearch } from '@tanstack/react-router'
 import { useQueryClient } from '@tanstack/react-query'
 import { db } from '../db/db'
 import { qk } from '../db/queryKeys'
@@ -8,9 +8,8 @@ import { toast } from 'sonner'
 import { categoryLabel } from '../i18n'
 import { currentISOWeek } from '../lib/date'
 import { formatCentsPlain } from '../lib/money'
-import { computeLiveBudgetSummary } from '../lib/budgetSelectors'
+import { liveSpendSummary } from '../lib/budgetSelectors'
 import {
-  useWeekBudget,
   useSessionsByWeek,
   usePurchasesBySession,
   useCreateSession,
@@ -27,6 +26,7 @@ const isoWeek = currentISOWeek()
 export function SpesaScreen() {
   const { t } = useTranslation()
   const navigate = useNavigate()
+  const { buoni, val } = useSearch({ from: '/spesa' })
   const [activeSessionId, setActiveSessionId] = useState<number | null>(null)
   const [priceTarget, setPriceTarget] = useState<{ itemId: number; name: string } | null>(null)
   const [newItemTarget, setNewItemTarget] = useState<{ name: string } | null>(null)
@@ -35,7 +35,6 @@ export function SpesaScreen() {
   const [newItemName, setNewItemName] = useState('')
   const [showFinishConfirm, setShowFinishConfirm] = useState(false)
 
-  const { data: budget } = useWeekBudget(isoWeek)
   const { data: sessions = [] } = useSessionsByWeek(isoWeek)
   const { data: supermarkets = [] } = useSupermarkets()
   const { data: listItems = [] } = useListItems()
@@ -58,9 +57,9 @@ export function SpesaScreen() {
   const clearList = useClearList()
   const qc = useQueryClient()
 
-  const summary = budget
-    ? computeLiveBudgetSummary(budget, purchases)
-    : { totalCents: 0, spentCents: 0, remainingCents: 0, outOfPocketCents: 0, isOver: false }
+  const liveBuoni = activeSession?.buoniSpent ?? buoni
+  const liveVal = activeSession?.buoniValueCents ?? val
+  const summary = liveSpendSummary(purchases, liveBuoni, liveVal)
 
   const supermarketName = activeSession
     ? (supermarkets.find((s) => s.id === activeSession.supermarketId)?.name ?? '?')
@@ -75,11 +74,15 @@ export function SpesaScreen() {
 
   const handleStartSession = useCallback(
     async (supermarketId: number) => {
-      const id = await createSession.mutateAsync(supermarketId)
+      const id = await createSession.mutateAsync({
+        supermarketId,
+        buoniSpent: buoni,
+        buoniValueCents: val,
+      })
       setActiveSessionId(id)
       setShowStorePicker(false)
     },
-    [createSession],
+    [createSession, buoni, val],
   )
 
   const handleConfirmPrice = useCallback(
@@ -91,12 +94,10 @@ export function SpesaScreen() {
           itemId: priceTarget.itemId,
           priceCents: cents,
         })
-        const rem = summary.remainingCents - cents
-        const sub =
-          rem < 0
-            ? t('spesa.toPayExtraAmount', { amount: formatCentsPlain(-rem) })
-            : t('spesa.remainingAmount', { amount: formatCentsPlain(rem) })
-        toast(t('spesa.itemAdded', { name: priceTarget.name }), { description: sub })
+        const oop = Math.max(0, summary.spentCents + cents - liveBuoni * liveVal)
+        toast(t('spesa.itemAdded', { name: priceTarget.name }), {
+          description: t('spesa.outOfPocketAmount', { amount: formatCentsPlain(oop) }),
+        })
         setPriceTarget(null)
       } else if (newItemTarget) {
         // Item fuori lista: nome già inserito
@@ -113,7 +114,7 @@ export function SpesaScreen() {
         setNewItemName('')
       }
     },
-    [activeSession, priceTarget, newItemTarget, addPurchase, summary.remainingCents, t],
+    [activeSession, priceTarget, newItemTarget, addPurchase, summary.spentCents, liveBuoni, liveVal, t],
   )
 
   const handleChangeStore = useCallback(
@@ -222,31 +223,25 @@ export function SpesaScreen() {
 
       {/* Hero budget */}
       <div className="px-5 pb-4 flex-none">
-        {summary.isOver ? (
-          <div className="bg-[#2A2A2C] rounded-[28px] p-[26px] mb-[22px]">
-            <div className="text-[12px] font-normal tracking-[1.6px] text-white/55 uppercase mb-3">{t('spesa.toPayExtra')}</div>
-            <div className="flex items-baseline text-white">
-              <span className="text-[36px] font-normal opacity-55 mr-1">€</span>
-              <span className="text-[76px] font-light leading-[.92] tabular-nums tracking-[-2px]">
-                {formatCentsPlain(summary.outOfPocketCents)}
-              </span>
-            </div>
+        <div className="bg-[#2A2A2C] rounded-[28px] p-[26px] mb-[22px]">
+          <div className="text-[12px] font-normal tracking-[1.6px] text-white/55 uppercase mb-3">{t('home.outOfPocket')}</div>
+          <div className="flex items-baseline text-white">
+            <span className="text-[36px] font-normal opacity-55 mr-1">€</span>
+            <span className="text-[76px] font-light leading-[.92] tabular-nums tracking-[-2px]">
+              {formatCentsPlain(summary.outOfPocketCents)}
+            </span>
           </div>
-        ) : (
-          <div className="text-center py-[22px]">
-            <div className="text-[12px] font-normal tracking-[1.6px] text-[#9B9B9F] uppercase mb-[14px]">{t('spesa.remaining')}</div>
-            <div className="flex items-baseline justify-center text-[#2A2A2C]">
-              <span className="text-[38px] font-normal text-[#B5B5BA] mr-1">€</span>
-              <span className="text-[88px] font-light leading-[.92] tabular-nums tracking-[-2.5px]">
-                {formatCentsPlain(summary.remainingCents)}
-              </span>
-            </div>
-          </div>
-        )}
+        </div>
         <div className="flex justify-center gap-0 text-[#9B9B9F] text-[13px]">
           <span className="tabular-nums">€{formatCentsPlain(summary.spentCents)} {t('common.spentWord')}</span>
           <span className="mx-[10px] opacity-50">·</span>
           <span className="tabular-nums">{t('spesa.itemsInCart', { count: doneItems.length })}</span>
+          {liveBuoni > 0 && (
+            <>
+              <span className="mx-[10px] opacity-50">·</span>
+              <span className="tabular-nums">{liveBuoni} {t('common.buoni')}</span>
+            </>
+          )}
         </div>
       </div>
 

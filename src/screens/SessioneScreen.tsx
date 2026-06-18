@@ -59,6 +59,11 @@ export function SessioneScreen() {
               {formatCentsPlain(totalCents)}
             </span>
           </div>
+          {session && session.buoniSpent > 0 && (
+            <div className="text-[13px] text-[#9B9B9F] mt-2 tabular-nums">
+              {session.buoniSpent} {t('common.buoni')} · €{formatCentsPlain(session.buoniSpent * session.buoniValueCents)}
+            </div>
+          )}
         </div>
 
         {/* Items list */}

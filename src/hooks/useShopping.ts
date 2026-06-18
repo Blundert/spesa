@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { qk } from '../db/queryKeys'
-import { getWeekBudget, updateWeekBudget } from '../db/repositories/weekBudget'
+import { getWeekBudget, setBuoniAvailable } from '../db/repositories/weekBudget'
 import { getSessionsByWeek, createSession, finishSession } from '../db/repositories/sessions'
 import {
   getPurchasesBySession,
@@ -22,16 +22,10 @@ export function useWeekBudget(isoWeek: string) {
   })
 }
 
-export function useUpdateWeekBudget(isoWeek: string) {
+export function useSetBuoniAvailable(isoWeek: string) {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: ({
-      buoniCount,
-      buoniValueCents,
-    }: {
-      buoniCount: number
-      buoniValueCents: number
-    }) => updateWeekBudget(isoWeek, buoniCount, buoniValueCents),
+    mutationFn: (buoniAvailable: number) => setBuoniAvailable(isoWeek, buoniAvailable),
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: qk.weekBudget(isoWeek) })
     },
@@ -57,7 +51,15 @@ export function useAllSessions() {
 export function useCreateSession(isoWeek: string) {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: (supermarketId: number) => createSession(isoWeek, supermarketId),
+    mutationFn: ({
+      supermarketId,
+      buoniSpent,
+      buoniValueCents,
+    }: {
+      supermarketId: number
+      buoniSpent: number
+      buoniValueCents: number
+    }) => createSession(isoWeek, supermarketId, buoniSpent, buoniValueCents),
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: qk.sessions(isoWeek) })
       void qc.invalidateQueries({ queryKey: qk.allSessions() })

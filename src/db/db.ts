@@ -9,6 +9,7 @@ import type {
   Purchase,
   MealPlan,
 } from './types'
+import { DEFAULT_BUONO_VALUE_CENTS } from './types'
 
 class SpesaDb extends Dexie {
   categories!: EntityTable<Category, 'id'>
@@ -57,6 +58,26 @@ class SpesaDb extends Dexie {
             s.confirmedTotalCents = null
           })
       })
+
+    // v4: buoni pasto per-spesa. weekBudgets: buoniCount→buoniAvailable (drop valueCents);
+    // sessions: buoniSpent + buoniValueCents. Indici invariati → solo upgrade dati.
+    this.version(4).upgrade(async (tx) => {
+      await tx
+        .table('weekBudgets')
+        .toCollection()
+        .modify((b: { buoniCount?: number; buoniAvailable?: number; buoniValueCents?: number }) => {
+          b.buoniAvailable = b.buoniCount ?? 0
+          delete b.buoniCount
+          delete b.buoniValueCents
+        })
+      await tx
+        .table('sessions')
+        .toCollection()
+        .modify((s: { buoniSpent?: number; buoniValueCents?: number }) => {
+          s.buoniSpent = 0
+          s.buoniValueCents = DEFAULT_BUONO_VALUE_CENTS
+        })
+    })
   }
 }
 

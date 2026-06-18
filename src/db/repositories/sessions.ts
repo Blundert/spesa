@@ -13,13 +13,20 @@ export async function getSessionById(id: number): Promise<Session | undefined> {
   return db.sessions.get(id)
 }
 
-export async function createSession(isoWeek: string, supermarketId: number): Promise<number> {
+export async function createSession(
+  isoWeek: string,
+  supermarketId: number,
+  buoniSpent: number,
+  buoniValueCents: number,
+): Promise<number> {
   const id = await db.sessions.add({
     isoWeek,
     supermarketId,
     startedAt: Date.now(),
     finishedAt: null,
     confirmedTotalCents: null,
+    buoniSpent,
+    buoniValueCents,
   })
   return id as number
 }
