@@ -6,6 +6,8 @@ export const it = {
     spentWord: 'spesi',
     takenWord: 'presi',
     buoni: 'buoni',
+    save: 'Salva',
+    quantity: 'Quantità',
   },
   nav: {
     week: 'Settimana',
@@ -81,6 +83,8 @@ export const it = {
     newTitle: 'Nuova spesa',
     buoni: 'Buoni pasto',
     buonoValue: 'Valore buono',
+    removeItem: 'Rimuovi',
+    uncheck: 'Rimetti da prendere',
   },
   storico: {
     title: 'Storico',

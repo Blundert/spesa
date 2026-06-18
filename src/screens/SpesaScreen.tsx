@@ -15,8 +15,10 @@ import {
   useCreateSession,
   useFinishSession,
   useAddPurchase,
+  useRemovePurchase,
+  useUpdatePurchase,
 } from '../hooks/useShopping'
-import { useListItems, useClearList } from '../hooks/useListItems'
+import { useListItems, useClearList, useRemoveFromList } from '../hooks/useListItems'
 import { useSupermarkets, useCategories, useItems } from '../hooks/useItems'
 import { PriceKeypad } from '../components/PriceKeypad'
 import { BottomSheet } from '../components/BottomSheet'
@@ -28,7 +30,13 @@ export function SpesaScreen() {
   const navigate = useNavigate()
   const { buoni, val } = useSearch({ from: '/spesa' })
   const [activeSessionId, setActiveSessionId] = useState<number | null>(null)
-  const [priceTarget, setPriceTarget] = useState<{ itemId: number; name: string } | null>(null)
+  const [priceTarget, setPriceTarget] = useState<{
+    itemId: number
+    name: string
+    purchaseId?: number
+    priceCents?: number
+    quantity?: number
+  } | null>(null)
   const [newItemTarget, setNewItemTarget] = useState<{ name: string } | null>(null)
   const [showStorePicker, setShowStorePicker] = useState(false)
   const [showNewItem, setShowNewItem] = useState(false)
@@ -54,6 +62,9 @@ export function SpesaScreen() {
   const createSession = useCreateSession(isoWeek)
   const finishSession = useFinishSession(isoWeek)
   const addPurchase = useAddPurchase(isoWeek)
+  const removePurchase = useRemovePurchase(activeSession?.id ?? 0)
+  const updatePurchase = useUpdatePurchase(activeSession?.id ?? 0)
+  const removeFromList = useRemoveFromList()
   const clearList = useClearList()
   const qc = useQueryClient()
 
@@ -86,18 +97,24 @@ export function SpesaScreen() {
   )
 
   const handleConfirmPrice = useCallback(
-    async (cents: number) => {
+    async (cents: number, quantity: number) => {
       if (!activeSession?.id) return
       if (priceTarget) {
-        await addPurchase.mutateAsync({
-          sessionId: activeSession.id,
-          itemId: priceTarget.itemId,
-          priceCents: cents,
-        })
-        const oop = Math.max(0, summary.spentCents + cents - liveBuoni * liveVal)
-        toast(t('spesa.itemAdded', { name: priceTarget.name }), {
-          description: t('spesa.outOfPocketAmount', { amount: formatCentsPlain(oop) }),
-        })
+        if (priceTarget.purchaseId !== undefined) {
+          // Modifica della voce esistente (no clone)
+          await updatePurchase.mutateAsync({ id: priceTarget.purchaseId, priceCents: cents, quantity })
+        } else {
+          await addPurchase.mutateAsync({
+            sessionId: activeSession.id,
+            itemId: priceTarget.itemId,
+            priceCents: cents,
+            quantity,
+          })
+          const oop = Math.max(0, summary.spentCents + cents * quantity - liveBuoni * liveVal)
+          toast(t('spesa.itemAdded', { name: priceTarget.name }), {
+            description: t('spesa.outOfPocketAmount', { amount: formatCentsPlain(oop) }),
+          })
+        }
         setPriceTarget(null)
       } else if (newItemTarget) {
         // Item fuori lista: nome già inserito
@@ -106,7 +123,7 @@ export function SpesaScreen() {
         const categories = await getCategories()
         const altroCategory = categories.find((c) => c.name === 'Altro')
         const itemId = await upsertItem(newItemTarget.name, altroCategory?.id ?? 0, cents)
-        await addPurchase.mutateAsync({ sessionId: activeSession.id, itemId, priceCents: cents })
+        await addPurchase.mutateAsync({ sessionId: activeSession.id, itemId, priceCents: cents, quantity })
         toast(t('spesa.itemAdded', { name: newItemTarget.name }), {
           description: `€${formatCentsPlain(cents)}`,
         })
@@ -114,7 +131,7 @@ export function SpesaScreen() {
         setNewItemName('')
       }
     },
-    [activeSession, priceTarget, newItemTarget, addPurchase, summary.spentCents, liveBuoni, liveVal, t],
+    [activeSession, priceTarget, newItemTarget, addPurchase, updatePurchase, summary.spentCents, liveBuoni, liveVal, t],
   )
 
   const handleChangeStore = useCallback(
@@ -146,6 +163,17 @@ export function SpesaScreen() {
       void navigate({ to: '/storico' })
     },
     [activeSession, finishSession, clearList, navigate, supermarketName, t],
+  )
+
+  // Elimina del tutto una voce dal carrello: rimuove l'acquisto e, se era in lista,
+  // la toglie anche dalla lista.
+  const eliminateCart = useCallback(
+    async (purchaseId: number, itemId: number) => {
+      await removePurchase.mutateAsync(purchaseId)
+      const li = listItems.find((l) => l.itemId === itemId)
+      if (li?.id !== undefined) await removeFromList.mutateAsync(li.id)
+    },
+    [removePurchase, removeFromList, listItems],
   )
 
   // Divide lista in da prendere / nel carrello
@@ -255,20 +283,33 @@ export function SpesaScreen() {
             </div>
             <div className="bg-white rounded-[20px] overflow-hidden">
               {items.map((li, i) => (
-                <button
+                <div
                   key={li.id}
-                  onClick={() => setPriceTarget({ itemId: li.itemId, name: li.itemName })}
-                  className="w-full flex items-center gap-[13px] px-[18px] py-[17px] active:bg-[#F6F6F4] transition-colors text-left"
+                  className="flex items-center px-[18px] py-[17px]"
                   style={{ borderBottom: i < items.length - 1 ? '1px solid #ECECEC' : 'none' }}
                 >
-                  <div className="w-6 h-6 flex-none rounded-full border-2 border-[#D8D8D6]" />
-                  <div className="flex-1 text-base text-[#2A2A2C]">{li.itemName}</div>
-                  {li.suggestedPriceCents !== null && (
-                    <span className="text-sm text-[#B5B5BA] tabular-nums">
-                      {t('spesa.about')} €{formatCentsPlain(li.suggestedPriceCents)}
-                    </span>
-                  )}
-                </button>
+                  <button
+                    onClick={() => setPriceTarget({ itemId: li.itemId, name: li.itemName })}
+                    className="flex flex-1 items-center gap-[13px] text-left active:opacity-60 transition-opacity"
+                  >
+                    <div className="w-6 h-6 flex-none rounded-full border-2 border-[#D8D8D6]" />
+                    <div className="flex-1 text-base text-[#2A2A2C]">{li.itemName}</div>
+                    {li.suggestedPriceCents !== null && (
+                      <span className="text-sm text-[#B5B5BA] tabular-nums">
+                        {t('spesa.about')} €{formatCentsPlain(li.suggestedPriceCents)}
+                      </span>
+                    )}
+                  </button>
+                  <button
+                    onClick={() => li.id !== undefined && removeFromList.mutate(li.id)}
+                    aria-label={t('spesa.removeItem')}
+                    className="w-9 h-9 -mr-1.5 ml-2 flex-none flex items-center justify-center opacity-40 active:opacity-90"
+                  >
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2A2A2C" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6" />
+                    </svg>
+                  </button>
+                </div>
               ))}
             </div>
           </div>
@@ -282,24 +323,51 @@ export function SpesaScreen() {
             </div>
             <div className="bg-white rounded-[20px] overflow-hidden">
               {doneItems.map((p, i) => (
-                <button
+                <div
                   key={p.id}
-                  onClick={() =>
-                    setPriceTarget({ itemId: p.itemId, name: p.name })
-                  }
-                  className="w-full flex items-center gap-[13px] px-[18px] py-4 active:bg-[#F6F6F4] transition-colors text-left"
+                  className="flex items-center px-[18px] py-4"
                   style={{ borderBottom: i < doneItems.length - 1 ? '1px solid #ECECEC' : 'none' }}
                 >
-                  <div className="w-6 h-6 flex-none rounded-full bg-[#2A2A2C] flex items-center justify-center">
+                  {/* Spunta = depenna (rimette tra "da prendere") */}
+                  <button
+                    onClick={() => p.id !== undefined && removePurchase.mutate(p.id)}
+                    aria-label={t('spesa.uncheck')}
+                    className="w-6 h-6 flex-none rounded-full bg-[#2A2A2C] flex items-center justify-center active:opacity-50"
+                  >
                     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M5 12l4 4 10-10" />
                     </svg>
-                  </div>
-                  <div className="flex-1 opacity-50 text-base text-[#2A2A2C]">{p.name}</div>
-                  <span className="text-[15px] text-[#2A2A2C] font-normal tabular-nums">
-                    €{formatCentsPlain(p.priceCents)}
-                  </span>
-                </button>
+                  </button>
+                  {/* Voce = modifica prezzo/quantità */}
+                  <button
+                    onClick={() =>
+                      setPriceTarget({
+                        itemId: p.itemId,
+                        name: p.name,
+                        purchaseId: p.id,
+                        priceCents: p.priceCents,
+                        quantity: p.quantity,
+                      })
+                    }
+                    className="flex flex-1 items-center gap-[13px] ml-[13px] text-left active:opacity-60 transition-opacity"
+                  >
+                    <div className="flex-1 opacity-50 text-base text-[#2A2A2C]">{p.name}</div>
+                    <span className="text-[15px] text-[#2A2A2C] font-normal tabular-nums">
+                      €{formatCentsPlain(p.priceCents)}
+                      {p.quantity > 1 && <span className="text-[#9B9B9F]"> ×{p.quantity}</span>}
+                    </span>
+                  </button>
+                  {/* Cestino = elimina del tutto */}
+                  <button
+                    onClick={() => p.id !== undefined && void eliminateCart(p.id, p.itemId)}
+                    aria-label={t('spesa.removeItem')}
+                    className="w-9 h-9 -mr-1.5 ml-2 flex-none flex items-center justify-center opacity-40 active:opacity-90"
+                  >
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2A2A2C" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6" />
+                    </svg>
+                  </button>
+                </div>
               ))}
             </div>
           </div>
@@ -326,12 +394,15 @@ export function SpesaScreen() {
         onPick={handleChangeStore}
       />
 
-      {/* Price keypad — da lista */}
+      {/* Price keypad — da lista (aggiungi o modifica) */}
       <PriceKeypad
         open={priceTarget !== null}
         onClose={() => setPriceTarget(null)}
         label={priceTarget?.name ?? ''}
-        confirmLabel={t('spesa.addToCart')}
+        confirmLabel={priceTarget?.purchaseId !== undefined ? t('common.save') : t('spesa.addToCart')}
+        showQuantity
+        initialCents={priceTarget?.priceCents ?? 0}
+        initialQuantity={priceTarget?.quantity ?? 1}
         onConfirm={handleConfirmPrice}
       />
 
@@ -369,6 +440,7 @@ export function SpesaScreen() {
         onClose={() => setNewItemTarget(null)}
         label={newItemTarget?.name ?? ''}
         confirmLabel={t('spesa.addToCart')}
+        showQuantity
         onConfirm={handleConfirmPrice}
       />
 
@@ -380,7 +452,7 @@ export function SpesaScreen() {
         label={t('spesa.howMuch')}
         confirmLabel={t('spesa.confirmShopping')}
         initialCents={summary.spentCents}
-        onConfirm={handleConfirmFinish}
+        onConfirm={(cents) => handleConfirmFinish(cents)}
       />
     </div>
   )
