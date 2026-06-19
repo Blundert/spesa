@@ -67,8 +67,9 @@ export function AppShell() {
       {showDebug && <ViewportDebug />}
       {/* ── SCREEN ── */}
       <div className="absolute inset-0 bg-[#F2F2F0] flex flex-col overflow-hidden">
-        {/* Status bar spacer */}
-        <div className="h-[54px] flex-none" />
+        {/* Spazio in alto: con status bar 'default' la web view parte già sotto la status bar,
+            quindi serve solo un po' di respiro (e si adatta se mai si riattiva viewport-fit=cover). */}
+        <div className="flex-none" style={{ height: 'max(16px, env(safe-area-inset-top))' }} />
 
         {/* Screen content — fade in basso stile Claude (mask sull'opacità del contenuto) */}
         <div className="flex-1 flex flex-col overflow-hidden scroll-fade-bottom">
