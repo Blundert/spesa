@@ -40,7 +40,6 @@ export const it = {
     mealsPlanned: '{{count}} pasti pianificati',
     shoppingList: 'Lista della spesa',
     takenOfTotal: '{{taken}} / {{total}} presi',
-    startShopping: 'Inizia la spesa',
     outOfPocket: 'Di tasca tua',
     buoni: 'BUONI',
     buoniLine: '{{spent}} buoni spesi · {{remaining}} rimanenti',

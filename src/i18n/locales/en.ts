@@ -42,7 +42,6 @@ export const en: typeof it = {
     mealsPlanned: '{{count}} meals planned',
     shoppingList: 'Shopping list',
     takenOfTotal: '{{taken}} / {{total}} taken',
-    startShopping: 'Start shopping',
     outOfPocket: 'Out of pocket',
     buoni: 'VOUCHERS',
     buoniLine: '{{spent}} vouchers used · {{remaining}} left',
