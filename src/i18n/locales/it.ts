@@ -183,6 +183,8 @@ export const it = {
     syncPullConfirmTitle: 'Scaricare dal remoto?',
     syncPullConfirmBody: 'Sovrascriverà tutti i dati locali con il backup remoto. Non si può annullare.',
     syncPullConfirm: 'Scarica e sovrascrivi',
+    debug: 'Debug',
+    debugViewport: 'Mostra misure viewport',
   },
   categories: {
     0: 'Frutta e verdura',

@@ -6,6 +6,7 @@ import { formatCentsPlain } from '../lib/money'
 import { weekSpendSummary } from '../lib/budgetSelectors'
 import { useWeekBudget, useSessionsByWeek } from '../hooks/useShopping'
 import { useAutoSync } from '../hooks/useAutoSync'
+import { getDebugViewport, onDebugViewportChange } from '../lib/debugFlag'
 import { DEFAULT_BUONO_VALUE_CENTS } from '../db/types'
 import { qk } from '../db/queryKeys'
 import { useQuery } from '@tanstack/react-query'
@@ -34,11 +35,13 @@ export function AppShell() {
   const [sheetOpen, setSheetOpen] = useState(false)
   const [newBuoni, setNewBuoni] = useState(0)
   const [newVal, setNewVal] = useState(DEFAULT_BUONO_VALUE_CENTS)
+  const [showDebug, setShowDebug] = useState(getDebugViewport())
   const router = useRouter()
   const navigate = useNavigate()
   const pathname = router.state.location.pathname
 
   useAutoSync()
+  useEffect(() => onDebugViewportChange(() => setShowDebug(getDebugViewport())), [])
 
   const { data: budget } = useWeekBudget(isoWeek)
   const { data: sessions = [] } = useSessionsByWeek(isoWeek)
@@ -61,7 +64,7 @@ export function AppShell() {
 
   return (
     <div className="relative w-full h-full bg-[#F2F2F0] overflow-hidden">
-      <ViewportDebug />
+      {showDebug && <ViewportDebug />}
       {/* ── SCREEN ── */}
       <div className="absolute inset-0 bg-[#F2F2F0] flex flex-col overflow-hidden">
         {/* Status bar spacer */}
