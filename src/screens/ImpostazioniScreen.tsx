@@ -1,10 +1,11 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import type { PWAInstallElement } from '@khmyznikov/pwa-install'
 import { LANG_KEY, type Lang } from '../i18n'
 import { wipeAllData } from '../db/db'
+import { exportData, importData, isBackupData, type BackupData } from '../db/backup'
 import { BottomSheet } from '../components/BottomSheet'
 
 const LANGS: { code: Lang; label: string }[] = [
@@ -16,6 +17,8 @@ export function ImpostazioniScreen() {
   const { t, i18n } = useTranslation()
   const qc = useQueryClient()
   const [showWipe, setShowWipe] = useState(false)
+  const [pendingImport, setPendingImport] = useState<BackupData | null>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
   const current: Lang = i18n.language.startsWith('en') ? 'en' : 'it'
 
   const setLang = (lng: Lang) => {
@@ -44,6 +47,47 @@ export function ImpostazioniScreen() {
       await Promise.all(regs.map((r) => r.update()))
     }
     window.location.reload()
+  }
+
+  const handleExport = async () => {
+    const data = await exportData()
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `spesa-backup-${new Date().toISOString().slice(0, 10)}.json`
+    a.click()
+    URL.revokeObjectURL(url)
+    toast(t('settings.exported'))
+  }
+
+  const handleFileSelected = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    e.target.value = '' // permette di riselezionare lo stesso file
+    if (!file) return
+    try {
+      const parsed: unknown = JSON.parse(await file.text())
+      if (!isBackupData(parsed)) {
+        toast.error(t('settings.importInvalid'))
+        return
+      }
+      setPendingImport(parsed)
+    } catch {
+      toast.error(t('settings.importInvalid'))
+    }
+  }
+
+  const handleImportConfirm = async () => {
+    if (!pendingImport) return
+    try {
+      await importData(pendingImport)
+      await qc.invalidateQueries()
+      setPendingImport(null)
+      toast(t('settings.imported'))
+    } catch {
+      setPendingImport(null)
+      toast.error(t('settings.importInvalid'))
+    }
   }
 
   return (
@@ -109,12 +153,40 @@ export function ImpostazioniScreen() {
         <div className="text-[12px] font-normal tracking-[1.2px] text-[#9B9B9F] uppercase px-1.5 pb-[13px]">
           {t('settings.data')}
         </div>
+        <div className="bg-white rounded-[20px] overflow-hidden mb-3">
+          <button
+            onClick={() => void handleExport()}
+            className="w-full flex items-center justify-between px-5 py-[17px] border-b border-[#ECECEC] active:bg-[#F6F6F4] transition-colors text-left"
+          >
+            <span className="text-base text-[#2A2A2C]">{t('settings.exportData')}</span>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9B9B9F" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 4v11m0 0l-4-4m4 4l4-4M5 20h14" />
+            </svg>
+          </button>
+          <button
+            onClick={() => fileInputRef.current?.click()}
+            className="w-full flex items-center justify-between px-5 py-[17px] active:bg-[#F6F6F4] transition-colors text-left"
+          >
+            <span className="text-base text-[#2A2A2C]">{t('settings.importData')}</span>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9B9B9F" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 20V9m0 0L8 13m4-4l4 4M5 4h14" />
+            </svg>
+          </button>
+        </div>
         <button
           onClick={() => setShowWipe(true)}
           className="w-full bg-white rounded-[20px] px-5 py-[17px] text-left text-base text-[#D14343] active:bg-[#F6F6F4] transition-colors"
         >
           {t('settings.deleteAll')}
         </button>
+
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="application/json,.json"
+          className="hidden"
+          onChange={(e) => void handleFileSelected(e)}
+        />
       </div>
 
       {/* Drawer di conferma azzeramento */}
@@ -133,6 +205,28 @@ export function ImpostazioniScreen() {
         </button>
         <button
           onClick={() => setShowWipe(false)}
+          className="w-full bg-[#ECECEA] text-[#2A2A2C] text-[17px] py-[18px] rounded-[20px] active:scale-[.98] transition-transform"
+        >
+          {t('common.cancel')}
+        </button>
+      </BottomSheet>
+
+      {/* Drawer di conferma import (sovrascrive tutto) */}
+      <BottomSheet open={pendingImport !== null} onClose={() => setPendingImport(null)}>
+        <div className="text-[20px] font-normal text-[#2A2A2C] px-0.5 pb-2">
+          {t('settings.importConfirmTitle')}
+        </div>
+        <p className="text-sm text-[#6E6E72] px-0.5 pb-4 leading-relaxed">
+          {t('settings.importConfirmBody')}
+        </p>
+        <button
+          onClick={() => void handleImportConfirm()}
+          className="w-full bg-[#2A2A2C] text-white text-[17px] py-[18px] rounded-[20px] mb-2 active:scale-[.98] transition-transform"
+        >
+          {t('settings.importConfirm')}
+        </button>
+        <button
+          onClick={() => setPendingImport(null)}
           className="w-full bg-[#ECECEA] text-[#2A2A2C] text-[17px] py-[18px] rounded-[20px] active:scale-[.98] transition-transform"
         >
           {t('common.cancel')}
