@@ -71,9 +71,11 @@ export function AppShell() {
           <Outlet />
         </div>
 
-        {/* Barra fissa: pill riepilogo + cerchio menu, galleggianti. */}
+        {/* Barra fissa: pill riepilogo + cerchio menu, galleggianti.
+            position: fixed (ancorata al viewport, non al contenitore h-full) così in PWA
+            standalone iOS il fondo è sempre quello reale e la barra non "salta" più su. */}
         <div
-          className="absolute left-0 right-0 z-[20] px-[18px] flex items-stretch gap-2.5"
+          className="fixed left-0 right-0 z-[20] px-[18px] flex items-stretch gap-2.5"
           style={{ bottom: 'calc(18px + env(safe-area-inset-bottom))' }}
         >
           <button
