@@ -12,20 +12,34 @@ import './index.css'
 const rootEl = document.getElementById('root')
 if (!rootEl) throw new Error('Root element not found')
 
+// Altezza affidabile del viewport in PWA standalone iOS. documentElement.clientHeight è stabile,
+// mentre window.innerHeight (e quindi position:fixed/100dvh/100vh) oscilla includendo o no la
+// status bar (es. 793 ↔ 852). Guidiamo l'altezza dello shell da clientHeight via CSS variable.
+function syncAppHeight() {
+  document.documentElement.style.setProperty(
+    '--app-height',
+    `${document.documentElement.clientHeight}px`,
+  )
+}
+syncAppHeight()
+window.addEventListener('resize', syncAppHeight)
+window.addEventListener('orientationchange', syncAppHeight)
+window.visualViewport?.addEventListener('resize', syncAppHeight)
+
 createRoot(rootEl).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
-      {/* Shell ancorato al viewport con position: fixed (top/bottom: 0): in PWA standalone iOS
-          è affidabile dove 100dvh/100vh/100% rendono altezze incostanti. inset 0 + margin auto
-          riempie l'altezza reale e centra la colonna max 430px. */}
+      {/* Shell: position: fixed ancorato in alto, ALTEZZA esplicita da --app-height
+          (= documentElement.clientHeight, stabile) invece di bottom:0/100dvh, che su iOS
+          standalone si agganciano a innerHeight ballerino e lasciavano un vuoto in basso. */}
       <div
         data-vaul-drawer-wrapper
         style={{
           position: 'fixed',
           top: 0,
-          bottom: 0,
           left: 0,
           right: 0,
+          height: 'var(--app-height, 100%)',
           margin: '0 auto',
           width: '100%',
           maxWidth: '430px',
