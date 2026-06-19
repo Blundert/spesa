@@ -138,6 +138,7 @@ export const en: typeof it = {
   },
   settings: {
     title: 'Settings',
+    app: 'App',
     language: 'Language',
     version: 'Version',
     refresh: 'Update app',

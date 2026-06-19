@@ -160,6 +160,35 @@ export function ImpostazioniScreen() {
           </span>
         </div>
 
+        {/* App: versione, aggiorna, installa */}
+        <div className="text-[12px] font-normal tracking-[1.2px] text-[#9B9B9F] uppercase px-1.5 pb-[13px]">
+          {t('settings.app')}
+        </div>
+        <div className="bg-white rounded-[20px] overflow-hidden mb-7">
+          <div className="w-full flex items-center justify-between px-5 py-[17px] border-b border-[#ECECEC]">
+            <span className="text-base text-[#2A2A2C]">{t('settings.version')}</span>
+            <span className="text-[15px] text-[#9B9B9F] tabular-nums">{__APP_VERSION__}</span>
+          </div>
+          <button
+            onClick={() => void handleUpdate()}
+            className="w-full flex items-center justify-between px-5 py-[17px] border-b border-[#ECECEC] active:bg-[#F6F6F4] transition-colors text-left"
+          >
+            <span className="text-base text-[#2A2A2C]">{t('settings.refresh')}</span>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9B9B9F" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M21 12a9 9 0 1 1-2.64-6.36M21 4v5h-5" />
+            </svg>
+          </button>
+          <button
+            onClick={handleInstall}
+            className="w-full flex items-center justify-between px-5 py-[17px] active:bg-[#F6F6F4] transition-colors text-left"
+          >
+            <span className="text-base text-[#2A2A2C]">{t('install.title')}</span>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9B9B9F" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 3v13M8 12l4 4 4-4M5 19h14" />
+            </svg>
+          </button>
+        </div>
+
         {/* Lingua */}
         <div className="text-[12px] font-normal tracking-[1.2px] text-[#9B9B9F] uppercase px-1.5 pb-[13px]">
           {t('settings.language')}
@@ -180,34 +209,6 @@ export function ImpostazioniScreen() {
               )}
             </button>
           ))}
-        </div>
-
-        {/* Installa */}
-        <button
-          onClick={handleInstall}
-          className="w-full flex items-center justify-between bg-white rounded-[20px] px-5 py-[17px] mb-7 active:bg-[#F6F6F4] transition-colors text-left"
-        >
-          <span className="text-base text-[#2A2A2C]">{t('install.title')}</span>
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9B9B9F" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M12 3v13M8 12l4 4 4-4M5 19h14" />
-          </svg>
-        </button>
-
-        {/* Aggiorna app (service worker) */}
-        <button
-          onClick={() => void handleUpdate()}
-          className="w-full flex items-center justify-between bg-white rounded-[20px] px-5 py-[17px] mb-7 active:bg-[#F6F6F4] transition-colors text-left"
-        >
-          <span className="text-base text-[#2A2A2C]">{t('settings.refresh')}</span>
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9B9B9F" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M21 12a9 9 0 1 1-2.64-6.36M21 4v5h-5" />
-          </svg>
-        </button>
-
-        {/* Versione */}
-        <div className="bg-white rounded-[20px] px-5 py-[17px] flex items-center justify-between mb-7">
-          <span className="text-base text-[#2A2A2C]">{t('settings.version')}</span>
-          <span className="text-[15px] text-[#9B9B9F] tabular-nums">{__APP_VERSION__}</span>
         </div>
 
         {/* Dati */}
