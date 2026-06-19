@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next'
 import { currentISOWeek, formatWeekLabel, formatShortDate } from '../lib/date'
 import { formatCentsPlain } from '../lib/money'
 import { weekSpendSummary } from '../lib/budgetSelectors'
-import { DEFAULT_BUONO_VALUE_CENTS } from '../db/types'
 import { useWeekBudget, useSessionsByWeek } from '../hooks/useShopping'
 import { useListItems } from '../hooks/useListItems'
 import { useSupermarkets } from '../hooks/useItems'
@@ -184,18 +183,6 @@ export function HomeScreen() {
             <ChevronRight />
           </Link>
         </div>
-
-        <Link
-          to="/spesa"
-          search={{ buoni: summary.buoniRemaining, val: DEFAULT_BUONO_VALUE_CENTS }}
-          className="w-full bg-[#2A2A2C] text-white text-[17px] font-normal py-[18px] rounded-[22px] flex items-center justify-center gap-2.5 active:scale-[.98] transition-transform"
-        >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-            <circle cx="9" cy="20" r="1.4" /><circle cx="18" cy="20" r="1.4" />
-            <path d="M2 3h2.5l2.2 12.5a1.5 1.5 0 0 0 1.5 1.2h8.8a1.5 1.5 0 0 0 1.5-1.2L21 7H5.2" />
-          </svg>
-          {t('home.startShopping')}
-        </Link>
     </div>
   )
 }
