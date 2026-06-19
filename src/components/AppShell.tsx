@@ -5,6 +5,7 @@ import { currentISOWeek } from '../lib/date'
 import { formatCentsPlain } from '../lib/money'
 import { weekSpendSummary } from '../lib/budgetSelectors'
 import { useWeekBudget, useSessionsByWeek } from '../hooks/useShopping'
+import { useAutoSync } from '../hooks/useAutoSync'
 import { DEFAULT_BUONO_VALUE_CENTS } from '../db/types'
 import { qk } from '../db/queryKeys'
 import { useQuery } from '@tanstack/react-query'
@@ -36,6 +37,8 @@ export function AppShell() {
   const router = useRouter()
   const navigate = useNavigate()
   const pathname = router.state.location.pathname
+
+  useAutoSync()
 
   const { data: budget } = useWeekBudget(isoWeek)
   const { data: sessions = [] } = useSessionsByWeek(isoWeek)
