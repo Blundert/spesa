@@ -185,6 +185,8 @@ export const en: typeof it = {
     syncPullConfirmTitle: 'Pull from remote?',
     syncPullConfirmBody: 'This will overwrite all local data with the remote backup. This cannot be undone.',
     syncPullConfirm: 'Pull and overwrite',
+    debug: 'Debug',
+    debugViewport: 'Show viewport metrics',
   },
   categories: {
     0: 'Fruit & veg',

@@ -16,6 +16,7 @@ import {
   type GitConfig,
 } from '../lib/gitSync'
 import { runSync } from '../lib/syncRunner'
+import { getDebugViewport, setDebugViewport } from '../lib/debugFlag'
 import { BottomSheet } from '../components/BottomSheet'
 
 const LANGS: { code: Lang; label: string }[] = [
@@ -33,6 +34,7 @@ export function ImpostazioniScreen() {
   const [auto, setAuto] = useState<boolean>(() => getAutoSync())
   const [syncing, setSyncing] = useState(false)
   const [showPull, setShowPull] = useState(false)
+  const [debug, setDebug] = useState<boolean>(() => getDebugViewport())
   const current: Lang = i18n.language.startsWith('en') ? 'en' : 'it'
 
   const setLang = (lng: Lang) => {
@@ -331,6 +333,28 @@ export function ImpostazioniScreen() {
           className="w-full bg-white rounded-[20px] px-5 py-[17px] text-base text-[#2A2A2C] active:bg-[#F6F6F4] transition-colors disabled:opacity-50"
         >
           {t('settings.syncPull')}
+        </button>
+
+        {/* Debug (sviluppo) */}
+        <div className="text-[12px] font-normal tracking-[1.2px] text-[#9B9B9F] uppercase px-1.5 pt-7 pb-[13px]">
+          {t('settings.debug')}
+        </div>
+        <button
+          onClick={() => {
+            const next = !debug
+            setDebug(next)
+            setDebugViewport(next)
+          }}
+          className="w-full flex items-center justify-between bg-white rounded-[20px] px-5 py-[17px] active:bg-[#F6F6F4] transition-colors text-left"
+        >
+          <span className="text-base text-[#2A2A2C]">{t('settings.debugViewport')}</span>
+          <span
+            className={`relative w-[46px] h-[28px] rounded-full transition-colors flex-none ${debug ? 'bg-[#2A2A2C]' : 'bg-[#D8D8D6]'}`}
+          >
+            <span
+              className={`absolute top-[3px] w-[22px] h-[22px] rounded-full bg-white transition-all ${debug ? 'left-[21px]' : 'left-[3px]'}`}
+            />
+          </span>
         </button>
 
         <input
