@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Outlet, Link, useRouter, useNavigate } from '@tanstack/react-router'
 import { currentISOWeek } from '../lib/date'
@@ -61,6 +61,7 @@ export function AppShell() {
 
   return (
     <div className="relative w-full h-full bg-[#F2F2F0] overflow-hidden">
+      <ViewportDebug />
       {/* ── SCREEN ── */}
       <div className="absolute inset-0 bg-[#F2F2F0] flex flex-col overflow-hidden">
         {/* Status bar spacer */}
@@ -274,5 +275,64 @@ function PlusIcon() {
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2A2A2C" strokeWidth="2.4" strokeLinecap="round">
       <path d="M12 5v14M5 12h14" />
     </svg>
+  )
+}
+
+// TEMPORANEO: riquadro diagnostico per capire perché lo shell non riempie lo schermo su iOS.
+// Da rimuovere una volta individuata e risolta la causa.
+function ViewportDebug() {
+  const [txt, setTxt] = useState('…')
+  useEffect(() => {
+    const probe = document.createElement('div')
+    probe.style.cssText =
+      'position:fixed;inset:0;padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom);visibility:hidden;pointer-events:none'
+    document.body.appendChild(probe)
+    const read = () => {
+      const cs = getComputedStyle(probe)
+      const vv = window.visualViewport
+      const shell = document.querySelector('[data-vaul-drawer-wrapper]')
+      const r = shell?.getBoundingClientRect()
+      const nav = window.navigator as Navigator & { standalone?: boolean }
+      setTxt(
+        [
+          `inner ${window.innerHeight} · client ${document.documentElement.clientHeight}`,
+          `vv ${vv ? Math.round(vv.height) : '-'} · screen ${window.screen.height} · dpr ${window.devicePixelRatio}`,
+          `safe top ${cs.paddingTop} · bottom ${cs.paddingBottom}`,
+          r ? `shell top ${Math.round(r.top)} · bottom ${Math.round(r.bottom)} · h ${Math.round(r.height)}` : 'no shell',
+          `GAP bottom ${r ? Math.round(window.innerHeight - r.bottom) : '-'}`,
+          `standalone ${String(nav.standalone)}`,
+        ].join('\n'),
+      )
+    }
+    const raf = requestAnimationFrame(read)
+    const id = setInterval(read, 1000)
+    window.addEventListener('resize', read)
+    window.visualViewport?.addEventListener('resize', read)
+    return () => {
+      cancelAnimationFrame(raf)
+      clearInterval(id)
+      window.removeEventListener('resize', read)
+      window.visualViewport?.removeEventListener('resize', read)
+      probe.remove()
+    }
+  }, [])
+  return (
+    <div
+      style={{
+        position: 'fixed',
+        top: 56,
+        left: 8,
+        zIndex: 9999,
+        background: 'rgba(200,0,0,.92)',
+        color: '#fff',
+        font: '10px/1.45 ui-monospace, monospace',
+        padding: '6px 9px',
+        borderRadius: 8,
+        whiteSpace: 'pre',
+        pointerEvents: 'none',
+      }}
+    >
+      {txt}
+    </div>
   )
 }
