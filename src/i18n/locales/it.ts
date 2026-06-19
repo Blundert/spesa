@@ -136,6 +136,7 @@ export const it = {
   },
   settings: {
     title: 'Impostazioni',
+    app: 'App',
     language: 'Lingua',
     version: 'Versione',
     refresh: 'Aggiorna app',
