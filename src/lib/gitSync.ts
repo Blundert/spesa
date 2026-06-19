@@ -12,7 +12,8 @@ export interface GitConfig {
 
 const CONFIG_KEY = 'gitsync-config'
 const AUTO_KEY = 'gitsync-auto'
-const HASH_KEY = 'gitsync-lasthash'
+const HASH_KEY = 'gitsync-lasthash' // hash dei dati all'ultimo sync
+const SHA_KEY = 'gitsync-lastsha' // sha del file remoto all'ultimo sync
 
 export function getGitConfig(): GitConfig {
   try {
@@ -80,6 +81,10 @@ function contentHash(data: BackupData): string {
   return (h >>> 0).toString(16)
 }
 
+function isoStamp(): string {
+  return new Date().toISOString()
+}
+
 const API = 'https://api.github.com'
 
 function authHeaders(token: string): Record<string, string> {
@@ -94,21 +99,32 @@ function contentsUrl(c: GitConfig): string {
   return `${API}/repos/${c.owner}/${c.repo}/contents/${encodePath(c.path)}`
 }
 
-async function getRemoteSha(c: GitConfig): Promise<string | null> {
+interface RemoteFile {
+  sha: string
+  text: string
+}
+
+/** GET del file remoto: ritorna sha + contenuto, o null se non esiste (404). */
+async function getRemoteFile(c: GitConfig): Promise<RemoteFile | null> {
   const res = await fetch(`${contentsUrl(c)}?ref=${encodeURIComponent(c.branch)}`, {
     headers: authHeaders(c.token),
   })
   if (res.status === 404) return null
   if (!res.ok) throw new Error(`GitHub ${res.status}`)
-  const data = (await res.json()) as { sha?: string }
-  return data.sha ?? null
+  const data = (await res.json()) as { sha?: string; content?: string; download_url?: string }
+  let text = ''
+  if (data.content) text = base64ToUtf8(data.content)
+  else if (data.download_url) text = await (await fetch(data.download_url)).text()
+  return { sha: data.sha ?? '', text }
 }
 
-// ─── Push / Pull ─────────────────────────────────────────────────────────────
-
-/** Carica il JSON nel file remoto (= un commit). Usa lo sha corrente se il file esiste. */
-async function putFile(c: GitConfig, json: string, message: string): Promise<void> {
-  const sha = await getRemoteSha(c)
+/** PUT del file (= un commit). Passare lo sha corrente se il file esiste. Ritorna il nuovo sha. */
+async function putFile(
+  c: GitConfig,
+  json: string,
+  message: string,
+  sha: string | null,
+): Promise<string> {
   const res = await fetch(contentsUrl(c), {
     method: 'PUT',
     headers: { ...authHeaders(c.token), 'Content-Type': 'application/json' },
@@ -123,56 +139,101 @@ async function putFile(c: GitConfig, json: string, message: string): Promise<voi
     const txt = await res.text()
     throw new Error(`GitHub ${res.status}: ${txt.slice(0, 160)}`)
   }
+  const data = (await res.json()) as { content?: { sha?: string } }
+  return data.content?.sha ?? ''
 }
 
-/** Scarica il contenuto del file remoto, o null se non esiste. */
-async function getFile(c: GitConfig): Promise<string | null> {
-  const res = await fetch(`${contentsUrl(c)}?ref=${encodeURIComponent(c.branch)}`, {
-    headers: authHeaders(c.token),
-  })
-  if (res.status === 404) return null
-  if (!res.ok) throw new Error(`GitHub ${res.status}`)
-  const data = (await res.json()) as { content?: string; download_url?: string }
-  if (data.content) return base64ToUtf8(data.content)
-  if (data.download_url) return (await fetch(data.download_url)).text()
-  return null
+function rememberSynced(hash: string, sha: string): void {
+  localStorage.setItem(HASH_KEY, hash)
+  localStorage.setItem(SHA_KEY, sha)
 }
 
-// ─── API di alto livello ─────────────────────────────────────────────────────
+// ─── Sync ────────────────────────────────────────────────────────────────────
 
-function isoStamp(): string {
-  return new Date().toISOString()
+export type SyncOutcome =
+  | { status: 'noop' } // niente da fare
+  | { status: 'pushed' } // locale → remoto
+  | { status: 'pulled' } // remoto → locale
+  | { status: 'conflict' } // entrambi cambiati: serve scelta utente
+  | { status: 'notConfigured' }
+
+/**
+ * Sync bidirezionale "fast-forward". Confronta lo stato locale e remoto con
+ * l'ultimo sync (hash dati + sha remoto):
+ * - solo locale cambiato  → push
+ * - solo remoto cambiato  → pull (se allowPull)
+ * - entrambi cambiati     → conflitto (nessuna sovrascrittura automatica)
+ * `allowPull: false` (es. quando l'app va in background) fa solo push, mai pull.
+ */
+export async function autoSync(opts?: { allowPull?: boolean }): Promise<SyncOutcome> {
+  const allowPull = opts?.allowPull ?? true
+  const c = getGitConfig()
+  if (!isGitConfigured(c)) return { status: 'notConfigured' }
+
+  const data = await exportData()
+  const localHash = contentHash(data)
+  const lastHash = localStorage.getItem(HASH_KEY)
+  const lastSha = localStorage.getItem(SHA_KEY)
+  const localChanged = lastHash === null || localHash !== lastHash
+
+  // Andando in background senza modifiche locali non c'è nulla da inviare: niente rete.
+  if (!allowPull && !localChanged) return { status: 'noop' }
+
+  const remote = await getRemoteFile(c)
+
+  // Nessun file remoto ancora: lo creiamo col locale.
+  if (remote === null) {
+    const newSha = await putFile(c, JSON.stringify(data, null, 2), `Backup ${isoStamp()}`, null)
+    rememberSynced(localHash, newSha)
+    return { status: 'pushed' }
+  }
+
+  const remoteChanged = lastSha === null || remote.sha !== lastSha
+
+  if (!localChanged && !remoteChanged) return { status: 'noop' }
+
+  if (localChanged && !remoteChanged) {
+    const newSha = await putFile(c, JSON.stringify(data, null, 2), `Backup ${isoStamp()}`, remote.sha)
+    rememberSynced(localHash, newSha)
+    return { status: 'pushed' }
+  }
+
+  if (!localChanged && remoteChanged) {
+    if (!allowPull) return { status: 'noop' }
+    const parsed: unknown = JSON.parse(remote.text)
+    if (!isBackupData(parsed)) throw new Error('Backup remoto non valido')
+    await importData(parsed)
+    rememberSynced(contentHash(parsed), remote.sha)
+    return { status: 'pulled' }
+  }
+
+  // localChanged && remoteChanged
+  return { status: 'conflict' }
 }
 
-/** Push manuale ("Sync ora"): esporta e carica sempre. */
+/** Forza il locale come verità: sovrascrive il remoto (anche in conflitto = "tieni locale"). */
 export async function syncPushForce(): Promise<void> {
   const c = getGitConfig()
   if (!isGitConfigured(c)) throw new Error('Sync non configurato')
   const data = await exportData()
-  await putFile(c, JSON.stringify(data, null, 2), `Backup ${isoStamp()}`)
-  localStorage.setItem(HASH_KEY, contentHash(data))
+  const remote = await getRemoteFile(c)
+  const newSha = await putFile(
+    c,
+    JSON.stringify(data, null, 2),
+    `Backup ${isoStamp()}`,
+    remote?.sha ?? null,
+  )
+  rememberSynced(contentHash(data), newSha)
 }
 
-/** Push automatico: carica solo se i dati sono cambiati dall'ultimo sync. */
-export async function syncPushIfChanged(): Promise<boolean> {
-  const c = getGitConfig()
-  if (!isGitConfigured(c)) return false
-  const data = await exportData()
-  const h = contentHash(data)
-  if (localStorage.getItem(HASH_KEY) === h) return false
-  await putFile(c, JSON.stringify(data, null, 2), `Backup ${isoStamp()}`)
-  localStorage.setItem(HASH_KEY, h)
-  return true
-}
-
-/** Pull: scarica il backup remoto e lo importa (sovrascrive i dati locali). */
+/** Forza il remoto come verità: scarica e importa (sovrascrive il locale). */
 export async function syncPull(): Promise<void> {
   const c = getGitConfig()
   if (!isGitConfigured(c)) throw new Error('Sync non configurato')
-  const text = await getFile(c)
-  if (text === null) throw new Error('Nessun backup remoto')
-  const parsed: unknown = JSON.parse(text)
+  const remote = await getRemoteFile(c)
+  if (remote === null) throw new Error('Nessun backup remoto')
+  const parsed: unknown = JSON.parse(remote.text)
   if (!isBackupData(parsed)) throw new Error('Backup remoto non valido')
   await importData(parsed)
-  localStorage.setItem(HASH_KEY, contentHash(parsed))
+  rememberSynced(contentHash(parsed), remote.sha)
 }

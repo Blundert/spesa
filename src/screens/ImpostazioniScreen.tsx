@@ -12,10 +12,10 @@ import {
   getAutoSync,
   setAutoSync,
   isGitConfigured,
-  syncPushForce,
   syncPull,
   type GitConfig,
 } from '../lib/gitSync'
+import { runSync } from '../lib/syncRunner'
 import { BottomSheet } from '../components/BottomSheet'
 
 const LANGS: { code: Lang; label: string }[] = [
@@ -127,10 +127,8 @@ export function ImpostazioniScreen() {
     setGitConfig(git)
     setSyncing(true)
     try {
-      await syncPushForce()
-      toast(t('settings.syncDone'))
-    } catch (e) {
-      toast.error(`${t('settings.syncError')}: ${e instanceof Error ? e.message : ''}`)
+      // Sync bidirezionale: push se siamo avanti, pull se indietro, toast se in conflitto.
+      await runSync(qc, { announce: true })
     } finally {
       setSyncing(false)
     }
