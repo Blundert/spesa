@@ -248,6 +248,37 @@ export function ImpostazioniScreen() {
         <p className="text-[13px] text-[#9B9B9F] px-1.5 pb-[13px] leading-relaxed">
           {t('settings.syncHint')}
         </p>
+        <a
+          href="https://github.com/settings/personal-access-tokens/new"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="w-full flex items-center justify-between bg-white rounded-[20px] px-5 py-[17px] mb-3 active:bg-[#F6F6F4] transition-colors text-left"
+        >
+          <span className="text-base text-[#2A2A2C]">{t('settings.syncCreateToken')}</span>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9B9B9F" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M14 5h5v5M19 5l-8 8M11 5H6a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-5" />
+          </svg>
+        </a>
+        <div className="bg-[#F6F6F4] rounded-[20px] px-5 py-4 mb-3">
+          <div className="text-[12px] font-normal tracking-[0.4px] text-[#9B9B9F] uppercase pb-2.5">
+            {t('settings.syncStepsTitle')}
+          </div>
+          <ol className="space-y-2">
+            {[
+              t('settings.syncStep1'),
+              t('settings.syncStep2'),
+              t('settings.syncStep3'),
+              t('settings.syncStep4'),
+            ].map((step, i) => (
+              <li key={i} className="flex gap-2.5 text-[13px] text-[#6E6E72] leading-relaxed">
+                <span className="flex-none w-[18px] h-[18px] mt-px rounded-full bg-[#E3E3E1] text-[11px] flex items-center justify-center tabular-nums">
+                  {i + 1}
+                </span>
+                <span>{step}</span>
+              </li>
+            ))}
+          </ol>
+        </div>
         <div className="bg-white rounded-[20px] overflow-hidden mb-3">
           {([
             { f: 'token', ph: t('settings.syncToken'), type: 'password' },
