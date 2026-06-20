@@ -80,7 +80,7 @@ export function HomeScreen() {
         </div>
 
         {/* Hero: di tasca tua (speso − valore buoni della settimana) */}
-        <div className="bg-[#2A2A2C] rounded-[30px] px-[26px] py-[30px] mb-[14px]">
+        <div data-tour="week-card" className="bg-[#2A2A2C] rounded-[30px] px-[26px] py-[30px] mb-[14px]">
           <div className="text-[12px] font-normal tracking-[1.6px] text-white/55 uppercase mb-[14px]">
             {t('home.outOfPocket')}
           </div>

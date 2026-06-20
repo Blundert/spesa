@@ -134,6 +134,57 @@ export const it = {
     subtitle: 'Accesso rapido dalla home',
     install: 'Installa',
   },
+  tutorial: {
+    section: 'Tutorial',
+    replay: 'Ripeti tutorial',
+    skip: 'Salta',
+    next: 'Avanti',
+    prev: 'Indietro',
+    start: 'Inizia',
+    done: 'Fine',
+    slide1: {
+      title: 'Benvenuto in Spesa',
+      description:
+        'La tua app per gestire la spesa settimanale con i buoni pasto. Semplice, veloce, sempre con te.',
+    },
+    slide2: {
+      title: 'La tua settimana',
+      description:
+        'Tieni traccia di quanto spendi ogni settimana, quanti buoni hai usato e quanto hai pagato di tasca tua.',
+    },
+    slide3: {
+      title: 'Lista della spesa',
+      description:
+        'Aggiungi articoli alla lista, organizzali per categoria e spuntali mentre fai la spesa.',
+    },
+    slide4: {
+      title: 'Pronto per iniziare',
+      description:
+        "Esplora l'app liberamente. Puoi rivedere questo tutorial in qualsiasi momento dalle Impostazioni.",
+    },
+    tour: {
+      step1: {
+        title: 'Il tuo budget settimanale',
+        description:
+          'Qui vedi quanto hai speso e quanto ti rimane. Il numero grande è quello che hai pagato di tasca tua.',
+      },
+      step2: {
+        title: 'Nuova sessione di spesa',
+        description:
+          'Tocca questa barra per iniziare una nuova sessione al supermercato. Seleziona i buoni che userai.',
+      },
+      step3: {
+        title: 'Menu',
+        description:
+          'Da qui navighi tra Settimana, Lista, Storico, Supermercati e Impostazioni.',
+      },
+      step4: {
+        title: 'Lista della spesa',
+        description:
+          'Aggiungi articoli prima di uscire e spuntali durante la spesa. Si salva tutto in automatico.',
+      },
+    },
+  },
   settings: {
     title: 'Impostazioni',
     app: 'App',

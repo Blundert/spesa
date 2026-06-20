@@ -136,6 +136,56 @@ export const en: typeof it = {
     subtitle: 'Quick access from home',
     install: 'Install',
   },
+  tutorial: {
+    section: 'Tutorial',
+    replay: 'Replay tutorial',
+    skip: 'Skip',
+    next: 'Next',
+    prev: 'Back',
+    start: 'Get started',
+    done: 'Done',
+    slide1: {
+      title: 'Welcome to Spesa',
+      description:
+        'Your app for managing weekly shopping with meal vouchers. Simple, fast, always with you.',
+    },
+    slide2: {
+      title: 'Your week',
+      description:
+        "Track how much you spend each week, how many vouchers you've used, and how much came out of your pocket.",
+    },
+    slide3: {
+      title: 'Shopping list',
+      description:
+        'Add items to your list, organise them by category, and check them off as you shop.',
+    },
+    slide4: {
+      title: 'Ready to start',
+      description:
+        'Explore the app freely. You can replay this tutorial at any time from Settings.',
+    },
+    tour: {
+      step1: {
+        title: 'Your weekly budget',
+        description:
+          "See what you've spent and what's left. The big number is what came out of your pocket.",
+      },
+      step2: {
+        title: 'New shopping session',
+        description:
+          'Tap this bar to start a new shopping session. Select how many vouchers you will use.',
+      },
+      step3: {
+        title: 'Menu',
+        description: 'Navigate between Week, List, History, Supermarkets, and Settings from here.',
+      },
+      step4: {
+        title: 'Shopping list',
+        description:
+          'Add items before you leave and check them off during your shop. Everything saves automatically.',
+      },
+    },
+  },
   settings: {
     title: 'Settings',
     app: 'App',

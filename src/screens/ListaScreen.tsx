@@ -138,7 +138,7 @@ export function ListaScreen() {
   return (
     <div className="flex-1 overflow-y-auto px-5 pb-[120px]">
       {/* Header — menu button is in AppShell */}
-      <div className="flex items-center justify-between px-1 pt-2 pb-[18px]">
+      <div data-tour="lista-screen" className="flex items-center justify-between px-1 pt-2 pb-[18px]">
         <span className="text-[26px] font-normal tracking-[-0.5px] text-[#2A2A2C]">{t('lista.title')}</span>
       </div>
 

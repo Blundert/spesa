@@ -84,6 +84,7 @@ export function AppShell() {
           style={{ bottom: 'calc(18px + env(safe-area-inset-bottom))' }}
         >
           <button
+            data-tour="session-pill"
             onClick={openNewShopping}
             className="flex-1 bg-white rounded-3xl px-5 py-3 flex items-center justify-between active:scale-[.99] transition-transform text-left"
           >
@@ -102,6 +103,7 @@ export function AppShell() {
             </div>
           </button>
           <button
+            data-tour="menu-button"
             onClick={() => setMenuOpen(true)}
             aria-label={t('nav.openMenu')}
             className="flex-none self-center w-14 h-14 rounded-full bg-[#2A2A2C] flex items-center justify-center active:scale-[.95] transition-transform"

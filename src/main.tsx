@@ -6,6 +6,7 @@ import { Toaster } from 'sonner'
 import PWAInstall from '@khmyznikov/pwa-install/react-legacy'
 import { router } from './router'
 import { queryClient } from './lib/queryClient'
+import { TutorialController } from './tutorial'
 import './i18n'
 import './index.css'
 
@@ -48,6 +49,7 @@ createRoot(rootEl).render(
         }}
       >
         <RouterProvider router={router} />
+        <TutorialController />
         {/* Web component per l'installazione PWA (incl. istruzioni iOS). Manuale:
             si apre solo dalla pagina Impostazioni via showDialog(). Nome/icona passati
             espliciti così il dialog è corretto anche in dev (dove il manifest non è servito). */}

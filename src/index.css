@@ -42,3 +42,18 @@ body {
 [data-sonner-toast] [data-description] {
   color: rgba(255, 255, 255, 0.72) !important;
 }
+
+@keyframes tutorial-slide-in {
+  from {
+    transform: translateX(28px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.tutorial-slide-in {
+  animation: tutorial-slide-in 350ms cubic-bezier(0.32, 0.72, 0, 1) both;
+}

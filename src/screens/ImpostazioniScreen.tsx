@@ -17,6 +17,7 @@ import {
 } from '../lib/gitSync'
 import { runSync } from '../lib/syncRunner'
 import { getDebugViewport, setDebugViewport } from '../lib/debugFlag'
+import { resetTutorial } from '../tutorial/tutorialStore'
 import { BottomSheet } from '../components/BottomSheet'
 
 const LANGS: { code: Lang; label: string }[] = [
@@ -40,6 +41,10 @@ export function ImpostazioniScreen() {
   const setLang = (lng: Lang) => {
     void i18n.changeLanguage(lng)
     localStorage.setItem(LANG_KEY, lng)
+  }
+
+  const handleReplayTutorial = () => {
+    resetTutorial()
   }
 
   const handleWipe = async () => {
@@ -356,6 +361,17 @@ export function ImpostazioniScreen() {
               className={`absolute top-[3px] w-[22px] h-[22px] rounded-full bg-white transition-all ${debug ? 'left-[21px]' : 'left-[3px]'}`}
             />
           </span>
+        </button>
+
+        {/* Tutorial */}
+        <div className="text-[12px] font-normal tracking-[1.2px] text-[#9B9B9F] uppercase px-1.5 pt-7 pb-[13px]">
+          {t('tutorial.section')}
+        </div>
+        <button
+          onClick={handleReplayTutorial}
+          className="w-full bg-white rounded-[20px] px-5 py-[17px] text-left text-base text-[#2A2A2C] active:bg-[#F6F6F4] transition-colors"
+        >
+          {t('tutorial.replay')}
         </button>
 
         <input
