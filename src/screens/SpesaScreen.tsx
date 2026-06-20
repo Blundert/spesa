@@ -40,6 +40,7 @@ export function SpesaScreen() {
   const [newItemTarget, setNewItemTarget] = useState<{ name: string } | null>(null)
   const [showStorePicker, setShowStorePicker] = useState(false)
   const [showNewItem, setShowNewItem] = useState(false)
+  const [showCard, setShowCard] = useState(false)
   const [newItemName, setNewItemName] = useState('')
   const [showFinishConfirm, setShowFinishConfirm] = useState(false)
 
@@ -73,16 +74,17 @@ export function SpesaScreen() {
   const liveVal = activeSession?.buoniValueCents ?? val
   const summary = liveSpendSummary(purchases, liveBuoni, liveVal)
 
-  const supermarketName = activeSession
-    ? (supermarkets.find((s) => s.id === activeSession.supermarketId)?.name ?? '?')
-    : '—'
+  const activeSupermarket = activeSession
+    ? (supermarkets.find((s) => s.id === activeSession.supermarketId) ?? null)
+    : null
+  const supermarketName = activeSupermarket?.name ?? (activeSession ? '?' : '—')
 
   // Auto-open store picker if active session has no valid supermarket
   useEffect(() => {
-    if (activeSession && supermarketName === '?' && supermarkets.length > 0) {
+    if (activeSession && activeSupermarket === null && supermarkets.length > 0) {
       setShowStorePicker(true)
     }
-  }, [activeSession, supermarketName, supermarkets.length])
+  }, [activeSession, activeSupermarket, supermarkets.length])
 
   const handleStartSession = useCallback(
     async (supermarketId: number) => {
@@ -257,9 +259,23 @@ export function SpesaScreen() {
           <span className="text-[15px] text-[#2A2A2C]">{supermarketName}</span>
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#9B9B9F" strokeWidth="2.2" strokeLinecap="round"><path d="M6 9l6 6 6-6" /></svg>
         </button>
-        <button onClick={handleFinish} className="px-1 py-[7px] active:opacity-50">
-          <span className="text-[15px] text-[#2A2A2C]">{t('spesa.finish')}</span>
-        </button>
+        <div className="flex items-center gap-2">
+          {activeSupermarket?.loyaltyCard && (
+            <button
+              onClick={() => setShowCard(true)}
+              aria-label={t('supermercati.viewCard')}
+              className="w-[34px] h-[34px] flex items-center justify-center active:opacity-50"
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2A2A2C" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="2" y="5" width="20" height="14" rx="2" />
+                <path d="M2 10h20" />
+              </svg>
+            </button>
+          )}
+          <button onClick={handleFinish} className="px-1 py-[7px] active:opacity-50">
+            <span className="text-[15px] text-[#2A2A2C]">{t('spesa.finish')}</span>
+          </button>
+        </div>
       </div>
 
       {/* Hero budget */}
@@ -467,6 +483,20 @@ export function SpesaScreen() {
         initialCents={summary.spentCents}
         onConfirm={(cents) => handleConfirmFinish(cents)}
       />
+
+      {/* Overlay tessera fedeltà */}
+      {showCard && activeSupermarket?.loyaltyCard && (
+        <div
+          className="fixed inset-0 z-[60] bg-black/80 flex items-center justify-center p-6"
+          onClick={() => setShowCard(false)}
+        >
+          <img
+            src={activeSupermarket.loyaltyCard}
+            alt={t('supermercati.cardOf', { name: activeSupermarket.name })}
+            className="max-w-full max-h-full rounded-[16px] object-contain shadow-2xl"
+          />
+        </div>
+      )}
     </div>
   )
 }

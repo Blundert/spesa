@@ -118,6 +118,13 @@ export const it = {
     added: '{{name}} aggiunto',
     createdDesc: 'Supermercato creato',
     removed: '{{name}} rimosso',
+    loyaltyCard: 'Tessera fedeltà',
+    addCard: 'Aggiungi tessera',
+    viewCard: 'Tessera',
+    removeCard: 'Rimuovi tessera',
+    replaceCard: 'Sostituisci',
+    cardOf: 'Tessera — {{name}}',
+    cardError: 'Errore nel salvataggio della tessera',
   },
   item: {
     avgPrice: 'Prezzo medio',

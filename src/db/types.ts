@@ -24,6 +24,8 @@ export interface Supermarket {
   name: string
   /** Lowercase + trim. */
   normalizedName: string
+  /** Data URL base64 JPEG della tessera fedeltà. null = rimossa, undefined = mai aggiunta. */
+  loyaltyCard?: string | null
 }
 
 /** Buoni pasto disponibili in una settimana ISO (opzionale, non vincolante). */

@@ -11,7 +11,7 @@ import type {
 } from './types'
 
 /** Versione del formato di backup (allineata allo schema Dexie). */
-export const BACKUP_VERSION = 4
+export const BACKUP_VERSION = 5
 
 export interface BackupData {
   version: number
@@ -73,8 +73,8 @@ export function isBackupData(x: unknown): x is BackupData {
 /** Sostituisce tutti i dati con quelli del backup (transazione: svuota + ripopola). */
 export async function importData(data: BackupData): Promise<void> {
   if (!isBackupData(data)) throw new Error('Formato backup non valido')
-  if (data.version !== BACKUP_VERSION) {
-    throw new Error(`Versione backup non compatibile (${data.version} ≠ ${BACKUP_VERSION})`)
+  if (data.version < 4 || data.version > BACKUP_VERSION) {
+    throw new Error(`Versione backup non compatibile (${data.version})`)
   }
   await db.transaction(
     'rw',

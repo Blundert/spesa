@@ -33,7 +33,7 @@ async function seed() {
   await db.items.bulkAdd([
     { id: 1, name: 'Latte', normalizedName: 'latte', categoryId: 1, lastPriceCents: 120, suggestedPriceCents: 120 },
   ])
-  await db.supermarkets.bulkAdd([{ id: 1, name: 'Coop', normalizedName: 'coop' }])
+  await db.supermarkets.bulkAdd([{ id: 1, name: 'Coop', normalizedName: 'coop', loyaltyCard: 'data:image/jpeg;base64,abc' }])
   await db.weekBudgets.bulkAdd([{ id: 1, isoWeek: '2026-W24', buoniAvailable: 10 }])
   await db.listItems.bulkAdd([{ id: 1, itemId: 1, quantity: 2, addedAt: 1000 }])
   await db.sessions.bulkAdd([
@@ -105,6 +105,7 @@ describe('importData', () => {
     expect(after.mealPlans).toEqual(exported.mealPlans)
     // la relazione purchase→session resta valida
     expect(after.purchases[0].sessionId).toBe(after.sessions[0].id)
+    expect(after.supermarkets[0].loyaltyCard).toBe('data:image/jpeg;base64,abc')
   })
 
   it('sovrascrive i dati esistenti', async () => {
@@ -126,6 +127,11 @@ describe('importData', () => {
   it('rifiuta una versione incompatibile', async () => {
     const bad: BackupData = { ...validBase, version: 999 }
     await expect(importData(bad)).rejects.toThrow()
+  })
+
+  it('importa backup versione 4 (senza loyaltyCard)', async () => {
+    const v4: BackupData = { ...validBase, version: 4 }
+    await expect(importData(v4)).resolves.toBeUndefined()
   })
 
   it('rifiuta una struttura non valida', async () => {

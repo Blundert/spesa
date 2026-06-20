@@ -120,6 +120,13 @@ export const en: typeof it = {
     added: '{{name}} added',
     createdDesc: 'Supermarket created',
     removed: '{{name}} removed',
+    loyaltyCard: 'Loyalty card',
+    addCard: 'Add card',
+    viewCard: 'Card',
+    removeCard: 'Remove card',
+    replaceCard: 'Replace',
+    cardOf: 'Card — {{name}}',
+    cardError: 'Failed to save card',
   },
   item: {
     avgPrice: 'Average price',

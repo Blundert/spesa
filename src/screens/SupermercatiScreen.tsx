@@ -1,22 +1,27 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import { formatCentsPlain } from '../lib/money'
-import { useSupermarkets } from '../hooks/useItems'
+import { useSupermarkets, useUpdateLoyaltyCard } from '../hooks/useItems'
 import { useSupermarketStats } from '../hooks/usePriceHistory'
 import { BottomSheet } from '../components/BottomSheet'
 import { upsertSupermarket, deleteSupermarket } from '../db/repositories/supermarkets'
 import { useQueryClient } from '@tanstack/react-query'
 import { qk } from '../db/queryKeys'
+import { compressImage } from '../lib/imageUtils'
+import type { Supermarket } from '../db/types'
 
 export function SupermercatiScreen() {
   const { t } = useTranslation()
   const [sheetOpen, setSheetOpen] = useState(false)
   const [newName, setNewName] = useState('')
+  const [cardSheet, setCardSheet] = useState<Supermarket | null>(null)
 
   const qc = useQueryClient()
   const { data: supermarkets = [] } = useSupermarkets()
   const { data: stats = [] } = useSupermarketStats()
+  const updateLoyaltyCard = useUpdateLoyaltyCard()
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   const statsMap = Object.fromEntries(stats.map((s) => [s.supermarket.id ?? 0, s]))
 
@@ -36,8 +41,39 @@ export function SupermercatiScreen() {
     toast(t('supermercati.removed', { name }))
   }
 
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    e.target.value = ''
+    if (!file || !cardSheet?.id) return
+    try {
+      const dataUrl = await compressImage(file)
+      updateLoyaltyCard.mutate(
+        { id: cardSheet.id, imageDataUrl: dataUrl },
+        { onSuccess: () => setCardSheet(null) },
+      )
+    } catch {
+      toast.error(t('supermercati.cardError'))
+    }
+  }
+
+  const handleRemoveCard = () => {
+    if (!cardSheet?.id) return
+    updateLoyaltyCard.mutate(
+      { id: cardSheet.id, imageDataUrl: null },
+      { onSuccess: () => setCardSheet(null) },
+    )
+  }
+
   return (
     <>
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        className="sr-only"
+        onChange={(e) => void handleFileChange(e)}
+      />
+
       <div className="flex-1 overflow-y-auto px-5 pb-[120px]">
         <div className="px-1 pt-2 pb-[18px]">
           <span className="text-[26px] font-normal tracking-[-0.5px] text-[#2A2A2C]">{t('supermercati.title')}</span>
@@ -70,6 +106,27 @@ export function SupermercatiScreen() {
                 </div>
                 <div className="text-[12px] text-[#9B9B9F]">{t('supermercati.total')}</div>
               </div>
+              {/* Tessera fedeltà */}
+              <button
+                onClick={() => setCardSheet(s)}
+                className="w-[48px] h-[30px] flex-none rounded-[7px] overflow-hidden active:opacity-60 transition-opacity"
+                aria-label={t('supermercati.loyaltyCard')}
+              >
+                {s.loyaltyCard ? (
+                  <img
+                    src={s.loyaltyCard}
+                    alt={t('supermercati.cardOf', { name: s.name })}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full rounded-[7px] border border-dashed border-[#D8D8D6] flex items-center justify-center">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#B5B5BA" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <rect x="2" y="5" width="20" height="14" rx="2" />
+                      <path d="M12 10v4M10 12h4" />
+                    </svg>
+                  </div>
+                )}
+              </button>
               <button
                 onClick={() => s.id !== undefined && void handleDelete(s.id, s.name)}
                 className="w-8 h-8 flex items-center justify-center opacity-30 active:opacity-80 ml-1"
@@ -95,6 +152,7 @@ export function SupermercatiScreen() {
         </button>
       </div>
 
+      {/* Sheet: nuovo supermercato */}
       <BottomSheet open={sheetOpen} onClose={() => setSheetOpen(false)}>
         <div className="text-[20px] font-normal text-[#2A2A2C] px-0.5 pb-[6px]">{t('supermercati.newTitle')}</div>
         <input
@@ -111,6 +169,43 @@ export function SupermercatiScreen() {
         >
           {t('common.add')}
         </button>
+      </BottomSheet>
+
+      {/* Sheet: tessera fedeltà */}
+      <BottomSheet open={cardSheet !== null} onClose={() => setCardSheet(null)}>
+        <div className="text-[20px] font-normal text-[#2A2A2C] px-0.5 pb-[16px]">
+          {t('supermercati.loyaltyCard')}
+        </div>
+        {cardSheet?.loyaltyCard ? (
+          <>
+            <img
+              src={cardSheet.loyaltyCard}
+              alt={t('supermercati.cardOf', { name: cardSheet.name })}
+              className="w-full max-h-[220px] object-contain rounded-[16px] bg-[#F6F6F4]"
+            />
+            <div className="flex flex-col gap-2 mt-5">
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                className="w-full border border-[#ECECEC] bg-[#F6F6F4] text-[#2A2A2C] text-[16px] py-[16px] rounded-[18px] active:opacity-70 transition-opacity"
+              >
+                {t('supermercati.replaceCard')}
+              </button>
+              <button
+                onClick={handleRemoveCard}
+                className="w-full text-[#E53E3E] text-[16px] py-[14px] rounded-[18px] active:opacity-60 transition-opacity"
+              >
+                {t('supermercati.removeCard')}
+              </button>
+            </div>
+          </>
+        ) : (
+          <button
+            onClick={() => fileInputRef.current?.click()}
+            className="w-full bg-[#2A2A2C] text-white text-[17px] py-[18px] rounded-[20px] active:scale-[.98] transition-transform"
+          >
+            {t('supermercati.addCard')}
+          </button>
+        )}
       </BottomSheet>
     </>
   )

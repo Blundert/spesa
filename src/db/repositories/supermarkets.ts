@@ -30,6 +30,10 @@ export async function deleteSupermarket(id: number): Promise<void> {
   await db.supermarkets.delete(id)
 }
 
+export async function updateLoyaltyCard(id: number, imageDataUrl: string | null): Promise<void> {
+  await db.supermarkets.update(id, { loyaltyCard: imageDataUrl })
+}
+
 /** Statistiche aggregate per un supermercato. */
 export interface SupermarketStats {
   supermarket: Supermarket
