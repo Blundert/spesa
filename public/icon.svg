@@ -1,11 +1,15 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <!-- Full bleed: iOS e Android applicano il proprio clip radius -->
-  <rect width="512" height="512" fill="#2A2A2C"/>
-  <!-- Carrello: manico + corpo a trapezio (più largo in alto) + ruote -->
-  <path d="M72 116 H168 L196 312 H384 L420 116 H168"
-        stroke="white" stroke-width="52"
-        stroke-linecap="round" stroke-linejoin="round"
-        fill="none"/>
-  <circle cx="240" cy="388" r="44" fill="white"/>
-  <circle cx="352" cy="388" r="44" fill="white"/>
+  <!-- Sfondo bianco pieno — iOS/Android applicano il loro clip radius -->
+  <rect width="512" height="512" fill="white"/>
+  <!-- Cerchio nero centrato con margine ~12% (come Telegram) -->
+  <circle cx="256" cy="256" r="196" fill="#2A2A2C"/>
+  <!-- Carrello (versione 2) centrato e scalato 70% dentro il cerchio -->
+  <g transform="translate(256,256) scale(0.70) translate(-244,-262)">
+    <path d="M64 96 H116 L180 308 A24 24 0 0 0 203 324 H368 A24 24 0 0 0 391 308 L424 168 H144"
+          stroke="white" stroke-width="36"
+          stroke-linecap="round" stroke-linejoin="round"
+          fill="none"/>
+    <circle cx="192" cy="400" r="28" fill="white"/>
+    <circle cx="352" cy="400" r="28" fill="white"/>
+  </g>
 </svg>
