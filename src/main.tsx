@@ -73,6 +73,7 @@ createRoot(rootEl).render(
             borderRadius: '15px',
             border: 'none',
             fontSize: '14px',
+            width: '356px',
           },
         }}
       />
