@@ -12,6 +12,7 @@ import { PastiScreen } from './screens/PastiScreen'
 import { PianificazioniScreen } from './screens/PianificazioniScreen'
 import { SessioneScreen } from './screens/SessioneScreen'
 import { ItemDetailScreen } from './screens/ItemDetailScreen'
+import { ChangelogScreen } from './screens/ChangelogScreen'
 
 const rootRoute = createRootRoute({ component: Outlet })
 
@@ -96,6 +97,12 @@ const itemDetailRoute = createRoute({
   component: ItemDetailScreen,
 })
 
+const changelogRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/changelog',
+  component: ChangelogScreen,
+})
+
 const routeTree = rootRoute.addChildren([
   shellRoute.addChildren([homeRoute, listaRoute, storicoRoute, supermercatiRoute, impostazioniRoute]),
   spesaRoute,
@@ -103,6 +110,7 @@ const routeTree = rootRoute.addChildren([
   pianificazioniRoute,
   sessioneRoute,
   itemDetailRoute,
+  changelogRoute,
 ])
 
 export const router = createRouter({ routeTree })

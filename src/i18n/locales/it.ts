@@ -257,6 +257,8 @@ export const it = {
     syncPullConfirm: 'Scarica e sovrascrivi',
     debug: 'Debug',
     debugViewport: 'Mostra misure viewport',
+    changelog: 'Novità',
+    current: 'Attuale',
   },
   categories: {
     0: 'Frutta e verdura',

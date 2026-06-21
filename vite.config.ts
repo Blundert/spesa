@@ -30,6 +30,7 @@ export default defineConfig({
         scope: '/',
       },
       workbox: {
+        cleanupOutdatedCaches: true,
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
         // SPA: il service worker serve l'app shell per le navigazioni (anche offline)
         // sulle route del router. Complementare al 404.html del deploy GitHub Pages.

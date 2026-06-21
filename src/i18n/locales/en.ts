@@ -258,6 +258,8 @@ export const en: typeof it = {
     syncPullConfirm: 'Pull and overwrite',
     debug: 'Debug',
     debugViewport: 'Show viewport metrics',
+    changelog: "What's New",
+    current: 'Current',
   },
   categories: {
     0: 'Fruit & veg',

@@ -1,5 +1,6 @@
 import { useState, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useNavigate } from '@tanstack/react-router'
 import { useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import type { PWAInstallElement } from '@khmyznikov/pwa-install'
@@ -27,6 +28,7 @@ const LANGS: { code: Lang; label: string }[] = [
 
 export function ImpostazioniScreen() {
   const { t, i18n } = useTranslation()
+  const navigate = useNavigate()
   const qc = useQueryClient()
   const [showWipe, setShowWipe] = useState(false)
   const [pendingImport, setPendingImport] = useState<BackupData | null>(null)
@@ -60,12 +62,14 @@ export function ImpostazioniScreen() {
     document.querySelector<PWAInstallElement>('pwa-install')?.showDialog(true)
   }
 
-  // Forza il check di un nuovo service worker e ricarica: con registerType
-  // 'autoUpdate' (skipWaiting) la nuova versione si attiva al reload.
   const handleUpdate = async () => {
     if ('serviceWorker' in navigator) {
       const regs = await navigator.serviceWorker.getRegistrations()
-      await Promise.all(regs.map((r) => r.update()))
+      await Promise.all(regs.map((r) => r.unregister()))
+    }
+    if ('caches' in window) {
+      const keys = await caches.keys()
+      await Promise.all(keys.map((k) => caches.delete(k)))
     }
     window.location.reload()
   }
@@ -170,10 +174,18 @@ export function ImpostazioniScreen() {
           {t('settings.app')}
         </div>
         <div className="bg-white rounded-[20px] overflow-hidden mb-7">
-          <div className="w-full flex items-center justify-between px-5 py-[17px] border-b border-[#ECECEC]">
+          <button
+            onClick={() => void navigate({ to: '/changelog' })}
+            className="w-full flex items-center justify-between px-5 py-[17px] border-b border-[#ECECEC] active:bg-[#F6F6F4] transition-colors text-left"
+          >
             <span className="text-base text-[#2A2A2C]">{t('settings.version')}</span>
-            <span className="text-[15px] text-[#9B9B9F] tabular-nums">{__APP_VERSION__}</span>
-          </div>
+            <div className="flex items-center gap-1.5">
+              <span className="text-[15px] text-[#9B9B9F] tabular-nums">{__APP_VERSION__}</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B5B5BA" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M9 5l7 7-7 7" />
+              </svg>
+            </div>
+          </button>
           <button
             onClick={() => void handleUpdate()}
             className="w-full flex items-center justify-between px-5 py-[17px] border-b border-[#ECECEC] active:bg-[#F6F6F4] transition-colors text-left"
