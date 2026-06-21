@@ -84,6 +84,10 @@ export const it = {
     buonoValue: 'Valore buono',
     removeItem: 'Rimuovi',
     uncheck: 'Rimetti da prendere',
+    removeListConfirmTitle: 'Rimuovere dalla lista?',
+    removeListConfirm: 'Rimuovi',
+    removeCartConfirmTitle: 'Rimuovere dal carrello?',
+    removeCartConfirm: 'Rimuovi',
   },
   storico: {
     title: 'Storico',
@@ -92,6 +96,10 @@ export const it = {
   },
   sessione: {
     noPurchases: 'Nessun acquisto.',
+    deleteSession: 'Elimina sessione',
+    deleteConfirmTitle: 'Eliminare questa spesa?',
+    deleteConfirmBody: 'Verranno eliminati tutti gli acquisti registrati.',
+    deleteConfirm: 'Elimina',
   },
   pasti: {
     title: 'Pianifica i pasti',
@@ -125,6 +133,11 @@ export const it = {
     replaceCard: 'Sostituisci',
     cardOf: 'Tessera — {{name}}',
     cardError: 'Errore nel salvataggio della tessera',
+    deleteConfirmTitle: 'Eliminare {{name}}?',
+    deleteConfirmBody: 'Verranno eliminati anche tutti i dati associati.',
+    deleteConfirm: 'Elimina',
+    removeCardConfirmTitle: 'Rimuovere la tessera?',
+    removeCardConfirm: 'Rimuovi',
   },
   item: {
     avgPrice: 'Prezzo medio',

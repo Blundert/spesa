@@ -43,6 +43,8 @@ export function SpesaScreen() {
   const [showCard, setShowCard] = useState(false)
   const [newItemName, setNewItemName] = useState('')
   const [showFinishConfirm, setShowFinishConfirm] = useState(false)
+  const [pendingListRemove, setPendingListRemove] = useState<number | null>(null)
+  const [pendingCartRemove, setPendingCartRemove] = useState<{ id: number; itemId: number } | null>(null)
 
   const { data: sessions = [] } = useSessionsByWeek(isoWeek)
   const { data: supermarkets = [] } = useSupermarkets()
@@ -330,7 +332,7 @@ export function SpesaScreen() {
                     )}
                   </button>
                   <button
-                    onClick={() => li.id !== undefined && removeFromList.mutate(li.id)}
+                    onClick={() => li.id !== undefined && setPendingListRemove(li.id)}
                     aria-label={t('spesa.removeItem')}
                     className="w-9 h-9 -mr-1.5 ml-2 flex-none flex items-center justify-center opacity-40 active:opacity-90"
                   >
@@ -388,7 +390,7 @@ export function SpesaScreen() {
                   </button>
                   {/* Cestino = elimina del tutto */}
                   <button
-                    onClick={() => p.id !== undefined && void eliminateCart(p.id, p.itemId)}
+                    onClick={() => p.id !== undefined && setPendingCartRemove({ id: p.id, itemId: p.itemId })}
                     aria-label={t('spesa.removeItem')}
                     className="w-9 h-9 -mr-1.5 ml-2 flex-none flex items-center justify-center opacity-40 active:opacity-90"
                   >
@@ -483,6 +485,46 @@ export function SpesaScreen() {
         initialCents={summary.spentCents}
         onConfirm={(cents) => handleConfirmFinish(cents)}
       />
+
+      {/* Conferma rimuovi dalla lista */}
+      <BottomSheet open={pendingListRemove !== null} onClose={() => setPendingListRemove(null)}>
+        <div className="text-[20px] font-normal text-[#D14343] px-0.5 pb-6">{t('spesa.removeListConfirmTitle')}</div>
+        <button
+          onClick={() => {
+            if (pendingListRemove !== null) removeFromList.mutate(pendingListRemove)
+            setPendingListRemove(null)
+          }}
+          className="w-full bg-[#D14343] text-white text-[17px] py-[18px] rounded-[20px] mb-3 active:scale-[.98] transition-transform"
+        >
+          {t('spesa.removeListConfirm')}
+        </button>
+        <button
+          onClick={() => setPendingListRemove(null)}
+          className="w-full bg-[#F2F2F0] text-[#2A2A2C] text-[17px] py-[18px] rounded-[20px] active:scale-[.98] transition-transform"
+        >
+          {t('common.cancel')}
+        </button>
+      </BottomSheet>
+
+      {/* Conferma rimuovi dal carrello */}
+      <BottomSheet open={pendingCartRemove !== null} onClose={() => setPendingCartRemove(null)}>
+        <div className="text-[20px] font-normal text-[#D14343] px-0.5 pb-6">{t('spesa.removeCartConfirmTitle')}</div>
+        <button
+          onClick={() => {
+            if (pendingCartRemove) void eliminateCart(pendingCartRemove.id, pendingCartRemove.itemId)
+            setPendingCartRemove(null)
+          }}
+          className="w-full bg-[#D14343] text-white text-[17px] py-[18px] rounded-[20px] mb-3 active:scale-[.98] transition-transform"
+        >
+          {t('spesa.removeCartConfirm')}
+        </button>
+        <button
+          onClick={() => setPendingCartRemove(null)}
+          className="w-full bg-[#F2F2F0] text-[#2A2A2C] text-[17px] py-[18px] rounded-[20px] active:scale-[.98] transition-transform"
+        >
+          {t('common.cancel')}
+        </button>
+      </BottomSheet>
 
       {/* Overlay tessera fedeltà */}
       {showCard && activeSupermarket?.loyaltyCard && (

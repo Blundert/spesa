@@ -16,6 +16,8 @@ export function SupermercatiScreen() {
   const [sheetOpen, setSheetOpen] = useState(false)
   const [newName, setNewName] = useState('')
   const [cardSheet, setCardSheet] = useState<Supermarket | null>(null)
+  const [pendingDelete, setPendingDelete] = useState<{ id: number; name: string } | null>(null)
+  const [showRemoveCardConfirm, setShowRemoveCardConfirm] = useState(false)
 
   const qc = useQueryClient()
   const { data: supermarkets = [] } = useSupermarkets()
@@ -128,7 +130,7 @@ export function SupermercatiScreen() {
                 )}
               </button>
               <button
-                onClick={() => s.id !== undefined && void handleDelete(s.id, s.name)}
+                onClick={() => s.id !== undefined && setPendingDelete({ id: s.id, name: s.name })}
                 className="w-8 h-8 flex items-center justify-center opacity-30 active:opacity-80 ml-1"
               >
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2A2A2C" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -171,6 +173,51 @@ export function SupermercatiScreen() {
         </button>
       </BottomSheet>
 
+      {/* Conferma elimina supermercato */}
+      <BottomSheet open={pendingDelete !== null} onClose={() => setPendingDelete(null)}>
+        <div className="text-[20px] font-normal text-[#D14343] px-0.5 pb-2">
+          {t('supermercati.deleteConfirmTitle', { name: pendingDelete?.name ?? '' })}
+        </div>
+        <div className="text-[15px] text-[#9B9B9F] px-0.5 pb-6">{t('supermercati.deleteConfirmBody')}</div>
+        <button
+          onClick={() => {
+            if (pendingDelete) void handleDelete(pendingDelete.id, pendingDelete.name)
+            setPendingDelete(null)
+          }}
+          className="w-full bg-[#D14343] text-white text-[17px] py-[18px] rounded-[20px] mb-3 active:scale-[.98] transition-transform"
+        >
+          {t('supermercati.deleteConfirm')}
+        </button>
+        <button
+          onClick={() => setPendingDelete(null)}
+          className="w-full bg-[#F2F2F0] text-[#2A2A2C] text-[17px] py-[18px] rounded-[20px] active:scale-[.98] transition-transform"
+        >
+          {t('common.cancel')}
+        </button>
+      </BottomSheet>
+
+      {/* Conferma rimuovi tessera */}
+      <BottomSheet open={showRemoveCardConfirm} onClose={() => setShowRemoveCardConfirm(false)}>
+        <div className="text-[20px] font-normal text-[#D14343] px-0.5 pb-2">
+          {t('supermercati.removeCardConfirmTitle')}
+        </div>
+        <button
+          onClick={() => {
+            handleRemoveCard()
+            setShowRemoveCardConfirm(false)
+          }}
+          className="w-full bg-[#D14343] text-white text-[17px] py-[18px] rounded-[20px] mb-3 active:scale-[.98] transition-transform"
+        >
+          {t('supermercati.removeCardConfirm')}
+        </button>
+        <button
+          onClick={() => setShowRemoveCardConfirm(false)}
+          className="w-full bg-[#F2F2F0] text-[#2A2A2C] text-[17px] py-[18px] rounded-[20px] active:scale-[.98] transition-transform"
+        >
+          {t('common.cancel')}
+        </button>
+      </BottomSheet>
+
       {/* Sheet: tessera fedeltà */}
       <BottomSheet open={cardSheet !== null} onClose={() => setCardSheet(null)}>
         <div className="text-[20px] font-normal text-[#2A2A2C] px-0.5 pb-[16px]">
@@ -191,7 +238,7 @@ export function SupermercatiScreen() {
                 {t('supermercati.replaceCard')}
               </button>
               <button
-                onClick={handleRemoveCard}
+                onClick={() => setShowRemoveCardConfirm(true)}
                 className="w-full text-[#E53E3E] text-[16px] py-[14px] rounded-[18px] active:opacity-60 transition-opacity"
               >
                 {t('supermercati.removeCard')}

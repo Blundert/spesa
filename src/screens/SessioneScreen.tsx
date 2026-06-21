@@ -1,16 +1,22 @@
 import { useNavigate, useParams } from '@tanstack/react-router'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { formatCentsPlain } from '../lib/money'
 import { formatShortDate } from '../lib/date'
 import { useSupermarkets } from '../hooks/useItems'
-import { useQuery } from '@tanstack/react-query'
 import { db } from '../db/db'
+import { qk } from '../db/queryKeys'
+import { deleteSession } from '../db/repositories/sessions'
+import { BottomSheet } from '../components/BottomSheet'
 
 export function SessioneScreen() {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const { sessionId: sessionIdStr } = useParams({ from: '/storico/$sessionId' })
   const sessionId = parseInt(sessionIdStr, 10)
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+  const qc = useQueryClient()
 
   const { data: supermarkets = [] } = useSupermarkets()
   const { data: session } = useQuery({
@@ -31,12 +37,20 @@ export function SessioneScreen() {
   const totalCents = session?.confirmedTotalCents ?? computedCents
   const itemMap = Object.fromEntries(items.map((it) => [it.id ?? 0, it.name]))
 
+  const handleDelete = async () => {
+    await deleteSession(sessionId)
+    void qc.invalidateQueries({ queryKey: qk.allSessions() })
+    void qc.invalidateQueries({ queryKey: ['session', sessionId] })
+    void navigate({ to: '/storico' })
+  }
+
   return (
+    <>
     <div className="flex flex-col h-full bg-[#F2F2F0]">
       <div className="h-[54px] flex-none" />
       <div className="flex-1 overflow-y-auto px-5 pb-[120px]">
         {/* Header */}
-        <div className="flex items-center gap-2 pt-1 pb-[18px]">
+        <div className="relative flex items-center pt-1 pb-[18px]">
           <button
             onClick={() => void navigate({ to: '/storico' })}
             className="w-[34px] h-[34px] -ml-1.5 flex items-center justify-center active:opacity-50"
@@ -45,7 +59,18 @@ export function SessioneScreen() {
               <path d="M15 5l-7 7 7 7" />
             </svg>
           </button>
-          <span className="text-[26px] font-normal tracking-[-0.5px] text-[#2A2A2C]">{storeName}</span>
+          <span className="absolute left-1/2 -translate-x-1/2 text-[26px] font-normal tracking-[-0.5px] text-[#2A2A2C] max-w-[60%] truncate">
+            {storeName}
+          </span>
+          <button
+            onClick={() => setShowDeleteConfirm(true)}
+            aria-label={t('sessione.deleteSession')}
+            className="w-[34px] h-[34px] -mr-1.5 ml-auto flex items-center justify-center opacity-40 active:opacity-80"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2A2A2C" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6" />
+            </svg>
+          </button>
         </div>
 
         {/* Summary card */}
@@ -91,5 +116,23 @@ export function SessioneScreen() {
         </div>
       </div>
     </div>
+
+    <BottomSheet open={showDeleteConfirm} onClose={() => setShowDeleteConfirm(false)}>
+      <div className="text-[20px] font-normal text-[#D14343] px-0.5 pb-2">{t('sessione.deleteConfirmTitle')}</div>
+      <div className="text-[15px] text-[#9B9B9F] px-0.5 pb-6">{t('sessione.deleteConfirmBody')}</div>
+      <button
+        onClick={() => void handleDelete()}
+        className="w-full bg-[#D14343] text-white text-[17px] py-[18px] rounded-[20px] mb-3 active:scale-[.98] transition-transform"
+      >
+        {t('sessione.deleteConfirm')}
+      </button>
+      <button
+        onClick={() => setShowDeleteConfirm(false)}
+        className="w-full bg-[#F2F2F0] text-[#2A2A2C] text-[17px] py-[18px] rounded-[20px] active:scale-[.98] transition-transform"
+      >
+        {t('common.cancel')}
+      </button>
+    </BottomSheet>
+    </>
   )
 }

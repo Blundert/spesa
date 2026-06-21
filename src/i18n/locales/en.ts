@@ -86,6 +86,10 @@ export const en: typeof it = {
     buonoValue: 'Voucher value',
     removeItem: 'Remove',
     uncheck: 'Move back to list',
+    removeListConfirmTitle: 'Remove from list?',
+    removeListConfirm: 'Remove',
+    removeCartConfirmTitle: 'Remove from cart?',
+    removeCartConfirm: 'Remove',
   },
   storico: {
     title: 'History',
@@ -94,6 +98,10 @@ export const en: typeof it = {
   },
   sessione: {
     noPurchases: 'No purchases.',
+    deleteSession: 'Delete session',
+    deleteConfirmTitle: 'Delete this shopping session?',
+    deleteConfirmBody: 'All recorded purchases will be deleted.',
+    deleteConfirm: 'Delete',
   },
   pasti: {
     title: 'Plan meals',
@@ -127,6 +135,11 @@ export const en: typeof it = {
     replaceCard: 'Replace',
     cardOf: 'Card — {{name}}',
     cardError: 'Failed to save card',
+    deleteConfirmTitle: 'Delete {{name}}?',
+    deleteConfirmBody: 'All associated data will also be deleted.',
+    deleteConfirm: 'Delete',
+    removeCardConfirmTitle: 'Remove loyalty card?',
+    removeCardConfirm: 'Remove',
   },
   item: {
     avgPrice: 'Average price',
