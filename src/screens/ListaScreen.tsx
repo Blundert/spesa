@@ -2,76 +2,40 @@ import { useState, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from '@tanstack/react-router'
 import { categoryLabel } from '../i18n'
-import { currentISOWeek } from '../lib/date'
 import { formatCentsPlain } from '../lib/money'
-import { useListItems, useAddNewItemToList } from '../hooks/useListItems'
-import { useSessionsByWeek } from '../hooks/useShopping'
+import { useListItems, useAddNewItemToList, useRemoveFromList } from '../hooks/useListItems'
 import { useCategories, useItems } from '../hooks/useItems'
 import { normalizeName } from '../lib/normalize'
 import { BASE_ITEMS } from '../lib/baseItems'
-import { qk } from '../db/queryKeys'
-import { db } from '../db/db'
-import { useQuery } from '@tanstack/react-query'
+import { BottomSheet } from '../components/BottomSheet'
 
 interface Suggestion {
   name: string
   categoryId: number
 }
 
-const isoWeek = currentISOWeek()
-
-function usePurchasesForWeek() {
-  return useQuery({
-    queryKey: qk.purchasesForWeek(isoWeek),
-    queryFn: async () => {
-      const sessions = await db.sessions.where('isoWeek').equals(isoWeek).toArray()
-      if (!sessions.length) return []
-      const all = await Promise.all(
-        sessions.map((s) => db.purchases.where('sessionId').equals(s.id as number).toArray()),
-      )
-      return all.flat()
-    },
-  })
-}
-
 export function ListaScreen() {
   const { t } = useTranslation()
   const [addInput, setAddInput] = useState('')
   const inputRef = useRef<HTMLInputElement>(null)
+  const [pendingListRemove, setPendingListRemove] = useState<number | null>(null)
 
   const { data: listItems = [] } = useListItems()
   const { data: categories = [] } = useCategories()
   const { data: items = [] } = useItems()
-  const { data: purchases = [] } = usePurchasesForWeek()
-  const { data: sessions = [] } = useSessionsByWeek(isoWeek)
 
   const altroId = categories.find((c) => c.name === 'Altro')?.id ?? 0
   const addNewItem = useAddNewItemToList(altroId)
-
-  // "Preso" solo per gli acquisti della spesa in corso (sessione non finita): senza
-  // questa restrizione un item già comprato prima in settimana risulterebbe subito preso,
-  // perché gli item sono deduplicati e riusano lo stesso id.
-  const activeSession = sessions.find((s) => s.finishedAt === null)
-  const purchasedItemIds = new Set(
-    activeSession
-      ? purchases.filter((p) => p.sessionId === activeSession.id).map((p) => p.itemId)
-      : [],
-  )
+  const removeFromList = useRemoveFromList()
 
   // Build category map id → name
   const catMap = Object.fromEntries(categories.map((c) => [c.id ?? 0, categoryLabel(t, c.sortOrder)]))
 
-  // Group by category, sorted items with checked last
+  // Group by category
   const grouped = categories
     .map((cat) => {
-      const items = listItems
-        .filter((li) => li.itemCategoryId === cat.id)
-        .sort((a, b) => {
-          const aChecked = purchasedItemIds.has(a.itemId) ? 1 : 0
-          const bChecked = purchasedItemIds.has(b.itemId) ? 1 : 0
-          return aChecked - bChecked
-        })
-      return { cat, items }
+      const catItems = listItems.filter((li) => li.itemCategoryId === cat.id)
+      return { cat, items: catItems }
     })
     .filter(({ items }) => items.length > 0)
 
@@ -200,63 +164,51 @@ export function ListaScreen() {
       )}
 
       {/* Grouped list */}
-      {grouped.map(({ cat, items }) => (
+      {grouped.map(({ cat, items: catItems }) => (
         <div key={cat.id} className="mb-[18px]">
           <div className="text-[12px] font-normal tracking-[1.2px] text-[#9B9B9F] uppercase px-1.5 pb-[13px]">
             {categoryLabel(t, cat.sortOrder)}
           </div>
           <div className="bg-white rounded-[20px] overflow-hidden">
-            {items.map((li, i) => {
-              const isChecked = purchasedItemIds.has(li.itemId)
-              return (
-                <div
-                  key={li.id}
-                  className="flex items-center gap-[13px] px-[18px] py-4"
-                  style={{ borderBottom: i < items.length - 1 ? '1px solid #ECECEC' : 'none' }}
-                >
-                  {/* Checkbox circle */}
-                  <button
-                    onClick={() => isChecked ? null : null}
-                    className="w-6 h-6 flex-none rounded-full flex items-center justify-center"
-                    style={{
-                      border: `2px solid ${isChecked ? '#2A2A2C' : '#D8D8D6'}`,
-                      background: isChecked ? '#2A2A2C' : 'transparent',
-                    }}
-                  >
-                    {isChecked && (
-                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M5 12l4 4 10-10" />
-                      </svg>
-                    )}
-                  </button>
-
-                  {/* Name + sub */}
-                  <div className="flex-1" style={{ opacity: isChecked ? 0.42 : 1 }}>
-                    <div className="text-base text-[#2A2A2C]" style={{ textDecoration: isChecked ? 'line-through' : 'none' }}>
-                      {li.itemName}
-                    </div>
-                    <div className="text-[12px] text-[#9B9B9F] mt-0.5">
-                      {isChecked
-                        ? t('lista.taken')
-                        : li.suggestedPriceCents !== null
-                        ? `~ €${formatCentsPlain(li.suggestedPriceCents)}`
-                        : t('lista.toGet')}
-                    </div>
+            {catItems.map((li, i) => (
+              <div
+                key={li.id}
+                className="flex items-center gap-[13px] px-[18px] py-4"
+                style={{ borderBottom: i < catItems.length - 1 ? '1px solid #ECECEC' : 'none' }}
+              >
+                {/* Name + sub */}
+                <div className="flex-1">
+                  <div className="text-base text-[#2A2A2C]">{li.itemName}</div>
+                  <div className="text-[12px] text-[#9B9B9F] mt-0.5">
+                    {li.suggestedPriceCents !== null
+                      ? `~ €${formatCentsPlain(li.suggestedPriceCents)}`
+                      : t('lista.toGet')}
                   </div>
-
-                  {/* Detail link */}
-                  <Link
-                    to="/item/$itemId"
-                    params={{ itemId: String(li.itemId) }}
-                    className="w-[30px] h-[30px] flex items-center justify-center flex-none active:opacity-50"
-                  >
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#C5C5C9" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M9 6l6 6-6 6" />
-                    </svg>
-                  </Link>
                 </div>
-              )
-            })}
+
+                {/* Trash */}
+                <button
+                  onClick={() => li.id !== undefined && setPendingListRemove(li.id)}
+                  aria-label={t('spesa.removeItem')}
+                  className="w-9 h-9 -mr-1.5 flex-none flex items-center justify-center opacity-40 active:opacity-90"
+                >
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2A2A2C" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6" />
+                  </svg>
+                </button>
+
+                {/* Detail link */}
+                <Link
+                  to="/item/$itemId"
+                  params={{ itemId: String(li.itemId) }}
+                  className="w-[30px] h-[30px] flex items-center justify-center flex-none active:opacity-50"
+                >
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#C5C5C9" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M9 6l6 6-6 6" />
+                  </svg>
+                </Link>
+              </div>
+            ))}
           </div>
         </div>
       ))}
@@ -266,6 +218,26 @@ export function ListaScreen() {
           {t('lista.empty')}
         </div>
       )}
+
+      {/* Conferma rimuovi dalla lista */}
+      <BottomSheet open={pendingListRemove !== null} onClose={() => setPendingListRemove(null)}>
+        <div className="text-[20px] font-normal text-[#D14343] px-0.5 pb-6">{t('spesa.removeListConfirmTitle')}</div>
+        <button
+          onClick={() => {
+            if (pendingListRemove !== null) removeFromList.mutate(pendingListRemove)
+            setPendingListRemove(null)
+          }}
+          className="w-full bg-[#D14343] text-white text-[17px] py-[18px] rounded-[20px] mb-3 active:scale-[.98] transition-transform"
+        >
+          {t('spesa.removeListConfirm')}
+        </button>
+        <button
+          onClick={() => setPendingListRemove(null)}
+          className="w-full bg-[#F2F2F0] text-[#2A2A2C] text-[17px] py-[18px] rounded-[20px] active:scale-[.98] transition-transform"
+        >
+          {t('common.cancel')}
+        </button>
+      </BottomSheet>
     </div>
   )
 }
