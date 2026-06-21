@@ -1,9 +1,9 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <!-- Sfondo bianco pieno — iOS/Android applicano il loro clip radius -->
+  <!-- Sfondo bianco — il clip radius arrotondato di iOS/Android mostra il bianco agli angoli -->
   <rect width="512" height="512" fill="white"/>
-  <!-- Cerchio nero centrato con margine ~12% (come Telegram) -->
-  <circle cx="256" cy="256" r="196" fill="#2A2A2C"/>
-  <!-- Carrello (versione 2) centrato e scalato 70% dentro il cerchio -->
+  <!-- Cerchio nero quasi full-bleed: il bianco è visibile solo agli angoli (come Telegram) -->
+  <circle cx="256" cy="256" r="238" fill="#2A2A2C"/>
+  <!-- Carrello (versione 2) centrato e scalato dentro il cerchio -->
   <g transform="translate(256,256) scale(0.70) translate(-244,-262)">
     <path d="M64 96 H116 L180 308 A24 24 0 0 0 203 324 H368 A24 24 0 0 0 391 308 L424 168 H144"
           stroke="white" stroke-width="36"
