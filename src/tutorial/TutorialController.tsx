@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { getTutorialIntroDone, getTutorialTourDone, onTutorialReset } from './tutorialStore'
 import { TutorialIntro } from './TutorialIntro'
 import { TutorialTour } from './TutorialTour'
+import { router } from '../router'
 
 type Phase = 'idle' | 'intro' | 'tour'
 
@@ -21,7 +22,14 @@ export function TutorialController() {
   return (
     <>
       {phase === 'intro' && <TutorialIntro onComplete={() => setPhase('tour')} />}
-      {phase === 'tour' && <TutorialTour onComplete={() => setPhase('idle')} />}
+      {phase === 'tour' && (
+        <TutorialTour
+          onComplete={() => {
+            void router.navigate({ to: '/' })
+            setPhase('idle')
+          }}
+        />
+      )}
     </>
   )
 }
