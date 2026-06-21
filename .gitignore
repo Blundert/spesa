@@ -1,6 +1,7 @@
 .devcontainer/docker-compose.yml.template
 node_modules
 dist
+coverage
 .DS_Store
 *.local
 

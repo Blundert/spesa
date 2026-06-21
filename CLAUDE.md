@@ -50,3 +50,4 @@ invece una floating bottom bar fissa che apre un bottom sheet di riepilogo setti
 - Il progetto gira in un container Docker: tenere conto di questo per dev server, build, ecc.
 - Quando fai un fix cambia versione patch.
 - Quando fai una feature cambia versione minor.
+- Prima di fare commit lanciare test e verificare che il coverage sia 100%. 
