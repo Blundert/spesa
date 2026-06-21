@@ -48,35 +48,5 @@ invece una floating bottom bar fissa che apre un bottom sheet di riepilogo setti
   e segnalarla nel messaggio finale invece di bloccarsi o andare oltre lo scopo.
 - Al termine di ogni task, creare un dump in `doc/roadmap/<N>.md`.
 - Il progetto gira in un container Docker: tenere conto di questo per dev server, build, ecc.
-
-## Roadmap
-
-### Fase 0 — Fondamenta
-1. ✅ Scaffold Vite + React + TS + TanStack Router + Tailwind + lint
-2. ✅ Setup PWA con vite-plugin-pwa (manifest, app shell offline)
-3. Utility: importi in centesimi, helper data e ISO week
-4. Database Dexie: schema, tipi entità, seed categorie
-
-### Fase 1 — Data layer (TanStack Query su Dexie)
-5. QueryClient + repository Dexie + convenzione query key
-6. Items e Supermarkets con dedup su normalizedName
-7. Week e budget: selettore rimanente derivato (Z, speso, "da pagare a parte")
-8. Lista della spesa: query e mutation
-9. Sessioni e acquisti: purchase mutation (quantità modificabile, default 1)
-10. Storico prezzi e statistiche supermercato
-11. Meal plan
-
-### Fase 2 — Primitive UI
-12. Sonner, Vaul, tastierino prezzo+quantità, layout, navigazione
-
-### Fase 3 — Schermate
-13. Modalità spesa (slice verticale, per prima)
-14. Home / settimana
-15. Lista della spesa
-16. Pianificazione pasti
-17. Storico sessioni
-18. Dettaglio oggetto (storico prezzi)
-19. Supermercati
-
-### Fase 4 — Rifinitura
-20. ✅ Polish PWA (icone, splash, install prompt, verifica offline)
+- Quando fai un fix cambia versione patch.
+- Quando fai una feature cambia versione minor.
