@@ -123,11 +123,11 @@ export function useAddPurchase(isoWeek: string) {
       )
       await updateItemPrices(itemId, priceCents, avg)
     },
-    onSuccess: (_data, { sessionId }) => {
+    onSuccess: (_data, { sessionId, itemId }) => {
       void qc.invalidateQueries({ queryKey: qk.purchases(sessionId) })
       void qc.invalidateQueries({ queryKey: qk.sessions(isoWeek) })
       void qc.invalidateQueries({ queryKey: qk.items() })
-      void qc.invalidateQueries({ queryKey: qk.priceHistory(0) }) // broad invalidation
+      void qc.invalidateQueries({ queryKey: qk.priceHistory(itemId) })
     },
   })
 }
@@ -157,9 +157,27 @@ export function useUpdatePurchase(sessionId: number) {
 export function useRemovePurchase(sessionId: number) {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: (id: number) => removePurchase(id),
-    onSuccess: () => {
+    mutationFn: async (id: number) => {
+      const purchase = await db.purchases.get(id)
+      await removePurchase(id)
+      if (purchase) {
+        const remaining = await db.purchases.where('itemId').equals(purchase.itemId).toArray()
+        if (remaining.length === 0) {
+          await db.items.update(purchase.itemId, { lastPriceCents: null, suggestedPriceCents: null })
+        } else {
+          const avg = Math.round(remaining.reduce((a, p) => a + p.priceCents, 0) / remaining.length)
+          const last = remaining[remaining.length - 1].priceCents
+          await updateItemPrices(purchase.itemId, last, avg)
+        }
+      }
+      return purchase?.itemId
+    },
+    onSuccess: (itemId) => {
       void qc.invalidateQueries({ queryKey: qk.purchases(sessionId) })
+      void qc.invalidateQueries({ queryKey: qk.items() })
+      if (itemId !== undefined) {
+        void qc.invalidateQueries({ queryKey: qk.priceHistory(itemId) })
+      }
     },
   })
 }
