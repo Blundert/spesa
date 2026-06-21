@@ -14,7 +14,7 @@ interface TourStep {
 const STEPS: TourStep[] = [
   {
     dataAttr: 'week-card',
-    route: null,
+    route: '/',
     tooltipPosition: 'below',
     titleKey: 'tutorial.tour.step1.title',
     descKey: 'tutorial.tour.step1.description',
