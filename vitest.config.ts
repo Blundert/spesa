@@ -14,6 +14,7 @@ export default defineConfig({
         'src/lib/budgetSelectors.ts',
         'src/lib/debugFlag.ts',
         'src/lib/imageUtils.ts',
+        'src/db/repositories/categories.ts',
       ],
       all: true,
       thresholds: {

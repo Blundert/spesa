@@ -213,6 +213,7 @@ function MenuSheet({
     { to: '/lista', label: t('nav.list') },
     { to: '/storico', label: t('nav.history') },
     { to: '/supermercati', label: t('nav.supermarkets') },
+    { to: '/catalogo', label: t('nav.catalog') },
     { to: '/impostazioni', label: t('nav.settings') },
   ]
   return (

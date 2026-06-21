@@ -58,3 +58,11 @@ export async function deleteItem(id: number): Promise<void> {
     await db.items.delete(id)
   })
 }
+
+export async function renameItem(id: number, name: string): Promise<void> {
+  await db.items.update(id, { name: name.trim(), normalizedName: normalizeName(name) })
+}
+
+export async function moveItemCategory(id: number, categoryId: number): Promise<void> {
+  await db.items.update(id, { categoryId })
+}

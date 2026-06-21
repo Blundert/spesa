@@ -2,6 +2,18 @@ export type ChangelogEntry = { it: string[]; en: string[] }
 
 // Ordine: più recente in cima. Aggiungere una entry ad ogni nuova versione.
 export const changelog: Record<string, ChangelogEntry> = {
+  '0.10.0': {
+    it: [
+      'Nuova schermata Catalogo: gestisci categorie e articoli',
+      'Aggiungi, rinomina ed elimina categorie personalizzate',
+      'Rinomina, sposta di categoria o elimina articoli dal DB',
+    ],
+    en: [
+      'New Catalog screen: manage categories and items',
+      'Add, rename and delete custom categories',
+      'Rename, move to another category or delete items from the database',
+    ],
+  },
   '0.9.0': {
     it: ['Test di unità con copertura 100% su money, date, budgetSelectors, normalize, debugFlag, imageUtils'],
     en: ['Unit tests with 100% coverage on money, date, budgetSelectors, normalize, debugFlag, imageUtils'],
