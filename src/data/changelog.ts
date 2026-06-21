@@ -2,6 +2,10 @@ export type ChangelogEntry = { it: string[]; en: string[] }
 
 // Ordine: più recente in cima. Aggiungere una entry ad ogni nuova versione.
 export const changelog: Record<string, ChangelogEntry> = {
+  '0.9.0': {
+    it: ['Test di unità con copertura 100% su money, date, budgetSelectors, normalize, debugFlag, imageUtils'],
+    en: ['Unit tests with 100% coverage on money, date, budgetSelectors, normalize, debugFlag, imageUtils'],
+  },
   '0.8.3': {
     it: ['Fix toast conflitto sync: pulsanti abbreviati per evitare testo verticale'],
     en: ['Fix sync conflict toast: shorter button labels to prevent vertical text'],

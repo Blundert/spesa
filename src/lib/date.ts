@@ -60,7 +60,7 @@ export function shiftISOWeek(isoWeek: string, delta: number): string {
   d.setUTCDate(d.getUTCDate() + delta * 7)
   // Ricalcola la settimana ISO (giovedì della settimana = anno ISO di riferimento).
   const thursday = new Date(d)
-  thursday.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7))
+  thursday.setUTCDate(d.getUTCDate() + 4 - d.getUTCDay())
   const year = thursday.getUTCFullYear()
   const yearStart = new Date(Date.UTC(year, 0, 1))
   const week = Math.ceil(((thursday.getTime() - yearStart.getTime()) / 86_400_000 + 1) / 7)
