@@ -216,7 +216,7 @@ export function SpesaScreen() {
     return (
       <div className="flex flex-col h-full bg-[#F2F2F0]">
         {/* Status bar placeholder */}
-        <div className="h-[54px] flex-none" />
+        <div className="flex-none" style={{ height: 'max(16px, env(safe-area-inset-top))' }} />
         <div className="flex-1 flex flex-col items-center justify-center gap-6 p-8">
           <h1 className="text-[26px] font-normal text-[#2A2A2C] tracking-tight">{t('spesa.startTitle')}</h1>
           <p className="text-sm text-[#9B9B9F] text-center">{t('spesa.choosePrompt')}</p>
@@ -250,7 +250,7 @@ export function SpesaScreen() {
   return (
     <div className="flex flex-col h-full bg-[#F2F2F0]">
       {/* Status bar */}
-      <div className="h-[54px] flex-none" />
+      <div className="flex-none" style={{ height: 'max(16px, env(safe-area-inset-top))' }} />
 
       {/* Header */}
       <div className="flex items-center justify-between px-5 py-2 flex-none">

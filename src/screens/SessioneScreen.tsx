@@ -47,10 +47,10 @@ export function SessioneScreen() {
   return (
     <>
     <div className="flex flex-col h-full bg-[#F2F2F0]">
-      <div className="h-[54px] flex-none" />
+      <div className="flex-none" style={{ height: 'max(16px, env(safe-area-inset-top))' }} />
       <div className="flex-1 overflow-y-auto px-5 pb-[120px]">
         {/* Header */}
-        <div className="relative flex items-center pt-1 pb-[18px]">
+        <div className="relative flex items-center pt-2 pb-[18px]">
           <button
             onClick={() => void navigate({ to: '/storico' })}
             className="w-[34px] h-[34px] -ml-1.5 flex items-center justify-center active:opacity-50"

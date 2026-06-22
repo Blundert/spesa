@@ -2,6 +2,10 @@ export type ChangelogEntry = { it: string[]; en: string[] }
 
 // Ordine: più recente in cima. Aggiungere una entry ad ogni nuova versione.
 export const changelog: Record<string, ChangelogEntry> = {
+  '0.10.1': {
+    it: ['Fix posizione titolo/bottone indietro: allineamento verticale uniforme su tutte le schermate'],
+    en: ['Fix header position: consistent vertical alignment of title/back button across all screens'],
+  },
   '0.10.0': {
     it: [
       'Nuova schermata Catalogo: gestisci categorie e articoli',
