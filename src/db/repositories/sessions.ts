@@ -36,8 +36,20 @@ export async function finishSession(id: number, confirmedTotalCents: number): Pr
 }
 
 export async function deleteSession(id: number): Promise<void> {
-  await db.transaction('rw', [db.sessions, db.purchases], async () => {
+  await db.transaction('rw', [db.sessions, db.purchases, db.items], async () => {
+    const purchases = await db.purchases.where('sessionId').equals(id).toArray()
+    const itemIds = [...new Set(purchases.map((p) => p.itemId))]
     await db.purchases.where('sessionId').equals(id).delete()
     await db.sessions.delete(id)
+    for (const itemId of itemIds) {
+      const remaining = await db.purchases.where('itemId').equals(itemId).toArray()
+      if (remaining.length === 0) {
+        await db.items.update(itemId, { lastPriceCents: null, suggestedPriceCents: null })
+      } else {
+        const avg = Math.round(remaining.reduce((a, p) => a + p.priceCents, 0) / remaining.length)
+        const last = remaining[remaining.length - 1].priceCents
+        await db.items.update(itemId, { lastPriceCents: last, suggestedPriceCents: avg })
+      }
+    }
   })
 }

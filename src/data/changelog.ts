@@ -2,6 +2,10 @@ export type ChangelogEntry = { it: string[]; en: string[] }
 
 // Ordine: più recente in cima. Aggiungere una entry ad ogni nuova versione.
 export const changelog: Record<string, ChangelogEntry> = {
+  '0.10.3': {
+    it: ['Fix: il prezzo stimato in lista non veniva azzerato dopo l\'eliminazione di una sessione di spesa'],
+    en: ['Fix: estimated price in list was not cleared after deleting a shopping session'],
+  },
   '0.10.2': {
     it: ['Fix bottom sheet: si sposta sopra la tastiera e diventa scorrevole quando la tastiera è aperta'],
     en: ['Fix bottom sheet: moves above keyboard and becomes scrollable when keyboard is open'],
