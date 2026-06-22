@@ -2,6 +2,10 @@ export type ChangelogEntry = { it: string[]; en: string[] }
 
 // Ordine: più recente in cima. Aggiungere una entry ad ogni nuova versione.
 export const changelog: Record<string, ChangelogEntry> = {
+  '0.10.2': {
+    it: ['Fix bottom sheet: si sposta sopra la tastiera e diventa scorrevole quando la tastiera è aperta'],
+    en: ['Fix bottom sheet: moves above keyboard and becomes scrollable when keyboard is open'],
+  },
   '0.10.1': {
     it: ['Fix posizione titolo/bottone indietro: allineamento verticale uniforme su tutte le schermate'],
     en: ['Fix header position: consistent vertical alignment of title/back button across all screens'],
