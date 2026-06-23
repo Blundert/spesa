@@ -9,9 +9,10 @@ import type {
   Purchase,
   MealPlan,
 } from './types'
+import { getWeekStartDay, setWeekStartDay } from '../lib/weekSettings'
 
 /** Versione del formato di backup (allineata allo schema Dexie). */
-export const BACKUP_VERSION = 5
+export const BACKUP_VERSION = 6
 
 export interface BackupData {
   version: number
@@ -24,6 +25,7 @@ export interface BackupData {
   sessions: Session[]
   purchases: Purchase[]
   mealPlans: MealPlan[]
+  settings?: { weekStartDay: number }
 }
 
 /** Serializza tutte le tabelle in un oggetto di backup (id inclusi → relazioni preservate). */
@@ -50,6 +52,7 @@ export async function exportData(): Promise<BackupData> {
     sessions,
     purchases,
     mealPlans,
+    settings: { weekStartDay: getWeekStartDay() },
   }
 }
 
@@ -111,4 +114,7 @@ export async function importData(data: BackupData): Promise<void> {
       ])
     },
   )
+  if (data.settings?.weekStartDay !== undefined) {
+    setWeekStartDay(data.settings.weekStartDay)
+  }
 }

@@ -1,6 +1,13 @@
-import { describe, it, expect, beforeEach } from 'vitest'
+import { vi, describe, it, expect, beforeEach } from 'vitest'
 import { db } from './db'
 import { exportData, importData, isBackupData, BACKUP_VERSION, type BackupData } from './backup'
+
+const mockGetWeekStartDay = vi.hoisted(() => vi.fn(() => 0))
+const mockSetWeekStartDay = vi.hoisted(() => vi.fn())
+vi.mock('../lib/weekSettings', () => ({
+  getWeekStartDay: mockGetWeekStartDay,
+  setWeekStartDay: mockSetWeekStartDay,
+}))
 
 const validBase: BackupData = {
   version: BACKUP_VERSION,
@@ -54,6 +61,8 @@ async function seed() {
 
 beforeEach(async () => {
   await clearAll()
+  mockGetWeekStartDay.mockReturnValue(0)
+  mockSetWeekStartDay.mockClear()
 })
 
 describe('isBackupData', () => {
@@ -85,6 +94,17 @@ describe('exportData', () => {
     const data = await exportData()
     expect(data.items).toEqual([])
     expect(data.sessions).toEqual([])
+  })
+
+  it('include settings.weekStartDay dal valore corrente', async () => {
+    mockGetWeekStartDay.mockReturnValue(3)
+    const data = await exportData()
+    expect(data.settings?.weekStartDay).toBe(3)
+  })
+
+  it('include settings.weekStartDay = 0 quando non configurato', async () => {
+    const data = await exportData()
+    expect(data.settings?.weekStartDay).toBe(0)
   })
 })
 
@@ -136,5 +156,17 @@ describe('importData', () => {
 
   it('rifiuta una struttura non valida', async () => {
     await expect(importData({} as unknown as BackupData)).rejects.toThrow()
+  })
+
+  it('ripristina weekStartDay da settings nel backup', async () => {
+    const backup: BackupData = { ...validBase, settings: { weekStartDay: 5 } }
+    await importData(backup)
+    expect(mockSetWeekStartDay).toHaveBeenCalledWith(5)
+  })
+
+  it('non chiama setWeekStartDay se il backup non ha settings (retrocompat)', async () => {
+    const backup: BackupData = { ...validBase, settings: undefined }
+    await importData(backup)
+    expect(mockSetWeekStartDay).not.toHaveBeenCalled()
   })
 })
