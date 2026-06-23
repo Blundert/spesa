@@ -37,6 +37,19 @@ invece una floating bottom bar fissa che apre un bottom sheet di riepilogo setti
 - **Vaul** per i bottom sheet
 - **Tailwind CSS** per lo stile
 
+## VNC (accesso grafico al container)
+
+Il desktop remoto parte automaticamente all'avvio del container (via `postStartCommand`).
+Connettiti con qualsiasi client VNC a `localhost:5901` — password: **password**.
+
+Se il server VNC non risponde (es. dopo un rebuild o un crash), riavvialo manualmente:
+
+```bash
+vncserver -kill :1 2>/dev/null; vncserver :1 -geometry 1280x800 -depth 24 -localhost no
+```
+
+Il display `:1` è usato anche dal browser nei test e2e (MCP Playwright).
+
 ## Modo di lavorare
 
 - Si procede per task numerate. Eseguire SOLO la task indicata, poi fermarsi.
@@ -51,3 +64,4 @@ invece una floating bottom bar fissa che apre un bottom sheet di riepilogo setti
 - Quando fai un fix cambia versione patch.
 - Quando fai una feature cambia versione minor.
 - Prima di fare commit lanciare test e verificare che il coverage sia 100%. 
+- Aggiorna sempre test/smoke.md in modo che sia coerente con le nuove feature e fix. 

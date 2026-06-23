@@ -8,3 +8,7 @@ coverage
 # Claude Code: config agent/permessi locali, non parte del codice app
 .claude/settings.json
 .claude/settings.local.json
+
+# playwright
+.playwright-mcp
+test/e2e-screenshots

@@ -1,0 +1,32 @@
+{
+  "suite": "smoke",
+  "date": "2026-06-23",
+  "appVersion": "0.11.0",
+  "results": [
+    {
+      "flow": "Flusso 1 — Onboarding prima apertura",
+      "status": "PASS",
+      "notes": "4 slide intro + tour in-app (1/4) entrambi mostrati correttamente; 'Salta' chiude il tour e lascia la schermata principale pulita"
+    },
+    {
+      "flow": "Flusso 2 — Aggiunta articolo alla lista",
+      "status": "PASS",
+      "notes": "'Latte' aggiunto correttamente, appare sotto la categoria Frigo"
+    },
+    {
+      "flow": "Flusso 3 — Avvia sessione di spesa e aggiungi articolo al carrello",
+      "status": "PASS",
+      "notes": "Supermercato aggiunto e sessione avviata; Latte apparso in 'Da prendere'; tastierino prezzi aperto; €1,50 inserito; Latte spostato in 'Nel carrello'"
+    },
+    {
+      "flow": "Flusso 4 — Persistenza dopo reload",
+      "status": "PASS",
+      "notes": "'Latte' persiste nella lista dopo reload, con prezzo stimato ~ €1,50 derivato dall'acquisto precedente"
+    },
+    {
+      "flow": "Flusso 5 — Giorno di inizio settimana",
+      "status": "PASS",
+      "notes": "'Lun' default confermato; 'Sab' selezionato; toast 'Impostazione salvata' confermato via MutationObserver; floating bar aggiornata a '20–26 giu' (sab–ven); persistenza verificata dopo reload"
+    }
+  ]
+}
