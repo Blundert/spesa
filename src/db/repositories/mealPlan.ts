@@ -18,11 +18,12 @@ export interface MealPlanDay {
 
 /**
  * Restituisce i 7 giorni con pranzo e cena (stringa vuota se non pianificato).
+ * L'array è ruotato in modo che il primo elemento corrisponda a `startDay` (0=Lun…6=Dom).
  */
-export async function getMealPlan(isoWeek: string): Promise<MealPlanDay[]> {
+export async function getMealPlan(isoWeek: string, startDay: number = 0): Promise<MealPlanDay[]> {
   const rows = await db.mealPlans.where('isoWeek').equals(isoWeek).toArray()
 
-  return Array.from({ length: 7 }, (_, dayIndex) => {
+  const allDays = Array.from({ length: 7 }, (_, dayIndex) => {
     const pranzoRow = rows.find((r) => r.dayIndex === dayIndex && r.mealType === 0)
     const cenaRow = rows.find((r) => r.dayIndex === dayIndex && r.mealType === 1)
     return {
@@ -33,6 +34,8 @@ export async function getMealPlan(isoWeek: string): Promise<MealPlanDay[]> {
       cenaId: cenaRow?.id,
     }
   })
+
+  return [...allDays.slice(startDay), ...allDays.slice(0, startDay)]
 }
 
 export async function upsertMealPlan(

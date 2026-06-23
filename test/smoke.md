@@ -36,3 +36,10 @@
 6. Torna alla schermata principale
 7. Verifica che la floating bar mostri l'intervallo corretto (sabato–venerdì)
 8. Torna su Impostazioni e verifica che "Sab" risulti ancora selezionato dopo il reload
+
+### Flusso 6 — Pianificazione inizia dal giorno configurato
+1. Vai su Impostazioni → imposta il giorno di inizio su "Mer"
+2. Naviga su Pasti
+3. Verifica che il primo giorno visualizzato sia "MER" e l'ultimo "MAR"
+4. Torna su Impostazioni → reimposta il giorno di inizio su "Lun"
+5. Verifica che i giorni nella schermata Pasti tornino a LUN→DOM

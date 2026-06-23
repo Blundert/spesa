@@ -7,11 +7,12 @@ import {
   getPlannedWeeks,
 } from '../db/repositories/mealPlan'
 import type { MealType } from '../db/types'
+import { getWeekStartDay } from '../lib/weekSettings'
 
 export function useMealPlan(isoWeek: string) {
   return useQuery({
     queryKey: qk.mealPlan(isoWeek),
-    queryFn: () => getMealPlan(isoWeek),
+    queryFn: () => getMealPlan(isoWeek, getWeekStartDay()),
   })
 }
 
