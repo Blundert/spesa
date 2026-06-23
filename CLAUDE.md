@@ -64,4 +64,4 @@ Il display `:1` è usato anche dal browser nei test e2e (MCP Playwright).
 - Quando fai un fix cambia versione patch.
 - Quando fai una feature cambia versione minor.
 - Prima di fare commit lanciare test e verificare che il coverage sia 100%. 
-- Aggiorna sempre test/smoke.md in modo che sia coerente con le nuove feature e fix. 
+- Aggiorna sempre test/smoke.md in modo che sia coerente con le nuove feature e fix. Non eseguire i teste e2e ad ogni commit. 

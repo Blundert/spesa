@@ -37,6 +37,15 @@
 7. Verifica che la floating bar mostri l'intervallo corretto (sabato–venerdì)
 8. Torna su Impostazioni e verifica che "Sab" risulti ancora selezionato dopo il reload
 
+### Flusso 7 — Eliminazione settimana dallo storico
+1. Naviga su http://localhost:5173/storico (con almeno una sessione di spesa salvata)
+2. Verifica che le sessioni siano raggruppate per settimana con intestazione (es. "9 – 15 giu") e icona cestino
+3. Clicca l'icona cestino accanto a una settimana
+4. Verifica che si apra un BottomSheet con il titolo "Eliminare la settimana …?" e i pulsanti "Elimina settimana" e "Annulla"
+5. Clicca "Annulla" — verifica che il sheet si chiuda e la settimana sia ancora visibile
+6. Clicca nuovamente il cestino e poi "Elimina settimana"
+7. Verifica che la settimana scompaia dalla lista e appaia il toast "Settimana eliminata"
+
 ### Flusso 6 — Pianificazione inizia dal giorno configurato
 1. Vai su Impostazioni → imposta il giorno di inizio su "Mer"
 2. Naviga su Pasti
