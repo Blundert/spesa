@@ -94,6 +94,10 @@ export const it = {
     title: 'Storico',
     empty: 'Nessuna sessione salvata.',
     itemsCount: '{{count}} oggetti',
+    deleteWeekTitle: 'Eliminare la settimana {{week}}?',
+    deleteWeekBody: 'Verranno eliminate tutte le sessioni di spesa e la pianificazione dei pasti.',
+    deleteWeekConfirm: 'Elimina settimana',
+    weekDeleted: 'Settimana eliminata',
   },
   sessione: {
     noPurchases: 'Nessun acquisto.',

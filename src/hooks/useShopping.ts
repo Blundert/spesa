@@ -1,7 +1,9 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useTranslation } from 'react-i18next'
+import { toast } from 'sonner'
 import { qk } from '../db/queryKeys'
 import { getWeekBudget, setBuoniAvailable } from '../db/repositories/weekBudget'
-import { getSessionsByWeek, createSession, finishSession } from '../db/repositories/sessions'
+import { getSessionsByWeek, createSession, finishSession, deleteWeek } from '../db/repositories/sessions'
 import {
   getPurchasesBySession,
   addPurchase,
@@ -81,6 +83,24 @@ export function useFinishSession(isoWeek: string) {
       void qc.invalidateQueries({ queryKey: qk.sessions(isoWeek) })
       void qc.invalidateQueries({ queryKey: qk.allSessions() })
       void qc.invalidateQueries({ queryKey: qk.purchasesForWeek(isoWeek) })
+    },
+  })
+}
+
+export function useDeleteWeek() {
+  const qc = useQueryClient()
+  const { t } = useTranslation()
+  return useMutation({
+    mutationFn: (isoWeek: string) => deleteWeek(isoWeek),
+    onSuccess: (_data, isoWeek) => {
+      void qc.invalidateQueries({ queryKey: qk.allSessions() })
+      void qc.invalidateQueries({ queryKey: qk.sessions(isoWeek) })
+      void qc.invalidateQueries({ queryKey: qk.weekBudget(isoWeek) })
+      void qc.invalidateQueries({ queryKey: qk.mealPlan(isoWeek) })
+      void qc.invalidateQueries({ queryKey: qk.plannedWeeks() })
+      void qc.invalidateQueries({ queryKey: qk.items() })
+      void qc.invalidateQueries({ queryKey: qk.purchasesForWeek(isoWeek) })
+      toast(t('storico.weekDeleted'))
     },
   })
 }
