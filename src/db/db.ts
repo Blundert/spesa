@@ -78,6 +78,33 @@ class SpesaDb extends Dexie {
           s.buoniValueCents = DEFAULT_BUONO_VALUE_CENTS
         })
     })
+
+    // v5: ripara suggestedPriceCents/lastPriceCents su items senza acquisti
+    // (artefatto di un bug in deleteSession, ora corretto).
+    this.version(5).upgrade(async (tx) => {
+      const items = (await tx.table('items').toArray()) as Array<{
+        id: number
+        suggestedPriceCents: number | null
+        lastPriceCents: number | null
+      }>
+      for (const item of items) {
+        if (item.suggestedPriceCents === null && item.lastPriceCents === null) continue
+        const purchases = (await tx
+          .table('purchases')
+          .where('itemId')
+          .equals(item.id)
+          .toArray()) as Array<{ priceCents: number }>
+        if (purchases.length === 0) {
+          await tx.table('items').update(item.id, { lastPriceCents: null, suggestedPriceCents: null })
+        } else {
+          const avg = Math.round(
+            purchases.reduce((a, p) => a + p.priceCents, 0) / purchases.length,
+          )
+          const last = purchases[purchases.length - 1].priceCents
+          await tx.table('items').update(item.id, { lastPriceCents: last, suggestedPriceCents: avg })
+        }
+      }
+    })
   }
 }
 
