@@ -20,6 +20,8 @@
     },
     "updateRemoteUserUID": true,
     "forwardPorts": [
-        5173
-    ]
+        5173,
+        5901
+    ],
+    "postStartCommand": "vncserver -kill :1 2>/dev/null; vncserver :1 -geometry 1280x800 -depth 24 -localhost no"
 }

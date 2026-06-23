@@ -3,6 +3,13 @@
     "browser-tools": {
       "command": "npx",
       "args": ["-y", "@agentdeskai/browser-tools-mcp@latest"]
+    },
+    "playwright": {
+      "command": "npx",
+      "args": ["@playwright/mcp@latest", "--no-sandbox", "--executable-path", "/root/.cache/ms-playwright/chromium-1228/chrome-linux/chrome"],
+      "env": {
+        "DISPLAY": ":1"
+      }
     }
   }
 }
