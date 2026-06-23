@@ -1,8 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <!-- Sfondo bianco — visibile solo agli angoli dove iOS applica il clip squircle -->
-  <rect width="512" height="512" fill="white"/>
-  <!-- Cerchio r=256: tocca tutti e 4 i lati, identico a Telegram -->
-  <circle cx="256" cy="256" r="256" fill="#2A2A2C"/>
+  <rect width="512" height="512" fill="#2A2A2C"/>
   <!-- Carrello (versione 2) centrato e scalato dentro il cerchio -->
   <g transform="translate(256,256) scale(0.70) translate(-244,-262)">
     <path d="M64 96 H116 L180 308 A24 24 0 0 0 203 324 H368 A24 24 0 0 0 391 308 L424 168 H144"
