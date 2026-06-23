@@ -256,6 +256,8 @@ export const it = {
     syncPullConfirmTitle: 'Scaricare dal remoto?',
     syncPullConfirmBody: 'Sovrascriverà tutti i dati locali con il backup remoto. Non si può annullare.',
     syncPullConfirm: 'Scarica e sovrascrivi',
+    weekStartDay: 'Inizio settimana',
+    weekStartDaySaved: 'Impostazione salvata',
     debug: 'Debug',
     debugViewport: 'Mostra misure viewport',
     changelog: 'Novità',

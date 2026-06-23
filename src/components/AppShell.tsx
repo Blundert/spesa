@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Outlet, Link, useRouter, useNavigate } from '@tanstack/react-router'
-import { currentISOWeek } from '../lib/date'
+import { currentWeek } from '../lib/date'
 import { formatCentsPlain } from '../lib/money'
 import { weekSpendSummary } from '../lib/budgetSelectors'
 import { useWeekBudget, useSessionsByWeek } from '../hooks/useShopping'
@@ -13,7 +13,7 @@ import { useQuery } from '@tanstack/react-query'
 import { db } from '../db/db'
 import { BottomSheet } from './BottomSheet'
 
-const isoWeek = currentISOWeek()
+const isoWeek = currentWeek()
 
 function usePurchasesForWeek() {
   return useQuery({

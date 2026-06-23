@@ -105,6 +105,44 @@ class SpesaDb extends Dexie {
         }
       }
     })
+
+    // v6: cambia il formato di isoWeek da "YYYY-WNN" a "YYYY-MM-DD" (data del
+    // lunedì di quella settimana ISO), in preparazione al giorno di inizio
+    // settimana configurabile.
+    this.version(6).upgrade(async (tx) => {
+      function isoWeekToMondayKey(isoWeek: string): string {
+        if (!isoWeek.includes('-W')) return isoWeek // già nel nuovo formato
+        const [yearStr, weekStr] = isoWeek.split('-W')
+        const year = parseInt(yearStr, 10)
+        const week = parseInt(weekStr, 10)
+        const jan4 = new Date(Date.UTC(year, 0, 4))
+        const jan4Day = jan4.getUTCDay() || 7
+        const monday = new Date(jan4)
+        monday.setUTCDate(jan4.getUTCDate() - jan4Day + 1 + (week - 1) * 7)
+        const y = monday.getUTCFullYear()
+        const m = String(monday.getUTCMonth() + 1).padStart(2, '0')
+        const d = String(monday.getUTCDate()).padStart(2, '0')
+        return `${y}-${m}-${d}`
+      }
+      await tx
+        .table('weekBudgets')
+        .toCollection()
+        .modify((b: { isoWeek: string }) => {
+          b.isoWeek = isoWeekToMondayKey(b.isoWeek)
+        })
+      await tx
+        .table('sessions')
+        .toCollection()
+        .modify((s: { isoWeek: string }) => {
+          s.isoWeek = isoWeekToMondayKey(s.isoWeek)
+        })
+      await tx
+        .table('mealPlans')
+        .toCollection()
+        .modify((mp: { isoWeek: string }) => {
+          mp.isoWeek = isoWeekToMondayKey(mp.isoWeek)
+        })
+    })
   }
 }
 

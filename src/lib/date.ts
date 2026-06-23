@@ -1,23 +1,18 @@
 import i18n from '../i18n'
+import { getWeekStartDay } from './weekSettings'
 
-/**
- * Returns the ISO 8601 week number for a given date.
- * Week 1 is the week containing the first Thursday of the year.
- */
+// ---------------------------------------------------------------------------
+// ISO week utilities — usate solo nella migrazione DB v6
+// ---------------------------------------------------------------------------
+
 export function getISOWeek(date: Date): number {
   const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()))
-  // Set to nearest Thursday: current date + 4 - current day number, make Sunday's day 7
   d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7))
   const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1))
   return Math.ceil(((d.getTime() - yearStart.getTime()) / 86400000 + 1) / 7)
 }
 
-/**
- * Returns the ISO week string "YYYY-WNN" for a given date.
- * E.g. "2026-W24"
- */
 export function toISOWeekString(date: Date): string {
-  // The ISO week year may differ from the calendar year near year boundaries
   const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()))
   d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7))
   const year = d.getUTCFullYear()
@@ -25,47 +20,58 @@ export function toISOWeekString(date: Date): string {
   return `${year}-W${String(week).padStart(2, '0')}`
 }
 
-/**
- * Returns the ISO week string for today.
- */
-export function currentISOWeek(): string {
-  return toISOWeekString(new Date())
+// ---------------------------------------------------------------------------
+// Week key: "YYYY-MM-DD" (data del primo giorno della settimana)
+// Convenzione day index: 0=Lun, 1=Mar, 2=Mer, 3=Gio, 4=Ven, 5=Sab, 6=Dom
+// ---------------------------------------------------------------------------
+
+function dateToKey(d: Date): string {
+  const y = d.getUTCFullYear()
+  const m = String(d.getUTCMonth() + 1).padStart(2, '0')
+  const day = String(d.getUTCDate()).padStart(2, '0')
+  return `${y}-${m}-${day}`
 }
 
 /**
- * Returns Monday and Sunday (inclusive) of the ISO week identified by "YYYY-WNN".
+ * Restituisce la chiave "YYYY-MM-DD" della settimana che contiene `date`,
+ * con inizio settimana al giorno `startDay` (0=Lun … 6=Dom).
  */
-export function weekRange(isoWeek: string): { monday: Date; sunday: Date } {
-  const [yearStr, weekStr] = isoWeek.split('-W')
-  const year = parseInt(yearStr, 10)
-  const week = parseInt(weekStr, 10)
+export function toWeekKey(date: Date, startDay: number): string {
+  // Convertiamo il giorno JS (0=Dom) nella nostra convenzione (0=Lun)
+  const ourDay = (date.getUTCDay() + 6) % 7
+  const offset = (ourDay - startDay + 7) % 7
+  const weekStart = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()))
+  weekStart.setUTCDate(weekStart.getUTCDate() - offset)
+  return dateToKey(weekStart)
+}
 
-  // Jan 4 is always in week 1
-  const jan4 = new Date(Date.UTC(year, 0, 4))
-  const jan4Day = jan4.getUTCDay() || 7 // Mon=1 … Sun=7
-  const monday = new Date(jan4)
-  monday.setUTCDate(jan4.getUTCDate() - jan4Day + 1 + (week - 1) * 7)
-  const sunday = new Date(monday)
-  sunday.setUTCDate(monday.getUTCDate() + 6)
-  return { monday, sunday }
+/** Chiave della settimana corrente (rispetta il giorno di inizio configurato). */
+export function currentWeek(): string {
+  return toWeekKey(new Date(), getWeekStartDay())
+}
+
+/** Restituisce start e end (incluso) della settimana identificata da `weekKey`. */
+export function weekRange(weekKey: string): { start: Date; end: Date } {
+  const [y, m, d] = weekKey.split('-').map(Number)
+  const start = new Date(Date.UTC(y, m - 1, d))
+  const end = new Date(start)
+  end.setUTCDate(start.getUTCDate() + 6)
+  return { start, end }
 }
 
 /**
- * Sposta una settimana ISO di `delta` settimane (negativo = indietro).
- * Calcolo interamente in UTC per evitare scivolamenti di fuso, gestisce i confini d'anno.
+ * Sposta `weekKey` di `delta` settimane (negativo = indietro).
  */
-export function shiftISOWeek(isoWeek: string, delta: number): string {
-  const { monday } = weekRange(isoWeek)
-  const d = new Date(monday)
-  d.setUTCDate(d.getUTCDate() + delta * 7)
-  // Ricalcola la settimana ISO (giovedì della settimana = anno ISO di riferimento).
-  const thursday = new Date(d)
-  thursday.setUTCDate(d.getUTCDate() + 4 - d.getUTCDay())
-  const year = thursday.getUTCFullYear()
-  const yearStart = new Date(Date.UTC(year, 0, 1))
-  const week = Math.ceil(((thursday.getTime() - yearStart.getTime()) / 86_400_000 + 1) / 7)
-  return `${year}-W${String(week).padStart(2, '0')}`
+export function shiftWeek(weekKey: string, delta: number): string {
+  const [y, m, d] = weekKey.split('-').map(Number)
+  const date = new Date(Date.UTC(y, m - 1, d))
+  date.setUTCDate(date.getUTCDate() + delta * 7)
+  return dateToKey(date)
 }
+
+// ---------------------------------------------------------------------------
+// Nomi giorni / mesi
+// ---------------------------------------------------------------------------
 
 const DAY_NAMES_SHORT = {
   it: ['Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab', 'Dom'],
@@ -80,30 +86,33 @@ const MONTH_NAMES = {
   en: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
 } as const
 
-/** Lingua attiva per la formattazione date (segue i18n). */
 function lang(): 'it' | 'en' {
   return i18n.language?.startsWith('en') ? 'en' : 'it'
 }
 
-/** Returns "Lun", "Mar" … for ISO day index 0=Mon … 6=Sun (lingua attiva) */
+/** Returns "Lun", "Mar" … for day index 0=Lun … 6=Dom (lingua attiva) */
 export function dayShort(dayIndex: number): string {
   return DAY_NAMES_SHORT[lang()][dayIndex] ?? ''
 }
 
-/** Returns "Lunedì", "Martedì" … for ISO day index 0=Mon … 6=Sun (lingua attiva) */
+/** Returns "Lunedì", "Martedì" … for day index 0=Lun … 6=Dom (lingua attiva) */
 export function dayFull(dayIndex: number): string {
   return DAY_NAMES_FULL[lang()][dayIndex] ?? ''
 }
 
 /**
- * Formats a Date as "9 – 15 giu" style range label.
+ * Formats a week key as "9 – 15 giu" or "29 giu – 5 lug" (cross-month).
  */
-export function formatWeekLabel(isoWeek: string): string {
-  const { monday, sunday } = weekRange(isoWeek)
-  const d1 = monday.getUTCDate()
-  const d2 = sunday.getUTCDate()
-  const month = MONTH_NAMES[lang()][sunday.getUTCMonth()]
-  return `${d1} – ${d2} ${month}`
+export function formatWeekLabel(weekKey: string): string {
+  const { start, end } = weekRange(weekKey)
+  const d1 = start.getUTCDate()
+  const d2 = end.getUTCDate()
+  const endMonth = MONTH_NAMES[lang()][end.getUTCMonth()]
+  if (start.getUTCMonth() !== end.getUTCMonth()) {
+    const startMonth = MONTH_NAMES[lang()][start.getUTCMonth()]
+    return `${d1} ${startMonth} – ${d2} ${endMonth}`
+  }
+  return `${d1} – ${d2} ${endMonth}`
 }
 
 /**

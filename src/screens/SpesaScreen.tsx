@@ -6,7 +6,7 @@ import { db } from '../db/db'
 import { qk } from '../db/queryKeys'
 import { toast } from 'sonner'
 import { categoryLabel } from '../i18n'
-import { currentISOWeek } from '../lib/date'
+import { currentWeek } from '../lib/date'
 import { formatCentsPlain } from '../lib/money'
 import { liveSpendSummary } from '../lib/budgetSelectors'
 import {
@@ -23,7 +23,7 @@ import { useSupermarkets, useCategories, useItems } from '../hooks/useItems'
 import { PriceKeypad } from '../components/PriceKeypad'
 import { BottomSheet } from '../components/BottomSheet'
 
-const isoWeek = currentISOWeek()
+const isoWeek = currentWeek()
 
 export function SpesaScreen() {
   const { t } = useTranslation()

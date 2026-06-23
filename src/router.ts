@@ -1,5 +1,5 @@
 import { createRouter, createRootRoute, createRoute, Outlet } from '@tanstack/react-router'
-import { currentISOWeek } from './lib/date'
+import { currentWeek } from './lib/date'
 import { DEFAULT_BUONO_VALUE_CENTS } from './db/types'
 import { AppShell } from './components/AppShell'
 import { HomeScreen } from './screens/HomeScreen'
@@ -82,7 +82,7 @@ const pastiRoute = createRoute({
   path: '/pasti',
   component: PastiScreen,
   validateSearch: (search: Record<string, unknown>): { week: string } => ({
-    week: typeof search.week === 'string' ? search.week : currentISOWeek(),
+    week: typeof search.week === 'string' ? search.week : currentWeek(),
   }),
 })
 

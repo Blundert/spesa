@@ -5,6 +5,8 @@ import { useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import type { PWAInstallElement } from '@khmyznikov/pwa-install'
 import { LANG_KEY, type Lang } from '../i18n'
+import { getWeekStartDay, setWeekStartDay } from '../lib/weekSettings'
+import { dayShort } from '../lib/date'
 import { wipeAllData } from '../db/db'
 import { exportData, importData, isBackupData, type BackupData } from '../db/backup'
 import {
@@ -38,11 +40,19 @@ export function ImpostazioniScreen() {
   const [syncing, setSyncing] = useState(false)
   const [showPull, setShowPull] = useState(false)
   const [debug, setDebug] = useState<boolean>(() => getDebugViewport())
+  const [weekStart, setWeekStart] = useState<number>(() => getWeekStartDay())
   const current: Lang = i18n.language.startsWith('en') ? 'en' : 'it'
 
   const setLang = (lng: Lang) => {
     void i18n.changeLanguage(lng)
     localStorage.setItem(LANG_KEY, lng)
+  }
+
+  const handleWeekStart = (day: number) => {
+    setWeekStartDay(day)
+    setWeekStart(day)
+    void qc.invalidateQueries()
+    toast(t('settings.weekStartDaySaved'))
   }
 
   const handleReplayTutorial = () => {
@@ -220,6 +230,28 @@ export function ImpostazioniScreen() {
             >
               <span className="text-base text-[#2A2A2C]">{l.label}</span>
               {current === l.code && (
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2A2A2C" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M5 12l4 4 10-10" />
+                </svg>
+              )}
+            </button>
+          ))}
+        </div>
+
+        {/* Inizio settimana */}
+        <div className="text-[12px] font-normal tracking-[1.2px] text-[#9B9B9F] uppercase px-1.5 pb-[13px]">
+          {t('settings.weekStartDay')}
+        </div>
+        <div className="bg-white rounded-[20px] overflow-hidden mb-7">
+          {Array.from({ length: 7 }, (_, i) => (
+            <button
+              key={i}
+              onClick={() => handleWeekStart(i)}
+              className="w-full flex items-center justify-between px-5 py-[17px] active:bg-[#F6F6F4] transition-colors text-left"
+              style={{ borderBottom: i < 6 ? '1px solid #ECECEC' : 'none' }}
+            >
+              <span className="text-base text-[#2A2A2C]">{dayShort(i)}</span>
+              {weekStart === i && (
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2A2A2C" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M5 12l4 4 10-10" />
                 </svg>

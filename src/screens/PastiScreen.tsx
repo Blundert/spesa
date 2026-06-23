@@ -1,6 +1,6 @@
 import { Link, useNavigate, useSearch } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
-import { dayShort, formatWeekLabel, shiftISOWeek } from '../lib/date'
+import { dayShort, formatWeekLabel, shiftWeek } from '../lib/date'
 import { useMealPlan, useUpdateMealSlot } from '../hooks/useMealPlan'
 import { useWeekBudget, useSetBuoniAvailable } from '../hooks/useShopping'
 
@@ -15,7 +15,7 @@ export function PastiScreen() {
   const buoniAvailable = budget?.buoniAvailable ?? 0
 
   const goToWeek = (delta: number) =>
-    void navigate({ to: '/pasti', search: { week: shiftISOWeek(week, delta) } })
+    void navigate({ to: '/pasti', search: { week: shiftWeek(week, delta) } })
 
   const handleGenerate = () => {
     void navigate({ to: '/lista' })

@@ -1,6 +1,6 @@
 import { Link } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
-import { currentISOWeek, formatWeekLabel, formatShortDate } from '../lib/date'
+import { currentWeek, formatWeekLabel, formatShortDate } from '../lib/date'
 import { formatCentsPlain } from '../lib/money'
 import { weekSpendSummary } from '../lib/budgetSelectors'
 import { useWeekBudget, useSessionsByWeek } from '../hooks/useShopping'
@@ -11,7 +11,7 @@ import { qk } from '../db/queryKeys'
 import { db } from '../db/db'
 import { useQuery } from '@tanstack/react-query'
 
-const isoWeek = currentISOWeek()
+const isoWeek = currentWeek()
 
 function usePurchasesForWeek(isoWeek: string) {
   return useQuery({
