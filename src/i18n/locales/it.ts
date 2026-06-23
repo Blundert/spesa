@@ -119,6 +119,10 @@ export const it = {
   pianificazioni: {
     title: 'Storico pianificazioni',
     empty: 'Nessuna settimana pianificata.',
+    deleteTitle: 'Eliminare la pianificazione {{week}}?',
+    deleteBody: 'Verranno eliminati tutti i pasti pianificati per questa settimana.',
+    deleteConfirm: 'Elimina pianificazione',
+    deleted: 'Pianificazione eliminata',
   },
   supermercati: {
     title: 'Supermercati',
