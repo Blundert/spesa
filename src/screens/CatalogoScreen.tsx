@@ -28,15 +28,16 @@ export function CatalogoScreen() {
   const [deleteCat, setDeleteCat] = useState<Category | null>(null)
 
   // Articolo: stati sheet
-  const [editItem, setEditItem] = useState<Item | null>(null)
-  const [editItemName, setEditItemName] = useState('')
-  const [editItemCatId, setEditItemCatId] = useState<number>(0)
+  const [renameItem, setRenameItem] = useState<Item | null>(null)
+  const [renameItemName, setRenameItemName] = useState('')
+  const [moveCatItem, setMoveCatItem] = useState<Item | null>(null)
+  const [moveCatItemCatId, setMoveCatItemCatId] = useState<number>(0)
   const [deleteItemState, setDeleteItemState] = useState<Item | null>(null)
 
   const addCategory = useAddCategory()
   const renameCategory = useRenameCategory()
   const deleteCategory = useDeleteCategory()
-  const renameItem = useRenameItem()
+  const renameItemMutation = useRenameItem()
   const moveItemCategory = useMoveItemCategory()
   const deleteItemMutation = useDeleteItemFromCatalog()
 
@@ -72,38 +73,35 @@ export function CatalogoScreen() {
     deleteCategory.mutate(deleteCat.id, { onSuccess: () => setDeleteCat(null) })
   }
 
-  const handleSaveItem = () => {
-    if (!editItem?.id) return
-    const name = editItemName.trim()
+  const handleRenameItem = () => {
+    if (!renameItem?.id) return
+    const name = renameItemName.trim()
     if (!name) return
-    const ops: Promise<void>[] = []
-    if (name !== editItem.name) {
-      ops.push(
-        new Promise<void>((res, rej) =>
-          renameItem.mutate({ id: editItem.id!, name }, { onSuccess: () => res(), onError: rej }),
-        ),
-      )
-    }
-    if (editItemCatId !== editItem.categoryId) {
-      ops.push(
-        new Promise<void>((res, rej) =>
-          moveItemCategory.mutate(
-            { id: editItem.id!, categoryId: editItemCatId },
-            { onSuccess: () => res(), onError: rej },
-          ),
-        ),
-      )
-    }
-    if (ops.length === 0) {
-      setEditItem(null)
+    if (name === renameItem.name) {
+      setRenameItem(null)
       return
     }
-    void Promise.all(ops)
-      .then(() => {
-        toast(t('catalogo.renamed', { name }))
-        setEditItem(null)
-      })
-      .catch(() => {})
+    renameItemMutation.mutate(
+      { id: renameItem.id, name },
+      {
+        onSuccess: () => {
+          toast(t('catalogo.renamed', { name }))
+          setRenameItem(null)
+        },
+      },
+    )
+  }
+
+  const handleMoveCategory = (categoryId: number) => {
+    if (!moveCatItem?.id) return
+    if (categoryId === moveCatItem.categoryId) {
+      setMoveCatItem(null)
+      return
+    }
+    moveItemCategory.mutate(
+      { id: moveCatItem.id, categoryId },
+      { onSuccess: () => setMoveCatItem(null) },
+    )
   }
 
   const handleDeleteItem = async (item: Item) => {
@@ -257,15 +255,14 @@ export function CatalogoScreen() {
                   >
                     <span className="flex-1 text-base text-[#2A2A2C] truncate">{item.name}</span>
 
-                    {/* Modifica */}
+                    {/* Rinomina */}
                     <button
                       onClick={() => {
-                        setEditItem(item)
-                        setEditItemName(item.name)
-                        setEditItemCatId(item.categoryId)
+                        setRenameItem(item)
+                        setRenameItemName(item.name)
                       }}
                       className="w-8 h-8 flex items-center justify-center opacity-40 active:opacity-80 transition-opacity"
-                      aria-label={t('catalogo.editItemTitle')}
+                      aria-label={t('catalogo.renameItemTitle')}
                     >
                       <svg
                         width="16"
@@ -279,6 +276,30 @@ export function CatalogoScreen() {
                       >
                         <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
                         <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                      </svg>
+                    </button>
+
+                    {/* Cambia categoria */}
+                    <button
+                      onClick={() => {
+                        setMoveCatItem(item)
+                        setMoveCatItemCatId(item.categoryId)
+                      }}
+                      className="w-8 h-8 flex items-center justify-center opacity-40 active:opacity-80 transition-opacity"
+                      aria-label={t('catalogo.changeCategoryTitle')}
+                    >
+                      <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="#2A2A2C"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z" />
+                        <line x1="7" y1="7" x2="7.01" y2="7" />
                       </svg>
                     </button>
 
@@ -373,34 +394,44 @@ export function CatalogoScreen() {
         </button>
       </BottomSheet>
 
-      {/* Sheet: modifica articolo */}
-      <BottomSheet open={editItem !== null} onClose={() => setEditItem(null)}>
+      {/* Sheet: rinomina articolo */}
+      <BottomSheet open={renameItem !== null} onClose={() => setRenameItem(null)}>
         <div className="text-[20px] font-normal text-[#2A2A2C] px-0.5 pb-[6px]">
-          {t('catalogo.editItemTitle')}
+          {t('catalogo.renameItemTitle')}
         </div>
         <input
-          value={editItemName}
-          onChange={(e) => setEditItemName(e.target.value)}
+          value={renameItemName}
+          onChange={(e) => setRenameItemName(e.target.value)}
           placeholder={t('catalogo.itemNamePlaceholder')}
           autoFocus
-          onKeyDown={(e) => e.key === 'Enter' && handleSaveItem()}
+          onKeyDown={(e) => e.key === 'Enter' && handleRenameItem()}
           className="w-full border-0 border-b border-[#ECECEC] outline-none bg-transparent px-0.5 py-3 text-[18px] text-[#2A2A2C] mb-4"
         />
-        <div className="text-[12px] font-normal tracking-[1.2px] text-[#9B9B9F] uppercase mb-2">
-          {t('catalogo.categoryLabel')}
+        <button
+          onClick={handleRenameItem}
+          className="w-full bg-[#2A2A2C] text-white text-[17px] py-[18px] rounded-[20px] active:scale-[.98] transition-transform"
+        >
+          {t('common.save')}
+        </button>
+      </BottomSheet>
+
+      {/* Sheet: cambia categoria articolo */}
+      <BottomSheet open={moveCatItem !== null} onClose={() => setMoveCatItem(null)}>
+        <div className="text-[20px] font-normal text-[#2A2A2C] px-0.5 pb-[14px]">
+          {t('catalogo.changeCategoryTitle')}
         </div>
-        <div className="bg-[#F6F6F4] rounded-[16px] overflow-hidden mb-4">
+        <div className="bg-[#F6F6F4] rounded-[16px] overflow-hidden">
           {categories.map((c, idx) => (
             <button
               key={c.id}
-              onClick={() => c.id !== undefined && setEditItemCatId(c.id)}
-              className="w-full flex items-center justify-between px-4 py-[13px] active:opacity-60 transition-opacity"
+              onClick={() => c.id !== undefined && handleMoveCategory(c.id)}
+              className="w-full flex items-center justify-between px-4 py-[15px] active:opacity-60 transition-opacity"
               style={{
                 borderBottom: idx < categories.length - 1 ? '1px solid #E6E6E2' : 'none',
               }}
             >
               <span className="text-[16px] text-[#2A2A2C]">{c.name}</span>
-              {editItemCatId === c.id && (
+              {moveCatItemCatId === c.id && (
                 <svg
                   width="18"
                   height="18"
@@ -417,12 +448,6 @@ export function CatalogoScreen() {
             </button>
           ))}
         </div>
-        <button
-          onClick={handleSaveItem}
-          className="w-full bg-[#2A2A2C] text-white text-[17px] py-[18px] rounded-[20px] active:scale-[.98] transition-transform"
-        >
-          {t('common.save')}
-        </button>
       </BottomSheet>
 
       {/* Sheet: conferma elimina articolo */}
