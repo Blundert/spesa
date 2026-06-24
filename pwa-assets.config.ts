@@ -8,7 +8,10 @@ import {
 // (l'icona app centrata su sfondo chiaro #F2F2F0, in linea col background dell'app).
 export default defineConfig({
   headLinkOptions: { preset: '2023' },
-  preset: combinePresetAndAppleSplashScreens(minimal2023Preset, {
+  preset: combinePresetAndAppleSplashScreens({
+    ...minimal2023Preset,
+    apple: { sizes: [180], padding: 0 },
+  }, {
     padding: 0.5,
     resizeOptions: { background: '#F2F2F0', fit: 'contain' },
     darkResizeOptions: { background: '#1C1C1E', fit: 'contain' },
