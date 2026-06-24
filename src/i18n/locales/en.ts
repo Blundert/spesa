@@ -121,6 +121,10 @@ export const en: typeof it = {
   pianificazioni: {
     title: 'Planning history',
     empty: 'No planned weeks.',
+    deleteTitle: 'Delete planning {{week}}?',
+    deleteBody: 'All meals planned for this week will be deleted.',
+    deleteConfirm: 'Delete planning',
+    deleted: 'Planning deleted',
   },
   supermercati: {
     title: 'Supermarkets',
