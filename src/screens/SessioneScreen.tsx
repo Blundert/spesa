@@ -38,9 +38,12 @@ export function SessioneScreen() {
   const itemMap = Object.fromEntries(items.map((it) => [it.id ?? 0, it.name]))
 
   const handleDelete = async () => {
+    const isoWeek = session?.isoWeek
     await deleteSession(sessionId)
     void qc.invalidateQueries({ queryKey: qk.allSessions() })
     void qc.invalidateQueries({ queryKey: ['session', sessionId] })
+    void qc.invalidateQueries({ queryKey: qk.items() })
+    if (isoWeek) void qc.invalidateQueries({ queryKey: qk.purchasesForWeek(isoWeek) })
     void navigate({ to: '/storico' })
   }
 

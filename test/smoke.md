@@ -46,12 +46,12 @@
 6. Clicca nuovamente il cestino e poi "Elimina settimana"
 7. Verifica che la settimana scompaia dalla lista e appaia il toast "Settimana eliminata"
 
-### Flusso 8 — Spostamento categoria articolo nel Catalogo si riflette nella Lista
+### Flusso 8 — Modifiche nel Catalogo si riflettono subito nella Lista
 1. Vai su Lista → aggiungi "Latte" (categoria: Frigo)
-2. Vai su Catalogo → trova "Latte" e spostalo nella categoria "Dispensa"
-3. Torna immediatamente alla Lista
-4. Verifica che "Latte" appaia sotto l'intestazione "Dispensa" (non più sotto "Frigo")
-5. Digita "Latte" nel campo di ricerca → verifica che l'autocomplete mostri la categoria "Dispensa"
+2. Catalogo → sposta "Latte" in "Dispensa" → Lista: "Latte" sotto "Dispensa" (non "Frigo") ✓
+3. Catalogo → rinomina "Latte" in "Latte Fresco" → Lista: compare "Latte Fresco" senza flash ✓
+4. Catalogo → rinomina la categoria "Dispensa" in "Dispensa 2" → Lista: intestazione gruppo mostra "Dispensa 2" ✓
+5. Catalogo → elimina "Latte Fresco" → Lista: l'articolo scompare immediatamente ✓
 
 ### Flusso 6 — Pianificazione inizia dal giorno configurato
 1. Vai su Impostazioni → imposta il giorno di inizio su "Mer"

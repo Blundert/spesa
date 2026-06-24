@@ -27,7 +27,7 @@ export function useRenameCategory() {
   return useMutation({
     mutationFn: (vars: { id: number; name: string }) => renameCategory(vars.id, vars.name),
     onSuccess: (_, vars) => {
-      void qc.invalidateQueries({ queryKey: qk.categories() })
+      void qc.refetchQueries({ queryKey: qk.categories(), type: 'all' })
       void qc.invalidateQueries({ queryKey: qk.items() })
       toast(t('catalogo.renamed', { name: vars.name }))
     },
@@ -58,7 +58,7 @@ export function useRenameItem() {
     mutationFn: (vars: { id: number; name: string }) => renameItem(vars.id, vars.name),
     onSuccess: (_, vars) => {
       void qc.invalidateQueries({ queryKey: qk.items() })
-      void qc.invalidateQueries({ queryKey: qk.listItems() })
+      void qc.refetchQueries({ queryKey: qk.listItems(), type: 'all' })
       toast(t('catalogo.renamed', { name: vars.name }))
     },
   })
@@ -85,7 +85,7 @@ export function useDeleteItemFromCatalog() {
     mutationFn: (id: number) => deleteItem(id),
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: qk.items() })
-      void qc.invalidateQueries({ queryKey: qk.listItems() })
+      void qc.refetchQueries({ queryKey: qk.listItems(), type: 'all' })
       toast(t('catalogo.deleted'))
     },
   })

@@ -21,7 +21,7 @@ export function useAddToList() {
   return useMutation({
     mutationFn: ({ itemId }: { itemId: number }) => addToList(itemId),
     onSuccess: () => {
-      void qc.invalidateQueries({ queryKey: qk.listItems() })
+      void qc.refetchQueries({ queryKey: qk.listItems(), type: 'all' })
     },
   })
 }
@@ -37,7 +37,7 @@ export function useAddNewItemToList(defaultCategoryId: number) {
       return itemId
     },
     onSuccess: () => {
-      void qc.invalidateQueries({ queryKey: qk.listItems() })
+      void qc.refetchQueries({ queryKey: qk.listItems(), type: 'all' })
       void qc.invalidateQueries({ queryKey: qk.items() })
     },
   })
@@ -48,7 +48,7 @@ export function useRemoveFromList() {
   return useMutation({
     mutationFn: (id: number) => removeFromList(id),
     onSuccess: () => {
-      void qc.invalidateQueries({ queryKey: qk.listItems() })
+      void qc.refetchQueries({ queryKey: qk.listItems(), type: 'all' })
     },
   })
 }
@@ -59,7 +59,7 @@ export function useUpdateListQuantity() {
     mutationFn: ({ id, quantity }: { id: number; quantity: number }) =>
       updateListItemQuantity(id, quantity),
     onSuccess: () => {
-      void qc.invalidateQueries({ queryKey: qk.listItems() })
+      void qc.refetchQueries({ queryKey: qk.listItems(), type: 'all' })
     },
   })
 }
@@ -69,7 +69,7 @@ export function useClearList() {
   return useMutation({
     mutationFn: () => clearList(),
     onSuccess: () => {
-      void qc.invalidateQueries({ queryKey: qk.listItems() })
+      void qc.refetchQueries({ queryKey: qk.listItems(), type: 'all' })
     },
   })
 }
