@@ -42,7 +42,8 @@ $ARGUMENTS
 - Se un elemento non è immediatamente visibile, aspetta fino a 5 secondi prima di
   dichiararlo assente.
 - Dopo ogni azione significativa (navigazione, submit form, cambio pagina),
-  fai uno screenshot e allegalo al report.
+  fai uno screenshot salvandolo in `test/e2e-screenshots/<suite>-<step>.png`
+  (es. `test/e2e-screenshots/smoke-01.png`) e allegalo al report.
 - Se incontri un errore inatteso (console error, pagina bianca, comportamento anomalo),
   documenta esattamente cosa hai visto e continua con il flusso successivo.
 - Non interrompere la sessione se un singolo flusso fallisce: completa tutti i test
