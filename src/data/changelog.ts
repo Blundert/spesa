@@ -18,6 +18,28 @@ export const changelog: Record<string, ChangelogEntry> = {
     it: ['Storico pianificazioni: elimina una settimana pianificata'],
     en: ['Planning history: delete a planned week'],
   },
+  '0.13.1': {
+    it: ['Fix: icona app ripristinata con sfondo bianco e carrello scuro'],
+    en: ['Fix: app icon restored with white background and dark cart'],
+  },
+  '0.13.0': {
+    it: ['Storico: elimina una settimana intera con tutte le sessioni di spesa collegate'],
+    en: ['History: delete an entire week including all its shopping sessions'],
+  },
+  '0.12.0': {
+    it: [
+      'La pianificazione pasti inizia dal giorno di inizio settimana configurato',
+      'Il giorno di inizio settimana è incluso nell\'export/import del backup',
+    ],
+    en: [
+      'Meal planning starts from the configured week start day',
+      'The week start day setting is included in backup export/import',
+    ],
+  },
+  '0.11.1': {
+    it: ['Fix: rimosso il padding bianco dall\'icona app (apple-touch-icon)'],
+    en: ['Fix: removed white padding from the app icon (apple-touch-icon)'],
+  },
   '0.11.0': {
     it: ['Impostazioni: scegli il giorno di inizio settimana (default lunedì)'],
     en: ['Settings: choose the week start day (default Monday)'],
