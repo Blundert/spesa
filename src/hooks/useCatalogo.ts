@@ -71,7 +71,9 @@ export function useMoveItemCategory() {
       moveItemCategory(vars.id, vars.categoryId),
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: qk.items() })
-      void qc.invalidateQueries({ queryKey: qk.listItems() })
+      // refetchQueries con type:'all' forza il refetch anche senza subscriber attivi
+      // (la Lista potrebbe non essere montata mentre si è sul Catalogo).
+      void qc.refetchQueries({ queryKey: qk.listItems(), type: 'all' })
     },
   })
 }
