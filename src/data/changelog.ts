@@ -2,6 +2,22 @@ export type ChangelogEntry = { it: string[]; en: string[] }
 
 // Ordine: più recente in cima. Aggiungere una entry ad ogni nuova versione.
 export const changelog: Record<string, ChangelogEntry> = {
+  '0.14.3': {
+    it: ['Fix: spostando un articolo di categoria nel Catalogo, la Lista si aggiorna subito senza mostrare la vecchia categoria'],
+    en: ['Fix: moving an item to a different category in the Catalog now immediately updates the List without showing the old category'],
+  },
+  '0.14.2': {
+    it: ['Fix: icona app su iOS home screen senza bordo bianco'],
+    en: ['Fix: app icon on iOS home screen no longer has a white border'],
+  },
+  '0.14.1': {
+    it: ['Fix: splash screen e icone tutte con sfondo beige'],
+    en: ['Fix: splash screen and all icons now use the beige background'],
+  },
+  '0.14.0': {
+    it: ['Storico pianificazioni: elimina una settimana pianificata'],
+    en: ['Planning history: delete a planned week'],
+  },
   '0.11.0': {
     it: ['Impostazioni: scegli il giorno di inizio settimana (default lunedì)'],
     en: ['Settings: choose the week start day (default Monday)'],
