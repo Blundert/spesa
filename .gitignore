@@ -4,6 +4,7 @@ dist
 coverage
 .DS_Store
 *.local
+.pnpm-store
 
 # Claude Code: config agent/permessi locali, non parte del codice app
 .claude/settings.json
