@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { Link } from '@tanstack/react-router'
 import { categoryLabel } from '../i18n'
 import { formatCentsPlain } from '../lib/money'
-import { useListItems, useAddNewItemToList, useRemoveFromList } from '../hooks/useListItems'
+import { useListItems, useAddNewItemToList, useRemoveFromList, useUpdateListQuantity } from '../hooks/useListItems'
 import { useCategories, useItems } from '../hooks/useItems'
 import { normalizeName } from '../lib/normalize'
 import { BASE_ITEMS } from '../lib/baseItems'
@@ -28,6 +28,8 @@ export function ListaScreen() {
   const altroId = categories.find((c) => c.name === 'Altro')?.id ?? 0
   const addNewItem = useAddNewItemToList(altroId)
   const removeFromList = useRemoveFromList()
+  const updateListQuantity = useUpdateListQuantity()
+  const updateListQuantity = useUpdateListQuantity()
 
   // Build category map id → name
   const catMap = Object.fromEntries(categories.map((c) => [c.id ?? 0, categoryLabel(t, c.sortOrder, c.name)]))
@@ -179,26 +181,44 @@ export function ListaScreen() {
                 className="flex items-center gap-[13px] px-[18px] py-4"
                 style={{ borderBottom: i < catItems.length - 1 ? '1px solid #ECECEC' : 'none' }}
               >
+                {/* Stepper quantità */}
+                <div className="flex items-center gap-1.5 flex-none">
+                  <button
+                    onClick={() => {
+                      if (li.quantity <= 1) {
+                        if (li.id !== undefined) setPendingListRemove(li.id)
+                      } else {
+                        if (li.id !== undefined) updateListQuantity.mutate({ id: li.id, quantity: li.quantity - 1 })
+                      }
+                    }}
+                    aria-label="-"
+                    className="w-7 h-7 rounded-full bg-[#F2F2F0] flex items-center justify-center active:bg-[#E6E6E4]"
+                  >
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#2A2A2C" strokeWidth="2.5" strokeLinecap="round">
+                      <path d="M5 12h14" />
+                    </svg>
+                  </button>
+                  <span className="text-[15px] text-[#2A2A2C] min-w-[18px] text-center tabular-nums">{li.quantity}</span>
+                  <button
+                    onClick={() => { if (li.id !== undefined) updateListQuantity.mutate({ id: li.id, quantity: li.quantity + 1 }) }}
+                    aria-label="+"
+                    className="w-7 h-7 rounded-full bg-[#F2F2F0] flex items-center justify-center active:bg-[#E6E6E4]"
+                  >
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#2A2A2C" strokeWidth="2.5" strokeLinecap="round">
+                      <path d="M12 5v14M5 12h14" />
+                    </svg>
+                  </button>
+                </div>
+
                 {/* Name + sub */}
-                <div className="flex-1">
-                  <div className="text-base text-[#2A2A2C]">{li.itemName}</div>
+                <div className="flex-1 min-w-0">
+                  <div className="text-base text-[#2A2A2C] truncate">{li.itemName}</div>
                   <div className="text-[12px] text-[#9B9B9F] mt-0.5">
                     {li.suggestedPriceCents !== null
                       ? `~ €${formatCentsPlain(li.suggestedPriceCents)}`
                       : t('lista.toGet')}
                   </div>
                 </div>
-
-                {/* Trash */}
-                <button
-                  onClick={() => li.id !== undefined && setPendingListRemove(li.id)}
-                  aria-label={t('spesa.removeItem')}
-                  className="w-9 h-9 -mr-1.5 flex-none flex items-center justify-center opacity-40 active:opacity-90"
-                >
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2A2A2C" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6" />
-                  </svg>
-                </button>
 
                 {/* Detail link */}
                 <Link
