@@ -2,7 +2,8 @@ import { db } from '../db'
 import type { Category } from '../types'
 
 export async function getCategories(): Promise<Category[]> {
-  return db.categories.orderBy('sortOrder').toArray()
+  const cats = await db.categories.toArray()
+  return cats.sort((a, b) => a.name.localeCompare(b.name, 'it', { sensitivity: 'base' }))
 }
 
 export async function getCategoryById(id: number): Promise<Category | undefined> {
