@@ -67,6 +67,15 @@ export function ListaScreen() {
   const inListNorm = new Set(listItems.map((li) => normalizeName(li.itemName)))
   const query = normalizeName(addInput)
 
+  // Template automatico: top-8 articoli per purchaseCount, non già in lista
+  const templateSuggestions =
+    listItems.length < 3
+      ? Array.from(pool.values())
+          .filter((p) => p.purchaseCount > 0 && !inListNorm.has(normalizeName(p.name)))
+          .sort((a, b) => b.purchaseCount - a.purchaseCount)
+          .slice(0, 8)
+      : []
+
   // Match per l'autocomplete (input non vuoto): prima chi inizia col testo, poi alfabetico.
   const matches: Suggestion[] = query
     ? Array.from(pool.values())
@@ -165,6 +174,30 @@ export function ListaScreen() {
               {p.name}
             </button>
           ))}
+        </div>
+      )}
+
+      {/* Template spesa solita */}
+      {templateSuggestions.length > 0 && (
+        <div className="bg-white rounded-[20px] px-[18px] py-[15px] mb-4 flex items-center justify-between gap-3">
+          <div className="flex-1 min-w-0">
+            <div className="text-[15px] font-normal text-[#2A2A2C] mb-[3px]">{t('lista.templateTitle')}</div>
+            <div className="text-[12px] text-[#9B9B9F] truncate">
+              {templateSuggestions
+                .slice(0, 5)
+                .map((s) => s.name)
+                .join(' · ')}
+              {templateSuggestions.length > 5 && ' · …'}
+            </div>
+          </div>
+          <button
+            onClick={() => {
+              templateSuggestions.forEach((s) => addNewItem.mutate({ name: s.name, categoryId: s.categoryId }))
+            }}
+            className="flex-none bg-[#2A2A2C] text-white text-[14px] px-4 py-[9px] rounded-full active:opacity-70"
+          >
+            {t('lista.templateLoad')}
+          </button>
         </div>
       )}
 

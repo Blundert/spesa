@@ -52,6 +52,8 @@ export const it = {
     taken: 'Preso',
     toGet: 'da prendere',
     empty: 'La lista è vuota. Aggiungi qualcosa sopra.',
+    templateTitle: 'Carica la tua spesa solita',
+    templateLoad: 'Carica',
   },
   spesa: {
     startTitle: 'Inizia la spesa',

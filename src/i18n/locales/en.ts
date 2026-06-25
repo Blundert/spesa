@@ -54,6 +54,8 @@ export const en: typeof it = {
     taken: 'Taken',
     toGet: 'to get',
     empty: 'The list is empty. Add something above.',
+    templateTitle: 'Load your usual shopping',
+    templateLoad: 'Load',
   },
   spesa: {
     startTitle: 'Start shopping',
