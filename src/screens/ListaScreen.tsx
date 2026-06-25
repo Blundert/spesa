@@ -12,6 +12,7 @@ import { BottomSheet } from '../components/BottomSheet'
 interface Suggestion {
   name: string
   categoryId: number
+  purchaseCount: number
 }
 
 export function ListaScreen() {
@@ -54,10 +55,11 @@ export function ListaScreen() {
     pool.set(normalizeName(b.name), {
       name: b.name,
       categoryId: catIdByName.get(b.category) ?? altroId,
+      purchaseCount: 0,
     })
   }
   for (const it of items) {
-    pool.set(normalizeName(it.name), { name: it.name, categoryId: it.categoryId })
+    pool.set(normalizeName(it.name), { name: it.name, categoryId: it.categoryId, purchaseCount: it.purchaseCount ?? 0 })
   }
 
   const inListNorm = new Set(listItems.map((li) => normalizeName(li.itemName)))
@@ -81,11 +83,12 @@ export function ListaScreen() {
         .slice(0, 8)
     : []
 
-  // Chip rapide quando l'input è vuoto: qualche suggerimento non ancora in lista.
+  // Chip rapide quando l'input è vuoto: i più comprati prima, poi default.
   const quick: Suggestion[] = addInput
     ? []
     : Array.from(pool.values())
         .filter((p) => !inListNorm.has(normalizeName(p.name)))
+        .sort((a, b) => b.purchaseCount - a.purchaseCount)
         .slice(0, 6)
 
   const exactInPool = pool.has(query)

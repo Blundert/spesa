@@ -83,6 +83,7 @@ export function useFinishSession(isoWeek: string) {
       void qc.invalidateQueries({ queryKey: qk.sessions(isoWeek) })
       void qc.invalidateQueries({ queryKey: qk.allSessions() })
       void qc.invalidateQueries({ queryKey: qk.purchasesForWeek(isoWeek) })
+      void qc.refetchQueries({ queryKey: qk.items(), type: 'all' })
     },
   })
 }

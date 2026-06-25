@@ -143,6 +143,21 @@ class SpesaDb extends Dexie {
           mp.isoWeek = isoWeekToMondayKey(mp.isoWeek)
         })
     })
+
+    // v7: aggiunge purchaseCount su items — somma delle quantità acquistate
+    // su tutte le sessioni, usato per ordinare i suggerimenti rapidi nella Lista.
+    this.version(7).upgrade(async (tx) => {
+      const items = (await tx.table('items').toArray()) as Array<{ id: number }>
+      for (const item of items) {
+        const ps = (await tx
+          .table('purchases')
+          .where('itemId')
+          .equals(item.id)
+          .toArray()) as Array<{ quantity: number }>
+        const total = ps.reduce((s, p) => s + p.quantity, 0)
+        await tx.table('items').update(item.id, { purchaseCount: total })
+      }
+    })
   }
 }
 

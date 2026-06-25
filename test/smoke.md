@@ -12,6 +12,8 @@
 1. Dalla schermata principale, clicca su "Lista della spesa"
 2. Nel campo "Aggiungi un oggetto…", digita "Latte" e premi Invio
 3. Verifica che "Latte" appaia nella lista sotto la categoria corretta (es. Frigo)
+4. Verifica che le chip rapide (scroll orizzontale) mostrino articoli predefiniti alla prima apertura
+5. Dopo una sessione di spesa completata: le chip mostrano in cima gli articoli acquistati più spesso
 
 ### Flusso 3 — Avvia sessione di spesa e aggiungi articolo al carrello
 1. Naviga su http://localhost:5173/spesa

@@ -16,6 +16,8 @@ export interface Item {
   lastPriceCents: number | null
   /** Prezzo suggerito (media storica), in centesimi. null se non disponibile. */
   suggestedPriceCents: number | null
+  /** Somma totale delle quantità acquistate in tutte le sessioni. Usato per ordinare i suggerimenti rapidi. */
+  purchaseCount?: number
 }
 
 /** Supermercato (deduplicato su normalizedName). */

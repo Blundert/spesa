@@ -2,6 +2,10 @@ export type ChangelogEntry = { it: string[]; en: string[] }
 
 // Ordine: più recente in cima. Aggiungere una entry ad ogni nuova versione.
 export const changelog: Record<string, ChangelogEntry> = {
+  '0.15.0': {
+    it: ['Lista: i suggerimenti rapidi mostrano ora i prodotti che compri di più'],
+    en: ['List: quick suggestions now show your most purchased items first'],
+  },
   '0.14.6': {
     it: ['Fix: categorie in ordine alfabetico nel Catalogo, nella Lista e nella Spesa'],
     en: ['Fix: categories now sorted alphabetically in Catalog, List and Shopping'],
