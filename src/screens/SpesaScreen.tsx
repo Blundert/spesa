@@ -36,6 +36,7 @@ export function SpesaScreen() {
     purchaseId?: number
     priceCents?: number
     quantity?: number
+    lastPriceCents?: number | null
   } | null>(null)
   const [newItemTarget, setNewItemTarget] = useState<{ name: string } | null>(null)
   const [showStorePicker, setShowStorePicker] = useState(false)
@@ -53,6 +54,7 @@ export function SpesaScreen() {
   const { data: items = [] } = useItems()
   const catMap = Object.fromEntries(categories.map((c) => [c.id ?? 0, categoryLabel(t, c.sortOrder, c.name)]))
   const itemNameMap = Object.fromEntries(items.map((it) => [it.id ?? 0, it.name]))
+  const itemLastPriceMap = Object.fromEntries(items.map((it) => [it.id ?? 0, it.lastPriceCents]))
 
   // Usa la sessione più recente non finita, o quella attiva manualmente
   const activeSession =
@@ -320,7 +322,7 @@ export function SpesaScreen() {
                   style={{ borderBottom: i < items.length - 1 ? '1px solid #ECECEC' : 'none' }}
                 >
                   <button
-                    onClick={() => setPriceTarget({ itemId: li.itemId, name: li.itemName })}
+                    onClick={() => setPriceTarget({ itemId: li.itemId, name: li.itemName, lastPriceCents: itemLastPriceMap[li.itemId] ?? null })}
                     className="flex flex-1 items-center gap-[13px] text-left active:opacity-60 transition-opacity"
                   >
                     <div className="w-6 h-6 flex-none rounded-full border-2 border-[#D8D8D6]" />
@@ -378,6 +380,7 @@ export function SpesaScreen() {
                         purchaseId: p.id,
                         priceCents: p.priceCents,
                         quantity: p.quantity,
+                        lastPriceCents: itemLastPriceMap[p.itemId] ?? null,
                       })
                     }
                     className="flex flex-1 items-center gap-[13px] ml-[13px] text-left active:opacity-60 transition-opacity"
@@ -434,6 +437,7 @@ export function SpesaScreen() {
         showQuantity
         initialCents={priceTarget?.priceCents ?? 0}
         initialQuantity={priceTarget?.quantity ?? 1}
+        lastPriceCents={priceTarget?.lastPriceCents}
         onConfirm={handleConfirmPrice}
       />
 

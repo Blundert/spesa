@@ -91,6 +91,10 @@ export const en: typeof it = {
     removeListConfirm: 'Remove',
     removeCartConfirmTitle: 'Remove from cart?',
     removeCartConfirm: 'Remove',
+    priceFirstBuy: 'first purchase',
+    priceSame: 'same price as last time',
+    priceHigher: '↑ +€{{diff}} vs last time (€{{last}})',
+    priceLower: '↓ −€{{diff}} vs last time (€{{last}})',
   },
   storico: {
     title: 'History',

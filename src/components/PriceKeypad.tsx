@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useTranslation } from 'react-i18next'
+import { useTranslation, type TFunction } from 'react-i18next'
 import { Drawer } from 'vaul'
 import { formatCentsPlain } from '../lib/money'
 
@@ -16,6 +16,8 @@ interface PriceKeypadProps {
   showQuantity?: boolean
   /** Quantità iniziale (default 1). */
   initialQuantity?: number
+  /** Ultimo prezzo pagato (per mostrare la variazione). undefined = non mostrare. null = primo acquisto. */
+  lastPriceCents?: number | null
   onConfirm: (cents: number, quantity: number) => void
 }
 
@@ -27,6 +29,7 @@ export function PriceKeypad({
   initialCents = 0,
   showQuantity = false,
   initialQuantity = 1,
+  lastPriceCents,
   onConfirm,
 }: PriceKeypadProps) {
   const { t } = useTranslation()
@@ -76,6 +79,7 @@ export function PriceKeypad({
                 {formatCentsPlain(cents)}
               </span>
             </div>
+            <PriceCompareRow lastPriceCents={lastPriceCents} cents={cents} t={t} />
           </div>
 
           {/* Quantità */}
@@ -134,5 +138,36 @@ export function PriceKeypad({
         </Drawer.Content>
       </Drawer.Portal>
     </Drawer.Root>
+  )
+}
+
+function PriceCompareRow({
+  lastPriceCents,
+  cents,
+  t,
+}: {
+  lastPriceCents: number | null | undefined
+  cents: number
+  t: TFunction
+}) {
+  if (lastPriceCents === undefined || cents === 0) return null
+  if (lastPriceCents === null) {
+    return <div className="text-[13px] text-[#9B9B9F] mt-2">{t('spesa.priceFirstBuy')}</div>
+  }
+  const diff = cents - lastPriceCents
+  if (diff === 0) {
+    return <div className="text-[13px] text-[#9B9B9F] mt-2">{t('spesa.priceSame')}</div>
+  }
+  if (diff > 0) {
+    return (
+      <div className="text-[13px] mt-2" style={{ color: '#D14343' }}>
+        {t('spesa.priceHigher', { diff: formatCentsPlain(diff), last: formatCentsPlain(lastPriceCents) })}
+      </div>
+    )
+  }
+  return (
+    <div className="text-[13px] mt-2" style={{ color: '#2E9E6B' }}>
+      {t('spesa.priceLower', { diff: formatCentsPlain(-diff), last: formatCentsPlain(lastPriceCents) })}
+    </div>
   )
 }

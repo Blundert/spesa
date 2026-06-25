@@ -89,6 +89,10 @@ export const it = {
     removeListConfirm: 'Rimuovi',
     removeCartConfirmTitle: 'Rimuovere dal carrello?',
     removeCartConfirm: 'Rimuovi',
+    priceFirstBuy: 'primo acquisto',
+    priceSame: "stesso prezzo dell'ultima volta",
+    priceHigher: '↑ +€{{diff}} rispetto all\'ultima volta (€{{last}})',
+    priceLower: '↓ −€{{diff}} rispetto all\'ultima volta (€{{last}})',
   },
   storico: {
     title: 'Storico',
