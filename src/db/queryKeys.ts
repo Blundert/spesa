@@ -32,4 +32,6 @@ export const qk = {
 
   /** Settimane con almeno un pasto pianificato (storico pianificazioni). */
   plannedWeeks: () => ['plannedWeeks'] as const,
+
+  stats: () => ['stats'] as const,
 } as const

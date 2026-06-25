@@ -15,6 +15,7 @@ export default defineConfig({
         'src/lib/debugFlag.ts',
         'src/lib/imageUtils.ts',
         'src/db/repositories/categories.ts',
+        'src/db/repositories/stats.ts',
       ],
       all: true,
       thresholds: {
