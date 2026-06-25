@@ -20,10 +20,12 @@ void i18n.use(initReactI18next).init({
   interpolation: { escapeValue: false },
 })
 
-/** Etichetta tradotta di una categoria seed (per sortOrder 0–5, fallback "Altro"). */
-export function categoryLabel(t: TFunction, sortOrder: number): string {
-  const key = sortOrder >= 0 && sortOrder <= 5 ? sortOrder : 5
-  return t(`categories.${key}` as 'categories.0')
+/** Etichetta di una categoria: tradotta per le seed (sortOrder 0–5), nome DB per le custom. */
+export function categoryLabel(t: TFunction, sortOrder: number, name?: string): string {
+  if (sortOrder >= 0 && sortOrder <= 5) {
+    return t(`categories.${sortOrder}` as 'categories.0')
+  }
+  return name ?? t('categories.5')
 }
 
 export default i18n

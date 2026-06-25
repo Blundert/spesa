@@ -29,7 +29,7 @@ export function ListaScreen() {
   const removeFromList = useRemoveFromList()
 
   // Build category map id → name
-  const catMap = Object.fromEntries(categories.map((c) => [c.id ?? 0, categoryLabel(t, c.sortOrder)]))
+  const catMap = Object.fromEntries(categories.map((c) => [c.id ?? 0, categoryLabel(t, c.sortOrder, c.name)]))
 
   // Group by category
   const grouped = categories
@@ -43,7 +43,7 @@ export function ListaScreen() {
   const catIds = new Set(categories.map((c) => c.id))
   const otherItems = listItems.filter((li) => !catIds.has(li.itemCategoryId))
   if (otherItems.length > 0) {
-    grouped.push({ cat: { id: 0, name: 'Altro', sortOrder: 99 }, items: otherItems })
+    grouped.push({ cat: { id: 0, name: t('categories.5'), sortOrder: 99 }, items: otherItems })
   }
 
   // Pool autocomplete: articoli base predefiniti + già usati, deduplicati per nome
@@ -167,7 +167,7 @@ export function ListaScreen() {
       {grouped.map(({ cat, items: catItems }) => (
         <div key={cat.id} className="mb-[18px]">
           <div className="text-[12px] font-normal tracking-[1.2px] text-[#9B9B9F] uppercase px-1.5 pb-[13px]">
-            {categoryLabel(t, cat.sortOrder)}
+            {categoryLabel(t, cat.sortOrder, cat.name)}
           </div>
           <div className="bg-white rounded-[20px] overflow-hidden">
             {catItems.map((li, i) => (
