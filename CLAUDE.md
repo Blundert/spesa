@@ -55,11 +55,12 @@ Il display `:1` è usato anche dal browser nei test e2e (MCP Playwright).
 - Si procede per task numerate. Eseguire SOLO la task indicata, poi fermarsi.
 - Ogni task si chiude con un commit in stile conventional commits. Non accorpare
   più task in un singolo commit, e non anticipare task future.
+- Scrivi i commit message in inglese.
 - Non creare file, dipendenze o strutture non richiesti dalla task corrente.
 - TypeScript strict, niente `any`. Tutti gli importi monetari in centesimi interi.
 - Se si incontra una scelta non specificata e non banale, fare l'opzione più semplice
   e segnalarla nel messaggio finale invece di bloccarsi o andare oltre lo scopo.
-- Al termine di ogni task, creare un dump in `doc/roadmap/<N>.md`.
+- Al termine di ogni task, creare un dump in `docs/roadmap/<N>.md`.
 - Il progetto gira in un container Docker: tenere conto di questo per dev server, build, ecc.
 - Quando fai un fix cambia versione patch.
 - Quando fai una feature cambia versione minor.
