@@ -29,7 +29,6 @@ export function ListaScreen() {
   const addNewItem = useAddNewItemToList(altroId)
   const removeFromList = useRemoveFromList()
   const updateListQuantity = useUpdateListQuantity()
-  const updateListQuantity = useUpdateListQuantity()
 
   // Build category map id → name
   const catMap = Object.fromEntries(categories.map((c) => [c.id ?? 0, categoryLabel(t, c.sortOrder, c.name)]))

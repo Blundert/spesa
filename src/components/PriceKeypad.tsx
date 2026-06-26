@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useTranslation, type TFunction } from 'react-i18next'
+import { useTranslation } from 'react-i18next'
 import { Drawer } from 'vaul'
 import { formatCentsPlain } from '../lib/money'
 
@@ -79,7 +79,7 @@ export function PriceKeypad({
                 {formatCentsPlain(cents)}
               </span>
             </div>
-            <PriceCompareRow lastPriceCents={lastPriceCents} cents={cents} t={t} />
+            <PriceCompareRow lastPriceCents={lastPriceCents} cents={cents} />
           </div>
 
           {/* Quantità */}
@@ -144,12 +144,11 @@ export function PriceKeypad({
 function PriceCompareRow({
   lastPriceCents,
   cents,
-  t,
 }: {
   lastPriceCents: number | null | undefined
   cents: number
-  t: TFunction
 }) {
+  const { t } = useTranslation()
   if (lastPriceCents === undefined || cents === 0) return null
   if (lastPriceCents === null) {
     return <div className="text-[13px] text-[#9B9B9F] mt-2">{t('spesa.priceFirstBuy')}</div>

@@ -63,7 +63,7 @@ Il display `:1` è usato anche dal browser nei test e2e (MCP Playwright).
 - Il progetto gira in un container Docker: tenere conto di questo per dev server, build, ecc.
 - Quando fai un fix cambia versione patch.
 - Quando fai una feature cambia versione minor.
-- Prima di fare commit lanciare test e verificare che il coverage sia 100%. 
+- Prima di fare commit lanciare test e verificare che il coverage sia 100%, e poi `npx tsc --noEmit` per verificare che non ci siano errori TypeScript. 
 - Aggiorna sempre test/smoke.md in modo che sia coerente con le nuove feature e fix. Non eseguire i teste e2e ad ogni commit.
 - Le traduzioni sono in `src/i18n/locales/it.ts` e `src/i18n/locales/en.ts`. Ogni chiave aggiunta a `it.ts` va aggiunta **anche** a `en.ts` — il tipo è condiviso e il build TypeScript fallisce se le due strutture non sono allineate.
 - Ad ogni bump di versione (patch o minor) aggiungere una entry in `src/data/changelog.ts` — in cima alla mappa, chiave = versione, valori `it` e `en` con le modifiche rilevanti per l'utente.
