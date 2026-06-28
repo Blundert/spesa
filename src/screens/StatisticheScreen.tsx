@@ -138,14 +138,16 @@ function StatCell({ label, value, big }: { label: string; value: string; big?: b
 }
 
 function WeeklyBarChart({ weeklyTotals }: { weeklyTotals: Array<{ weekKey: string; totalCents: number }> }) {
-  const max = Math.max(...weeklyTotals.map((w) => w.totalCents), 1)
+  const firstNonEmpty = weeklyTotals.findIndex((w) => w.totalCents > 0)
+  const visible = firstNonEmpty === -1 ? weeklyTotals.slice(-1) : weeklyTotals.slice(firstNonEmpty)
+  const max = Math.max(...visible.map((w) => w.totalCents), 1)
   const BAR_HEIGHT = 80
   const AMOUNT_LABEL_HEIGHT = 14
 
   return (
     <div className="overflow-x-auto -mx-[18px] px-[18px]">
-      <div className="flex items-end gap-[6px]" style={{ minWidth: weeklyTotals.length * 40 }}>
-        {weeklyTotals.map((w) => {
+      <div className="flex items-end gap-[6px]" style={{ minWidth: visible.length * 40 }}>
+        {visible.map((w) => {
           const h = Math.max(3, Math.round((w.totalCents / max) * BAR_HEIGHT))
           const [y, m, d] = w.weekKey.split('-').map(Number)
           const date = new Date(Date.UTC(y, m - 1, d))
