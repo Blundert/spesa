@@ -1,32 +1,57 @@
 {
   "suite": "smoke",
-  "date": "2026-06-23",
-  "appVersion": "0.11.0",
+  "date": "2026-06-28",
+  "appVersion": "0.20.4",
   "results": [
     {
       "flow": "Flusso 1 — Onboarding prima apertura",
       "status": "PASS",
-      "notes": "4 slide intro + tour in-app (1/4) entrambi mostrati correttamente; 'Salta' chiude il tour e lascia la schermata principale pulita"
+      "notes": "4 slide intro + tour in-app (1/4) mostrati correttamente; 'Salta' chiude il tour e lascia la schermata principale pulita"
     },
     {
       "flow": "Flusso 2 — Aggiunta articolo alla lista",
       "status": "PASS",
-      "notes": "'Latte' aggiunto correttamente, appare sotto la categoria Frigo"
+      "notes": "'Latte' aggiunto correttamente, appare sotto la categoria Frigo; chip rapide visibili"
     },
     {
       "flow": "Flusso 3 — Avvia sessione di spesa e aggiungi articolo al carrello",
       "status": "PASS",
-      "notes": "Supermercato aggiunto e sessione avviata; Latte apparso in 'Da prendere'; tastierino prezzi aperto; €1,50 inserito; Latte spostato in 'Nel carrello'"
+      "notes": "Supermercato selezionato e sessione avviata; Latte in 'Da prendere'; tastierino aperto; €1,50 inserito; Latte spostato in 'Nel carrello'"
     },
     {
       "flow": "Flusso 4 — Persistenza dopo reload",
       "status": "PASS",
-      "notes": "'Latte' persiste nella lista dopo reload, con prezzo stimato ~ €1,50 derivato dall'acquisto precedente"
+      "notes": "'Latte' persiste nella lista dopo reload con prezzo stimato derivato dall'acquisto precedente"
     },
     {
       "flow": "Flusso 5 — Giorno di inizio settimana",
       "status": "PASS",
-      "notes": "'Lun' default confermato; 'Sab' selezionato; toast 'Impostazione salvata' confermato via MutationObserver; floating bar aggiornata a '20–26 giu' (sab–ven); persistenza verificata dopo reload"
+      "notes": "'Lun' default confermato; 'Sab' selezionato; toast 'Impostazione salvata'; floating bar aggiornata a sabato–venerdì; persistenza verificata dopo reload"
+    },
+    {
+      "flow": "Flusso 6 — Pianificazione inizia dal giorno configurato",
+      "status": "PASS",
+      "notes": "Impostato 'Mer': primo giorno Pasti = MER, ultimo = MAR; reimpostato 'Lun': Pasti tornano a LUN→DOM"
+    },
+    {
+      "flow": "Flusso 7 — Eliminazione settimana dallo storico",
+      "status": "PASS",
+      "notes": "Cestino apre BottomSheet; 'Annulla' chiude senza eliminare; 'Elimina settimana' rimuove la settimana con toast 'Settimana eliminata'"
+    },
+    {
+      "flow": "Flusso 8 — Modifiche nel Catalogo si riflettono subito nella Lista",
+      "status": "PASS",
+      "notes": "Sposta categoria (Frigo→Dispensa) ✓; rinomina articolo (Latte→Latte Fresco) ✓; rinomina categoria (Dispensa→Dispensa 2) ✓; elimina articolo ✓. Il selettore ha richiesto la forma esatta 'button[aria-label=\"Rinomina articolo\"]' per evitare di colpire 'Rinomina categoria'"
+    },
+    {
+      "flow": "Flusso 9 — Modifica sessione di spesa dallo storico",
+      "status": "PASS",
+      "notes": "Modifica supermercato (Coop→Lidl): toast 'Modifiche salvate' ✓; modifica prezzo (€2,50→€3,00): toast ✓; modifica data (28→27 giu stessa settimana): toast ✓; sessione abbandonata: badge 'Non completata' in Storico ✓, scritta sotto supermercato in dettaglio ✓, 'Concludi spesa' apre tastierino precompilato ✓, conferma → toast 'Spesa salvata' e badge sparito ✓"
+    },
+    {
+      "flow": "Flusso 10 — Grafico andamento Statistiche",
+      "status": "PASS",
+      "notes": "Sezione 'ANDAMENTO (12 SETTIMANE)' visibile; 12 date in formato G/M (6/4…22/6) ✓; barra settimana con spesa mostra importo sopra (€3 per sessione €2,50, arrotondamento display) ✓; settimane vuote senza etichetta ✓"
     }
   ]
 }
