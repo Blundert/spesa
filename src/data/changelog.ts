@@ -2,6 +2,10 @@ export type ChangelogEntry = { it: string[]; en: string[] }
 
 // Ordine: più recente in cima. Aggiungere una entry ad ogni nuova versione.
 export const changelog: Record<string, ChangelogEntry> = {
+  '0.21.0': {
+    it: ['Statistiche: selettore range di date (7 giorni, 30 giorni, 3 mesi, 6 mesi, tutto, giorni personalizzati) — default 30 giorni'],
+    en: ['Statistics: date range selector (7 days, 30 days, 3 months, 6 months, all, custom days) — default 30 days'],
+  },
   '0.20.6': {
     it: ['Fix: le statistiche si aggiornano subito dopo rinomina/sposta/elimina articoli o categorie nel Catalogo'],
     en: ['Fix: statistics now update immediately after renaming, moving or deleting items or categories in the Catalog'],

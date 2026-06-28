@@ -47,7 +47,11 @@ export interface StatsResult {
   categoryBreakdown: CategoryBreakdown[]
 }
 
-export async function getStats(currentWeekKey: string, weekStartDay: number): Promise<StatsResult> {
+export async function getStats(
+  currentWeekKey: string,
+  weekStartDay: number,
+  fromTs: number | null,
+): Promise<StatsResult> {
   const [sessions, purchases, items, categories, supermarkets] = await Promise.all([
     db.sessions.toArray(),
     db.purchases.toArray(),
@@ -56,7 +60,9 @@ export async function getStats(currentWeekKey: string, weekStartDay: number): Pr
     db.supermarkets.toArray(),
   ])
 
-  const finishedSessions = sessions.filter((s) => s.finishedAt !== null)
+  const finishedSessions = sessions.filter(
+    (s) => s.finishedAt !== null && (fromTs === null || s.startedAt >= fromTs),
+  )
   const sessionCount = finishedSessions.length
 
   // Totale per sessione: usa confirmedTotalCents se disponibile, altrimenti somma acquisti
@@ -91,28 +97,47 @@ export async function getStats(currentWeekKey: string, weekStartDay: number): Pr
   const topSupermarketName =
     topSupermarketId !== null ? (supermarkets.find((s) => s.id === topSupermarketId)?.name ?? null) : null
 
-  // Totali settimanali: ultime 12 settimane
-  // Re-bucket ogni sessione in base alla data reale e al weekStartDay corrente,
-  // così le sessioni salvate con un vecchio giorno di inizio settimana vengono
-  // posizionate correttamente nel grafico.
+  // Totali settimanali: griglia dalla settimana di fromTs (o dalla più vecchia con sessioni) a quella corrente
   const weeklyMap = new Map<string, number>()
   for (const { session, totalCents } of sessionTotals) {
     const key = sessionWeekKey(session.startedAt, weekStartDay)
     weeklyMap.set(key, (weeklyMap.get(key) ?? 0) + totalCents)
   }
-  const weeklyTotals: WeeklyTotal[] = Array.from({ length: 12 }, (_, i) => {
-    const weekKey = shiftWeekKey(currentWeekKey, -(11 - i))
-    return { weekKey, totalCents: weeklyMap.get(weekKey) ?? 0 }
-  })
 
-  // Top 5 articoli per purchaseCount
-  const topItems: TopItem[] = [...items]
-    .filter((it) => (it.purchaseCount ?? 0) > 0)
-    .sort((a, b) => b.purchaseCount! - a.purchaseCount!)
+  let firstWeekKey: string
+  if (fromTs !== null) {
+    firstWeekKey = sessionWeekKey(fromTs, weekStartDay)
+  } else if (finishedSessions.length === 0) {
+    firstWeekKey = currentWeekKey
+  } else {
+    const earliestTs = finishedSessions.reduce((min, s) => Math.min(min, s.startedAt), Infinity)
+    firstWeekKey = sessionWeekKey(earliestTs, weekStartDay)
+  }
+
+  const weeklyTotals: WeeklyTotal[] = []
+  let wk = firstWeekKey
+  while (wk <= currentWeekKey) {
+    weeklyTotals.push({ weekKey: wk, totalCents: weeklyMap.get(wk) ?? 0 })
+    wk = shiftWeekKey(wk, 1)
+  }
+  if (weeklyTotals.length === 0) weeklyTotals.push({ weekKey: currentWeekKey, totalCents: 0 })
+
+  // Top 5 articoli per acquisti nelle sessioni filtrate
+  const filteredSessionIds = new Set(finishedSessions.map((s) => s.id!))
+  const itemOccurrences = new Map<number, number>()
+  for (const p of purchases) {
+    if (filteredSessionIds.has(p.sessionId)) {
+      itemOccurrences.set(p.itemId, (itemOccurrences.get(p.itemId) ?? 0) + 1)
+    }
+  }
+  const itemNameMap = new Map<number, string>()
+  for (const it of items) itemNameMap.set(it.id!, it.name)
+  const topItems: TopItem[] = Array.from(itemOccurrences.entries())
+    .map(([itemId, count]) => ({ name: itemNameMap.get(itemId) ?? 'Sconosciuto', purchaseCount: count }))
+    .sort((a, b) => b.purchaseCount - a.purchaseCount)
     .slice(0, 5)
-    .map((it) => ({ name: it.name, purchaseCount: it.purchaseCount! }))
 
-  // Ripartizione per categoria (da acquisti)
+  // Ripartizione per categoria (da acquisti nelle sessioni filtrate)
   const itemCategoryMap = new Map<number, number>()
   for (const it of items) {
     itemCategoryMap.set(it.id!, it.categoryId)
@@ -123,6 +148,7 @@ export async function getStats(currentWeekKey: string, weekStartDay: number): Pr
   }
   const categoryTotals = new Map<number, number>()
   for (const p of purchases) {
+    if (!filteredSessionIds.has(p.sessionId)) continue
     const catId = itemCategoryMap.get(p.itemId) ?? 0
     categoryTotals.set(catId, (categoryTotals.get(catId) ?? 0) + p.priceCents * p.quantity)
   }
