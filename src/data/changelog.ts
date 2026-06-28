@@ -2,6 +2,10 @@ export type ChangelogEntry = { it: string[]; en: string[] }
 
 // Ordine: più recente in cima. Aggiungere una entry ad ogni nuova versione.
 export const changelog: Record<string, ChangelogEntry> = {
+  '0.20.3': {
+    it: ['Fix: grafico andamento settimanale mostra l\'importo sopra ogni barra e la data come giorno/mese'],
+    en: ['Fix: weekly trend chart now shows the amount above each bar and the date as day/month'],
+  },
   '0.20.2': {
     it: ['Fix: modifica data nello storico ora funziona su iOS e Android'],
     en: ['Fix: date editing in session history now works on iOS and Android'],

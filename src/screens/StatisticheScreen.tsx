@@ -140,26 +140,34 @@ function StatCell({ label, value, big }: { label: string; value: string; big?: b
 function WeeklyBarChart({ weeklyTotals }: { weeklyTotals: Array<{ weekKey: string; totalCents: number }> }) {
   const max = Math.max(...weeklyTotals.map((w) => w.totalCents), 1)
   const BAR_HEIGHT = 80
+  const AMOUNT_LABEL_HEIGHT = 14
 
   return (
     <div className="overflow-x-auto -mx-[18px] px-[18px]">
-      <div className="flex items-end gap-[6px]" style={{ minWidth: weeklyTotals.length * 32 }}>
+      <div className="flex items-end gap-[6px]" style={{ minWidth: weeklyTotals.length * 40 }}>
         {weeklyTotals.map((w) => {
           const h = Math.max(3, Math.round((w.totalCents / max) * BAR_HEIGHT))
           const [y, m, d] = w.weekKey.split('-').map(Number)
           const date = new Date(Date.UTC(y, m - 1, d))
-          const dayLabel = String(date.getUTCDate())
+          const dayLabel = `${date.getUTCDate()}/${date.getUTCMonth() + 1}`
           const hasData = w.totalCents > 0
+          const euroLabel = hasData ? `€${Math.round(w.totalCents / 100)}` : ''
           return (
-            <div key={w.weekKey} className="flex-1 flex flex-col items-center gap-1">
-              <div
-                className="w-full rounded-[4px]"
-                style={{
-                  height: h,
-                  marginTop: BAR_HEIGHT - h,
-                  background: hasData ? '#2A2A2C' : '#ECECEC',
-                }}
-              />
+            <div key={w.weekKey} className="flex-1 flex flex-col items-center gap-1 min-w-0">
+              <div className="relative w-full" style={{ height: BAR_HEIGHT + AMOUNT_LABEL_HEIGHT }}>
+                {hasData && (
+                  <div
+                    className="absolute left-0 right-0 text-center text-[9px] text-[#9B9B9F] tabular-nums leading-none"
+                    style={{ bottom: h + 3 }}
+                  >
+                    {euroLabel}
+                  </div>
+                )}
+                <div
+                  className="absolute bottom-0 left-0 right-0 rounded-[4px]"
+                  style={{ height: h, background: hasData ? '#2A2A2C' : '#ECECEC' }}
+                />
+              </div>
               <div className="text-[10px] text-[#9B9B9F] tabular-nums">{dayLabel}</div>
             </div>
           )
