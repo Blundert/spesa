@@ -2,6 +2,10 @@ export type ChangelogEntry = { it: string[]; en: string[] }
 
 // Ordine: più recente in cima. Aggiungere una entry ad ogni nuova versione.
 export const changelog: Record<string, ChangelogEntry> = {
+  '0.20.6': {
+    it: ['Fix: le statistiche si aggiornano subito dopo rinomina/sposta/elimina articoli o categorie nel Catalogo'],
+    en: ['Fix: statistics now update immediately after renaming, moving or deleting items or categories in the Catalog'],
+  },
   '0.20.5': {
     it: ['Fix: grafico andamento non mostra le settimane iniziali vuote'],
     en: ['Fix: weekly trend chart no longer shows leading empty weeks'],

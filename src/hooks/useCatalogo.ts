@@ -29,6 +29,7 @@ export function useRenameCategory() {
     onSuccess: (_, vars) => {
       void qc.refetchQueries({ queryKey: qk.categories(), type: 'all' })
       void qc.invalidateQueries({ queryKey: qk.items() })
+      void qc.invalidateQueries({ queryKey: qk.stats() })
       toast(t('catalogo.renamed', { name: vars.name }))
     },
   })
@@ -41,6 +42,7 @@ export function useDeleteCategory() {
     mutationFn: (id: number) => deleteCategory(id),
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: qk.categories() })
+      void qc.invalidateQueries({ queryKey: qk.stats() })
       toast(t('catalogo.deleted'))
     },
     onError: (err: Error) => {
@@ -58,6 +60,7 @@ export function useRenameItem() {
     mutationFn: (vars: { id: number; name: string }) => renameItem(vars.id, vars.name),
     onSuccess: (_, vars) => {
       void qc.invalidateQueries({ queryKey: qk.items() })
+      void qc.invalidateQueries({ queryKey: qk.stats() })
       void qc.refetchQueries({ queryKey: qk.listItems(), type: 'all' })
       toast(t('catalogo.renamed', { name: vars.name }))
     },
@@ -71,6 +74,7 @@ export function useMoveItemCategory() {
       moveItemCategory(vars.id, vars.categoryId),
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: qk.items() })
+      void qc.invalidateQueries({ queryKey: qk.stats() })
       // refetchQueries con type:'all' forza il refetch anche senza subscriber attivi
       // (la Lista potrebbe non essere montata mentre si è sul Catalogo).
       void qc.refetchQueries({ queryKey: qk.listItems(), type: 'all' })
@@ -85,6 +89,7 @@ export function useDeleteItemFromCatalog() {
     mutationFn: (id: number) => deleteItem(id),
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: qk.items() })
+      void qc.invalidateQueries({ queryKey: qk.stats() })
       void qc.refetchQueries({ queryKey: qk.listItems(), type: 'all' })
       toast(t('catalogo.deleted'))
     },
