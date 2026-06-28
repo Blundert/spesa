@@ -1,5 +1,5 @@
 import { useNavigate, useParams } from '@tanstack/react-router'
-import { useRef, useState } from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
@@ -23,7 +23,6 @@ export function SessioneScreen() {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const [showStorePicker, setShowStorePicker] = useState(false)
   const [editingPurchaseId, setEditingPurchaseId] = useState<number | null>(null)
-  const dateInputRef = useRef<HTMLInputElement>(null)
   const qc = useQueryClient()
 
   const { data: supermarkets = [] } = useSupermarkets()
@@ -147,20 +146,18 @@ export function SessioneScreen() {
 
         {/* Summary card */}
         <div className="bg-white rounded-[22px] px-6 pt-6 pb-4 mb-[14px] text-center">
-          <input
-            ref={dateInputRef}
-            type="date"
-            value={dateInputValue}
-            onChange={handleDateChange}
-            className="sr-only"
-            aria-label={t('sessione.editDate')}
-          />
-          <button
-            onClick={() => dateInputRef.current?.click()}
-            className="text-[13px] text-[#9B9B9F] mb-2 underline decoration-dotted underline-offset-2 active:opacity-50"
-          >
-            {session ? formatShortDate(session.startedAt) : '—'}
-          </button>
+          <div className="relative inline-block mb-2">
+            <span className="text-[13px] text-[#9B9B9F] underline decoration-dotted underline-offset-2 select-none">
+              {session ? formatShortDate(session.startedAt) : '—'}
+            </span>
+            <input
+              type="date"
+              value={dateInputValue}
+              onChange={handleDateChange}
+              aria-label={t('sessione.editDate')}
+              className="absolute inset-0 opacity-0 cursor-pointer w-full"
+            />
+          </div>
           <div className="flex items-baseline justify-center text-[#2A2A2C]">
             <span className="text-[30px] font-normal text-[#B5B5BA] mr-1">€</span>
             <span className="text-[64px] font-light tracking-[-1.5px] leading-[.95] tabular-nums">
