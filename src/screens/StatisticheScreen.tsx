@@ -6,7 +6,6 @@ import { useCategories } from '../hooks/useItems'
 import { useStats } from '../hooks/useStats'
 import {
   type StatsRange,
-  DEFAULT_STATS_RANGE,
   getStatsRange,
   setStatsRange,
   getCustomDays,
