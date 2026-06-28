@@ -87,6 +87,7 @@ export function StoricoScreen() {
               storeName={supermarketMap[s.supermarketId] ?? '?'}
               date={s.startedAt}
               confirmedTotalCents={s.confirmedTotalCents}
+              finishedAt={s.finishedAt}
             />
           ))}
         </div>
@@ -121,11 +122,13 @@ function SessionCard({
   storeName,
   date,
   confirmedTotalCents,
+  finishedAt,
 }: {
   sessionId: number
   storeName: string
   date: number
   confirmedTotalCents: number | null
+  finishedAt: number | null
 }) {
   const { t } = useTranslation()
   const { data: computedCents = 0 } = useSessionTotal(sessionId)
@@ -134,6 +137,7 @@ function SessionCard({
     queryFn: () => db.purchases.where('sessionId').equals(sessionId).toArray(),
   })
   const totalCents = confirmedTotalCents ?? computedCents
+  const isCompleted = finishedAt !== null
 
   return (
     <Link
@@ -142,7 +146,12 @@ function SessionCard({
       className="flex items-center gap-[14px] bg-white rounded-[20px] px-5 py-[18px] mb-[10px] active:bg-[#F6F6F4] block"
     >
       <div className="flex-1">
-        <div className="text-base font-normal text-[#2A2A2C]">{storeName}</div>
+        <div className="flex items-center gap-2">
+          <span className="text-base font-normal text-[#2A2A2C]">{storeName}</span>
+          {!isCompleted && (
+            <span className="text-[11px] text-white bg-[#E07B39] rounded-full px-[7px] py-[2px] leading-none">{t('sessione.notCompleted')}</span>
+          )}
+        </div>
         <div className="text-[13px] text-[#9B9B9F] mt-0.5">
           {formatShortDate(date)} · {t('storico.itemsCount', { count: purchases.length })}
         </div>

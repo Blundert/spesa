@@ -115,6 +115,8 @@ export const it = {
     saved: 'Modifiche salvate',
     editDate: 'Modifica data',
     editStore: 'Modifica supermercato',
+    notCompleted: 'Non completata',
+    finish: 'Concludi spesa',
   },
   pasti: {
     title: 'Pianifica i pasti',

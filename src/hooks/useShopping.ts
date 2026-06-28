@@ -13,6 +13,7 @@ import {
   updatePurchaseFull,
 } from '../db/repositories/purchases'
 import { updateItemPrices } from '../db/repositories/items'
+import { clearList } from '../db/repositories/listItems'
 import { db } from '../db/db'
 import type { Purchase, Session } from '../db/types'
 
@@ -251,6 +252,24 @@ export function useEditPastPurchase(sessionId: number, isoWeek: string) {
       void qc.invalidateQueries({ queryKey: qk.allSessions() })
       void qc.invalidateQueries({ queryKey: qk.sessions(isoWeek) })
       void qc.invalidateQueries({ queryKey: qk.items() })
+    },
+  })
+}
+
+export function useFinishPastSession(sessionId: number, isoWeek: string) {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async (confirmedTotalCents: number) => {
+      await finishSession(sessionId, confirmedTotalCents)
+      await clearList()
+    },
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: qk.session(sessionId) })
+      void qc.invalidateQueries({ queryKey: qk.allSessions() })
+      void qc.invalidateQueries({ queryKey: qk.sessions(isoWeek) })
+      void qc.invalidateQueries({ queryKey: qk.purchasesForWeek(isoWeek) })
+      void qc.invalidateQueries({ queryKey: qk.items() })
+      void qc.invalidateQueries({ queryKey: qk.listItems() })
     },
   })
 }

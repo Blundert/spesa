@@ -13,7 +13,7 @@ import { qk } from '../db/queryKeys'
 import { deleteSession } from '../db/repositories/sessions'
 import { BottomSheet } from '../components/BottomSheet'
 import { PriceKeypad } from '../components/PriceKeypad'
-import { useUpdateSession, useEditPastPurchase } from '../hooks/useShopping'
+import { useUpdateSession, useEditPastPurchase, useFinishPastSession } from '../hooks/useShopping'
 
 export function SessioneScreen() {
   const { t } = useTranslation()
@@ -42,6 +42,9 @@ export function SessioneScreen() {
 
   const updateSession = useUpdateSession()
   const editPurchase = useEditPastPurchase(sessionId, session?.isoWeek ?? '')
+  const finishPast = useFinishPastSession(sessionId, session?.isoWeek ?? '')
+  const [showFinishKeypad, setShowFinishKeypad] = useState(false)
+  const isCompleted = session?.finishedAt !== null && session?.finishedAt !== undefined
 
   const storeName = supermarkets.find((s) => s.id === session?.supermarketId)?.name ?? '?'
   const computedCents = purchases.reduce((acc, p) => acc + p.priceCents * p.quantity, 0)
@@ -119,13 +122,18 @@ export function SessioneScreen() {
               <path d="M15 5l-7 7 7 7" />
             </svg>
           </button>
-          <button
-            onClick={() => setShowStorePicker(true)}
-            aria-label={t('sessione.editStore')}
-            className="absolute left-1/2 -translate-x-1/2 text-[26px] font-normal tracking-[-0.5px] text-[#2A2A2C] max-w-[60%] truncate active:opacity-50"
-          >
-            {storeName}
-          </button>
+          <div className="absolute left-1/2 -translate-x-1/2 flex flex-col items-center gap-0.5">
+            <button
+              onClick={() => setShowStorePicker(true)}
+              aria-label={t('sessione.editStore')}
+              className="text-[26px] font-normal tracking-[-0.5px] text-[#2A2A2C] max-w-[200px] truncate active:opacity-50"
+            >
+              {storeName}
+            </button>
+            {!isCompleted && (
+              <span className="text-[11px] text-[#9B9B9F] leading-none">{t('sessione.notCompleted')}</span>
+            )}
+          </div>
           <button
             onClick={() => setShowDeleteConfirm(true)}
             aria-label={t('sessione.deleteSession')}
@@ -165,6 +173,16 @@ export function SessioneScreen() {
             </div>
           )}
         </div>
+
+        {/* Concludi spesa — visibile solo per sessioni non completate */}
+        {!isCompleted && (
+          <button
+            onClick={() => setShowFinishKeypad(true)}
+            className="w-full bg-[#2A2A2C] text-white text-[17px] font-normal py-[18px] rounded-[20px] mb-[14px] active:scale-[.98] transition-transform"
+          >
+            {t('sessione.finish')}
+          </button>
+        )}
 
         {/* Items list */}
         <div className="bg-white rounded-[20px] overflow-hidden">
@@ -226,6 +244,23 @@ export function SessioneScreen() {
       initialQuantity={editingPurchase?.quantity ?? 1}
       showQuantity
       onConfirm={handleConfirmPrice}
+    />
+
+    <PriceKeypad
+      open={showFinishKeypad}
+      onClose={() => setShowFinishKeypad(false)}
+      label={t('spesa.howMuch')}
+      confirmLabel={t('spesa.confirmShopping')}
+      initialCents={computedCents}
+      onConfirm={(cents) => {
+        finishPast.mutate(cents, {
+          onSuccess: () => {
+            setShowFinishKeypad(false)
+            toast(t('spesa.saved'))
+            void navigate({ to: '/storico' })
+          },
+        })
+      }}
     />
     </>
   )

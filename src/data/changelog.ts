@@ -2,6 +2,10 @@ export type ChangelogEntry = { it: string[]; en: string[] }
 
 // Ordine: più recente in cima. Aggiungere una entry ad ogni nuova versione.
 export const changelog: Record<string, ChangelogEntry> = {
+  '0.20.1': {
+    it: ['Fix: sessione non completata ora concludibile dallo storico; badge visivo per sessioni non completate; lista svuotata automaticamente alla conclusione'],
+    en: ['Fix: abandoned sessions can now be finished from history; visual badge for incomplete sessions; list cleared automatically on finish'],
+  },
   '0.20.0': {
     it: ['Storico: modifica data, supermercato e prezzo/quantità di ogni voce direttamente dalla schermata di dettaglio'],
     en: ['History: edit date, supermarket and price/quantity of each item directly from the session detail screen'],

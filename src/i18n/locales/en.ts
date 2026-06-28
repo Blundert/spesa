@@ -117,6 +117,8 @@ export const en: typeof it = {
     saved: 'Changes saved',
     editDate: 'Edit date',
     editStore: 'Edit supermarket',
+    notCompleted: 'Not completed',
+    finish: 'Finish shopping',
   },
   pasti: {
     title: 'Plan meals',
