@@ -185,6 +185,8 @@ export function StatisticheScreen() {
             min={1}
             value={customInput}
             onChange={(e) => setCustomInput(e.target.value)}
+            onPointerDown={(e) => e.stopPropagation()}
+            data-vaul-no-drag
             className="w-full bg-transparent text-[16px] text-[#2A2A2C] outline-none tabular-nums"
             placeholder="30"
           />
