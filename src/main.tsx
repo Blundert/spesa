@@ -8,8 +8,13 @@ import { router } from './router'
 import { queryClient } from './lib/queryClient'
 import { TutorialController } from './tutorial'
 import { UpdateNotifier } from './pwa/UpdateNotifier'
+import { DesktopApp } from './desktop/DesktopApp'
 import './i18n'
 import './index.css'
+
+// Viewport ≥ 768 px → interfaccia desktop. Controllo una-tantum al boot;
+// su iPad/Capacitor il viewport è fisso, su browser un refresh è accettabile.
+const IS_DESKTOP = window.matchMedia('(min-width: 768px)').matches
 
 const rootEl = document.getElementById('root')
 if (!rootEl) throw new Error('Root element not found')
@@ -31,54 +36,60 @@ window.visualViewport?.addEventListener('resize', syncAppHeight)
 createRoot(rootEl).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
-      {/* Shell: position: fixed ancorato in alto, ALTEZZA esplicita da --app-height
-          (= documentElement.clientHeight, stabile) invece di bottom:0/100dvh, che su iOS
-          standalone si agganciano a innerHeight ballerino e lasciavano un vuoto in basso. */}
-      <div
-        data-vaul-drawer-wrapper
-        style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          height: 'var(--app-height, 100%)',
-          margin: '0 auto',
-          width: '100%',
-          maxWidth: '430px',
-          overflow: 'hidden',
-          background: '#F2F2F0',
-        }}
-      >
-        <RouterProvider router={router} />
-        <TutorialController />
-        <UpdateNotifier />
-        {/* Web component per l'installazione PWA (incl. istruzioni iOS). Manuale:
-            si apre solo dalla pagina Impostazioni via showDialog(). Nome/icona passati
-            espliciti così il dialog è corretto anche in dev (dove il manifest non è servito). */}
-        <PWAInstall
-          manualApple
-          manualChrome
-          useLocalStorage
-          name="Spesa"
-          description="App per la spesa con buoni pasto"
-          icon="/pwa-192x192.png"
-        />
-      </div>
-      <Toaster
-        position="bottom-center"
-        offset="calc(env(safe-area-inset-bottom) + 100px)"
-        duration={2000}
-        toastOptions={{
-          style: {
-            background: '#2A2A2C',
-            color: '#fff',
-            borderRadius: '15px',
-            border: 'none',
-            fontSize: '14px',
-            width: '356px',
-          },
-        }}
-      />
+      {IS_DESKTOP ? (
+        <DesktopApp />
+      ) : (
+        <>
+          {/* Shell: position: fixed ancorato in alto, ALTEZZA esplicita da --app-height
+              (= documentElement.clientHeight, stabile) invece di bottom:0/100dvh, che su iOS
+              standalone si agganciano a innerHeight ballerino e lasciavano un vuoto in basso. */}
+          <div
+            data-vaul-drawer-wrapper
+            style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              right: 0,
+              height: 'var(--app-height, 100%)',
+              margin: '0 auto',
+              width: '100%',
+              maxWidth: '430px',
+              overflow: 'hidden',
+              background: '#F2F2F0',
+            }}
+          >
+            <RouterProvider router={router} />
+            <TutorialController />
+            <UpdateNotifier />
+            {/* Web component per l'installazione PWA (incl. istruzioni iOS). Manuale:
+                si apre solo dalla pagina Impostazioni via showDialog(). Nome/icona passati
+                espliciti così il dialog è corretto anche in dev (dove il manifest non è servito). */}
+            <PWAInstall
+              manualApple
+              manualChrome
+              useLocalStorage
+              name="Spesa"
+              description="App per la spesa con buoni pasto"
+              icon="/pwa-192x192.png"
+            />
+          </div>
+          <Toaster
+            position="bottom-center"
+            offset="calc(env(safe-area-inset-bottom) + 100px)"
+            duration={2000}
+            toastOptions={{
+              style: {
+                background: '#2A2A2C',
+                color: '#fff',
+                borderRadius: '15px',
+                border: 'none',
+                fontSize: '14px',
+                width: '356px',
+              },
+            }}
+          />
+        </>
+      )}
     </QueryClientProvider>
   </StrictMode>,
 )
