@@ -1,5 +1,17 @@
 import { db } from '../db'
 
+function sessionWeekKey(startedAt: number, startDay: number): string {
+  const date = new Date(startedAt)
+  const ourDay = (date.getUTCDay() + 6) % 7
+  const offset = (ourDay - startDay + 7) % 7
+  const ws = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()))
+  ws.setUTCDate(ws.getUTCDate() - offset)
+  const y = ws.getUTCFullYear()
+  const m = String(ws.getUTCMonth() + 1).padStart(2, '0')
+  const d = String(ws.getUTCDate()).padStart(2, '0')
+  return `${y}-${m}-${d}`
+}
+
 function shiftWeekKey(weekKey: string, delta: number): string {
   const [y, m, d] = weekKey.split('-').map(Number)
   const date = new Date(Date.UTC(y, m - 1, d))
@@ -35,7 +47,7 @@ export interface StatsResult {
   categoryBreakdown: CategoryBreakdown[]
 }
 
-export async function getStats(currentWeekKey: string): Promise<StatsResult> {
+export async function getStats(currentWeekKey: string, weekStartDay: number): Promise<StatsResult> {
   const [sessions, purchases, items, categories, supermarkets] = await Promise.all([
     db.sessions.toArray(),
     db.purchases.toArray(),
@@ -80,9 +92,13 @@ export async function getStats(currentWeekKey: string): Promise<StatsResult> {
     topSupermarketId !== null ? (supermarkets.find((s) => s.id === topSupermarketId)?.name ?? null) : null
 
   // Totali settimanali: ultime 12 settimane
+  // Re-bucket ogni sessione in base alla data reale e al weekStartDay corrente,
+  // così le sessioni salvate con un vecchio giorno di inizio settimana vengono
+  // posizionate correttamente nel grafico.
   const weeklyMap = new Map<string, number>()
   for (const { session, totalCents } of sessionTotals) {
-    weeklyMap.set(session.isoWeek, (weeklyMap.get(session.isoWeek) ?? 0) + totalCents)
+    const key = sessionWeekKey(session.startedAt, weekStartDay)
+    weeklyMap.set(key, (weeklyMap.get(key) ?? 0) + totalCents)
   }
   const weeklyTotals: WeeklyTotal[] = Array.from({ length: 12 }, (_, i) => {
     const weekKey = shiftWeekKey(currentWeekKey, -(11 - i))

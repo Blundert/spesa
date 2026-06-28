@@ -2,7 +2,8 @@ import { describe, it, expect, beforeEach } from 'vitest'
 import { db } from '../db'
 import { getStats } from './stats'
 
-const WEEK = '2026-06-23' // lunedì
+const WEEK = '2026-06-22' // lunedì 22 giugno 2026 (confermato: giu 23 è martedì)
+const WEEK_TS = Date.UTC(2026, 5, 22) // lunedì 22 giugno 2026 00:00 UTC
 
 async function clearAll() {
   await db.sessions.clear()
@@ -18,7 +19,7 @@ beforeEach(async () => {
 
 describe('getStats — stato vuoto', () => {
   it('restituisce zero quando non ci sono sessioni', async () => {
-    const result = await getStats(WEEK)
+    const result = await getStats(WEEK, 0)
     expect(result.totalCents).toBe(0)
     expect(result.sessionCount).toBe(0)
     expect(result.avgCents).toBe(0)
@@ -43,7 +44,7 @@ describe('getStats — sessioni finite', () => {
       buoniSpent: 0,
       buoniValueCents: 800,
     })
-    const result = await getStats(WEEK)
+    const result = await getStats(WEEK, 0)
     expect(result.sessionCount).toBe(0)
   })
 
@@ -59,7 +60,7 @@ describe('getStats — sessioni finite', () => {
       buoniSpent: 0,
       buoniValueCents: 800,
     })
-    const result = await getStats(WEEK)
+    const result = await getStats(WEEK, 0)
     expect(result.totalCents).toBe(5000)
     expect(result.sessionCount).toBe(1)
     expect(result.avgCents).toBe(5000)
@@ -78,7 +79,7 @@ describe('getStats — sessioni finite', () => {
       buoniValueCents: 800,
     })
     // Nessun acquisto → purchasesBySession.get(1) è undefined → ?? [] → reduce → 0
-    const result = await getStats(WEEK)
+    const result = await getStats(WEEK, 0)
     expect(result.totalCents).toBe(0)
     expect(result.sessionCount).toBe(1)
   })
@@ -98,7 +99,7 @@ describe('getStats — sessioni finite', () => {
       buoniValueCents: 800,
     })
     await db.purchases.add({ id: 1, sessionId: 1, itemId: 1, priceCents: 200, quantity: 3 })
-    const result = await getStats(WEEK)
+    const result = await getStats(WEEK, 0)
     expect(result.totalCents).toBe(600)
     expect(result.avgCents).toBe(600)
   })
@@ -113,12 +114,12 @@ describe('getStats — sessioni finite', () => {
       { id: 2, isoWeek: WEEK, supermarketId: 1, startedAt: 3000, finishedAt: 4000, confirmedTotalCents: 1000, buoniSpent: 0, buoniValueCents: 800 },
       { id: 3, isoWeek: WEEK, supermarketId: 2, startedAt: 5000, finishedAt: 6000, confirmedTotalCents: 1000, buoniSpent: 0, buoniValueCents: 800 },
     ])
-    const result = await getStats(WEEK)
+    const result = await getStats(WEEK, 0)
     expect(result.topSupermarketName).toBe('Coop')
   })
 
   it('supermercato top è null se non ci sono sessioni finite', async () => {
-    const result = await getStats(WEEK)
+    const result = await getStats(WEEK, 0)
     expect(result.topSupermarketName).toBeNull()
   })
 
@@ -134,7 +135,7 @@ describe('getStats — sessioni finite', () => {
       buoniSpent: 0,
       buoniValueCents: 800,
     })
-    const result = await getStats(WEEK)
+    const result = await getStats(WEEK, 0)
     expect(result.topSupermarketName).toBeNull()
   })
 })
@@ -146,20 +147,45 @@ describe('getStats — weeklyTotals', () => {
       id: 1,
       isoWeek: WEEK,
       supermarketId: 1,
-      startedAt: 1000,
-      finishedAt: 2000,
+      startedAt: WEEK_TS,
+      finishedAt: WEEK_TS + 1000,
       confirmedTotalCents: 3500,
       buoniSpent: 0,
       buoniValueCents: 800,
     })
-    const result = await getStats(WEEK)
+    const result = await getStats(WEEK, 0)
     const currentWeekEntry = result.weeklyTotals.find((w) => w.weekKey === WEEK)
     expect(currentWeekEntry?.totalCents).toBe(3500)
   })
 
   it('genera sempre 12 settimane', async () => {
-    const result = await getStats(WEEK)
+    const result = await getStats(WEEK, 0)
     expect(result.weeklyTotals).toHaveLength(12)
+  })
+
+  it('re-bucket sessione in base a startedAt e weekStartDay corrente', async () => {
+    await db.supermarkets.add({ id: 1, name: 'Coop', normalizedName: 'coop' })
+    // Sessione salvata con isoWeek='2026-06-13' (sabato precedente) ma startedAt
+    // cade il sabato 20 giugno → con weekStartDay=5 (sab) deve apparire in '2026-06-20',
+    // non in '2026-06-13' (che era la chiave salvata con un vecchio weekStartDay)
+    const satTs = Date.UTC(2026, 5, 20) // sabato 20 giugno 2026 (giu 22 è lun → giu 20 è sab)
+    await db.sessions.add({
+      id: 1,
+      isoWeek: '2026-06-13', // chiave "vecchia" — sabato precedente, presente nella griglia
+      supermarketId: 1,
+      startedAt: satTs,
+      finishedAt: satTs + 1000,
+      confirmedTotalCents: 5000,
+      buoniSpent: 0,
+      buoniValueCents: 800,
+    })
+    const result = await getStats('2026-06-20', 5)
+    // Deve apparire alla settimana corretta (sabato 20)
+    const correctEntry = result.weeklyTotals.find((w) => w.weekKey === '2026-06-20')
+    expect(correctEntry?.totalCents).toBe(5000)
+    // La vecchia isoWeek (sabato 13) non deve avere dati
+    const wrongEntry = result.weeklyTotals.find((w) => w.weekKey === '2026-06-13')
+    expect(wrongEntry?.totalCents).toBe(0)
   })
 })
 
@@ -174,7 +200,7 @@ describe('getStats — topItems', () => {
       { id: 5, name: 'E', normalizedName: 'e', categoryId: 1, lastPriceCents: null, suggestedPriceCents: null, purchaseCount: 7 },
       { id: 6, name: 'F', normalizedName: 'f', categoryId: 1, lastPriceCents: null, suggestedPriceCents: null, purchaseCount: 1 },
     ])
-    const result = await getStats(WEEK)
+    const result = await getStats(WEEK, 0)
     expect(result.topItems).toHaveLength(5)
     expect(result.topItems[0].name).toBe('A')
     expect(result.topItems[0].purchaseCount).toBe(10)
@@ -184,7 +210,7 @@ describe('getStats — topItems', () => {
   it('esclude articoli con purchaseCount 0 o undefined', async () => {
     await db.categories.add({ id: 1, name: 'Dispensa', sortOrder: 2 })
     await db.items.add({ id: 1, name: 'Nuovo', normalizedName: 'nuovo', categoryId: 1, lastPriceCents: null, suggestedPriceCents: null, purchaseCount: 0 })
-    const result = await getStats(WEEK)
+    const result = await getStats(WEEK, 0)
     expect(result.topItems).toHaveLength(0)
   })
 })
@@ -205,7 +231,7 @@ describe('getStats — categoryBreakdown', () => {
       { id: 1, sessionId: 1, itemId: 1, priceCents: 150, quantity: 2 }, // Frigo: 300
       { id: 2, sessionId: 1, itemId: 2, priceCents: 100, quantity: 1 }, // Dispensa: 100
     ])
-    const result = await getStats(WEEK)
+    const result = await getStats(WEEK, 0)
     expect(result.categoryBreakdown).toHaveLength(2)
     expect(result.categoryBreakdown[0].name).toBe('Frigo')
     expect(result.categoryBreakdown[0].totalCents).toBe(300)
@@ -218,7 +244,7 @@ describe('getStats — categoryBreakdown', () => {
     await db.items.add({ id: 1, name: 'X', normalizedName: 'x', categoryId: 99, lastPriceCents: null, suggestedPriceCents: null })
     await db.sessions.add({ id: 1, isoWeek: WEEK, supermarketId: 1, startedAt: 1000, finishedAt: 2000, confirmedTotalCents: null, buoniSpent: 0, buoniValueCents: 800 })
     await db.purchases.add({ id: 1, sessionId: 1, itemId: 1, priceCents: 200, quantity: 1 })
-    const result = await getStats(WEEK)
+    const result = await getStats(WEEK, 0)
     expect(result.categoryBreakdown[0].name).toBe('Altro')
   })
 
@@ -227,7 +253,7 @@ describe('getStats — categoryBreakdown', () => {
     await db.sessions.add({ id: 1, isoWeek: WEEK, supermarketId: 1, startedAt: 1000, finishedAt: 2000, confirmedTotalCents: null, buoniSpent: 0, buoniValueCents: 800 })
     // itemId: 999 non esiste in items → itemCategoryMap.get(999) === undefined → ?? 0
     await db.purchases.add({ id: 1, sessionId: 1, itemId: 999, priceCents: 100, quantity: 1 })
-    const result = await getStats(WEEK)
+    const result = await getStats(WEEK, 0)
     expect(result.categoryBreakdown).toHaveLength(1)
     expect(result.categoryBreakdown[0].totalCents).toBe(100)
   })

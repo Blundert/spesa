@@ -62,6 +62,13 @@
 4. Torna su Impostazioni → reimposta il giorno di inizio su "Lun"
 5. Verifica che i giorni nella schermata Pasti tornino a LUN→DOM
 
+### Flusso 10 — Grafico andamento Statistiche
+1. Con almeno due sessioni di spesa completate (anche in settimane diverse), naviga su Statistiche
+2. Nella sezione "ANDAMENTO (12 SETTIMANE)" verifica che il grafico mostri barre per le settimane con spesa
+3. Ogni barra deve avere: l'importo (€XX) sopra la barra e la data in formato "G/M" sotto
+4. Le barre vuote (settimane senza spesa) devono essere basse e grigie
+5. Se hai cambiato il giorno di inizio settimana nelle Impostazioni, le barre devono essere posizionate in base al nuovo giorno di inizio (non al vecchio)
+
 ### Flusso 9 — Modifica sessione di spesa dallo storico
 1. Con almeno una sessione di spesa completata, naviga su Storico
 2. Clicca su una sessione per aprire il dettaglio
