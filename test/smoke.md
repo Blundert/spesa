@@ -61,3 +61,10 @@
 3. Verifica che il primo giorno visualizzato sia "MER" e l'ultimo "MAR"
 4. Torna su Impostazioni → reimposta il giorno di inizio su "Lun"
 5. Verifica che i giorni nella schermata Pasti tornino a LUN→DOM
+
+### Flusso 9 — Modifica sessione di spesa dallo storico
+1. Con almeno una sessione di spesa completata, naviga su Storico
+2. Clicca su una sessione per aprire il dettaglio
+3. **Modifica data**: clicca sulla data (testo sottolineato punteggiato) → si apre il date picker nativo → scegli una data diversa → verifica il toast "Modifiche salvate" e che la data si aggiorni; se la nuova data è in una settimana diversa, la sessione deve spostarsi nel gruppo corretto nello Storico
+4. **Modifica supermercato**: clicca sul nome del supermercato nell'intestazione → si apre il picker supermercati → seleziona un negozio diverso → verifica il toast "Modifiche salvate" e che l'intestazione si aggiorni
+5. **Modifica prezzo/quantità**: clicca su una riga acquisto → si apre il tastierino prezzi con il prezzo attuale precompilato e lo stepper quantità → modifica prezzo e/o quantità → clicca "Conferma" → verifica il toast "Modifiche salvate" e che il totale della sessione si aggiorni di conseguenza

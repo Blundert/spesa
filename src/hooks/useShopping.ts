@@ -3,17 +3,18 @@ import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import { qk } from '../db/queryKeys'
 import { getWeekBudget, setBuoniAvailable } from '../db/repositories/weekBudget'
-import { getSessionsByWeek, createSession, finishSession, deleteWeek } from '../db/repositories/sessions'
+import { getSessionsByWeek, createSession, finishSession, deleteWeek, updateSession as updateSessionRepo } from '../db/repositories/sessions'
 import {
   getPurchasesBySession,
   addPurchase,
   updatePurchasePrice,
   updatePurchaseQuantity,
   removePurchase,
+  updatePurchaseFull,
 } from '../db/repositories/purchases'
 import { updateItemPrices } from '../db/repositories/items'
 import { db } from '../db/db'
-import type { Purchase } from '../db/types'
+import type { Purchase, Session } from '../db/types'
 
 // ── Budget ──────────────────────────────────────────────────────────────────
 
@@ -199,6 +200,57 @@ export function useRemovePurchase(sessionId: number) {
       if (itemId !== undefined) {
         void qc.invalidateQueries({ queryKey: qk.priceHistory(itemId) })
       }
+    },
+  })
+}
+
+// ── Edit past session ─────────────────────────────────────────────────────────
+
+export function useUpdateSession() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: ({
+      id,
+      patch,
+    }: {
+      id: number
+      oldIsoWeek: string
+      patch: Partial<Pick<Session, 'supermarketId' | 'startedAt' | 'isoWeek' | 'confirmedTotalCents'>>
+    }) => updateSessionRepo(id, patch),
+    onSuccess: (_, { id, oldIsoWeek, patch }) => {
+      void qc.invalidateQueries({ queryKey: qk.session(id) })
+      void qc.invalidateQueries({ queryKey: qk.allSessions() })
+      void qc.invalidateQueries({ queryKey: qk.sessions(oldIsoWeek) })
+      void qc.invalidateQueries({ queryKey: qk.purchasesForWeek(oldIsoWeek) })
+      if (patch.isoWeek && patch.isoWeek !== oldIsoWeek) {
+        void qc.invalidateQueries({ queryKey: qk.sessions(patch.isoWeek) })
+        void qc.invalidateQueries({ queryKey: qk.purchasesForWeek(patch.isoWeek) })
+      }
+    },
+  })
+}
+
+export function useEditPastPurchase(sessionId: number, isoWeek: string) {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async ({
+      purchaseId,
+      priceCents,
+      quantity,
+    }: {
+      purchaseId: number
+      priceCents: number
+      quantity: number
+    }) => {
+      await updatePurchaseFull(purchaseId, priceCents, quantity)
+      await db.sessions.update(sessionId, { confirmedTotalCents: null })
+    },
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: qk.session(sessionId) })
+      void qc.invalidateQueries({ queryKey: qk.purchases(sessionId) })
+      void qc.invalidateQueries({ queryKey: qk.allSessions() })
+      void qc.invalidateQueries({ queryKey: qk.sessions(isoWeek) })
+      void qc.invalidateQueries({ queryKey: qk.items() })
     },
   })
 }

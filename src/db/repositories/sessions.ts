@@ -72,6 +72,13 @@ export async function deleteWeek(isoWeek: string): Promise<void> {
   })
 }
 
+export async function updateSession(
+  id: number,
+  patch: Partial<Pick<Session, 'supermarketId' | 'startedAt' | 'isoWeek' | 'confirmedTotalCents'>>,
+): Promise<void> {
+  await db.sessions.update(id, patch)
+}
+
 export async function deleteSession(id: number): Promise<void> {
   await db.transaction('rw', [db.sessions, db.purchases, db.items], async () => {
     const purchases = await db.purchases.where('sessionId').equals(id).toArray()

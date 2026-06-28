@@ -114,6 +114,9 @@ export const en: typeof it = {
     deleteConfirmTitle: 'Delete this shopping session?',
     deleteConfirmBody: 'All recorded purchases will be deleted.',
     deleteConfirm: 'Delete',
+    saved: 'Changes saved',
+    editDate: 'Edit date',
+    editStore: 'Edit supermarket',
   },
   pasti: {
     title: 'Plan meals',

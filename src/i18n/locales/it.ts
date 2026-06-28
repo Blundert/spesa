@@ -112,6 +112,9 @@ export const it = {
     deleteConfirmTitle: 'Eliminare questa spesa?',
     deleteConfirmBody: 'Verranno eliminati tutti gli acquisti registrati.',
     deleteConfirm: 'Elimina',
+    saved: 'Modifiche salvate',
+    editDate: 'Modifica data',
+    editStore: 'Modifica supermercato',
   },
   pasti: {
     title: 'Pianifica i pasti',
