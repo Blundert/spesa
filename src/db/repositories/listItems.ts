@@ -49,7 +49,11 @@ export async function updateListItemQuantity(id: number, quantity: number): Prom
   }
 }
 
-/** Svuota l'intera lista (usato a fine spesa). */
-export async function clearList(): Promise<void> {
-  await db.listItems.clear()
+/**
+ * Rimuove dalla lista solo le voci corrispondenti agli item acquistati
+ * (usato a fine spesa). Le voci non acquistate restano in lista.
+ */
+export async function removePurchasedFromList(itemIds: number[]): Promise<void> {
+  if (itemIds.length === 0) return
+  await db.listItems.where('itemId').anyOf(itemIds).delete()
 }

@@ -18,7 +18,12 @@ import {
   useRemovePurchase,
   useUpdatePurchase,
 } from '../hooks/useShopping'
-import { useListItems, useClearList, useRemoveFromList, useAddToList } from '../hooks/useListItems'
+import {
+  useListItems,
+  useRemovePurchasedFromList,
+  useRemoveFromList,
+  useAddToList,
+} from '../hooks/useListItems'
 import { useSupermarkets, useCategories, useItems } from '../hooks/useItems'
 import { PriceKeypad } from '../components/PriceKeypad'
 import { BottomSheet } from '../components/BottomSheet'
@@ -71,7 +76,7 @@ export function SpesaScreen() {
   const updatePurchase = useUpdatePurchase(activeSession?.id ?? 0)
   const removeFromList = useRemoveFromList()
   const addToList = useAddToList()
-  const clearList = useClearList()
+  const removePurchasedFromList = useRemovePurchasedFromList()
   const qc = useQueryClient()
 
   const liveBuoni = activeSession?.buoniSpent ?? buoni
@@ -163,13 +168,13 @@ export function SpesaScreen() {
     async (cents: number) => {
       if (!activeSession?.id) return
       await finishSession.mutateAsync({ sessionId: activeSession.id, confirmedTotalCents: cents })
-      await clearList.mutateAsync()
+      await removePurchasedFromList.mutateAsync(purchases.map((p) => p.itemId))
       toast(t('spesa.saved'), {
         description: `${supermarketName} · €${formatCentsPlain(cents)}`,
       })
       void navigate({ to: '/storico' })
     },
-    [activeSession, finishSession, clearList, navigate, supermarketName, t],
+    [activeSession, finishSession, removePurchasedFromList, purchases, navigate, supermarketName, t],
   )
 
   // Depenna: annulla l'acquisto e rimette la voce tra "da prendere". Se era fuori lista

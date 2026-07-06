@@ -13,7 +13,7 @@ import {
   updatePurchaseFull,
 } from '../db/repositories/purchases'
 import { updateItemPrices } from '../db/repositories/items'
-import { clearList } from '../db/repositories/listItems'
+import { removePurchasedFromList } from '../db/repositories/listItems'
 import { db } from '../db/db'
 import type { Purchase, Session } from '../db/types'
 
@@ -261,7 +261,8 @@ export function useFinishPastSession(sessionId: number, isoWeek: string) {
   return useMutation({
     mutationFn: async (confirmedTotalCents: number) => {
       await finishSession(sessionId, confirmedTotalCents)
-      await clearList()
+      const purchases = await getPurchasesBySession(sessionId)
+      await removePurchasedFromList(purchases.map((p) => p.itemId))
     },
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: qk.session(sessionId) })

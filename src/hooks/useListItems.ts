@@ -5,7 +5,7 @@ import {
   addToList,
   removeFromList,
   updateListItemQuantity,
-  clearList,
+  removePurchasedFromList,
 } from '../db/repositories/listItems'
 import { upsertItem } from '../db/repositories/items'
 
@@ -64,10 +64,10 @@ export function useUpdateListQuantity() {
   })
 }
 
-export function useClearList() {
+export function useRemovePurchasedFromList() {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: () => clearList(),
+    mutationFn: (itemIds: number[]) => removePurchasedFromList(itemIds),
     onSuccess: () => {
       void qc.refetchQueries({ queryKey: qk.listItems(), type: 'all' })
     },

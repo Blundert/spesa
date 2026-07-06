@@ -81,4 +81,12 @@
 3. **Modifica data**: clicca sulla data (testo sottolineato punteggiato) → si apre il date picker nativo → scegli una data diversa → verifica il toast "Modifiche salvate" e che la data si aggiorni; se la nuova data è in una settimana diversa, la sessione deve spostarsi nel gruppo corretto nello Storico
 4. **Modifica supermercato**: clicca sul nome del supermercato nell'intestazione → si apre il picker supermercati → seleziona un negozio diverso → verifica il toast "Modifiche salvate" e che l'intestazione si aggiorni
 5. **Modifica prezzo/quantità**: clicca su una riga acquisto → si apre il tastierino prezzi con il prezzo attuale precompilato e lo stepper quantità → modifica prezzo e/o quantità → clicca "Conferma" → verifica il toast "Modifiche salvate" e che il totale della sessione si aggiorni di conseguenza
-6. **Sessione non completata**: una sessione con "Fine" non premuto appare nello Storico con badge arancione "Non completata" → tap su di essa → nell'intestazione appare la scritta "Non completata" sotto il nome del supermercato → pulsante "Concludi spesa" visibile sopra la lista acquisti → tap → si apre il tastierino con il totale pre-calcolato → conferma → sessione ora conclusa (badge sparisce, pulsante sparisce), lista della spesa svuotata, toast "Spesa salvata"
+6. **Sessione non completata**: una sessione con "Fine" non premuto appare nello Storico con badge arancione "Non completata" → tap su di essa → nell'intestazione appare la scritta "Non completata" sotto il nome del supermercato → pulsante "Concludi spesa" visibile sopra la lista acquisti → tap → si apre il tastierino con il totale pre-calcolato → conferma → sessione ora conclusa (badge sparisce, pulsante sparisce), gli articoli acquistati in questa sessione spariscono dalla lista della spesa (gli altri restano), toast "Spesa salvata"
+
+### Flusso 10 — Fine spesa non svuota gli articoli non acquistati
+1. Vai su "Lista della spesa" e aggiungi due articoli, es. "Latte" e "Pane"
+2. Naviga su http://localhost:5173/spesa, scegli un supermercato per avviare la sessione
+3. Verifica che entrambi appaiano in "Da prendere"
+4. Clicca su "Latte", inserisci un prezzo e conferma — verifica che si sposti in "Nel carrello"
+5. Clicca "Termina spesa", conferma il totale
+6. Vai su "Lista della spesa": verifica che "Pane" sia ancora presente (non acquistato) e che "Latte" sia sparito (acquistato)
