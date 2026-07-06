@@ -209,6 +209,15 @@ describe('getStats — weeklyTotals', () => {
     const wrongEntry = result.weeklyTotals.find((w) => w.weekKey === '2026-06-13')
     expect(wrongEntry?.totalCents ?? 0).toBe(0)
   })
+
+  it('garantisce almeno una settimana se fromTs è successivo alla settimana corrente', async () => {
+    // fromTs in una settimana futura rispetto a currentWeekKey: il range firstWeekKey..currentWeekKey
+    // è vuoto (firstWeekKey > currentWeekKey), il fallback deve comunque restituire una voce
+    const futureTs = Date.UTC(2026, 6, 6) // lunedì 6 luglio 2026, dopo la settimana corrente (22 giugno)
+    const result = await getStats(WEEK, 0, futureTs)
+    expect(result.weeklyTotals).toHaveLength(1)
+    expect(result.weeklyTotals[0]).toEqual({ weekKey: WEEK, totalCents: 0 })
+  })
 })
 
 describe('getStats — topItems', () => {
