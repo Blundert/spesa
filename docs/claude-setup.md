@@ -35,3 +35,28 @@
 
   - L'utente non-root usato è node (uid 1000, già presente nelle immagini Docker Node-based).
   - I permessi allowlist in settings.json ("allow": [...]) restano utili per restare selettivi anche Jump to bottom (ctrl+End) ↓  da solo non è valido — servono regole tipo "Bash", "Bash(git *)", ecc.
+
+## Menu `/` (slash commands) senza evidenziazione della selezione
+
+**Sintomo:** aprendo il menu `/` in Claude Code, la voce attualmente selezionata non
+appare evidenziata visivamente.
+
+**Causa:** `TERM` era impostato a `xterm` invece di `xterm-256color`, quindi il
+terminale dichiarava un supporto colori limitato (8/16 colori) e l'highlight
+risultava invisibile o a basso contrasto. `NO_COLOR` e `COLORTERM` non erano
+impostate.
+
+**Diagnosi:**
+
+```bash
+echo "TERM=$TERM"
+echo "NO_COLOR=${NO_COLOR:-<non impostata>}"
+echo "COLORTERM=${COLORTERM:-<non impostata>}"
+```
+
+**Fix applicato:** aggiunto `export TERM=xterm-256color` in fondo a `~/.bashrc`
+(nessun export esplicito di `TERM` era già presente, solo dei blocchi `case "$TERM"`
+condizionali).
+
+Per applicare la modifica in un terminale già aperto: `source ~/.bashrc`.
+Per i nuovi terminali/nuove sessioni bash prende effetto automaticamente.
