@@ -235,6 +235,7 @@ export const en: typeof it = {
     language: 'Language',
     version: 'Version',
     refresh: 'Update app',
+    appUpdated: 'Updated to version',
     data: 'Data',
     deleteAll: 'Clear all data',
     confirmTitle: 'Are you sure?',

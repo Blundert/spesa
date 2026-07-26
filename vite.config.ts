@@ -16,7 +16,9 @@ export default defineConfig({
     react(),
     tailwindcss(),
     VitePWA({
-      registerType: 'autoUpdate',
+      // 'prompt' invece di 'autoUpdate': lasciamo che sia UpdateNotifier a decidere
+      // quando applicare l'update (mai a metà sessione, solo al resume dell'app).
+      registerType: 'prompt',
       pwaAssets: { config: true },
       manifest: {
         name: 'App Spesa',

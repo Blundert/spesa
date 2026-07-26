@@ -92,3 +92,15 @@
 4. Clicca su "Latte", inserisci un prezzo e conferma — verifica che si sposti in "Nel carrello"
 5. Clicca "Termina spesa", conferma il totale
 6. Vai su "Lista della spesa": verifica che "Pane" sia ancora presente (non acquistato) e che "Latte" sia sparito (acquistato)
+
+### Flusso 11 — Aggiornamento automatico app + notifica versione
+Nota: il service worker è attivo solo in build di produzione (`npm run build` + `npm run preview`), non in `npm run dev`.
+1. `npm run build` e `npm run preview`, apri l'app dalla preview
+2. In devtools → Application → Service Workers, verifica che il SW sia registrato e attivo
+3. Bumpa la versione in `package.json` (patch fittizia), rifai `npm run build`
+4. Nella tab già aperta, metti l'app in background e poi torna in primo piano (o cambia tab e torna) — non ricaricare manualmente
+5. Verifica che l'app si aggiorni e ricarichi da sola, senza alcun popup di conferma
+6. Dopo il reload, verifica che compaia un toast "Aggiornato alla versione X" con la nuova versione
+7. Tocca il toast: verifica che navighi alla schermata Changelog
+8. Ricarica di nuovo la pagina: verifica che il toast non ricompaia (stessa versione già vista)
+9. In Impostazioni, verifica che il bottone "Aggiorna app" sia ancora presente e funzioni come prima (reset forzato SW + cache + reload)

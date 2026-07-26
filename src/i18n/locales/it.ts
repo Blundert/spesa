@@ -234,6 +234,7 @@ export const it = {
     language: 'Lingua',
     version: 'Versione',
     refresh: 'Aggiorna app',
+    appUpdated: 'Aggiornato alla versione',
     data: 'Dati',
     deleteAll: 'Azzera tutti i dati',
     confirmTitle: 'Sei sicuro?',

@@ -2,6 +2,10 @@ export type ChangelogEntry = { it: string[]; en: string[] }
 
 // Ordine: più recente in cima. Aggiungere una entry ad ogni nuova versione.
 export const changelog: Record<string, ChangelogEntry> = {
+  '0.23.0': {
+    it: ['App: aggiornamento automatico alla nuova versione al resume dell\'app, con notifica del cambio versione (tap per vedere le novità)'],
+    en: ['App: app now updates automatically on resume to the latest version, with a notification of the version change (tap to see what\'s new)'],
+  },
   '0.22.0': {
     it: ['Storico: modifica il totale di una spesa conclusa, con opzione per tornare al totale calcolato dagli articoli'],
     en: ['History: edit the total of a completed shopping session, with an option to revert to the total calculated from items'],
