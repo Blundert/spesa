@@ -119,6 +119,8 @@ export const en: typeof it = {
     editStore: 'Edit supermarket',
     notCompleted: 'Not completed',
     finish: 'Finish shopping',
+    editTotal: 'Edit amount',
+    useComputedTotal: 'Use calculated total (€{{amount}})',
   },
   pasti: {
     title: 'Plan meals',

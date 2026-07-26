@@ -117,6 +117,8 @@ export const it = {
     editStore: 'Modifica supermercato',
     notCompleted: 'Non completata',
     finish: 'Concludi spesa',
+    editTotal: 'Modifica importo',
+    useComputedTotal: 'Usa il totale calcolato (€{{amount}})',
   },
   pasti: {
     title: 'Pianifica i pasti',

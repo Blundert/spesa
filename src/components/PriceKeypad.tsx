@@ -19,6 +19,8 @@ interface PriceKeypadProps {
   /** Ultimo prezzo pagato (per mostrare la variazione). undefined = non mostrare. null = primo acquisto. */
   lastPriceCents?: number | null
   onConfirm: (cents: number, quantity: number) => void
+  /** Azione secondaria opzionale (es. "usa il totale calcolato"), mostrata sopra il bottone di conferma. */
+  secondaryAction?: { label: string; onTap: () => void }
 }
 
 export function PriceKeypad({
@@ -31,6 +33,7 @@ export function PriceKeypad({
   initialQuantity = 1,
   lastPriceCents,
   onConfirm,
+  secondaryAction,
 }: PriceKeypadProps) {
   const { t } = useTranslation()
   const confirmText = confirmLabel ?? t('common.confirm')
@@ -124,6 +127,18 @@ export function PriceKeypad({
               </button>
             ))}
           </div>
+
+          {secondaryAction && (
+            <button
+              onClick={() => {
+                secondaryAction.onTap()
+                onClose()
+              }}
+              className="w-full bg-[#F2F2F0] text-[#2A2A2C] text-[15px] font-normal py-[14px] rounded-[20px] mb-[10px] active:scale-[.98] transition-transform"
+            >
+              {secondaryAction.label}
+            </button>
+          )}
 
           <button
             onClick={() => {

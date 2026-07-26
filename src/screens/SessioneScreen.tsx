@@ -23,6 +23,7 @@ export function SessioneScreen() {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const [showStorePicker, setShowStorePicker] = useState(false)
   const [editingPurchaseId, setEditingPurchaseId] = useState<number | null>(null)
+  const [showEditTotal, setShowEditTotal] = useState(false)
   const qc = useQueryClient()
 
   const { data: supermarkets = [] } = useSupermarkets()
@@ -96,6 +97,22 @@ export function SessioneScreen() {
     )
   }
 
+  const handleConfirmTotal = (cents: number) => {
+    if (!session) return
+    updateSession.mutate(
+      { id: sessionId, oldIsoWeek: session.isoWeek, patch: { confirmedTotalCents: cents } },
+      { onSuccess: () => toast(t('sessione.saved')) },
+    )
+  }
+
+  const handleResetTotal = () => {
+    if (!session) return
+    updateSession.mutate(
+      { id: sessionId, oldIsoWeek: session.isoWeek, patch: { confirmedTotalCents: null } },
+      { onSuccess: () => toast(t('sessione.saved')) },
+    )
+  }
+
   const dateInputValue = session
     ? (() => {
         const d = new Date(session.startedAt)
@@ -158,12 +175,25 @@ export function SessioneScreen() {
               className="absolute inset-0 opacity-0 cursor-pointer w-full"
             />
           </div>
-          <div className="flex items-baseline justify-center text-[#2A2A2C]">
-            <span className="text-[30px] font-normal text-[#B5B5BA] mr-1">€</span>
-            <span className="text-[64px] font-light tracking-[-1.5px] leading-[.95] tabular-nums">
-              {formatCentsPlain(totalCents)}
-            </span>
-          </div>
+          {isCompleted ? (
+            <button
+              onClick={() => setShowEditTotal(true)}
+              aria-label={t('sessione.editTotal')}
+              className="flex items-baseline justify-center text-[#2A2A2C] w-full active:opacity-50"
+            >
+              <span className="text-[30px] font-normal text-[#B5B5BA] mr-1">€</span>
+              <span className="text-[64px] font-light tracking-[-1.5px] leading-[.95] tabular-nums">
+                {formatCentsPlain(totalCents)}
+              </span>
+            </button>
+          ) : (
+            <div className="flex items-baseline justify-center text-[#2A2A2C]">
+              <span className="text-[30px] font-normal text-[#B5B5BA] mr-1">€</span>
+              <span className="text-[64px] font-light tracking-[-1.5px] leading-[.95] tabular-nums">
+                {formatCentsPlain(totalCents)}
+              </span>
+            </div>
+          )}
           {session && session.buoniSpent > 0 && (
             <div className="text-[13px] text-[#9B9B9F] mt-2 tabular-nums">
               {session.buoniSpent} {t('common.buoni')} · €{formatCentsPlain(session.buoniSpent * session.buoniValueCents)}
@@ -258,6 +288,20 @@ export function SessioneScreen() {
           },
         })
       }}
+    />
+
+    <PriceKeypad
+      open={showEditTotal}
+      onClose={() => setShowEditTotal(false)}
+      label={t('sessione.editTotal')}
+      confirmLabel={t('common.save')}
+      initialCents={totalCents}
+      secondaryAction={
+        session?.confirmedTotalCents !== null && session?.confirmedTotalCents !== undefined
+          ? { label: t('sessione.useComputedTotal', { amount: formatCentsPlain(computedCents) }), onTap: handleResetTotal }
+          : undefined
+      }
+      onConfirm={handleConfirmTotal}
     />
     </>
   )

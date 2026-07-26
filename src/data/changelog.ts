@@ -2,6 +2,10 @@ export type ChangelogEntry = { it: string[]; en: string[] }
 
 // Ordine: più recente in cima. Aggiungere una entry ad ogni nuova versione.
 export const changelog: Record<string, ChangelogEntry> = {
+  '0.22.0': {
+    it: ['Storico: modifica il totale di una spesa conclusa, con opzione per tornare al totale calcolato dagli articoli'],
+    en: ['History: edit the total of a completed shopping session, with an option to revert to the total calculated from items'],
+  },
   '0.21.1': {
     it: ['Fix: gli articoli non acquistati non vengono più cancellati dalla lista a fine spesa'],
     en: ['Fix: unpurchased items are no longer removed from the list when finishing a shopping trip'],
