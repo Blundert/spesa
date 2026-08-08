@@ -4,9 +4,10 @@ import { toast } from 'sonner'
 import { qk } from '../db/queryKeys'
 import {
   getMealPlan,
-  upsertMealPlan,
+  setMealSlotDish,
   clearMealPlan,
   getPlannedWeeks,
+  type MealSlotDish,
 } from '../db/repositories/mealPlan'
 import type { MealType } from '../db/types'
 import { getWeekStartDay } from '../lib/weekSettings'
@@ -25,18 +26,18 @@ export function usePlannedWeeks() {
   })
 }
 
-export function useUpdateMealSlot(isoWeek: string) {
+export function useSetMealSlotDish(isoWeek: string) {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: ({
       dayIndex,
       mealType,
-      dish,
+      value,
     }: {
       dayIndex: number
       mealType: MealType
-      dish: string
-    }) => upsertMealPlan(isoWeek, dayIndex, mealType, dish),
+      value: MealSlotDish | null
+    }) => setMealSlotDish(isoWeek, dayIndex, mealType, value),
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: qk.mealPlan(isoWeek) })
       void qc.invalidateQueries({ queryKey: qk.plannedWeeks() })

@@ -96,6 +96,13 @@ export interface MealPlan {
   /** 0=pranzo, 1=cena */
   mealType: MealType
   dish: string
+  /** Piatto del catalogo collegato. Assente nelle pianificazioni create prima di questa feature. */
+  dishId?: number
+  /**
+   * Ingredienti del piatto effettivamente necessari per questa occorrenza (sottoinsieme
+   * degli ingredienti del piatto). Presente solo se `dishId` è presente.
+   */
+  selectedItemIds?: number[]
 }
 
 /** Piatto del catalogo (deduplicato su normalizedName), riutilizzabile tra settimane diverse. */

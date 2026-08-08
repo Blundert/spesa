@@ -14,6 +14,12 @@ export interface MealPlanDay {
   cena: string
   pranzoId: number | undefined
   cenaId: number | undefined
+  /** Piatto del catalogo collegato (assente per pianificazioni pre-esistenti in formato testo libero). */
+  pranzoDishId: number | undefined
+  cenaDishId: number | undefined
+  /** Ingredienti selezionati per questa occorrenza (vuoto se pranzoDishId/cenaDishId assente). */
+  pranzoSelectedItemIds: number[]
+  cenaSelectedItemIds: number[]
 }
 
 /**
@@ -32,31 +38,47 @@ export async function getMealPlan(isoWeek: string, startDay: number = 0): Promis
       cena: cenaRow?.dish ?? '',
       pranzoId: pranzoRow?.id,
       cenaId: cenaRow?.id,
+      pranzoDishId: pranzoRow?.dishId,
+      cenaDishId: cenaRow?.dishId,
+      pranzoSelectedItemIds: pranzoRow?.selectedItemIds ?? [],
+      cenaSelectedItemIds: cenaRow?.selectedItemIds ?? [],
     }
   })
 
   return [...allDays.slice(startDay), ...allDays.slice(0, startDay)]
 }
 
-export async function upsertMealPlan(
+/** Piatto del catalogo assegnato a uno slot pasto, con gli ingredienti scelti per quella occorrenza. */
+export interface MealSlotDish {
+  dishId: number
+  name: string
+  selectedItemIds: number[]
+}
+
+/**
+ * Assegna (o rimuove, con `value = null`) il piatto di uno slot pasto.
+ */
+export async function setMealSlotDish(
   isoWeek: string,
   dayIndex: number,
   mealType: MealType,
-  dish: string,
+  value: MealSlotDish | null,
 ): Promise<void> {
   const existing = await db.mealPlans
     .where('[isoWeek+dayIndex+mealType]')
     .equals([isoWeek, dayIndex, mealType])
     .first()
 
+  if (value === null) {
+    if (existing?.id !== undefined) await db.mealPlans.delete(existing.id)
+    return
+  }
+
+  const patch = { dish: value.name, dishId: value.dishId, selectedItemIds: value.selectedItemIds }
   if (existing?.id !== undefined) {
-    if (dish.trim() === '') {
-      await db.mealPlans.delete(existing.id)
-    } else {
-      await db.mealPlans.update(existing.id, { dish: dish.trim() })
-    }
-  } else if (dish.trim() !== '') {
-    await db.mealPlans.add({ isoWeek, dayIndex, mealType, dish: dish.trim() })
+    await db.mealPlans.update(existing.id, patch)
+  } else {
+    await db.mealPlans.add({ isoWeek, dayIndex, mealType, ...patch })
   }
 }
 

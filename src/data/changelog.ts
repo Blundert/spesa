@@ -2,6 +2,10 @@ export type ChangelogEntry = { it: string[]; en: string[] }
 
 // Ordine: più recente in cima. Aggiungere una entry ad ogni nuova versione.
 export const changelog: Record<string, ChangelogEntry> = {
+  '0.25.0': {
+    it: ['Pianificazione pasti: tocca un pasto per scegliere un piatto salvato (o crearne uno al volo) e spuntare gli ingredienti che ti servono davvero'],
+    en: ['Meal planning: tap a meal to pick a saved dish (or create one on the fly) and check off the ingredients you actually need'],
+  },
   '0.24.0': {
     it: ['Nuova schermata "Piatti": salva i tuoi piatti con gli ingredienti necessari, per non doverli riscrivere ogni volta'],
     en: ['New "Dishes" screen: save your dishes with their ingredients, so you don\'t have to rewrite them every time'],

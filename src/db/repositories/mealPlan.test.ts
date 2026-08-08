@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import { db } from '../db'
-import { getMealPlan, upsertMealPlan, clearMealPlan, getPlannedWeeks } from './mealPlan'
+import { getMealPlan, setMealSlotDish, clearMealPlan, getPlannedWeeks } from './mealPlan'
 
 const WEEK = '2026-06-23'
 
@@ -56,28 +56,59 @@ describe('getMealPlan', () => {
     expect(days[5].dayIndex).toBe(0)
     expect(days[5].pranzo).toBe('Pasta')
   })
+
+  it('pranzoDishId/cenaDishId assenti e selectedItemIds vuoto per pianificazioni in formato legacy', async () => {
+    await db.mealPlans.add({ isoWeek: WEEK, dayIndex: 0, mealType: 0, dish: 'Pasta' })
+    const days = await getMealPlan(WEEK)
+    expect(days[0].pranzoDishId).toBeUndefined()
+    expect(days[0].pranzoSelectedItemIds).toEqual([])
+  })
+
+  it('espone dishId e selectedItemIds per pianificazioni collegate a un piatto', async () => {
+    await db.mealPlans.add({
+      isoWeek: WEEK,
+      dayIndex: 0,
+      mealType: 1,
+      dish: 'Pasta al pomodoro',
+      dishId: 7,
+      selectedItemIds: [1, 2],
+    })
+    const days = await getMealPlan(WEEK)
+    expect(days[0].cenaDishId).toBe(7)
+    expect(days[0].cenaSelectedItemIds).toEqual([1, 2])
+  })
 })
 
-describe('upsertMealPlan', () => {
-  it('aggiunge un nuovo pasto', async () => {
-    await upsertMealPlan(WEEK, 1, 0, 'Pizza')
+describe('setMealSlotDish', () => {
+  it('assegna un piatto a uno slot vuoto', async () => {
+    await setMealSlotDish(WEEK, 1, 0, { dishId: 5, name: 'Pizza', selectedItemIds: [1, 2] })
     const days = await getMealPlan(WEEK)
     expect(days[1].pranzo).toBe('Pizza')
+    expect(days[1].pranzoDishId).toBe(5)
+    expect(days[1].pranzoSelectedItemIds).toEqual([1, 2])
   })
 
-  it('aggiorna un pasto esistente', async () => {
-    await upsertMealPlan(WEEK, 1, 0, 'Pizza')
-    await upsertMealPlan(WEEK, 1, 0, 'Lasagne')
+  it('aggiorna uno slot già assegnato', async () => {
+    await setMealSlotDish(WEEK, 1, 0, { dishId: 5, name: 'Pizza', selectedItemIds: [1] })
+    await setMealSlotDish(WEEK, 1, 0, { dishId: 9, name: 'Lasagne', selectedItemIds: [3, 4] })
     const days = await getMealPlan(WEEK)
     expect(days[1].pranzo).toBe('Lasagne')
+    expect(days[1].pranzoDishId).toBe(9)
+    expect(days[1].pranzoSelectedItemIds).toEqual([3, 4])
   })
 
-  it('elimina il pasto se il piatto è stringa vuota', async () => {
-    await upsertMealPlan(WEEK, 1, 0, 'Pizza')
-    await upsertMealPlan(WEEK, 1, 0, '')
+  it('con value null rimuove lo slot', async () => {
+    await setMealSlotDish(WEEK, 1, 0, { dishId: 5, name: 'Pizza', selectedItemIds: [1] })
+    await setMealSlotDish(WEEK, 1, 0, null)
     const days = await getMealPlan(WEEK)
     expect(days[1].pranzo).toBe('')
     expect(days[1].pranzoId).toBeUndefined()
+  })
+
+  it('con value null su uno slot già vuoto non fa nulla', async () => {
+    await expect(setMealSlotDish(WEEK, 1, 0, null)).resolves.toBeUndefined()
+    const days = await getMealPlan(WEEK)
+    expect(days[1].pranzo).toBe('')
   })
 })
 
