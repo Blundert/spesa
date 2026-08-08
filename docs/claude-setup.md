@@ -60,3 +60,6 @@ condizionali).
 
 Per applicare la modifica in un terminale già aperto: `source ~/.bashrc`.
 Per i nuovi terminali/nuove sessioni bash prende effetto automaticamente.
+
+
+IS_SANDBOX=1  claude --dangerously-skip-permissions
