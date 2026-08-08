@@ -135,3 +135,11 @@ Nota: il service worker è attivo solo in build di produzione (`npm run build` +
 3. Tocca "Importa piatti e vai alla lista" → verifica di essere portato su Lista della spesa
 4. Verifica che l'ingrediente selezionato compaia con quantità 2 (una per ogni occorrenza pianificata) e il toast "2 ingredienti aggiunti alla lista"
 5. Torna su Pasti senza aver pianificato nulla di nuovo (o con nessun ingrediente selezionato) → tocca "Importa piatti e vai alla lista" → verifica che navighi comunque alla lista, senza toast e senza errori
+
+### Flusso 15 — Autocomplete in "Aggiungi fuori lista" (durante la spesa)
+1. Avvia una sessione di spesa, tocca "Aggiungi fuori lista"
+2. Digita parte del nome di un articolo già esistente nel catalogo (es. le prime lettere di "Latte") → verifica che compaiano suggerimenti con nome e categoria
+3. Tocca un suggerimento → verifica che si apra direttamente il tastierino prezzi (senza dover toccare "Continua") → conferma un prezzo
+4. Vai su Catalogo → verifica che l'articolo sia comparso nella categoria corretta (quella del suggerimento), non in "Altro"
+5. Torna su Spesa, tocca di nuovo "Aggiungi fuori lista", digita un nome che non corrisponde a nulla → verifica che non compaia alcun suggerimento, solo il bottone "Continua" → conferma un prezzo
+6. Vai su Catalogo → verifica che questo secondo articolo sia comparso sotto "Altro"

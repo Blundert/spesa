@@ -25,8 +25,15 @@ import {
   useAddToList,
 } from '../hooks/useListItems'
 import { useSupermarkets, useCategories, useItems } from '../hooks/useItems'
+import { normalizeName } from '../lib/normalize'
+import { BASE_ITEMS } from '../lib/baseItems'
 import { PriceKeypad } from '../components/PriceKeypad'
 import { BottomSheet } from '../components/BottomSheet'
+
+interface OffListSuggestion {
+  name: string
+  categoryId: number
+}
 
 const isoWeek = currentWeek()
 
@@ -43,7 +50,7 @@ export function SpesaScreen() {
     quantity?: number
     lastPriceCents?: number | null
   } | null>(null)
-  const [newItemTarget, setNewItemTarget] = useState<{ name: string } | null>(null)
+  const [newItemTarget, setNewItemTarget] = useState<{ name: string; categoryId?: number } | null>(null)
   const [showStorePicker, setShowStorePicker] = useState(false)
   const [showNewItem, setShowNewItem] = useState(false)
   const [showCard, setShowCard] = useState(false)
@@ -60,6 +67,33 @@ export function SpesaScreen() {
   const catMap = Object.fromEntries(categories.map((c) => [c.id ?? 0, categoryLabel(t, c.sortOrder, c.name)]))
   const itemNameMap = Object.fromEntries(items.map((it) => [it.id ?? 0, it.name]))
   const itemLastPriceMap = Object.fromEntries(items.map((it) => [it.id ?? 0, it.lastPriceCents]))
+
+  const altroCategoryId = categories.find((c) => c.name === 'Altro')?.id ?? 0
+
+  // Pool autocomplete per "Aggiungi fuori lista": articoli base predefiniti + già usati,
+  // stesso pattern di ListaScreen.
+  const catIdByName = new Map(categories.map((c) => [c.name, c.id ?? 0]))
+  const offListPool = new Map<string, OffListSuggestion>()
+  for (const b of BASE_ITEMS) {
+    offListPool.set(normalizeName(b.name), { name: b.name, categoryId: catIdByName.get(b.category) ?? altroCategoryId })
+  }
+  for (const it of items) {
+    offListPool.set(normalizeName(it.name), { name: it.name, categoryId: it.categoryId })
+  }
+  const offListQuery = normalizeName(newItemName)
+  const offListMatches: OffListSuggestion[] = offListQuery
+    ? Array.from(offListPool.values())
+        .filter((p) => normalizeName(p.name).includes(offListQuery))
+        .sort((a, b) => {
+          const an = normalizeName(a.name)
+          const bn = normalizeName(b.name)
+          const aStarts = an.startsWith(offListQuery) ? 0 : 1
+          const bStarts = bn.startsWith(offListQuery) ? 0 : 1
+          if (aStarts !== bStarts) return aStarts - bStarts
+          return an.localeCompare(bn)
+        })
+        .slice(0, 8)
+    : []
 
   // Usa la sessione più recente non finita, o quella attiva manualmente
   const activeSession =
@@ -129,12 +163,23 @@ export function SpesaScreen() {
         }
         setPriceTarget(null)
       } else if (newItemTarget) {
-        // Item fuori lista: nome già inserito
-        const { upsertItem } = await import('../db/repositories/items')
+        // Item fuori lista: nome (ed eventuale categoria, se scelto da un suggerimento) già inseriti.
+        // Se la categoria non è già nota (nessun suggerimento toccato), la si ricava da un eventuale
+        // match esatto (Item esistente o articolo base), altrimenti "Altro" — stesso comportamento di
+        // ListaScreen. Dati letti freschi (non dalla closure) per restare coerenti col resto della funzione.
+        const { upsertItem, getItems } = await import('../db/repositories/items')
         const { getCategories } = await import('../db/repositories/categories')
-        const categories = await getCategories()
-        const altroCategory = categories.find((c) => c.name === 'Altro')
-        const itemId = await upsertItem(newItemTarget.name, altroCategory?.id ?? 0, cents)
+        let categoryId = newItemTarget.categoryId
+        if (categoryId === undefined) {
+          const [cats, allItems] = await Promise.all([getCategories(), getItems()])
+          const catIdByName = new Map(cats.map((c) => [c.name, c.id ?? 0]))
+          const altroId = catIdByName.get('Altro') ?? 0
+          const normalized = normalizeName(newItemTarget.name)
+          const existingItem = allItems.find((it) => normalizeName(it.name) === normalized)
+          const baseMatch = BASE_ITEMS.find((b) => normalizeName(b.name) === normalized)
+          categoryId = existingItem?.categoryId ?? (baseMatch ? catIdByName.get(baseMatch.category) ?? altroId : altroId)
+        }
+        const itemId = await upsertItem(newItemTarget.name, categoryId, cents)
         await addPurchase.mutateAsync({ sessionId: activeSession.id, itemId, priceCents: cents, quantity })
         toast(t('spesa.itemAdded', { name: newItemTarget.name }), {
           description: `€${formatCentsPlain(cents)}`,
@@ -462,13 +507,30 @@ export function SpesaScreen() {
             }
           }}
         />
+        {offListMatches.length > 0 && (
+          <div className="bg-[#F6F6F4] rounded-[14px] overflow-hidden mb-3 divide-y divide-[#ECECEC]">
+            {offListMatches.map((p) => (
+              <button
+                key={p.name}
+                onClick={() => {
+                  setNewItemTarget({ name: p.name, categoryId: p.categoryId })
+                  setShowNewItem(false)
+                }}
+                className="w-full flex items-center justify-between px-4 py-[11px] text-left active:bg-[#ECECEC]"
+              >
+                <span className="text-[15px] text-[#2A2A2C]">{p.name}</span>
+                <span className="text-[12px] text-[#9B9B9F]">{catMap[p.categoryId] ?? t('categories.5')}</span>
+              </button>
+            ))}
+          </div>
+        )}
         <button
           onClick={() => {
             if (!newItemName.trim()) return
             setNewItemTarget({ name: newItemName.trim() })
             setShowNewItem(false)
           }}
-          className="mt-3 w-full bg-[#2A2A2C] text-white text-[17px] py-[18px] rounded-[20px] active:scale-[.98] transition-transform"
+          className="mt-1 w-full bg-[#2A2A2C] text-white text-[17px] py-[18px] rounded-[20px] active:scale-[.98] transition-transform"
         >
           {t('spesa.continue')}
         </button>
