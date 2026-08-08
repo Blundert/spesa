@@ -31,7 +31,7 @@ export function ListaScreen() {
   const updateListQuantity = useUpdateListQuantity()
 
   // Build category map id → name
-  const catMap = Object.fromEntries(categories.map((c) => [c.id ?? 0, categoryLabel(t, c.sortOrder, c.name)]))
+  const catMap = Object.fromEntries(categories.map((c) => [c.id ?? 0, categoryLabel(t, c.name)]))
 
   // Group by category
   const grouped = categories
@@ -204,7 +204,7 @@ export function ListaScreen() {
       {grouped.map(({ cat, items: catItems }) => (
         <div key={cat.id} className="mb-[18px]">
           <div className="text-[12px] font-normal tracking-[1.2px] text-[#9B9B9F] uppercase px-1.5 pb-[13px]">
-            {categoryLabel(t, cat.sortOrder, cat.name)}
+            {categoryLabel(t, cat.name)}
           </div>
           <div className="bg-white rounded-[20px] overflow-hidden">
             {catItems.map((li, i) => (

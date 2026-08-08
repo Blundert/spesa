@@ -2,6 +2,10 @@ export type ChangelogEntry = { it: string[]; en: string[] }
 
 // Ordine: più recente in cima. Aggiungere una entry ad ogni nuova versione.
 export const changelog: Record<string, ChangelogEntry> = {
+  '0.28.1': {
+    it: ['Fix: rinominare una categoria si riflette ora ovunque (prima la Lista e le Statistiche ignoravano la rinomina per le categorie predefinite come Frigo o Dispensa)'],
+    en: ['Fix: renaming a category is now reflected everywhere (previously the List and Statistics screens ignored renames for built-in categories like Fridge or Pantry)'],
+  },
   '0.28.0': {
     it: ['Statistiche: il range personalizzato ora è un vero intervallo di date (da / a), con scorciatoia "Mese corrente"'],
     en: ['Statistics: the custom range is now a real date interval (from / to), with a "Current month" shortcut'],

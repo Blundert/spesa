@@ -1,7 +1,7 @@
 {
   "suite": "smoke",
-  "date": "2026-06-28",
-  "appVersion": "0.20.4",
+  "date": "2026-08-08",
+  "appVersion": "0.28.1",
   "results": [
     {
       "flow": "Flusso 1 — Onboarding prima apertura",
@@ -11,47 +11,82 @@
     {
       "flow": "Flusso 2 — Aggiunta articolo alla lista",
       "status": "PASS",
-      "notes": "'Latte' aggiunto correttamente, appare sotto la categoria Frigo; chip rapide visibili"
+      "notes": "'Latte' aggiunto correttamente sotto Frigo; chip rapide predefinite visibili alla prima apertura; dopo una sessione completata 'Latte' passa in cima alle chip e compare nel template 'spesa solita'"
     },
     {
       "flow": "Flusso 3 — Avvia sessione di spesa e aggiungi articolo al carrello",
       "status": "PASS",
-      "notes": "Supermercato selezionato e sessione avviata; Latte in 'Da prendere'; tastierino aperto; €1,50 inserito; Latte spostato in 'Nel carrello'"
+      "notes": "Supermercato creato/selezionato, sessione avviata, 'Latte' in 'Da prendere', tastierino aperto, €1,50 confermato, spostato in 'Nel carrello'"
     },
     {
       "flow": "Flusso 4 — Persistenza dopo reload",
       "status": "PASS",
-      "notes": "'Latte' persiste nella lista dopo reload con prezzo stimato derivato dall'acquisto precedente"
+      "notes": "'Latte' persiste dopo navigazione con prezzo stimato €1,50 derivato dall'acquisto"
     },
     {
       "flow": "Flusso 5 — Giorno di inizio settimana",
       "status": "PASS",
-      "notes": "'Lun' default confermato; 'Sab' selezionato; toast 'Impostazione salvata'; floating bar aggiornata a sabato–venerdì; persistenza verificata dopo reload"
+      "notes": "'Lun' selezionato di default (verificato via presenza icona spunta); 'Sab' selezionato, floating bar aggiornata a 'Sab–Ven' (8–14 ago), persistenza confermata dopo reload. OSSERVAZIONE: il widget budget 'La mia settimana'/pill in AppShell non ri-bucketizza le sessioni già salvate quando si cambia il giorno di inizio settimana nella stessa sessione browser (mostra €0,00 finché non si ricarica con la nuova impostazione già attiva) — comportamento pre-esistente, non introdotto in questa sessione di lavoro, non bloccante per il flusso testato"
     },
     {
-      "flow": "Flusso 6 — Pianificazione inizia dal giorno configurato",
-      "status": "PASS",
-      "notes": "Impostato 'Mer': primo giorno Pasti = MER, ultimo = MAR; reimpostato 'Lun': Pasti tornano a LUN→DOM"
-    },
-    {
-      "flow": "Flusso 7 — Eliminazione settimana dallo storico",
+      "flow": "Flusso 6 — Eliminazione settimana dallo storico",
       "status": "PASS",
       "notes": "Cestino apre BottomSheet; 'Annulla' chiude senza eliminare; 'Elimina settimana' rimuove la settimana con toast 'Settimana eliminata'"
     },
     {
-      "flow": "Flusso 8 — Modifiche nel Catalogo si riflettono subito nella Lista",
+      "flow": "Flusso 7 — Modifiche nel Catalogo si riflettono subito nella Lista",
       "status": "PASS",
-      "notes": "Sposta categoria (Frigo→Dispensa) ✓; rinomina articolo (Latte→Latte Fresco) ✓; rinomina categoria (Dispensa→Dispensa 2) ✓; elimina articolo ✓. Il selettore ha richiesto la forma esatta 'button[aria-label=\"Rinomina articolo\"]' per evitare di colpire 'Rinomina categoria'"
+      "notes": "Sposta categoria (Frigo→Dispensa) OK; rinomina articolo (Latte→Latte Fresco) OK e si riflette in Lista; elimina articolo OK (scompare da Lista); rinomina categoria seed (Frigo→'Frigo 2') OK, verificato riflesso subito in Lista E nelle Statistiche (sezione 'Per categoria'). FIX applicato in questa sessione (v0.28.1): categoryLabel() in src/i18n/index.ts ignorava il campo name per le 6 categorie seed (sortOrder 0-5) mostrando sempre la traduzione i18n fissa; ora usa sempre il nome reale, coerente con CatalogoScreen. Era PARZIALE/FAIL nel run precedente (vedi screenshot storico smoke-08-FAIL-lista-non-mostra-dispensa2.png), ora risolto"
     },
     {
-      "flow": "Flusso 9 — Modifica sessione di spesa dallo storico",
+      "flow": "Flusso 8 — Pianificazione inizia dal giorno configurato",
       "status": "PASS",
-      "notes": "Modifica supermercato (Coop→Lidl): toast 'Modifiche salvate' ✓; modifica prezzo (€2,50→€3,00): toast ✓; modifica data (28→27 giu stessa settimana): toast ✓; sessione abbandonata: badge 'Non completata' in Storico ✓, scritta sotto supermercato in dettaglio ✓, 'Concludi spesa' apre tastierino precompilato ✓, conferma → toast 'Spesa salvata' e badge sparito ✓"
+      "notes": "Impostato 'Mer': primo giorno Pasti = MER, ultimo = MAR; reimpostato 'Lun': Pasti tornano a LUN→DOM"
     },
     {
-      "flow": "Flusso 10 — Grafico andamento Statistiche",
+      "flow": "Flusso 9 — Grafico andamento Statistiche e selettore range",
       "status": "PASS",
-      "notes": "Sezione 'ANDAMENTO (12 SETTIMANE)' visibile; 12 date in formato G/M (6/4…22/6) ✓; barra settimana con spesa mostra importo sopra (€3 per sessione €2,50, arrotondamento display) ✓; settimane vuote senza etichetta ✓"
+      "notes": "Chip 7/30/6 mesi/Tutto/Personalizzato visibili, '30 giorni' default evidenziata in nero; grafico Andamento con barra su settimana con spesa (arrotondamento a €1 per €0,60, comportamento noto/documentato); switch tra 'Tutto' e preset funzionante"
+    },
+    {
+      "flow": "Flusso 10 — Statistiche: range di date personalizzato e \"Mese corrente\"",
+      "status": "PASS",
+      "notes": "Sheet 'Intervallo personalizzato' con bottone 'Mese corrente' e campi Da/A precompilati a oggi; 'Mese corrente' applica subito (1 ago–8 ago) e chiude lo sheet; persistenza dopo reload confermata; range manuale su mese interamente passato (giugno) applicato via 'Applica', grafico Andamento fermo alla settimana del campo 'A' (non estende a oggi); tornando a un preset la chip 'Personalizzato' mostra di nuovo l'etichetta generica"
+    },
+    {
+      "flow": "Flusso 11 — Modifica sessione di spesa dallo storico",
+      "status": "PASS",
+      "notes": "Modifica data (8→7 ago, stessa settimana) OK; modifica supermercato (Lidl→Coop) OK con header aggiornato; modifica prezzo/quantità (×2, totale ricalcolato a €0,60) OK; sessione non completata → badge 'Non completata', 'Concludi spesa' con totale precompilato, dopo conferma badge sparisce e toast 'Spesa salvata'; modifica totale manuale (€0,60→€5,00) persistita dopo reload, totale non tappabile prima della conclusione; reset al totale calcolato via bottone secondario 'Usa il totale calcolato (€0,60)' OK, bottone non ricompare finché non si modifica di nuovo"
+    },
+    {
+      "flow": "Flusso 12 — Fine spesa non svuota gli articoli non acquistati",
+      "status": "PASS",
+      "notes": "Con 'Latte' e 'Pane' in lista, acquistato solo 'Latte' e conclusa la spesa: 'Pane' resta in Lista, 'Latte' sparisce (acquistato)"
+    },
+    {
+      "flow": "Flusso 13 — Aggiornamento automatico app + notifica versione",
+      "status": "PARZIALE",
+      "notes": "Non testato su indicazione esplicita dell'utente ('ok no testare'). Il flusso richiederebbe comunque build di produzione (npm run build + preview), un vero evento di background/foreground del browser e un secondo bump di versione + rebuild — non riproducibile in modo affidabile con automazione headless Playwright. Non impattato da nessuna delle modifiche di questa sessione."
+    },
+    {
+      "flow": "Flusso 14 — Catalogo piatti",
+      "status": "PASS",
+      "notes": "Stato vuoto mostrato correttamente; creazione piatto con ingrediente da suggerimento + ingrediente nuovo (creato ed effettivamente comparso nel Catalogo Item); modifica con rimozione ingrediente e conteggio aggiornato; eliminazione con conferma e toast 'Piatto eliminato'"
+    },
+    {
+      "flow": "Flusso 15 — Pianificazione pasti: piatto dal catalogo + checklist ingredienti",
+      "status": "PASS",
+      "notes": "Sheet 'Lunedì · Pranzo'; creazione piatto al volo con ingrediente via builder; slot aggiornato con nome piatto; piatto presente nel Catalogo Piatti; checklist con ingrediente spuntato di default; deselezione persistita dopo reload; 'Cambia piatto' svuota la ricerca e riselezionando un piatto esistente la checklist torna tutta spuntata; 'Rimuovi piatto' riporta lo slot a '—' lasciando il piatto nel catalogo"
+    },
+    {
+      "flow": "Flusso 16 — Import ingredienti pianificati nella lista della spesa",
+      "status": "PASS",
+      "notes": "Stesso piatto/ingrediente pianificato su 2 pasti diversi → 'Importa piatti e vai alla lista' naviga a Lista con l'ingrediente a quantità 2 (merge duplicati); con zero ingredienti selezionati nella settimana, il bottone naviga comunque senza errori né effetti sulla lista esistente"
+    },
+    {
+      "flow": "Flusso 17 — Autocomplete in \"Aggiungi fuori lista\" (durante la spesa)",
+      "status": "PASS",
+      "notes": "Suggerimenti con nome+categoria mostrati durante la digitazione; selezione di un suggerimento salta direttamente al tastierino prezzi; articolo creato con la categoria del suggerimento (non 'Altro'); testo senza match non mostra suggerimenti, solo 'Continua'; articolo creato da testo libero finisce in 'Altro'"
     }
   ]
 }

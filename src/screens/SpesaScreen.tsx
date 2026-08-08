@@ -64,7 +64,7 @@ export function SpesaScreen() {
   const { data: listItems = [] } = useListItems()
   const { data: categories = [] } = useCategories()
   const { data: items = [] } = useItems()
-  const catMap = Object.fromEntries(categories.map((c) => [c.id ?? 0, categoryLabel(t, c.sortOrder, c.name)]))
+  const catMap = Object.fromEntries(categories.map((c) => [c.id ?? 0, categoryLabel(t, c.name)]))
   const itemNameMap = Object.fromEntries(items.map((it) => [it.id ?? 0, it.name]))
   const itemLastPriceMap = Object.fromEntries(items.map((it) => [it.id ?? 0, it.lastPriceCents]))
 

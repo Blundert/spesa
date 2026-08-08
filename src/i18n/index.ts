@@ -20,11 +20,8 @@ void i18n.use(initReactI18next).init({
   interpolation: { escapeValue: false },
 })
 
-/** Etichetta di una categoria: tradotta per le seed (sortOrder 0–5), nome DB per le custom. */
-export function categoryLabel(t: TFunction, sortOrder: number, name?: string): string {
-  if (sortOrder >= 0 && sortOrder <= 5) {
-    return t(`categories.${sortOrder}` as 'categories.0')
-  }
+/** Etichetta di una categoria: sempre il nome DB, così una rinomina si riflette ovunque. */
+export function categoryLabel(t: TFunction, name?: string): string {
   return name ?? t('categories.5')
 }
 

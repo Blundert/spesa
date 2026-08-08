@@ -34,7 +34,7 @@ export function StatisticheScreen() {
   const { data: categories = [] } = useCategories()
 
   const catLabelMap = Object.fromEntries(
-    categories.map((c) => [c.name, categoryLabel(t, c.sortOrder, c.name)]),
+    categories.map((c) => [c.name, categoryLabel(t, c.name)]),
   )
 
   function handleRangeSelect(r: StatsRange) {
