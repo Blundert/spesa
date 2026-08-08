@@ -214,6 +214,7 @@ function MenuSheet({
     { to: '/storico', label: t('nav.history') },
     { to: '/supermercati', label: t('nav.supermarkets') },
     { to: '/catalogo', label: t('nav.catalog') },
+    { to: '/piatti', label: t('nav.dishes') },
     { to: '/statistiche', label: t('nav.statistics') },
     { to: '/impostazioni', label: t('nav.settings') },
   ]

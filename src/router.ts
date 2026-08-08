@@ -14,6 +14,7 @@ import { SessioneScreen } from './screens/SessioneScreen'
 import { ItemDetailScreen } from './screens/ItemDetailScreen'
 import { ChangelogScreen } from './screens/ChangelogScreen'
 import { CatalogoScreen } from './screens/CatalogoScreen'
+import { PiattiScreen } from './screens/PiattiScreen'
 import { StatisticheScreen } from './screens/StatisticheScreen'
 
 const rootRoute = createRootRoute({ component: Outlet })
@@ -68,6 +69,12 @@ const statisticheRoute = createRoute({
   component: StatisticheScreen,
 })
 
+const piattiRoute = createRoute({
+  getParentRoute: () => shellRoute,
+  path: '/piatti',
+  component: PiattiScreen,
+})
+
 // Standalone routes (no shell nav)
 const spesaRoute = createRoute({
   getParentRoute: () => rootRoute,
@@ -118,7 +125,16 @@ const changelogRoute = createRoute({
 })
 
 const routeTree = rootRoute.addChildren([
-  shellRoute.addChildren([homeRoute, listaRoute, storicoRoute, supermercatiRoute, cataloRoute, statisticheRoute, impostazioniRoute]),
+  shellRoute.addChildren([
+    homeRoute,
+    listaRoute,
+    storicoRoute,
+    supermercatiRoute,
+    cataloRoute,
+    piattiRoute,
+    statisticheRoute,
+    impostazioniRoute,
+  ]),
   spesaRoute,
   pastiRoute,
   pianificazioniRoute,

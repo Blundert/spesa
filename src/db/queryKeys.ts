@@ -34,4 +34,7 @@ export const qk = {
   plannedWeeks: () => ['plannedWeeks'] as const,
 
   stats: () => ['stats'] as const,
+
+  /** Catalogo piatti (con ingredienti). */
+  dishes: () => ['dishes'] as const,
 } as const

@@ -62,6 +62,18 @@ export async function setDishIngredients(dishId: number, itemIds: number[]): Pro
   })
 }
 
+/**
+ * Crea o aggiorna un piatto (nome + ingredienti) in un'unica operazione.
+ * Senza `id`: crea un nuovo piatto (o riusa quello esistente con lo stesso nome, via `upsertDish`).
+ * Con `id`: rinomina il piatto esistente e sostituisce i suoi ingredienti.
+ */
+export async function saveDish(id: number | undefined, name: string, itemIds: number[]): Promise<number> {
+  const dishId = id !== undefined ? id : await upsertDish(name)
+  if (id !== undefined) await renameDish(id, name)
+  await setDishIngredients(dishId, itemIds)
+  return dishId
+}
+
 /** Tutti i piatti con i rispettivi ingredienti (volumi piccoli: riduzione in JS). */
 export async function getDishesWithIngredients(): Promise<DishWithIngredients[]> {
   const dishes = await db.dishes.toArray()

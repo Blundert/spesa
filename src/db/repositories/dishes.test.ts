@@ -10,6 +10,7 @@ import {
   getDishIngredients,
   setDishIngredients,
   getDishesWithIngredients,
+  saveDish,
 } from './dishes'
 
 async function clearAll() {
@@ -142,6 +143,36 @@ describe('deleteDish', () => {
     await deleteDish(dish1)
     const remaining = await getDishIngredients(dish2)
     expect(remaining.map((i) => i.name)).toEqual(['Farina'])
+  })
+})
+
+describe('saveDish', () => {
+  it('senza id: crea un nuovo piatto con i suoi ingredienti', async () => {
+    await seedItems()
+    const dishId = await saveDish(undefined, 'Pasta', [1, 2])
+    const dish = await getDishById(dishId)
+    expect(dish?.name).toBe('Pasta')
+    const ingredients = await getDishIngredients(dishId)
+    expect(ingredients.map((i) => i.name).sort()).toEqual(['Farina', 'Uova'])
+  })
+
+  it('senza id: riusa un piatto esistente con lo stesso nome', async () => {
+    await seedItems()
+    const first = await saveDish(undefined, 'Pasta', [1])
+    const second = await saveDish(undefined, 'pasta', [2])
+    expect(second).toBe(first)
+    expect(await db.dishes.count()).toBe(1)
+  })
+
+  it('con id: rinomina il piatto e sostituisce gli ingredienti', async () => {
+    await seedItems()
+    const dishId = await saveDish(undefined, 'Pasta', [1])
+    const result = await saveDish(dishId, 'Pasta al forno', [2])
+    expect(result).toBe(dishId)
+    const dish = await getDishById(dishId)
+    expect(dish?.name).toBe('Pasta al forno')
+    const ingredients = await getDishIngredients(dishId)
+    expect(ingredients.map((i) => i.name)).toEqual(['Farina'])
   })
 })
 

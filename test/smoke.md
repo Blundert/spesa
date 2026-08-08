@@ -104,3 +104,16 @@ Nota: il service worker è attivo solo in build di produzione (`npm run build` +
 7. Tocca il toast: verifica che navighi alla schermata Changelog
 8. Ricarica di nuovo la pagina: verifica che il toast non ricompaia (stessa versione già vista)
 9. In Impostazioni, verifica che il bottone "Aggiorna app" sia ancora presente e funzioni come prima (reset forzato SW + cache + reload)
+
+### Flusso 12 — Catalogo piatti
+1. Dal menu principale, apri "Piatti"
+2. Verifica il messaggio "Nessun piatto salvato." se non ce ne sono ancora
+3. Tocca "Aggiungi piatto" → si apre un bottom sheet "Nuovo piatto"
+4. Scrivi il nome del piatto (es. "Pasta al pomodoro")
+5. Nel campo ingredienti digita parte del nome di un articolo esistente (es. "Pomodor") → verifica che compaiano suggerimenti dal catalogo
+6. Tocca un suggerimento → verifica che diventi una chip rimovibile sotto il campo
+7. Digita il nome di un articolo che non esiste ancora → verifica il bottone "Aggiungi “…”" → toccalo → verifica che diventi comunque una chip (e che l'articolo compaia poi anche nel Catalogo)
+8. Tocca "Salva" → verifica che il piatto appaia nell'elenco con il conteggio ingredienti corretto
+9. Tocca l'icona di modifica → verifica che nome e ingredienti siano precompilati; rimuovi un ingrediente toccando la sua chip → salva → verifica che il conteggio si aggiorni
+10. Tocca l'icona cestino → conferma "Elimina piatto" nel bottom sheet → verifica che il piatto scompaia e appaia il toast "Piatto eliminato"
+11. Ricarica la pagina → verifica che i piatti salvati persistano
