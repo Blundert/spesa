@@ -51,6 +51,7 @@ export async function getStats(
   currentWeekKey: string,
   weekStartDay: number,
   fromTs: number | null,
+  toTs: number | null,
 ): Promise<StatsResult> {
   const [sessions, purchases, items, categories, supermarkets] = await Promise.all([
     db.sessions.toArray(),
@@ -61,7 +62,10 @@ export async function getStats(
   ])
 
   const finishedSessions = sessions.filter(
-    (s) => s.finishedAt !== null && (fromTs === null || s.startedAt >= fromTs),
+    (s) =>
+      s.finishedAt !== null &&
+      (fromTs === null || s.startedAt >= fromTs) &&
+      (toTs === null || s.startedAt <= toTs),
   )
   const sessionCount = finishedSessions.length
 
@@ -97,18 +101,21 @@ export async function getStats(
   const topSupermarketName =
     topSupermarketId !== null ? (supermarkets.find((s) => s.id === topSupermarketId)?.name ?? null) : null
 
-  // Totali settimanali: griglia dalla settimana di fromTs (o dalla più vecchia con sessioni) a quella corrente
+  // Totali settimanali: griglia dalla settimana di fromTs (o dalla più vecchia con sessioni) a quella
+  // di toTs (o quella corrente, se il range è aperto in avanti).
   const weeklyMap = new Map<string, number>()
   for (const { session, totalCents } of sessionTotals) {
     const key = sessionWeekKey(session.startedAt, weekStartDay)
     weeklyMap.set(key, (weeklyMap.get(key) ?? 0) + totalCents)
   }
 
+  const lastWeekKey = toTs !== null ? sessionWeekKey(toTs, weekStartDay) : currentWeekKey
+
   let firstWeekKey: string
   if (fromTs !== null) {
     firstWeekKey = sessionWeekKey(fromTs, weekStartDay)
   } else if (finishedSessions.length === 0) {
-    firstWeekKey = currentWeekKey
+    firstWeekKey = lastWeekKey
   } else {
     const earliestTs = finishedSessions.reduce((min, s) => Math.min(min, s.startedAt), Infinity)
     firstWeekKey = sessionWeekKey(earliestTs, weekStartDay)
@@ -116,11 +123,11 @@ export async function getStats(
 
   const weeklyTotals: WeeklyTotal[] = []
   let wk = firstWeekKey
-  while (wk <= currentWeekKey) {
+  while (wk <= lastWeekKey) {
     weeklyTotals.push({ weekKey: wk, totalCents: weeklyMap.get(wk) ?? 0 })
     wk = shiftWeekKey(wk, 1)
   }
-  if (weeklyTotals.length === 0) weeklyTotals.push({ weekKey: currentWeekKey, totalCents: 0 })
+  if (weeklyTotals.length === 0) weeklyTotals.push({ weekKey: lastWeekKey, totalCents: 0 })
 
   // Top 5 articoli per acquisti nelle sessioni filtrate
   const filteredSessionIds = new Set(finishedSessions.map((s) => s.id!))

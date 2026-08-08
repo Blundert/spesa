@@ -1,16 +1,20 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { formatCentsPlain } from '../lib/money'
+import { formatShortDate } from '../lib/date'
 import { categoryLabel } from '../i18n'
 import { useCategories } from '../hooks/useItems'
 import { useStats } from '../hooks/useStats'
 import {
   type StatsRange,
+  type CustomDateRange,
   getStatsRange,
   setStatsRange,
-  getCustomDays,
-  setCustomDays,
-  rangeToFromTs,
+  getCustomDateRange,
+  setCustomDateRange,
+  currentMonthDateRange,
+  todayDateString,
+  rangeToTimestamps,
 } from '../lib/statsRange'
 import { BottomSheet } from '../components/BottomSheet'
 
@@ -20,12 +24,13 @@ export function StatisticheScreen() {
   const { t } = useTranslation()
 
   const [range, setRangeState] = useState<StatsRange>(() => getStatsRange())
-  const [customDays, setCustomDaysState] = useState<number>(() => getCustomDays())
+  const [customRange, setCustomRangeState] = useState<CustomDateRange>(() => getCustomDateRange())
   const [customOpen, setCustomOpen] = useState(false)
-  const [customInput, setCustomInput] = useState<string>('')
+  const [draftFrom, setDraftFrom] = useState('')
+  const [draftTo, setDraftTo] = useState('')
 
-  const fromTs = rangeToFromTs(range, customDays)
-  const { data: stats, isLoading } = useStats(fromTs)
+  const { fromTs, toTs } = rangeToTimestamps(range, customRange)
+  const { data: stats, isLoading } = useStats(fromTs, toTs)
   const { data: categories = [] } = useCategories()
 
   const catLabelMap = Object.fromEntries(
@@ -34,7 +39,8 @@ export function StatisticheScreen() {
 
   function handleRangeSelect(r: StatsRange) {
     if (r === 'custom') {
-      setCustomInput(String(customDays))
+      setDraftFrom(customRange.from)
+      setDraftTo(customRange.to)
       setCustomOpen(true)
     } else {
       setStatsRange(r)
@@ -42,19 +48,27 @@ export function StatisticheScreen() {
     }
   }
 
-  function handleCustomApply() {
-    const n = parseInt(customInput, 10)
-    if (!Number.isFinite(n) || n <= 0) return
-    setCustomDays(n)
-    setCustomDaysState(n)
+  function applyCustomRange(next: CustomDateRange) {
+    setCustomDateRange(next)
+    setCustomRangeState(next)
     setStatsRange('custom')
     setRangeState('custom')
     setCustomOpen(false)
   }
 
+  function handleCurrentMonth() {
+    applyCustomRange(currentMonthDateRange())
+  }
+
+  function handleCustomApply() {
+    if (!draftFrom || !draftTo || draftFrom > draftTo) return
+    applyCustomRange({ from: draftFrom, to: draftTo })
+  }
+
   function rangeLabel(r: StatsRange): string {
-    if (r === 'custom') return t('statistiche.range.customLabel', { n: customDays })
-    return t(`statistiche.range.${r}`)
+    if (r !== 'custom') return t(`statistiche.range.${r}`)
+    if (range !== 'custom' || fromTs === null || toTs === null) return t('statistiche.range.customLabel')
+    return `${formatShortDate(fromTs)} – ${formatShortDate(toTs)}`
   }
 
   if (isLoading) {
@@ -98,9 +112,7 @@ export function StatisticheScreen() {
               color: range === 'custom' ? '#fff' : '#9B9B9F',
             }}
           >
-            {range === 'custom'
-              ? t('statistiche.range.customLabel', { n: customDays })
-              : t('statistiche.range.customLabel', { n: '?' })}
+            {rangeLabel('custom')}
           </button>
         </div>
       </div>
@@ -174,26 +186,48 @@ export function StatisticheScreen() {
         </>
       )}
 
-      {/* Bottom sheet giorni personalizzati */}
+      {/* Bottom sheet range di date personalizzato */}
       <BottomSheet open={customOpen} onClose={() => setCustomOpen(false)}>
         <div className="text-[20px] font-normal text-[#2A2A2C] px-0.5 pb-[14px]">
           {t('statistiche.range.customTitle')}
         </div>
-        <div className="bg-[#F6F6F4] rounded-[16px] px-4 py-[14px] mb-4">
-          <input
-            type="number"
-            min={1}
-            value={customInput}
-            onChange={(e) => setCustomInput(e.target.value)}
-            onPointerDown={(e) => e.stopPropagation()}
-            data-vaul-no-drag
-            className="w-full bg-transparent text-[16px] text-[#2A2A2C] outline-none tabular-nums"
-            placeholder="30"
-          />
+        <button
+          onClick={handleCurrentMonth}
+          className="w-full mb-4 py-[13px] rounded-[14px] text-[15px] font-normal text-[#2A2A2C] bg-[#F6F6F4] active:bg-[#ECECEC]"
+        >
+          {t('statistiche.range.currentMonth')}
+        </button>
+        <div className="flex items-center gap-3 mb-4">
+          <div className="flex-1">
+            <div className="text-[11px] text-[#9B9B9F] mb-1 px-0.5">{t('statistiche.range.from')}</div>
+            <input
+              type="date"
+              value={draftFrom}
+              max={draftTo || todayDateString()}
+              onChange={(e) => setDraftFrom(e.target.value)}
+              onPointerDown={(e) => e.stopPropagation()}
+              data-vaul-no-drag
+              className="w-full bg-[#F6F6F4] rounded-[12px] px-3 py-[10px] text-[15px] text-[#2A2A2C] outline-none"
+            />
+          </div>
+          <div className="flex-1">
+            <div className="text-[11px] text-[#9B9B9F] mb-1 px-0.5">{t('statistiche.range.to')}</div>
+            <input
+              type="date"
+              value={draftTo}
+              min={draftFrom}
+              max={todayDateString()}
+              onChange={(e) => setDraftTo(e.target.value)}
+              onPointerDown={(e) => e.stopPropagation()}
+              data-vaul-no-drag
+              className="w-full bg-[#F6F6F4] rounded-[12px] px-3 py-[10px] text-[15px] text-[#2A2A2C] outline-none"
+            />
+          </div>
         </div>
         <button
           onClick={handleCustomApply}
-          className="w-full py-[15px] rounded-[16px] text-[16px] font-normal text-white"
+          disabled={!draftFrom || !draftTo || draftFrom > draftTo}
+          className="w-full py-[15px] rounded-[16px] text-[16px] font-normal text-white disabled:opacity-40"
           style={{ background: '#2A2A2C' }}
         >
           {t('statistiche.range.customApply')}

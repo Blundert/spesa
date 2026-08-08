@@ -4,11 +4,11 @@ import { getStats } from '../db/repositories/stats'
 import { currentWeek } from '../lib/date'
 import { getWeekStartDay } from '../lib/weekSettings'
 
-export function useStats(fromTs: number | null) {
+export function useStats(fromTs: number | null, toTs: number | null) {
   const weekStartDay = getWeekStartDay()
   const weekKey = currentWeek()
   return useQuery({
-    queryKey: [...qk.stats(), weekStartDay, fromTs],
-    queryFn: () => getStats(weekKey, weekStartDay, fromTs),
+    queryKey: [...qk.stats(), weekStartDay, fromTs, toTs],
+    queryFn: () => getStats(weekKey, weekStartDay, fromTs, toTs),
   })
 }

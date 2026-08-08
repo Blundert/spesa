@@ -64,16 +64,24 @@
 
 ### Flusso 10 — Grafico andamento Statistiche e selettore range
 1. Con almeno due sessioni di spesa completate (anche in settimane diverse), naviga su Statistiche
-2. Verifica che il selettore range sia visibile sopra il riepilogo con le chip: "7 giorni", "30 giorni", "3 mesi", "6 mesi", "Tutto", "? giorni"
+2. Verifica che il selettore range sia visibile sopra il riepilogo con le chip: "7 giorni", "30 giorni", "3 mesi", "6 mesi", "Tutto", "Personalizzato"
 3. Il default è "30 giorni" (chip evidenziata in nero)
 4. Nella sezione "ANDAMENTO" verifica che il grafico mostri barre per le settimane con spesa
 5. Ogni barra deve avere: l'importo (€XX) sopra la barra e la data in formato "G/M" sotto
 6. Le barre vuote (settimane senza spesa) devono essere basse e grigie; le settimane iniziali vuote non vengono mostrate
 7. Seleziona "Tutto" → il grafico mostra tutte le settimane dalla prima sessione a oggi e i totali crescono
 8. Seleziona "7 giorni" → solo le sessioni degli ultimi 7 giorni
-9. Tap su "? giorni" → si apre un bottom sheet con un campo numerico → inserisci un numero (es. 45) → "Applica" → la chip mostra "45 giorni" e i dati si aggiornano
-10. Ricarica la pagina → il range selezionato persiste
-11. Se hai cambiato il giorno di inizio settimana nelle Impostazioni, le barre devono essere posizionate in base al nuovo giorno di inizio (non al vecchio)
+9. Se hai cambiato il giorno di inizio settimana nelle Impostazioni, le barre devono essere posizionate in base al nuovo giorno di inizio (non al vecchio)
+
+### Flusso 16 — Statistiche: range di date personalizzato e "Mese corrente"
+1. Su Statistiche, tocca la chip "Personalizzato" → si apre un bottom sheet "Intervallo personalizzato" con un bottone "Mese corrente" e due campi data "Da"/"A" (precompilati a oggi)
+2. Tocca "Mese corrente" → verifica che lo sheet si chiuda subito e che la chip mostri l'intervallo dal 1° del mese a oggi (es. "1 ago – 8 ago")
+3. Verifica che il grafico "ANDAMENTO" e il riepilogo si aggiornino di conseguenza
+4. Ricarica la pagina → verifica che il range personalizzato applicato persista
+5. Riapri la chip "Personalizzato" → cambia manualmente "Da" e "A" a un intervallo completamente nel passato (es. un mese intero precedente) → tocca "Applica"
+6. Verifica che il grafico "ANDAMENTO" si fermi alla settimana del campo "A" (non si estenda fino a oggi) e che il riepilogo mostri solo le sessioni in quell'intervallo
+7. Verifica che il campo "A" non permetta di selezionare una data futura (max = oggi) e che "Da" non possa superare "A"
+8. Seleziona di nuovo un preset (es. "30 giorni") → verifica che la chip "Personalizzato" torni all'etichetta generica "Personalizzato" (non mostri più le date)
 
 ### Flusso 9 — Modifica sessione di spesa dallo storico
 1. Con almeno una sessione di spesa completata, naviga su Storico

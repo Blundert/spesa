@@ -2,6 +2,10 @@ export type ChangelogEntry = { it: string[]; en: string[] }
 
 // Ordine: più recente in cima. Aggiungere una entry ad ogni nuova versione.
 export const changelog: Record<string, ChangelogEntry> = {
+  '0.28.0': {
+    it: ['Statistiche: il range personalizzato ora è un vero intervallo di date (da / a), con scorciatoia "Mese corrente"'],
+    en: ['Statistics: the custom range is now a real date interval (from / to), with a "Current month" shortcut'],
+  },
   '0.27.0': {
     it: ['Spesa: "Aggiungi fuori lista" mostra ora suggerimenti dal catalogo mentre digiti, per evitare di creare doppioni'],
     en: ['Shopping: "Add off-list" now shows catalog suggestions as you type, to avoid creating duplicate items'],
