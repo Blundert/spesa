@@ -8,6 +8,8 @@ import type {
   Session,
   Purchase,
   MealPlan,
+  Dish,
+  DishIngredient,
 } from './types'
 import { DEFAULT_BUONO_VALUE_CENTS } from './types'
 
@@ -20,6 +22,8 @@ class SpesaDb extends Dexie {
   sessions!: EntityTable<Session, 'id'>
   purchases!: EntityTable<Purchase, 'id'>
   mealPlans!: EntityTable<MealPlan, 'id'>
+  dishes!: EntityTable<Dish, 'id'>
+  dishIngredients!: EntityTable<DishIngredient, 'id'>
 
   constructor() {
     super('spesa')
@@ -158,6 +162,12 @@ class SpesaDb extends Dexie {
         await tx.table('items').update(item.id, { purchaseCount: total })
       }
     })
+
+    // v8: catalogo piatti riutilizzabile (dishes + dishIngredients), riferimenti a Item.
+    this.version(8).stores({
+      dishes: '++id, normalizedName',
+      dishIngredients: '++id, dishId, itemId, [dishId+itemId]',
+    })
   }
 }
 
@@ -196,6 +206,8 @@ export async function wipeAllData(): Promise<void> {
       db.sessions,
       db.purchases,
       db.mealPlans,
+      db.dishes,
+      db.dishIngredients,
     ],
     async () => {
       await Promise.all([
@@ -206,6 +218,8 @@ export async function wipeAllData(): Promise<void> {
         db.sessions.clear(),
         db.purchases.clear(),
         db.mealPlans.clear(),
+        db.dishes.clear(),
+        db.dishIngredients.clear(),
         db.categories.clear(),
       ])
       await db.categories.bulkAdd(SEED_CATEGORIES)

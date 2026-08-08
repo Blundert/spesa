@@ -8,11 +8,13 @@ import type {
   Session,
   Purchase,
   MealPlan,
+  Dish,
+  DishIngredient,
 } from './types'
 import { getWeekStartDay, setWeekStartDay } from '../lib/weekSettings'
 
 /** Versione del formato di backup (allineata allo schema Dexie). */
-export const BACKUP_VERSION = 6
+export const BACKUP_VERSION = 7
 
 export interface BackupData {
   version: number
@@ -25,22 +27,37 @@ export interface BackupData {
   sessions: Session[]
   purchases: Purchase[]
   mealPlans: MealPlan[]
+  /** Assente nei backup precedenti alla v7 (catalogo piatti). */
+  dishes?: Dish[]
+  dishIngredients?: DishIngredient[]
   settings?: { weekStartDay: number }
 }
 
 /** Serializza tutte le tabelle in un oggetto di backup (id inclusi → relazioni preservate). */
 export async function exportData(): Promise<BackupData> {
-  const [categories, items, supermarkets, weekBudgets, listItems, sessions, purchases, mealPlans] =
-    await Promise.all([
-      db.categories.toArray(),
-      db.items.toArray(),
-      db.supermarkets.toArray(),
-      db.weekBudgets.toArray(),
-      db.listItems.toArray(),
-      db.sessions.toArray(),
-      db.purchases.toArray(),
-      db.mealPlans.toArray(),
-    ])
+  const [
+    categories,
+    items,
+    supermarkets,
+    weekBudgets,
+    listItems,
+    sessions,
+    purchases,
+    mealPlans,
+    dishes,
+    dishIngredients,
+  ] = await Promise.all([
+    db.categories.toArray(),
+    db.items.toArray(),
+    db.supermarkets.toArray(),
+    db.weekBudgets.toArray(),
+    db.listItems.toArray(),
+    db.sessions.toArray(),
+    db.purchases.toArray(),
+    db.mealPlans.toArray(),
+    db.dishes.toArray(),
+    db.dishIngredients.toArray(),
+  ])
   return {
     version: BACKUP_VERSION,
     exportedAt: Date.now(),
@@ -52,6 +69,8 @@ export async function exportData(): Promise<BackupData> {
     sessions,
     purchases,
     mealPlans,
+    dishes,
+    dishIngredients,
     settings: { weekStartDay: getWeekStartDay() },
   }
 }
@@ -90,6 +109,8 @@ export async function importData(data: BackupData): Promise<void> {
       db.sessions,
       db.purchases,
       db.mealPlans,
+      db.dishes,
+      db.dishIngredients,
     ],
     async () => {
       await Promise.all([
@@ -101,6 +122,8 @@ export async function importData(data: BackupData): Promise<void> {
         db.sessions.clear(),
         db.purchases.clear(),
         db.mealPlans.clear(),
+        db.dishes.clear(),
+        db.dishIngredients.clear(),
       ])
       await Promise.all([
         db.categories.bulkAdd(data.categories),
@@ -111,6 +134,8 @@ export async function importData(data: BackupData): Promise<void> {
         db.sessions.bulkAdd(data.sessions),
         db.purchases.bulkAdd(data.purchases),
         db.mealPlans.bulkAdd(data.mealPlans),
+        db.dishes.bulkAdd(data.dishes ?? []),
+        db.dishIngredients.bulkAdd(data.dishIngredients ?? []),
       ])
     },
   )

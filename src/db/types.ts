@@ -97,3 +97,18 @@ export interface MealPlan {
   mealType: MealType
   dish: string
 }
+
+/** Piatto del catalogo (deduplicato su normalizedName), riutilizzabile tra settimane diverse. */
+export interface Dish {
+  id?: number
+  name: string
+  /** Lowercase + trim, usato per dedup. */
+  normalizedName: string
+}
+
+/** Ingrediente di un piatto: riferimento a un Item del catalogo spesa. */
+export interface DishIngredient {
+  id?: number
+  dishId: number
+  itemId: number
+}

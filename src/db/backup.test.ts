@@ -20,6 +20,8 @@ const validBase: BackupData = {
   sessions: [],
   purchases: [],
   mealPlans: [],
+  dishes: [],
+  dishIngredients: [],
 }
 
 async function clearAll() {
@@ -32,6 +34,8 @@ async function clearAll() {
     db.sessions.clear(),
     db.purchases.clear(),
     db.mealPlans.clear(),
+    db.dishes.clear(),
+    db.dishIngredients.clear(),
   ])
 }
 
@@ -57,6 +61,8 @@ async function seed() {
   ])
   await db.purchases.bulkAdd([{ id: 1, sessionId: 1, itemId: 1, priceCents: 120, quantity: 2 }])
   await db.mealPlans.bulkAdd([{ id: 1, isoWeek: '2026-W24', dayIndex: 0, mealType: 0, dish: 'Pasta' }])
+  await db.dishes.bulkAdd([{ id: 1, name: 'Pasta al pomodoro', normalizedName: 'pasta al pomodoro' }])
+  await db.dishIngredients.bulkAdd([{ id: 1, dishId: 1, itemId: 1 }])
 }
 
 beforeEach(async () => {
@@ -123,8 +129,12 @@ describe('importData', () => {
     expect(after.sessions).toEqual(exported.sessions)
     expect(after.purchases).toEqual(exported.purchases)
     expect(after.mealPlans).toEqual(exported.mealPlans)
+    expect(after.dishes).toEqual(exported.dishes)
+    expect(after.dishIngredients).toEqual(exported.dishIngredients)
     // la relazione purchase→session resta valida
     expect(after.purchases[0].sessionId).toBe(after.sessions[0].id)
+    // la relazione dishIngredient→dish resta valida
+    expect(after.dishIngredients?.[0].dishId).toBe(after.dishes?.[0].id)
     expect(after.supermarkets[0].loyaltyCard).toBe('data:image/jpeg;base64,abc')
   })
 
@@ -152,6 +162,14 @@ describe('importData', () => {
   it('importa backup versione 4 (senza loyaltyCard)', async () => {
     const v4: BackupData = { ...validBase, version: 4 }
     await expect(importData(v4)).resolves.toBeUndefined()
+  })
+
+  it('importa backup versione 6 (senza dishes/dishIngredients)', async () => {
+    const v6: BackupData = { ...validBase, version: 6, dishes: undefined, dishIngredients: undefined }
+    await importData(v6)
+    const data = await exportData()
+    expect(data.dishes).toEqual([])
+    expect(data.dishIngredients).toEqual([])
   })
 
   it('rifiuta una struttura non valida', async () => {
