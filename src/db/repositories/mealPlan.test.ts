@@ -1,6 +1,12 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import { db } from '../db'
-import { getMealPlan, setMealSlotDish, clearMealPlan, getPlannedWeeks } from './mealPlan'
+import {
+  getMealPlan,
+  setMealSlotDish,
+  clearMealPlan,
+  getPlannedWeeks,
+  getSelectedItemIdsForWeek,
+} from './mealPlan'
 
 const WEEK = '2026-06-23'
 
@@ -129,6 +135,32 @@ describe('clearMealPlan', () => {
     await clearMealPlan(WEEK)
     const other = await getMealPlan(OTHER)
     expect(other[0].pranzo).toBe('Pasta')
+  })
+})
+
+describe('getSelectedItemIdsForWeek', () => {
+  it('restituisce array vuoto senza pasti pianificati', async () => {
+    expect(await getSelectedItemIdsForWeek(WEEK)).toEqual([])
+  })
+
+  it('restituisce array vuoto per pasti in formato legacy (senza selectedItemIds)', async () => {
+    await db.mealPlans.add({ isoWeek: WEEK, dayIndex: 0, mealType: 0, dish: 'Pasta' })
+    expect(await getSelectedItemIdsForWeek(WEEK)).toEqual([])
+  })
+
+  it('unisce gli itemId selezionati di tutti i pasti della settimana, con ripetizioni', async () => {
+    await db.mealPlans.bulkAdd([
+      { isoWeek: WEEK, dayIndex: 0, mealType: 0, dish: 'Pasta', dishId: 1, selectedItemIds: [10, 11] },
+      { isoWeek: WEEK, dayIndex: 0, mealType: 1, dish: 'Risotto', dishId: 2, selectedItemIds: [10] },
+      { isoWeek: WEEK, dayIndex: 3, mealType: 0, dish: 'Pizza', dishId: 3, selectedItemIds: [] },
+    ])
+    expect(await getSelectedItemIdsForWeek(WEEK)).toEqual([10, 11, 10])
+  })
+
+  it('non include gli itemId di altre settimane', async () => {
+    const OTHER = '2026-06-16'
+    await db.mealPlans.add({ isoWeek: OTHER, dayIndex: 0, mealType: 0, dish: 'Pasta', dishId: 1, selectedItemIds: [10] })
+    expect(await getSelectedItemIdsForWeek(WEEK)).toEqual([])
   })
 })
 

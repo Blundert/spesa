@@ -7,8 +7,10 @@ import {
   setMealSlotDish,
   clearMealPlan,
   getPlannedWeeks,
+  getSelectedItemIdsForWeek,
   type MealSlotDish,
 } from '../db/repositories/mealPlan'
+import { addToList } from '../db/repositories/listItems'
 import type { MealType } from '../db/types'
 import { getWeekStartDay } from '../lib/weekSettings'
 
@@ -52,6 +54,28 @@ export function useClearMealPlan(isoWeek: string) {
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: qk.mealPlan(isoWeek) })
       void qc.invalidateQueries({ queryKey: qk.plannedWeeks() })
+    },
+  })
+}
+
+/**
+ * Importa nella lista della spesa gli ingredienti selezionati nei pasti pianificati
+ * della settimana. I duplicati si sommano (vedi `addToList`).
+ */
+export function useImportMealPlanToList(isoWeek: string) {
+  const qc = useQueryClient()
+  const { t } = useTranslation()
+  return useMutation({
+    mutationFn: async () => {
+      const itemIds = await getSelectedItemIdsForWeek(isoWeek)
+      for (const itemId of itemIds) {
+        await addToList(itemId)
+      }
+      return itemIds.length
+    },
+    onSuccess: (count) => {
+      void qc.refetchQueries({ queryKey: qk.listItems(), type: 'all' })
+      if (count > 0) toast(t('pasti.importedToList', { count }))
     },
   })
 }

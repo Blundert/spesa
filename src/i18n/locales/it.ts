@@ -129,6 +129,8 @@ export const it = {
     lunch: 'Pranzo',
     dinner: 'Cena',
     goToList: 'Vai alla lista della spesa',
+    importAndGoToList: 'Importa piatti e vai alla lista',
+    importedToList: '{{count}} ingredienti aggiunti alla lista',
     buoniAvailable: 'Buoni disponibili',
     createDish: 'Crea piatto “{{name}}”',
     changeDish: 'Cambia piatto',

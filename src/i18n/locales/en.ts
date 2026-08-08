@@ -131,6 +131,8 @@ export const en: typeof it = {
     lunch: 'Lunch',
     dinner: 'Dinner',
     goToList: 'Go to shopping list',
+    importAndGoToList: 'Import dishes and go to list',
+    importedToList: '{{count}} ingredients added to the list',
     buoniAvailable: 'Vouchers available',
     createDish: 'Create dish “{{name}}”',
     changeDish: 'Change dish',

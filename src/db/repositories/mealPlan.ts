@@ -92,6 +92,16 @@ export async function getMealDishes(isoWeek: string): Promise<string[]> {
   return rows.map((r) => r.dish).filter(Boolean)
 }
 
+/**
+ * Tutti gli itemId selezionati (con ripetizioni) nei pasti pianificati di una settimana —
+ * usati per importare gli ingredienti nella lista della spesa. I duplicati non vengono
+ * deduplicati qui: contano come occorrenze, che si sommano all'import (vedi `addToList`).
+ */
+export async function getSelectedItemIdsForWeek(isoWeek: string): Promise<number[]> {
+  const rows = await db.mealPlans.where('isoWeek').equals(isoWeek).toArray()
+  return rows.flatMap((r) => r.selectedItemIds ?? [])
+}
+
 export interface PlannedWeek {
   isoWeek: string
   mealCount: number

@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useNavigate, useSearch, Link } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 import { dayShort, dayFull, formatWeekLabel, shiftWeek } from '../lib/date'
-import { useMealPlan, useSetMealSlotDish } from '../hooks/useMealPlan'
+import { useMealPlan, useSetMealSlotDish, useImportMealPlanToList } from '../hooks/useMealPlan'
 import { useDishes, useSaveDish } from '../hooks/useDishes'
 import { useCategories, useItems, useUpsertItem } from '../hooks/useItems'
 import { useWeekBudget, useSetBuoniAvailable } from '../hooks/useShopping'
@@ -44,6 +44,7 @@ export function PastiScreen() {
   const { data: budget } = useWeekBudget(week)
   const setBuoni = useSetBuoniAvailable(week)
   const setMealSlotDish = useSetMealSlotDish(week)
+  const importToList = useImportMealPlanToList(week)
   const saveDish = useSaveDish()
   const upsertItem = useUpsertItem()
   const buoniAvailable = budget?.buoniAvailable ?? 0
@@ -58,6 +59,10 @@ export function PastiScreen() {
 
   const handleGenerate = () => {
     void navigate({ to: '/lista' })
+  }
+
+  const handleImportAndGenerate = () => {
+    importToList.mutate(undefined, { onSuccess: () => void navigate({ to: '/lista' }) })
   }
 
   const openSlot = (day: MealPlanDay, mealType: MealType) => {
@@ -351,6 +356,12 @@ export function PastiScreen() {
           className="w-full mt-4 bg-[#2A2A2C] text-white text-[17px] font-normal py-[18px] rounded-[22px] active:scale-[.98] transition-transform"
         >
           {t('pasti.goToList')}
+        </button>
+        <button
+          onClick={handleImportAndGenerate}
+          className="w-full mt-2.5 bg-white text-[#2A2A2C] text-[17px] font-normal py-[18px] rounded-[22px] active:scale-[.98] transition-transform"
+        >
+          {t('pasti.importAndGoToList')}
         </button>
       </div>
 

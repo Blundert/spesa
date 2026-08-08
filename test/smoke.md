@@ -128,3 +128,10 @@ Nota: il service worker è attivo solo in build di produzione (`npm run build` +
 7. Deseleziona un ingrediente → "Salva" → ricarica la pagina → riapri lo slot → verifica che la deselezione sia persistita
 8. Tocca "Cambia piatto" → verifica che il campo si svuoti e digitando il nome di un piatto già esistente compaia come suggerimento → selezionalo → verifica che gli ingredienti tornino tutti spuntati
 9. Tocca "Rimuovi piatto" → verifica che lo slot torni a "—" e che il piatto resti comunque nel catalogo "Piatti"
+
+### Flusso 14 — Import ingredienti pianificati nella lista della spesa
+1. Su Pasti, pianifica lo stesso piatto (con lo stesso ingrediente spuntato) per due pasti diversi della settimana (es. pranzo lunedì e cena martedì)
+2. Verifica che in fondo alla pagina siano presenti due bottoni: "Vai alla lista della spesa" (comportamento invariato, solo navigazione) e "Importa piatti e vai alla lista"
+3. Tocca "Importa piatti e vai alla lista" → verifica di essere portato su Lista della spesa
+4. Verifica che l'ingrediente selezionato compaia con quantità 2 (una per ogni occorrenza pianificata) e il toast "2 ingredienti aggiunti alla lista"
+5. Torna su Pasti senza aver pianificato nulla di nuovo (o con nessun ingrediente selezionato) → tocca "Importa piatti e vai alla lista" → verifica che navighi comunque alla lista, senza toast e senza errori
