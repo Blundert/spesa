@@ -89,6 +89,8 @@ export const en: typeof it = {
     newTitle: 'New shopping',
     buoni: 'Meal vouchers',
     buonoValue: 'Voucher value',
+    editBuoniTitle: 'Edit vouchers',
+    editBuoni: 'Edit meal vouchers',
     removeItem: 'Remove',
     uncheck: 'Move back to list',
     removeListConfirmTitle: 'Remove from list?',

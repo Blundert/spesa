@@ -216,7 +216,7 @@ export function useUpdateSession() {
     }: {
       id: number
       oldIsoWeek: string
-      patch: Partial<Pick<Session, 'supermarketId' | 'startedAt' | 'isoWeek' | 'confirmedTotalCents'>>
+      patch: Partial<Pick<Session, 'supermarketId' | 'startedAt' | 'isoWeek' | 'confirmedTotalCents' | 'buoniSpent' | 'buoniValueCents'>>
     }) => updateSessionRepo(id, patch),
     onSuccess: (_, { id, oldIsoWeek, patch }) => {
       void qc.invalidateQueries({ queryKey: qk.session(id) })

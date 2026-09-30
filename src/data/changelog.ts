@@ -2,6 +2,10 @@ export type ChangelogEntry = { it: string[]; en: string[] }
 
 // Ordine: più recente in cima. Aggiungere una entry ad ogni nuova versione.
 export const changelog: Record<string, ChangelogEntry> = {
+  '0.29.0': {
+    it: ['Buoni pasto modificabili: tocca "N buoni" durante la spesa o nel dettaglio di una spesa dello Storico per cambiare numero e valore dei buoni usati'],
+    en: ['Editable meal vouchers: tap "N vouchers" while shopping or in a past session\'s detail to change how many vouchers you used and their value'],
+  },
   '0.28.2': {
     it: ['Fix: i menu dal basso con campo di testo (aggiungi categoria/articolo/supermercato, piatti, pasti, range date) si aprono quasi a schermo intero per evitare glitch con la tastiera su iOS'],
     en: ['Fix: bottom sheets with a text field (add category/item/store, dishes, meals, date range) now open near full-screen to avoid keyboard glitches on iOS'],

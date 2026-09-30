@@ -87,6 +87,8 @@ export const it = {
     newTitle: 'Nuova spesa',
     buoni: 'Buoni pasto',
     buonoValue: 'Valore buono',
+    editBuoniTitle: 'Modifica buoni',
+    editBuoni: 'Modifica buoni pasto',
     removeItem: 'Rimuovi',
     uncheck: 'Rimetti da prendere',
     removeListConfirmTitle: 'Rimuovere dalla lista?',

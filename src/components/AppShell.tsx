@@ -12,6 +12,7 @@ import { qk } from '../db/queryKeys'
 import { useQuery } from '@tanstack/react-query'
 import { db } from '../db/db'
 import { BottomSheet } from './BottomSheet'
+import { BuoniSteppers } from './BuoniSheet'
 
 const isoWeek = currentWeek()
 
@@ -155,36 +156,7 @@ function NewShoppingSheet({
       <div className="text-[12px] font-normal tracking-[1.4px] text-[#9B9B9F] uppercase px-0.5 pb-[14px]">
         {t('spesa.newTitle')}
       </div>
-      <div className="bg-[#F6F6F4] rounded-[18px] px-4 mb-[14px]">
-        <div className="flex items-center justify-between py-[14px] border-b border-[#E6E6E2]">
-          <span className="text-base text-[#2A2A2C]">{t('spesa.buoni')}</span>
-          <div className="flex items-center gap-4">
-            <StepperBtn onClick={() => onBuoni(Math.max(0, buoni - 1))}>
-              <MinusIcon />
-            </StepperBtn>
-            <span className="text-[18px] font-normal text-[#2A2A2C] min-w-[20px] text-center tabular-nums">
-              {buoni}
-            </span>
-            <StepperBtn onClick={() => onBuoni(buoni + 1)}>
-              <PlusIcon />
-            </StepperBtn>
-          </div>
-        </div>
-        <div className="flex items-center justify-between py-[14px]">
-          <span className="text-base text-[#2A2A2C]">{t('spesa.buonoValue')}</span>
-          <div className="flex items-center gap-4">
-            <StepperBtn onClick={() => onValue(Math.max(50, valueCents - 50))}>
-              <MinusIcon />
-            </StepperBtn>
-            <span className="text-[18px] font-normal text-[#2A2A2C] min-w-[54px] text-center tabular-nums">
-              €{formatCentsPlain(valueCents)}
-            </span>
-            <StepperBtn onClick={() => onValue(valueCents + 50)}>
-              <PlusIcon />
-            </StepperBtn>
-          </div>
-        </div>
-      </div>
+      <BuoniSteppers buoni={buoni} valueCents={valueCents} onBuoni={onBuoni} onValue={onValue} />
       <button
         onClick={onStart}
         className="w-full bg-[#2A2A2C] text-white text-[17px] font-normal py-[17px] rounded-[18px] flex items-center justify-center gap-2 active:scale-[.98] transition-transform"
@@ -256,33 +228,6 @@ function ChevronRight() {
   return (
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#C5C5C9" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <path d="M9 6l6 6-6 6" />
-    </svg>
-  )
-}
-
-function StepperBtn({ children, onClick }: { children: React.ReactNode; onClick: () => void }) {
-  return (
-    <button
-      onClick={onClick}
-      className="w-8 h-8 rounded-full bg-white flex items-center justify-center shadow-[0_1px_3px_rgba(0,0,0,.08)] active:opacity-50"
-    >
-      {children}
-    </button>
-  )
-}
-
-function MinusIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2A2A2C" strokeWidth="2.4" strokeLinecap="round">
-      <path d="M5 12h14" />
-    </svg>
-  )
-}
-
-function PlusIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2A2A2C" strokeWidth="2.4" strokeLinecap="round">
-      <path d="M12 5v14M5 12h14" />
     </svg>
   )
 }

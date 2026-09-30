@@ -17,6 +17,7 @@ import {
   useAddPurchase,
   useRemovePurchase,
   useUpdatePurchase,
+  useUpdateSession,
 } from '../hooks/useShopping'
 import {
   useListItems,
@@ -29,6 +30,7 @@ import { normalizeName } from '../lib/normalize'
 import { BASE_ITEMS } from '../lib/baseItems'
 import { PriceKeypad } from '../components/PriceKeypad'
 import { BottomSheet } from '../components/BottomSheet'
+import { EditBuoniSheet } from '../components/BuoniSheet'
 
 interface OffListSuggestion {
   name: string
@@ -54,6 +56,7 @@ export function SpesaScreen() {
   const [showStorePicker, setShowStorePicker] = useState(false)
   const [showNewItem, setShowNewItem] = useState(false)
   const [showCard, setShowCard] = useState(false)
+  const [showEditBuoni, setShowEditBuoni] = useState(false)
   const [newItemName, setNewItemName] = useState('')
   const [showFinishConfirm, setShowFinishConfirm] = useState(false)
   const [pendingListRemove, setPendingListRemove] = useState<number | null>(null)
@@ -108,6 +111,7 @@ export function SpesaScreen() {
   const addPurchase = useAddPurchase(isoWeek)
   const removePurchase = useRemovePurchase(activeSession?.id ?? 0)
   const updatePurchase = useUpdatePurchase(activeSession?.id ?? 0)
+  const updateSession = useUpdateSession()
   const removeFromList = useRemoveFromList()
   const addToList = useAddToList()
   const removePurchasedFromList = useRemovePurchasedFromList()
@@ -141,6 +145,16 @@ export function SpesaScreen() {
     },
     [createSession, buoni, val],
   )
+
+  // La riga buoni è visibile solo con una sessione attiva (creata alla scelta del supermercato).
+  const handleSaveBuoni = (buoniSpent: number, buoniValueCents: number) => {
+    setShowEditBuoni(false)
+    if (!activeSession?.id) return
+    updateSession.mutate(
+      { id: activeSession.id, oldIsoWeek: activeSession.isoWeek, patch: { buoniSpent, buoniValueCents } },
+      { onSuccess: () => toast(t('sessione.saved')) },
+    )
+  }
 
   const handleConfirmPrice = useCallback(
     async (cents: number, quantity: number) => {
@@ -347,12 +361,14 @@ export function SpesaScreen() {
           <span className="tabular-nums">€{formatCentsPlain(summary.spentCents)} {t('common.spentWord')}</span>
           <span className="mx-[10px] opacity-50">·</span>
           <span className="tabular-nums">{t('spesa.itemsInCart', { count: doneItems.length })}</span>
-          {liveBuoni > 0 && (
-            <>
-              <span className="mx-[10px] opacity-50">·</span>
-              <span className="tabular-nums">{liveBuoni} {t('common.buoni')}</span>
-            </>
-          )}
+          <span className="mx-[10px] opacity-50">·</span>
+          <button
+            onClick={() => setShowEditBuoni(true)}
+            aria-label={t('spesa.editBuoni')}
+            className="tabular-nums underline decoration-dotted underline-offset-2 active:opacity-50"
+          >
+            {liveBuoni} {t('common.buoni')}
+          </button>
         </div>
       </div>
 
@@ -479,6 +495,14 @@ export function SpesaScreen() {
       />
 
       {/* Price keypad — da lista (aggiungi o modifica) */}
+      <EditBuoniSheet
+        open={showEditBuoni}
+        onClose={() => setShowEditBuoni(false)}
+        buoni={liveBuoni}
+        valueCents={liveVal}
+        onSave={handleSaveBuoni}
+      />
+
       <PriceKeypad
         open={priceTarget !== null}
         onClose={() => setPriceTarget(null)}

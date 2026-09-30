@@ -161,3 +161,14 @@ Nota: il service worker è attivo solo in build di produzione (`npm run build` +
 6. In Sessione/Spesa → tocca "Cambia negozio" (o l'equivalente store picker): verifica che il sheet resti all'altezza normale (lista di negozi, no input) finché non tocchi "Aggiungi supermercato" → in quel momento il sheet deve espandersi quasi a schermo intero e mostrare il campo di testo senza glitch
 7. Verifica che il drag-to-dismiss (swipe verso il basso sull'handle) funzioni ancora normalmente su questi sheet espansi
 8. Ripeti su un piatto/pasto con lista ingredienti lunga (molti ingredienti) per verificare che lo scroll del contenuto sopra la tastiera funzioni anche con più elementi
+
+### Flusso 19 — Modifica buoni pasto di una spesa (durante e dopo)
+1. Avvia una nuova spesa con 2 buoni da €8,00 (barra in basso → stepper → "Inizia la spesa") e scegli un supermercato
+2. Nella riga sotto l'hero ("€X spesi · N oggetti nel carrello · 2 buoni") tocca "2 buoni" (sottolineato punteggiato) → si apre il sheet "Modifica buoni" con gli stepper precompilati a 2 / €8,00
+3. Porta i buoni a 3 e il valore a €7,50 → "Salva" → la riga mostra "3 buoni" e il "Di tasca tua" si ricalcola con 3 × €7,50, toast "Modifiche salvate"
+4. Porta i buoni a 0 → "Salva" → la riga mostra "0 buoni" (resta visibile e tappabile)
+5. Riapri il sheet, modifica gli stepper e chiudilo con swipe/tap fuori senza salvare → i valori non cambiano; riaprendolo riparte dai valori salvati
+6. Aggiungi un articolo al carrello (es. €30,00) → "Di tasca tua" = spesa − buoni × valore; modifica di nuovo i buoni, ricarica la pagina e verifica che il valore persista
+7. Tocca "Fine" e conferma la spesa → apri la sessione dallo Storico → sotto il totale c'è la riga "N buoni · €Y" (visibile anche con 0 buoni) → tocca → sheet con i valori della sessione → modifica → "Salva" → toast "Modifiche salvate", riga aggiornata
+8. Torna alla Home: "Di tasca tua" e "N buoni spesi · M rimanenti" riflettono i nuovi buoni della sessione
+9. Ripeti il punto 7 su una sessione "Non completata" dello Storico

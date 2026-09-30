@@ -13,6 +13,7 @@ import { qk } from '../db/queryKeys'
 import { deleteSession } from '../db/repositories/sessions'
 import { BottomSheet } from '../components/BottomSheet'
 import { PriceKeypad } from '../components/PriceKeypad'
+import { EditBuoniSheet } from '../components/BuoniSheet'
 import { useUpdateSession, useEditPastPurchase, useFinishPastSession } from '../hooks/useShopping'
 
 export function SessioneScreen() {
@@ -24,6 +25,7 @@ export function SessioneScreen() {
   const [showStorePicker, setShowStorePicker] = useState(false)
   const [editingPurchaseId, setEditingPurchaseId] = useState<number | null>(null)
   const [showEditTotal, setShowEditTotal] = useState(false)
+  const [showEditBuoni, setShowEditBuoni] = useState(false)
   const qc = useQueryClient()
 
   const { data: supermarkets = [] } = useSupermarkets()
@@ -102,6 +104,14 @@ export function SessioneScreen() {
     updateSession.mutate(
       { id: sessionId, oldIsoWeek: session.isoWeek, patch: { confirmedTotalCents: cents } },
       { onSuccess: () => toast(t('sessione.saved')) },
+    )
+  }
+
+  const handleSaveBuoni = (buoniSpent: number, buoniValueCents: number) => {
+    if (!session) return
+    updateSession.mutate(
+      { id: sessionId, oldIsoWeek: session.isoWeek, patch: { buoniSpent, buoniValueCents } },
+      { onSuccess: () => { setShowEditBuoni(false); toast(t('sessione.saved')) } },
     )
   }
 
@@ -194,10 +204,14 @@ export function SessioneScreen() {
               </span>
             </div>
           )}
-          {session && session.buoniSpent > 0 && (
-            <div className="text-[13px] text-[#9B9B9F] mt-2 tabular-nums">
+          {session && (
+            <button
+              onClick={() => setShowEditBuoni(true)}
+              aria-label={t('spesa.editBuoni')}
+              className="block mx-auto text-[13px] text-[#9B9B9F] mt-2 tabular-nums underline decoration-dotted underline-offset-2 active:opacity-50"
+            >
               {session.buoniSpent} {t('common.buoni')} · €{formatCentsPlain(session.buoniSpent * session.buoniValueCents)}
-            </div>
+            </button>
           )}
         </div>
 
@@ -254,6 +268,14 @@ export function SessioneScreen() {
         {t('common.cancel')}
       </button>
     </BottomSheet>
+
+    <EditBuoniSheet
+      open={showEditBuoni}
+      onClose={() => setShowEditBuoni(false)}
+      buoni={session?.buoniSpent ?? 0}
+      valueCents={session?.buoniValueCents ?? 0}
+      onSave={handleSaveBuoni}
+    />
 
     <StorePickerSheet
       open={showStorePicker}

@@ -74,7 +74,7 @@ export async function deleteWeek(isoWeek: string): Promise<void> {
 
 export async function updateSession(
   id: number,
-  patch: Partial<Pick<Session, 'supermarketId' | 'startedAt' | 'isoWeek' | 'confirmedTotalCents'>>,
+  patch: Partial<Pick<Session, 'supermarketId' | 'startedAt' | 'isoWeek' | 'confirmedTotalCents' | 'buoniSpent' | 'buoniValueCents'>>,
 ): Promise<void> {
   await db.sessions.update(id, patch)
 }
