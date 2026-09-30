@@ -2,6 +2,10 @@ export type ChangelogEntry = { it: string[]; en: string[] }
 
 // Ordine: più recente in cima. Aggiungere una entry ad ogni nuova versione.
 export const changelog: Record<string, ChangelogEntry> = {
+  '0.28.2': {
+    it: ['Fix: i menu dal basso con campo di testo (aggiungi categoria/articolo/supermercato, piatti, pasti, range date) si aprono quasi a schermo intero per evitare glitch con la tastiera su iOS'],
+    en: ['Fix: bottom sheets with a text field (add category/item/store, dishes, meals, date range) now open near full-screen to avoid keyboard glitches on iOS'],
+  },
   '0.28.1': {
     it: ['Fix: rinominare una categoria si riflette ora ovunque (prima la Lista e le Statistiche ignoravano la rinomina per le categorie predefinite come Frigo o Dispensa)'],
     en: ['Fix: renaming a category is now reflected everywhere (previously the List and Statistics screens ignored renames for built-in categories like Fridge or Pantry)'],

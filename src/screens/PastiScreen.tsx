@@ -366,7 +366,11 @@ export function PastiScreen() {
       </div>
 
       {/* Sheet: piatto + ingredienti per uno slot pasto */}
-      <BottomSheet open={slotState !== null} onClose={() => setSlotState(null)}>
+      <BottomSheet
+        open={slotState !== null}
+        onClose={() => setSlotState(null)}
+        hasInput={slotState?.dishId === undefined}
+      >
         {slotState && (
           <>
             <div className="text-[12px] font-normal tracking-[1.4px] text-[#9B9B9F] uppercase px-0.5 pb-[6px]">

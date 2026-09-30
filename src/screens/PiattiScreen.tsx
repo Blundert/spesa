@@ -171,7 +171,7 @@ export function PiattiScreen() {
       </div>
 
       {/* Sheet: crea/modifica piatto */}
-      <BottomSheet open={editorState !== null} onClose={() => setEditorState(null)}>
+      <BottomSheet open={editorState !== null} onClose={() => setEditorState(null)} hasInput>
         <div className="text-[20px] font-normal text-[#2A2A2C] px-0.5 pb-[6px]">
           {editorState?.id !== undefined ? t('piatti.editTitle') : t('piatti.newTitle')}
         </div>

@@ -187,7 +187,7 @@ export function StatisticheScreen() {
       )}
 
       {/* Bottom sheet range di date personalizzato */}
-      <BottomSheet open={customOpen} onClose={() => setCustomOpen(false)}>
+      <BottomSheet open={customOpen} onClose={() => setCustomOpen(false)} hasInput>
         <div className="text-[20px] font-normal text-[#2A2A2C] px-0.5 pb-[14px]">
           {t('statistiche.range.customTitle')}
         </div>

@@ -331,7 +331,7 @@ export function CatalogoScreen() {
       </div>
 
       {/* Sheet: aggiungi categoria */}
-      <BottomSheet open={addCatOpen} onClose={() => setAddCatOpen(false)}>
+      <BottomSheet open={addCatOpen} onClose={() => setAddCatOpen(false)} hasInput>
         <div className="text-[20px] font-normal text-[#2A2A2C] px-0.5 pb-[6px]">
           {t('catalogo.newCategoryTitle')}
         </div>
@@ -352,7 +352,7 @@ export function CatalogoScreen() {
       </BottomSheet>
 
       {/* Sheet: rinomina categoria */}
-      <BottomSheet open={renameCat !== null} onClose={() => setRenameCat(null)}>
+      <BottomSheet open={renameCat !== null} onClose={() => setRenameCat(null)} hasInput>
         <div className="text-[20px] font-normal text-[#2A2A2C] px-0.5 pb-[6px]">
           {t('catalogo.renameCategoryTitle')}
         </div>
@@ -395,7 +395,7 @@ export function CatalogoScreen() {
       </BottomSheet>
 
       {/* Sheet: rinomina articolo */}
-      <BottomSheet open={renameItem !== null} onClose={() => setRenameItem(null)}>
+      <BottomSheet open={renameItem !== null} onClose={() => setRenameItem(null)} hasInput>
         <div className="text-[20px] font-normal text-[#2A2A2C] px-0.5 pb-[6px]">
           {t('catalogo.renameItemTitle')}
         </div>

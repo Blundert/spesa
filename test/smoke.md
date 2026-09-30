@@ -151,3 +151,13 @@ Nota: il service worker è attivo solo in build di produzione (`npm run build` +
 4. Vai su Catalogo → verifica che l'articolo sia comparso nella categoria corretta (quella del suggerimento), non in "Altro"
 5. Torna su Spesa, tocca di nuovo "Aggiungi fuori lista", digita un nome che non corrisponde a nulla → verifica che non compaia alcun suggerimento, solo il bottone "Continua" → conferma un prezzo
 6. Vai su Catalogo → verifica che questo secondo articolo sia comparso sotto "Altro"
+
+### Flusso 18 — Bottom sheet quasi a schermo intero per i form con input (test su dispositivo iOS reale)
+1. Su un iPhone reale (non simulabile in desktop), apri uno dei bottom sheet con un campo di testo: Catalogo → "Aggiungi categoria" (o "Rinomina categoria/articolo"), Supermercati → "Nuovo supermercato", Spesa → "Aggiungi fuori lista", Piatti → "Aggiungi piatto", Pasti → tocca uno slot vuoto, Statistiche → chip "Personalizzato"
+2. Verifica che il sheet si apra già quasi a schermo intero (non all'altezza parziale usata dagli altri sheet, es. le conferme di eliminazione)
+3. Tocca il campo di testo e verifica che la tastiera compaia senza glitch visibili (salti, flash, contenuto tagliato) e che il campo toccato resti visibile sopra la tastiera
+4. Scrolla il contenuto del sheet mentre la tastiera è aperta → verifica che la parte sopra la tastiera scrolli correttamente e che il bottone di conferma in fondo sia raggiungibile
+5. Chiudi la tastiera (tap fuori dal campo) → verifica che il sheet torni all'altezza quasi piena senza glitch
+6. In Sessione/Spesa → tocca "Cambia negozio" (o l'equivalente store picker): verifica che il sheet resti all'altezza normale (lista di negozi, no input) finché non tocchi "Aggiungi supermercato" → in quel momento il sheet deve espandersi quasi a schermo intero e mostrare il campo di testo senza glitch
+7. Verifica che il drag-to-dismiss (swipe verso il basso sull'handle) funzioni ancora normalmente su questi sheet espansi
+8. Ripeti su un piatto/pasto con lista ingredienti lunga (molti ingredienti) per verificare che lo scroll del contenuto sopra la tastiera funzioni anche con più elementi

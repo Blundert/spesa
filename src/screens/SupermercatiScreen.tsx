@@ -155,7 +155,7 @@ export function SupermercatiScreen() {
       </div>
 
       {/* Sheet: nuovo supermercato */}
-      <BottomSheet open={sheetOpen} onClose={() => setSheetOpen(false)}>
+      <BottomSheet open={sheetOpen} onClose={() => setSheetOpen(false)} hasInput>
         <div className="text-[20px] font-normal text-[#2A2A2C] px-0.5 pb-[6px]">{t('supermercati.newTitle')}</div>
         <input
           value={newName}

@@ -492,7 +492,7 @@ export function SpesaScreen() {
       />
 
       {/* New item fuori lista */}
-      <BottomSheet open={showNewItem} onClose={() => setShowNewItem(false)}>
+      <BottomSheet open={showNewItem} onClose={() => setShowNewItem(false)} hasInput>
         <div className="text-[20px] font-normal text-[#2A2A2C] px-0.5 pb-[6px]">{t('spesa.offListTitle')}</div>
         <input
           value={newItemName}
@@ -630,7 +630,7 @@ function StorePickerSheet({ open, onClose, supermarkets, currentId, onPick }: St
   const [showAdd, setShowAdd] = useState(false)
 
   return (
-    <BottomSheet open={open} onClose={onClose}>
+    <BottomSheet open={open} onClose={onClose} hasInput={showAdd}>
       <div className="text-[20px] font-normal text-[#2A2A2C] px-0.5 pb-[14px]">{t('spesa.chooseStore')}</div>
       <div className="flex flex-col gap-0.5 pb-2">
         {supermarkets.map((s) => (
