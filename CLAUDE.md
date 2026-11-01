@@ -32,6 +32,8 @@ Navigazione (dalla v0.36.0, decisa con l'utente — prevale sul mockup):
   sostituiscono a vicenda; i dettagli tornano alla pagina precedente (`BackButton`).
 - La barra in basso è visibile ovunque tranne nella spesa in corso (`/spesa`, fuori dalla shell).
 - Transizioni: dissolvenza allo stesso livello, scorrimento laterale tra livelli (`navTransition`).
+- Più liste (dalla v0.37.0): schede sottolineate sotto i titoli (`ListTabs`, attiva con ⌄ = modifica),
+  una spesa parte da una lista (scelta nel pannello della pill), pagina "Liste" in "Gestisci".
 
 ## Stack
 

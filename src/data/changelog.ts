@@ -2,6 +2,24 @@ export type ChangelogEntry = { it: string[]; en: string[] }
 
 // Ordine: più recente in cima. Aggiungere una entry ad ogni nuova versione.
 export const changelog: Record<string, ChangelogEntry> = {
+  '0.37.0': {
+    it: [
+      'Più liste della spesa: sotto il titolo "Lista" trovi una scheda per ogni lista (la tua lista attuale si chiama "Spesa"). Tocca + per crearne una, ritocca quella attiva (con ⌄) per rinominarla, darle un supermercato o archiviarla',
+      'Ogni lista ha la sua "spesa solita" e lo stesso prodotto può stare in più liste: finita la spesa esce solo dalla lista usata',
+      'Nuova spesa: nel pannello della pill scegli la lista (parte da quella aperta). Se la lista ha un supermercato la spesa parte subito lì, altrimenti lo scegli come prima',
+      'Pasti: con più liste, "Importa piatti e vai alla lista" ti chiede in quale lista mettere gli ingredienti',
+      'Nuova pagina "Liste" nel menu (Gestisci): ordine delle schede, liste archiviate da ripristinare o eliminare definitivamente',
+      'Il nome della lista compare in corsia, nello Storico e nel riepilogo della settimana',
+    ],
+    en: [
+      'Multiple shopping lists: under the "List" title there is a tab for each list (your current list is called "Spesa"). Tap + to create one, tap the active one again (marked ⌄) to rename it, give it a supermarket or archive it',
+      'Each list has its own "usual shopping", and the same item can be in more than one list: after a trip it only leaves the list you used',
+      'New shopping: choose the list in the pill sheet (it starts from the open one). If the list has a supermarket the trip starts right there, otherwise you pick it as before',
+      'Meals: with more than one list, "Import dishes and go to list" asks which list the ingredients go to',
+      'New "Lists" page in the menu (Manage): tab order, and archived lists to restore or delete for good',
+      'The list name shows in the aisle, in History and in the week summary',
+    ],
+  },
   '0.36.1': {
     it: ['Pasti: il link in alto a destra si chiama ora "Settimane" (prima "Storico", che si confondeva con lo Storico delle spese) e apre "Settimane pianificate"'],
     en: ['Meals: the top-right link is now called "Weeks" (it was "History", easy to confuse with the shopping history) and opens "Planned weeks"'],

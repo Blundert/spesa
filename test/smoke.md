@@ -201,7 +201,7 @@ Nota: il service worker è attivo solo in build di produzione (`npm run build` +
 ### Flusso 23 — Svuota lista
 1. Vai su Lista con la lista vuota → in alto a destra **non** c'è "Svuota"
 2. Aggiungi 3 oggetti (es. Latte, Pane, Uova) → compare "Svuota" accanto al titolo
-3. Tocca "Svuota" → sheet "Svuotare la lista?" con "Tutti gli oggetti della lista (3) verranno rimossi…" → "Annulla" → la lista è intatta
+3. Tocca "Svuota" → sheet "Svuotare «Spesa»?" con "Tutti gli oggetti della lista (3) verranno rimossi…" → "Annulla" → la lista è intatta
 4. Tocca di nuovo "Svuota" → "Svuota lista" → toast "Lista svuotata", messaggio di lista vuota, "Svuota" sparisce
 5. Vai su Catalogo → Latte, Pane e Uova sono ancora presenti (con i loro prezzi)
 
@@ -230,10 +230,24 @@ Nota: il service worker è attivo solo in build di produzione (`npm run build` +
 ### Flusso 27 — Navigazione: Lista e Pasti, pill, menu e frecce
 1. Apri l'app → si apre la Lista; in alto "Lista" scuro e "Pasti" grigio. Visita http://localhost:5173/lista → reindirizza a `/`
 2. Tocca "Pasti" → dissolvenza breve, ora "Pasti" è scuro e "Lista" grigio; non c'è freccia indietro e la barra in basso resta visibile. Cambia settimana con le frecce. In alto a destra il link "Settimane" apre "Settimane pianificate" (‹ torna a Pasti)
-3. Tocca la pill → il pannello mostra "Questa settimana · …", la card "Di tasca tua", Speso / Buoni spesi / Rimanenti, le ultime spese (al massimo 3, con "Vedi tutte (N)" se sono di più) e sotto "Nuova spesa" con "Inizia la spesa". Tocca una spesa → si chiude il pannello e si apre il suo dettaglio
-4. Apri il menu → tre gruppi: "Le tue spese" (Storico, Statistiche), "Gestisci" (Catalogo, Piatti, Supermercati), Impostazioni; nessuna voce "Lista" o "Settimana"
+3. Tocca la pill → il pannello mostra "Questa settimana · …", la card "Di tasca tua", Speso / Buoni spesi / Rimanenti, le ultime spese (al massimo 3, con "Vedi tutte (N)" se sono di più) e sotto "Nuova spesa" con la riga "Lista", i buoni e "Inizia la spesa". Tocca una spesa → si chiude il pannello e si apre il suo dettaglio
+4. Apri il menu → tre gruppi: "Le tue spese" (Storico, Statistiche), "Gestisci" (Liste, Catalogo, Piatti, Supermercati), Impostazioni; nessuna voce "Lista" o "Settimana"
 5. Da Pasti apri Storico → la pagina entra da destra, con la freccia ‹ e la barra in basso. Dal menu apri Statistiche → dissolvenza; premi ‹ → torni su Pasti, sulla stessa settimana di prima
 6. Storico → tocca una spesa → il dettaglio entra da destra con la barra in basso; ‹ → torni allo Storico (la pagina rientra da sinistra); ‹ → torni alla sezione principale
 7. Apri direttamente http://localhost:5173/storico/<id> (senza cronologia) → ‹ porta allo Storico; apri http://localhost:5173/changelog → ‹ porta a Impostazioni
 8. Avvia una spesa → la schermata della spesa in corso è a schermo intero, senza pill né menu
 9. Con "Riduci movimento" attivo nel sistema → i cambi pagina avvengono senza animazioni
+
+### Flusso 28 — Più liste della spesa
+1. Apri la Lista → sotto "Lista  Pasti" c'è la riga delle schede con "Spesa ⌄" sottolineata e "+". Le voci di prima sono in "Spesa"
+2. Tocca "+" → "Nuova lista": scrivi "Casa", scegli "Coop" → "Crea lista" → toast "«Casa» creata", la scheda "Casa · Coop" è attiva e vuota
+3. Aggiungi "Latte" a Casa e anche a Spesa → le due voci hanno quantità indipendenti. Tocca "Spesa" e "Casa" per passare dall'una all'altra; ricarica → resta aperta l'ultima
+4. Ritocca la scheda attiva → "Modifica lista" con nome e supermercato; cambia nome → "Salva" → la scheda si aggiorna
+5. Pill → riga "Lista" su "Casa · Coop" → toccala, scegli "Spesa" e poi di nuovo "Casa" → "Inizia la spesa" → si entra subito in corsia da Coop (niente scelta del negozio), con "CASA" sopra la pillola del supermercato. In corsia c'è solo Latte
+6. Prendi Latte → "Fine" → conferma → Latte esce da Casa ma resta in Spesa. Nello Storico la card mostra "CASA" sopra "Coop"; nel pannello della pill la spesa mostra "Casa · <data>"
+7. Con una lista senza supermercato (Spesa) → "Inizia la spesa" mostra la scelta del supermercato come prima
+8. "Carica la tua spesa solita" in Casa propone solo i prodotti comprati con Casa; una lista nuova senza spese non lo mostra
+9. Pasti → "Importa piatti e vai alla lista" → sheet "In quale lista aggiungo gli ingredienti?" con l'ultima usata per i pasti selezionata → "Aggiungi a «…»" → si apre la Lista su quella scheda. Con una sola lista non chiede niente
+10. Ritocca "Casa" → "Archivia lista" → toast, la scheda sparisce. Con una sola lista attiva "Archivia lista" non c'è
+11. Menu → Gestisci → "Liste": frecce ↑↓ per riordinare (l'ordine delle schede segue); in "Archiviate" Casa con "Ripristina" (torna tra le schede con i suoi prodotti) ed "Elimina" → conferma "Elimina definitivamente" → sparisce, la spesa di Casa resta nello Storico senza etichetta
+12. Impostazioni → esporta un backup e reimportalo → liste, schede e voci tornano uguali
