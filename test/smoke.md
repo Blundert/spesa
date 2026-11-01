@@ -1,15 +1,17 @@
 ### Flusso 1 — Onboarding prima apertura
 1. Vai su http://localhost:5173 (con dati resettati / prima apertura)
 2. Verifica che venga mostrata la schermata di onboarding (slide 1: "Benvenuto in Spesa")
-3. Avanza tra le 4 slide tramite il pulsante "Avanti"
+3. Avanza tra le 4 slide tramite il pulsante "Avanti": "Benvenuto in Spesa", "Pianifica la settimana", "La tua lista", "Al supermercato"
 4. Verifica che l'ultima slide mostri il pulsante "Inizia"
 5. Clicca "Inizia"
-6. Verifica che si apra il tour in-app (indicatore "1 / 4" visibile)
-7. Clicca "Salta" per chiudere il tour
-8. Verifica che la schermata principale sia visibile senza overlay
+6. Verifica che si apra il tour in-app sulla Lista (indicatore "1 / 4"): evidenzia i titoli "Lista Pasti"
+7. "Avanti" → 2/4 evidenzia la pill in basso → "Avanti" → 3/4 il pannello della pill si apre da solo ed è evidenziato il blocco "Nuova spesa" (buoni + "Inizia la spesa"); toccare "Inizia la spesa" non fa nulla
+8. "Avanti" → il pannello si richiude, 4/4 evidenzia il cerchio del menu; "Indietro" riapre il pannello al passo 3
+9. Clicca "Salta" (o "Fine" all'ultimo passo) → il tour si chiude, nessun pannello resta aperto, la Lista è visibile senza overlay
+10. Il tour parte dalla Lista anche se lo si riavvia da Impostazioni → "Ripeti tutorial"
 
 ### Flusso 2 — Aggiunta articolo alla lista
-1. Dalla schermata principale, clicca su "Lista della spesa"
+1. Apri l'app: la schermata principale è la Lista
 2. Nel campo "Aggiungi un oggetto…", digita "Latte" e premi Invio
 3. Verifica che "Latte" appaia nella lista sotto la categoria corretta (es. Frigo)
 4. Verifica che le chip rapide (scroll orizzontale) mostrino articoli predefiniti alla prima apertura
@@ -26,7 +28,7 @@
 
 ### Flusso 4 — Persistenza dopo reload
 1. Ricarica la pagina (F5 / navigation reload)
-2. Vai su "Lista della spesa"
+2. La Lista si apre come home
 3. Verifica che "Latte" sia ancora presente nella lista
 
 ### Flusso 5 — Giorno di inizio settimana
@@ -94,12 +96,12 @@
 8. **Reset al totale calcolato**: dopo aver modificato il totale come sopra, tocca di nuovo il totale per riaprire il tastierino → deve comparire un bottone secondario "Usa il totale calcolato (€X)" con X pari alla somma dei prezzi degli articoli → tap → il totale mostrato torna a essere la somma degli articoli, toast "Modifiche salvate". Riapri il tastierino: il bottone secondario non deve più comparire (nessun override attivo) finché non si modifica di nuovo il totale a mano.
 
 ### Flusso 12 — Fine spesa non svuota gli articoli non acquistati
-1. Vai su "Lista della spesa" e aggiungi due articoli, es. "Latte" e "Pane"
+1. Vai sulla Lista (titolo "Lista" in alto) e aggiungi due articoli, es. "Latte" e "Pane"
 2. Naviga su http://localhost:5173/spesa, scegli un supermercato per avviare la sessione
 3. Verifica che entrambi appaiano in "Da prendere"
 4. Clicca su "Latte", inserisci un prezzo e conferma — verifica che si sposti in "Nel carrello"
 5. Clicca "Termina spesa", conferma il totale
-6. Vai su "Lista della spesa": verifica che "Pane" sia ancora presente (non acquistato) e che "Latte" sia sparito (acquistato)
+6. Vai sulla Lista (titolo "Lista" in alto): verifica che "Pane" sia ancora presente (non acquistato) e che "Latte" sia sparito (acquistato)
 
 ### Flusso 13 — Aggiornamento automatico app + notifica versione
 Nota: il service worker è attivo solo in build di produzione (`npm run build` + `npm run preview`), non in `npm run dev`.
@@ -114,7 +116,7 @@ Nota: il service worker è attivo solo in build di produzione (`npm run build` +
 9. In Impostazioni, verifica che il bottone "Aggiorna app" sia ancora presente e funzioni come prima (reset forzato SW + cache + reload)
 
 ### Flusso 14 — Catalogo piatti
-1. Dal menu principale, apri "Piatti"
+1. Dal menu (cerchio nero) → gruppo "Gestisci", apri "Piatti"
 2. Verifica il messaggio "Nessun piatto salvato." se non ce ne sono ancora
 3. Tocca "Aggiungi piatto" → si apre un bottom sheet "Nuovo piatto"
 4. Scrivi il nome del piatto (es. "Pasta al pomodoro")
@@ -127,7 +129,7 @@ Nota: il service worker è attivo solo in build di produzione (`npm run build` +
 11. Ricarica la pagina → verifica che i piatti salvati persistano
 
 ### Flusso 15 — Pianificazione pasti: piatto dal catalogo + checklist ingredienti
-1. Naviga su Pasti, tocca uno slot vuoto (es. "Pranzo" di lunedì) → si apre un bottom sheet con titolo "Lunedì · Pranzo"
+1. Tocca il titolo grigio "Pasti" accanto a "Lista", tocca uno slot vuoto (es. "Pranzo" di lunedì) → si apre un bottom sheet con titolo "Lunedì · Pranzo"
 2. Verifica che, finché stai scrivendo il nome del piatto, il bottone "Salva" **non** sia visibile. Digita il nome di un piatto non esistente → verifica il bottone "Crea piatto “…”" → toccalo → ora compare "Salva"
 3. Verifica che compaia la sezione INGREDIENTI con un campo "Aggiungi un ingrediente…"; digita e aggiungi 1-2 ingredienti (chip rimovibili) → tocca "Salva"
 4. Verifica che lo slot nella grid mostri il nome del piatto appena creato
@@ -140,7 +142,7 @@ Nota: il service worker è attivo solo in build di produzione (`npm run build` +
 ### Flusso 16 — Import ingredienti pianificati nella lista della spesa
 1. Su Pasti, pianifica lo stesso piatto (con lo stesso ingrediente spuntato) per due pasti diversi della settimana (es. pranzo lunedì e cena martedì)
 2. Verifica che in fondo alla pagina siano presenti due bottoni: "Vai alla lista della spesa" (comportamento invariato, solo navigazione) e "Importa piatti e vai alla lista"
-3. Tocca "Importa piatti e vai alla lista" → verifica di essere portato su Lista della spesa
+3. Tocca "Importa piatti e vai alla lista" → verifica di essere portato sulla Lista
 4. Verifica che l'ingrediente selezionato compaia con quantità 2 (una per ogni occorrenza pianificata) e il toast "2 ingredienti aggiunti alla lista"
 5. Torna su Pasti senza aver pianificato nulla di nuovo (o con nessun ingrediente selezionato) → tocca "Importa piatti e vai alla lista" → verifica che navighi comunque alla lista, senza toast e senza errori
 
@@ -164,7 +166,7 @@ Nota: il service worker è attivo solo in build di produzione (`npm run build` +
 5. Chiudi la tastiera (✓ della barra iOS o tap fuori dal campo) → il sheet resta quasi a schermo intero, senza salti
 6. In Sessione/Spesa → store picker: il sheet ha l'altezza normale finché non tocchi "Aggiungi supermercato" → si espande quasi a schermo intero e la tastiera si comporta come al punto 3
 7. Verifica che il drag-to-dismiss (swipe verso il basso sull'handle) funzioni ancora normalmente
-8. Chiudi il sheet con la tastiera aperta → la pagina sottostante (es. Pianifica i pasti) torna intatta, senza aree bianche o scroll spostato
+8. Chiudi il sheet con la tastiera aperta → la pagina sottostante (es. Pasti) torna intatta, senza aree bianche o scroll spostato
 
 ### Flusso 19 — Modifica buoni pasto di una spesa (durante e dopo)
 1. Avvia una nuova spesa con 2 buoni da €8,00 (barra in basso → stepper → "Inizia la spesa") e scegli un supermercato
@@ -174,7 +176,7 @@ Nota: il service worker è attivo solo in build di produzione (`npm run build` +
 5. Riapri il sheet, modifica gli stepper e chiudilo con swipe/tap fuori senza salvare → i valori non cambiano; riaprendolo riparte dai valori salvati
 6. Aggiungi un articolo al carrello (es. €30,00) → "Di tasca tua" = spesa − buoni × valore; modifica di nuovo i buoni, ricarica la pagina e verifica che il valore persista
 7. Tocca "Fine" e conferma la spesa → apri la sessione dallo Storico → sotto il totale c'è la riga "N buoni · €Y" (visibile anche con 0 buoni) → tocca → sheet con i valori della sessione → modifica → "Salva" → toast "Modifiche salvate", riga aggiornata
-8. Torna alla Home: "Di tasca tua" e "N buoni spesi · M rimanenti" riflettono i nuovi buoni della sessione
+8. Tocca la pill in basso: nel riepilogo della settimana "Di tasca tua", "Buoni spesi" e "Rimanenti" riflettono i nuovi buoni della sessione
 9. Ripeti il punto 7 su una sessione "Non completata" dello Storico
 
 ### Flusso 20 — Barra di stato chiara e velo con angoli arrotondati (test su iPhone, app installata in Home)
@@ -193,7 +195,7 @@ Nota: il service worker è attivo solo in build di produzione (`npm run build` +
 1. Impostazioni → sezione "Buoni pasto" → "Valore predefinito" mostra €8,00 (al primo avvio)
 2. Tocca "+" quattro volte → €10,00; tocca "−" fino in fondo → si ferma a €0,50; riporta a €10,00
 3. Ricarica la pagina → il valore resta €10,00
-4. Home → barra in basso → "Nuova spesa": "Valore buono" parte da €10,00 → avvia la spesa con 1 buono → "Di tasca tua" usa €10,00
+4. Pill in basso → "Nuova spesa": "Valore buono" parte da €10,00 → avvia la spesa con 1 buono → "Di tasca tua" usa €10,00
 5. Apri una spesa precedente dallo Storico → i suoi buoni mantengono il valore con cui era stata fatta (non diventano €10,00)
 
 ### Flusso 23 — Svuota lista
@@ -224,3 +226,14 @@ Nota: il service worker è attivo solo in build di produzione (`npm run build` +
 3. Verifica i conti: "Coperto dai buoni" + "Di tasca tua" = "Totale speso" del Riepilogo
 4. Una spesa con più buoni del totale (es. €10,00 con 3 buoni da €8,00) conta €10,00 come coperto e €0 di tasca tua (mai negativo)
 5. Cambia filtro (7 giorni, 30 giorni, Personalizzato) → la card segue il periodo; in un periodo senza spese la card non compare
+
+### Flusso 27 — Navigazione: Lista e Pasti, pill, menu e frecce
+1. Apri l'app → si apre la Lista; in alto "Lista" scuro e "Pasti" grigio. Visita http://localhost:5173/lista → reindirizza a `/`
+2. Tocca "Pasti" → dissolvenza breve, ora "Pasti" è scuro e "Lista" grigio; non c'è freccia indietro e la barra in basso resta visibile. Cambia settimana con le frecce
+3. Tocca la pill → il pannello mostra "Questa settimana · …", la card "Di tasca tua", Speso / Buoni spesi / Rimanenti, le ultime spese (al massimo 3, con "Vedi tutte (N)" se sono di più) e sotto "Nuova spesa" con "Inizia la spesa". Tocca una spesa → si chiude il pannello e si apre il suo dettaglio
+4. Apri il menu → tre gruppi: "Le tue spese" (Storico, Statistiche), "Gestisci" (Catalogo, Piatti, Supermercati), Impostazioni; nessuna voce "Lista" o "Settimana"
+5. Da Pasti apri Storico → la pagina entra da destra, con la freccia ‹ e la barra in basso. Dal menu apri Statistiche → dissolvenza; premi ‹ → torni su Pasti, sulla stessa settimana di prima
+6. Storico → tocca una spesa → il dettaglio entra da destra con la barra in basso; ‹ → torni allo Storico (la pagina rientra da sinistra); ‹ → torni alla sezione principale
+7. Apri direttamente http://localhost:5173/storico/<id> (senza cronologia) → ‹ porta allo Storico; apri http://localhost:5173/changelog → ‹ porta a Impostazioni
+8. Avvia una spesa → la schermata della spesa in corso è a schermo intero, senza pill né menu
+9. Con "Riduci movimento" attivo nel sistema → i cambi pagina avvengono senza animazioni

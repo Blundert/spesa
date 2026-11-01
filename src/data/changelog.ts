@@ -2,6 +2,22 @@ export type ChangelogEntry = { it: string[]; en: string[] }
 
 // Ordine: più recente in cima. Aggiungere una entry ad ogni nuova versione.
 export const changelog: Record<string, ChangelogEntry> = {
+  '0.36.0': {
+    it: [
+      'Navigazione ripensata: l\'app si apre sulla Lista e in alto tocchi "Pasti" per passare alla pianificazione della settimana (e "Lista" per tornare)',
+      'La barra in basso apre il riepilogo della settimana (di tasca tua, speso, buoni spesi e rimanenti, ultime spese) insieme a "Nuova spesa"; la schermata "La mia settimana" non c\'è più',
+      'Menu diviso in "Le tue spese" (Storico, Statistiche), "Gestisci" (Catalogo, Piatti, Supermercati) e Impostazioni; le sue pagine hanno la freccia ‹ che riporta a Lista o Pasti',
+      'La barra in basso è ora visibile ovunque, tranne durante la spesa; i cambi pagina sono animati',
+      'Tutorial e tour aggiornati alla nuova navigazione, incluso come iniziare una spesa',
+    ],
+    en: [
+      'Redesigned navigation: the app opens on the List, and tapping "Meals" at the top switches to weekly meal planning (tap "List" to go back)',
+      'The bottom bar opens the week summary (out of pocket, spent, vouchers used and remaining, latest trips) together with "New shopping"; the "My week" screen is gone',
+      'The menu is split into "Your spending" (History, Statistics), "Manage" (Catalog, Dishes, Supermarkets) and Settings; its pages have a ‹ arrow back to List or Meals',
+      'The bottom bar now shows everywhere except during a shopping trip; page changes are animated',
+      'Intro and tour updated for the new navigation, including how to start shopping',
+    ],
+  },
   '0.35.0': {
     it: ['Statistiche: nuova sezione "Buoni pasto e di tasca tua" con quanto del totale speso è stato coperto dai buoni e quanto hai pagato tu, in euro e in percentuale, più il numero di buoni usati nel periodo'],
     en: ['Statistics: new "Meal vouchers and out of pocket" section showing how much of the total was covered by vouchers and how much you paid yourself, in euros and percent, plus the number of vouchers used in the period'],
