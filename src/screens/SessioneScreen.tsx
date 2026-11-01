@@ -15,11 +15,12 @@ import { BottomSheet } from '../components/BottomSheet'
 import { PriceKeypad } from '../components/PriceKeypad'
 import { EditBuoniSheet } from '../components/BuoniSheet'
 import { useUpdateSession, useEditPastPurchase, useFinishPastSession } from '../hooks/useShopping'
+import { BackButton } from '../components/BackButton'
 
 export function SessioneScreen() {
   const { t } = useTranslation()
   const navigate = useNavigate()
-  const { sessionId: sessionIdStr } = useParams({ from: '/storico/$sessionId' })
+  const { sessionId: sessionIdStr } = useParams({ from: '/shell/storico/$sessionId' })
   const sessionId = parseInt(sessionIdStr, 10)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const [showStorePicker, setShowStorePicker] = useState(false)
@@ -135,19 +136,11 @@ export function SessioneScreen() {
 
   return (
     <>
-    <div className="flex flex-col h-full bg-[#F2F2F0]">
-      <div className="flex-none" style={{ height: 'max(16px, env(safe-area-inset-top))' }} />
+    <div className="flex-1 flex flex-col min-h-0">
       <div className="flex-1 overflow-y-auto px-5 pb-[120px]">
         {/* Header */}
         <div className="relative flex items-center pt-2 pb-[18px]">
-          <button
-            onClick={() => void navigate({ to: '/storico' })}
-            className="w-[34px] h-[34px] -ml-1.5 flex items-center justify-center active:opacity-50"
-          >
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2A2A2C" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M15 5l-7 7 7 7" />
-            </svg>
-          </button>
+          <BackButton fallback="/storico" />
           <div className="absolute left-1/2 -translate-x-1/2 flex flex-col items-center gap-0.5">
             <button
               onClick={() => setShowStorePicker(true)}

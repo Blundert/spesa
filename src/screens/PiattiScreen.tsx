@@ -6,6 +6,7 @@ import { normalizeName } from '../lib/normalize'
 import { BASE_ITEMS } from '../lib/baseItems'
 import { BottomSheet } from '../components/BottomSheet'
 import type { DishWithIngredients } from '../db/repositories/dishes'
+import { BackButton } from '../components/BackButton'
 
 interface Suggestion {
   name: string
@@ -124,7 +125,8 @@ export function PiattiScreen() {
   return (
     <>
       <div className="flex-1 overflow-y-auto px-5 pb-[120px]">
-        <div className="px-1 pt-2 pb-[18px]">
+        <div className="flex items-center gap-2 pt-2 pb-[18px]">
+          <BackButton />
           <span className="text-[26px] font-normal tracking-[-0.5px] text-[#2A2A2C]">{t('piatti.title')}</span>
         </div>
 

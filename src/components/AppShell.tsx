@@ -8,6 +8,7 @@ import { useWeekBudget, useSessionsByWeek } from '../hooks/useShopping'
 import { useAutoSync } from '../hooks/useAutoSync'
 import { getDebugViewport, onDebugViewportChange } from '../lib/debugFlag'
 import { getDefaultBuonoValueCents } from '../lib/buoniSettings'
+import { isPrimaryPath, rememberPrimary } from '../lib/primarySection'
 import { qk } from '../db/queryKeys'
 import { useQuery } from '@tanstack/react-query'
 import { db } from '../db/db'
@@ -41,8 +42,10 @@ export function AppShell() {
   const router = useRouter()
   const navigate = useNavigate()
   const pathname = router.state.location.pathname
+  const href = router.state.location.href
 
   useAutoSync()
+  useEffect(() => rememberPrimary(pathname, href), [pathname, href])
   useEffect(() => onDebugViewportChange(() => setShowDebug(getDebugViewport())), [])
 
   const { data: budget } = useWeekBudget(isoWeek)
@@ -193,44 +196,63 @@ function MenuSheet({
   pathname: string
 }) {
   const { t } = useTranslation()
-  const items: { to: string; label: string }[] = [
-    { to: '/storico', label: t('nav.history') },
-    { to: '/supermercati', label: t('nav.supermarkets') },
-    { to: '/catalogo', label: t('nav.catalog') },
-    { to: '/piatti', label: t('nav.dishes') },
-    { to: '/statistiche', label: t('nav.statistics') },
-    { to: '/impostazioni', label: t('nav.settings') },
+  const groups: { title?: string; items: { to: string; label: string }[] }[] = [
+    {
+      title: t('nav.groupSpending'),
+      items: [
+        { to: '/storico', label: t('nav.history') },
+        { to: '/statistiche', label: t('nav.statistics') },
+      ],
+    },
+    {
+      title: t('nav.groupManage'),
+      items: [
+        { to: '/catalogo', label: t('nav.catalog') },
+        { to: '/piatti', label: t('nav.dishes') },
+        { to: '/supermercati', label: t('nav.supermarkets') },
+      ],
+    },
+    { items: [{ to: '/impostazioni', label: t('nav.settings') }] },
   ]
+  // Fuori dalle sezioni principali le pagine del menu si sostituiscono a vicenda.
+  const replace = !isPrimaryPath(pathname)
   return (
     <BottomSheet open={open} onClose={onClose}>
-      <div className="text-[12px] font-normal tracking-[1.4px] text-[#9B9B9F] uppercase px-0.5 pb-[14px]">
-        {t('nav.menu')}
-      </div>
-      <div className="bg-[#F6F6F4] rounded-[18px] overflow-hidden">
-        {items.map((item, i) => {
-          const active = pathname === item.to
-          return (
-            <Link
-              key={item.to}
-              to={item.to}
-              onClick={onClose}
-              className="flex items-center justify-between px-[18px] py-[15px] active:opacity-50"
-              style={{ borderBottom: i < items.length - 1 ? '1px solid #E6E6E2' : 'none' }}
-            >
-              <span className={`text-[17px] text-[#2A2A2C] ${active ? 'font-semibold' : 'font-normal'}`}>
-                {item.label}
-              </span>
-              {active ? (
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2A2A2C" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M5 12l4 4 10-10" />
-                </svg>
-              ) : (
-                <ChevronRight />
-              )}
-            </Link>
-          )
-        })}
-      </div>
+      {groups.map((group, g) => (
+        <div key={g} className={g < groups.length - 1 ? 'mb-[18px]' : ''}>
+          {group.title && (
+            <div className="text-[12px] font-normal tracking-[1.4px] text-[#9B9B9F] uppercase px-0.5 pb-2">
+              {group.title}
+            </div>
+          )}
+          <div className="bg-[#F6F6F4] rounded-[18px] overflow-hidden">
+            {group.items.map((item, i) => {
+              const active = pathname === item.to
+              return (
+                <Link
+                  key={item.to}
+                  to={item.to}
+                  replace={replace}
+                  onClick={onClose}
+                  className="flex items-center justify-between px-[18px] py-[15px] active:opacity-50"
+                  style={{ borderBottom: i < group.items.length - 1 ? '1px solid #E6E6E2' : 'none' }}
+                >
+                  <span className={`text-[17px] text-[#2A2A2C] ${active ? 'font-semibold' : 'font-normal'}`}>
+                    {item.label}
+                  </span>
+                  {active ? (
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2A2A2C" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M5 12l4 4 10-10" />
+                    </svg>
+                  ) : (
+                    <ChevronRight />
+                  )}
+                </Link>
+              )
+            })}
+          </div>
+        </div>
+      ))}
     </BottomSheet>
   )
 }

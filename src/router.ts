@@ -77,7 +77,7 @@ const piattiRoute = createRoute({
   component: PiattiScreen,
 })
 
-// Standalone routes (no shell nav)
+// La spesa in corso è a schermo intero, senza barra né menu.
 const spesaRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/spesa',
@@ -93,7 +93,7 @@ const spesaRoute = createRoute({
   },
 })
 
-// Sezione principale accanto alla Lista: sta nella shell anche se è definita qui.
+// Sezione principale accanto alla Lista.
 const pastiRoute = createRoute({
   getParentRoute: () => shellRoute,
   path: '/pasti',
@@ -104,25 +104,25 @@ const pastiRoute = createRoute({
 })
 
 const pianificazioniRoute = createRoute({
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => shellRoute,
   path: '/pasti/storico',
   component: PianificazioniScreen,
 })
 
 const sessioneRoute = createRoute({
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => shellRoute,
   path: '/storico/$sessionId',
   component: SessioneScreen,
 })
 
 const itemDetailRoute = createRoute({
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => shellRoute,
   path: '/item/$itemId',
   component: ItemDetailScreen,
 })
 
 const changelogRoute = createRoute({
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => shellRoute,
   path: '/changelog',
   component: ChangelogScreen,
 })
@@ -137,13 +137,13 @@ const routeTree = rootRoute.addChildren([
     piattiRoute,
     statisticheRoute,
     impostazioniRoute,
+    pianificazioniRoute,
+    sessioneRoute,
+    itemDetailRoute,
+    changelogRoute,
   ]),
   listaAliasRoute,
   spesaRoute,
-  pianificazioniRoute,
-  sessioneRoute,
-  itemDetailRoute,
-  changelogRoute,
 ])
 
 export const router = createRouter({ routeTree })

@@ -1,5 +1,6 @@
 export const it = {
   common: {
+    back: 'Indietro',
     add: 'Aggiungi',
     cancel: 'Annulla',
     confirm: 'Conferma',
@@ -22,6 +23,8 @@ export const it = {
     startShopping: 'Inizia la spesa',
     openMenu: 'Apri menu',
     menu: 'Menu',
+    groupSpending: 'Le tue spese',
+    groupManage: 'Gestisci',
   },
   budget: {
     remaining: 'rimanente',

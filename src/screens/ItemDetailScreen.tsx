@@ -1,15 +1,15 @@
-import { useNavigate, useParams } from '@tanstack/react-router'
+import { useParams } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 import { formatCentsPlain } from '../lib/money'
 import { formatShortDate } from '../lib/date'
 import { useItemPriceHistory, useItemPriceByStore } from '../hooks/usePriceHistory'
 import { useQuery } from '@tanstack/react-query'
 import { db } from '../db/db'
+import { BackButton } from '../components/BackButton'
 
 export function ItemDetailScreen() {
   const { t } = useTranslation()
-  const navigate = useNavigate()
-  const { itemId: itemIdStr } = useParams({ from: '/item/$itemId' })
+  const { itemId: itemIdStr } = useParams({ from: '/shell/item/$itemId' })
   const itemId = parseInt(itemIdStr, 10)
 
   const { data: item } = useQuery({
@@ -55,19 +55,11 @@ export function ItemDetailScreen() {
   })()
 
   return (
-    <div className="flex flex-col h-full bg-[#F2F2F0]">
-      <div className="flex-none" style={{ height: 'max(16px, env(safe-area-inset-top))' }} />
+    <div className="flex-1 flex flex-col min-h-0">
       <div className="flex-1 overflow-y-auto px-5 pb-[120px]">
         {/* Header */}
         <div className="flex items-center gap-2 pt-2 pb-4">
-          <button
-            onClick={() => void navigate({ to: '/' })}
-            className="w-[34px] h-[34px] -ml-1.5 flex items-center justify-center active:opacity-50"
-          >
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2A2A2C" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M15 5l-7 7 7 7" />
-            </svg>
-          </button>
+          <BackButton fallback="/" />
           <span className="text-[24px] font-normal tracking-[-0.5px] text-[#2A2A2C]">
             {item?.name ?? '…'}
           </span>

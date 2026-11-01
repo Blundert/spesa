@@ -10,6 +10,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { qk } from '../db/queryKeys'
 import { compressImage } from '../lib/imageUtils'
 import type { Supermarket } from '../db/types'
+import { BackButton } from '../components/BackButton'
 
 export function SupermercatiScreen() {
   const { t } = useTranslation()
@@ -77,7 +78,8 @@ export function SupermercatiScreen() {
       />
 
       <div className="flex-1 overflow-y-auto px-5 pb-[120px]">
-        <div className="px-1 pt-2 pb-[18px]">
+        <div className="flex items-center gap-2 pt-2 pb-[18px]">
+          <BackButton />
           <span className="text-[26px] font-normal tracking-[-0.5px] text-[#2A2A2C]">{t('supermercati.title')}</span>
         </div>
 

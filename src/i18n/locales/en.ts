@@ -2,6 +2,7 @@ import type { it } from './it'
 
 export const en: typeof it = {
   common: {
+    back: 'Back',
     add: 'Add',
     cancel: 'Cancel',
     confirm: 'Confirm',
@@ -24,6 +25,8 @@ export const en: typeof it = {
     startShopping: 'Start shopping',
     openMenu: 'Open menu',
     menu: 'Menu',
+    groupSpending: 'Your spending',
+    groupManage: 'Manage',
   },
   budget: {
     remaining: 'remaining',

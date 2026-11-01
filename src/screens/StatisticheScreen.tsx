@@ -17,6 +17,7 @@ import {
   rangeToTimestamps,
 } from '../lib/statsRange'
 import { BottomSheet } from '../components/BottomSheet'
+import { BackButton } from '../components/BackButton'
 
 const PRESET_RANGES: StatsRange[] = ['7d', '30d', '3m', '6m', 'all']
 
@@ -84,7 +85,8 @@ export function StatisticheScreen() {
   return (
     <div className="flex-1 overflow-y-auto px-5 pb-[120px]">
       {/* Header */}
-      <div className="px-1 pt-2 pb-[14px]">
+      <div className="flex items-center gap-2 pt-2 pb-[14px]">
+        <BackButton />
         <span className="text-[26px] font-normal tracking-[-0.5px] text-[#2A2A2C]">{t('statistiche.title')}</span>
       </div>
 
