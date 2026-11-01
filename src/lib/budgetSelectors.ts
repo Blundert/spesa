@@ -63,3 +63,13 @@ export function liveSpendSummary(
     outOfPocketCents: Math.max(0, spentCents - buoniSpent * buoniValueCents),
   }
 }
+
+/**
+ * Scarto percentuale dello scontrino confermato rispetto alla somma degli oggetti:
+ * (confermato − calcolato) / calcolato, arrotondato a un decimale.
+ * Positivo = scontrino più alto degli oggetti. null se la somma degli oggetti è 0.
+ */
+export function receiptDeviationPercent(confirmedCents: number, computedCents: number): number | null {
+  if (computedCents <= 0) return null
+  return Math.round(((confirmedCents - computedCents) / computedCents) * 1000) / 10
+}

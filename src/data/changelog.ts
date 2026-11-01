@@ -2,6 +2,10 @@ export type ChangelogEntry = { it: string[]; en: string[] }
 
 // Ordine: più recente in cima. Aggiungere una entry ad ogni nuova versione.
 export const changelog: Record<string, ChangelogEntry> = {
+  '0.33.0': {
+    it: ['Storico: per ogni spesa confermata vedi anche il totale calcolato dagli oggetti ("calc. €…") e lo scarto in percentuale dello scontrino: arancione se hai pagato di più, verde se di meno'],
+    en: ['History: each confirmed trip now also shows the total computed from its items ("calc. €…") and how much the receipt differs in percent: orange if you paid more, green if less'],
+  },
   '0.32.0': {
     it: ['Lista: nuovo bottone "Svuota" in alto per togliere tutti gli oggetti in un colpo (con conferma). Catalogo e prezzi restano'],
     en: ['List: new "Clear" button at the top to remove all items at once (with confirmation). Catalog and prices are kept'],

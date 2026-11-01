@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { weekSpendSummary, liveSpendSummary } from './budgetSelectors'
+import { weekSpendSummary, liveSpendSummary, receiptDeviationPercent } from './budgetSelectors'
 import type { Session, Purchase } from '../db/types'
 
 function makeSession(overrides: Partial<Session> & { id: number }): Session {
@@ -134,5 +134,20 @@ describe('liveSpendSummary', () => {
     const r = liveSpendSummary(purchases, 1, 800)
     expect(r.spentCents).toBe(1000)
     expect(r.outOfPocketCents).toBe(200)
+  })
+})
+
+describe('receiptDeviationPercent', () => {
+  it('positivo se lo scontrino è più alto della somma degli oggetti', () => {
+    expect(receiptDeviationPercent(5230, 5010)).toBe(4.4)
+  })
+  it('negativo se lo scontrino è più basso', () => {
+    expect(receiptDeviationPercent(3100, 3205)).toBe(-3.3)
+  })
+  it('zero se coincidono', () => {
+    expect(receiptDeviationPercent(1840, 1840)).toBe(0)
+  })
+  it('null se la somma degli oggetti è 0', () => {
+    expect(receiptDeviationPercent(1000, 0)).toBeNull()
   })
 })

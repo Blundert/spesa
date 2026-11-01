@@ -202,3 +202,11 @@ Nota: il service worker è attivo solo in build di produzione (`npm run build` +
 3. Tocca "Svuota" → sheet "Svuotare la lista?" con "Tutti gli oggetti della lista (3) verranno rimossi…" → "Annulla" → la lista è intatta
 4. Tocca di nuovo "Svuota" → "Svuota lista" → toast "Lista svuotata", messaggio di lista vuota, "Svuota" sparisce
 5. Vai su Catalogo → Latte, Pane e Uova sono ancora presenti (con i loro prezzi)
+
+### Flusso 24 — Storico: totale calcolato e scarto dello scontrino
+1. Avvia una spesa, metti nel carrello oggetti per un totale di es. €27,55 → "Fine" → cambia l'importo in €28,80 → "Conferma spesa"
+2. Vai su Storico → la card mostra "… · 2 oggetti · calc. €27,55", a destra €28,80 e sotto l'etichetta arancione "+4,5%"
+3. Ripeti con uno scontrino più basso degli oggetti → etichetta verde con "−…%"
+4. Ripeti confermando esattamente il totale proposto → etichetta grigia "0%"
+5. Una spesa "Non completata" (senza totale confermato) o con 0 oggetti → niente "calc." e niente etichetta
+6. Apri una spesa e modificane il totale dal dettaglio → tornando allo Storico calcolato e scarto sono aggiornati

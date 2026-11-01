@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { Link } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
-import { formatCentsPlain } from '../lib/money'
+import { formatCentsPlain, formatSignedPercent } from '../lib/money'
+import { receiptDeviationPercent } from '../lib/budgetSelectors'
 import { formatShortDate, formatWeekLabel } from '../lib/date'
 import { useAllSessions, useDeleteWeek } from '../hooks/useShopping'
 import { useSupermarkets } from '../hooks/useItems'
@@ -138,6 +139,14 @@ function SessionCard({
   })
   const totalCents = confirmedTotalCents ?? computedCents
   const isCompleted = finishedAt !== null
+  // Con un totale confermato e oggetti con prezzo: mostra anche la somma degli oggetti e lo scarto %.
+  const deviation = confirmedTotalCents !== null ? receiptDeviationPercent(confirmedTotalCents, computedCents) : null
+  const deviationClass =
+    deviation === null || deviation === 0
+      ? 'bg-[#F2F2F0] text-[#9B9B9F]'
+      : deviation > 0
+        ? 'bg-[#FBEDE4] text-[#C2612A]'
+        : 'bg-[#E6F2EA] text-[#3B8A57]'
 
   return (
     <Link
@@ -154,11 +163,17 @@ function SessionCard({
         </div>
         <div className="text-[13px] text-[#9B9B9F] mt-0.5">
           {formatShortDate(date)} · {t('storico.itemsCount', { count: purchases.length })}
+          {deviation !== null && ` · ${t('storico.computed', { amount: formatCentsPlain(computedCents) })}`}
         </div>
       </div>
-      <span className="text-[22px] font-normal text-[#2A2A2C] tabular-nums">
-        €{formatCentsPlain(totalCents)}
-      </span>
+      <div className="flex flex-col items-end">
+        <span className="text-[22px] font-normal text-[#2A2A2C] tabular-nums">€{formatCentsPlain(totalCents)}</span>
+        {deviation !== null && (
+          <span className={`mt-1 text-[11px] leading-none rounded-full px-[7px] py-[3px] tabular-nums ${deviationClass}`}>
+            {formatSignedPercent(deviation)}
+          </span>
+        )}
+      </div>
     </Link>
   )
 }

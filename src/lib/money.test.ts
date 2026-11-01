@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { toCents, fromCents, formatCents, formatCentsPlain, addCents, clampCents } from './money'
+import { toCents, fromCents, formatCents, formatCentsPlain, addCents, clampCents, formatSignedPercent } from './money'
 
 describe('toCents', () => {
   it('converte euro interi in centesimi', () => {
@@ -56,5 +56,22 @@ describe('clampCents', () => {
   it('restituisce 0 per valori negativi', () => {
     expect(clampCents(-1)).toBe(0)
     expect(clampCents(-500)).toBe(0)
+  })
+})
+
+describe('formatSignedPercent', () => {
+  it('mostra il segno e la virgola', () => {
+    expect(formatSignedPercent(4.4)).toBe('+4,4%')
+    expect(formatSignedPercent(-3.3)).toBe('−3,3%')
+  })
+  it('zero (anche -0 o valori che arrotondano a 0) senza segno', () => {
+    expect(formatSignedPercent(0)).toBe('0%')
+    expect(formatSignedPercent(-0)).toBe('0%')
+    expect(formatSignedPercent(0.04)).toBe('0%')
+  })
+  it('toglie il ",0" finale e arrotonda a un decimale', () => {
+    expect(formatSignedPercent(5)).toBe('+5%')
+    expect(formatSignedPercent(-12)).toBe('−12%')
+    expect(formatSignedPercent(2.46)).toBe('+2,5%')
   })
 })

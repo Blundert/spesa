@@ -30,3 +30,15 @@ export function addCents(a: number, b: number): number {
 export function clampCents(cents: number): number {
   return Math.max(0, cents)
 }
+
+/**
+ * Format a percentage with explicit sign: "+4,4%", "−3,3%" (U+2212), "0%".
+ * One decimal at most, trailing ",0" dropped; comma as decimal separator like the amounts.
+ */
+export function formatSignedPercent(percent: number): string {
+  const rounded = Math.round(percent * 10) / 10
+  if (rounded === 0) return '0%'
+  const abs = Math.abs(rounded)
+  const body = (Number.isInteger(abs) ? String(abs) : abs.toFixed(1)).replace('.', ',')
+  return `${rounded > 0 ? '+' : '−'}${body}%`
+}
