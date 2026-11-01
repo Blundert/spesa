@@ -16,13 +16,12 @@ import { PageHeader, SectionTitle } from '../components/PageHeader'
 import { RangeSelector } from '../components/RangeSelector'
 import { useDesktopStats, type DesktopRange } from '../../hooks/useDesktopStats'
 import { formatCents } from '../../lib/money'
-import { dayShort, formatShortDate, formatWeekLabel } from '../../lib/date'
+import { dayShort, formatDate, formatWeekLabelWithYear } from '../../lib/date'
+import { SortableTable, type Column } from '../components/SortableTable'
+import type { SupermarketStat } from '../../db/repositories/statsExtended'
+import { CHART, seriesColor } from '../chartColors'
 
 const TOP_CATEGORIES = 6
-
-const AREA_COLORS = [
-  '#2A2A2C', '#6B6B70', '#9B9B9F', '#B5B5BA', '#D1D1D6', '#AEAEB2', '#48484A',
-]
 
 export function AdvancedStatsScreen() {
   const { t } = useTranslation()
@@ -49,7 +48,7 @@ export function AdvancedStatsScreen() {
   const otherLabel = t('desktop.stats.otherCategories')
   const allCategories = hasOthers ? [...topCategories, otherLabel] : topCategories
   const areaData = evoData.map((row) => {
-    const point: Record<string, number | string> = { label: formatWeekLabel(row.weekKey) }
+    const point: Record<string, number | string> = { label: formatWeekLabelWithYear(row.weekKey) }
     for (const name of topCategories) point[name] = row.categories[name] ?? 0
     if (hasOthers) {
       point[otherLabel] = Object.entries(row.categories)
@@ -61,13 +60,21 @@ export function AdvancedStatsScreen() {
 
   // Budget efficiency stacked bar
   const effData = (budgetEfficiency.data ?? []).map((r) => ({
-    label: formatWeekLabel(r.weekKey),
+    label: formatWeekLabelWithYear(r.weekKey),
     buoni: r.buoniCoveredCents,
     tasca: r.outOfPocketCents,
   }))
 
   // Supermarket table
   const smRows = supermarketStats.data ?? []
+
+  const smColumns: Column<SupermarketStat>[] = [
+    { key: 'name', label: t('desktop.stats.colSupermarket'), render: (r) => <span style={{ fontWeight: 500 }}>{r.name}</span>, sortValue: (r) => r.name },
+    { key: 'sessions', label: t('desktop.stats.colSessions'), render: (r) => r.sessionCount, sortValue: (r) => r.sessionCount },
+    { key: 'total', label: t('desktop.stats.colTotal'), render: (r) => `€ ${formatCents(r.totalCents)}`, sortValue: (r) => r.totalCents },
+    { key: 'avg', label: t('desktop.stats.colAvg'), render: (r) => `€ ${formatCents(r.avgCents)}`, sortValue: (r) => r.avgCents },
+    { key: 'last', label: t('desktop.stats.colLastVisit'), render: (r) => <span style={{ color: '#9B9B9F' }}>{formatDate(r.lastVisitTs)}</span>, sortValue: (r) => r.lastVisitTs },
+  ]
 
   return (
     <div style={{ padding: '32px 36px', maxWidth: '1200px' }}>
@@ -98,7 +105,7 @@ export function AdvancedStatsScreen() {
                 color: '#fff', fontSize: '13px',
               }}
             />
-            <Bar dataKey="sessions" fill="#2A2A2C" radius={[6, 6, 0, 0]} />
+            <Bar dataKey="sessions" fill={CHART.sessions} radius={[6, 6, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
       </div>
@@ -123,8 +130,8 @@ export function AdvancedStatsScreen() {
                 formatter={(v) => (v === 'buoni' ? t('desktop.stats.buoni') : t('desktop.stats.outOfPocket'))}
                 wrapperStyle={{ fontSize: '12px', color: '#9B9B9F' }}
               />
-              <Bar dataKey="buoni" stackId="a" fill="#9B9B9F" />
-              <Bar dataKey="tasca" stackId="a" fill="#2A2A2C" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="buoni" stackId="a" fill={CHART.buoni} />
+              <Bar dataKey="tasca" stackId="a" fill={CHART.outOfPocket} radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         ) : (
@@ -152,8 +159,8 @@ export function AdvancedStatsScreen() {
                   type="monotone"
                   dataKey={cat}
                   stackId="cats"
-                  stroke={AREA_COLORS[i % AREA_COLORS.length]}
-                  fill={AREA_COLORS[i % AREA_COLORS.length]}
+                  stroke={seriesColor(i)}
+                  fill={seriesColor(i)}
                   fillOpacity={0.85}
                   dot={false}
                 />
@@ -167,37 +174,7 @@ export function AdvancedStatsScreen() {
       {smRows.length > 0 && (
         <div style={{ background: '#fff', borderRadius: '16px', padding: '24px', marginBottom: '24px' }}>
           <SectionTitle>{t('desktop.stats.supermarketDetail')}</SectionTitle>
-          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '14px' }}>
-            <thead>
-              <tr>
-                {[t('desktop.stats.colSupermarket'), t('desktop.stats.colSessions'), t('desktop.stats.colTotal'), t('desktop.stats.colAvg'), t('desktop.stats.colLastVisit')].map((h) => (
-                  <th
-                    key={h}
-                    style={{
-                      textAlign: 'left', padding: '8px 12px 12px 0',
-                      fontSize: '11px', fontWeight: 500, color: '#9B9B9F',
-                      borderBottom: '1px solid #F2F2F0', letterSpacing: '0.3px',
-                    }}
-                  >
-                    {h}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {smRows.map((sm) => (
-                <tr key={sm.id} style={{ borderBottom: '1px solid #F2F2F0' }}>
-                  <td style={{ padding: '12px 12px 12px 0', color: '#2A2A2C', fontWeight: 500 }}>{sm.name}</td>
-                  <td style={{ padding: '12px 12px 12px 0', color: '#6B6B70' }}>{sm.sessionCount}</td>
-                  <td style={{ padding: '12px 12px 12px 0', color: '#2A2A2C' }}>€ {formatCents(sm.totalCents)}</td>
-                  <td style={{ padding: '12px 12px 12px 0', color: '#6B6B70' }}>€ {formatCents(sm.avgCents)}</td>
-                  <td style={{ padding: '12px 12px 12px 0', color: '#9B9B9F', fontSize: '13px' }}>
-                    {formatShortDate(sm.lastVisitTs)}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <SortableTable columns={smColumns} rows={smRows} rowKey={(r) => r.id} defaultSort={{ key: 'total', dir: 'desc' }} />
         </div>
       )}
     </div>

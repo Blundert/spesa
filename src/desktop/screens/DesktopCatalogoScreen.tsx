@@ -1,14 +1,17 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useNavigate } from '@tanstack/react-router'
 import { PageHeader, SectionTitle } from '../components/PageHeader'
 import { useCategories, useItems } from '../../hooks/useItems'
-import { compareNames } from '../../lib/normalize'
+import { SortableTable, type Column } from '../components/SortableTable'
+import type { Item } from '../../db/types'
 import { formatCents } from '../../lib/money'
 
 const ALL = -1
 
 export function DesktopCatalogoScreen() {
   const { t } = useTranslation()
+  const navigate = useNavigate()
   const { data: categories = [] } = useCategories()
   const { data: items = [] } = useItems()
   const [selected, setSelected] = useState<number>(ALL)
@@ -21,7 +24,12 @@ export function DesktopCatalogoScreen() {
   const needle = search.trim().toLowerCase()
   const visible = items
     .filter((i) => (selected === ALL || i.categoryId === selected) && i.name.toLowerCase().includes(needle))
-    .sort((a, b) => compareNames(a.name, b.name))
+
+  const columns: Column<Item>[] = [
+    { key: 'name', label: t('desktop.catalog.colName'), render: (i) => i.name, sortValue: (i) => i.name },
+    { key: 'category', label: t('desktop.catalog.colCategory'), render: (i) => <span style={{ color: '#9B9B9F' }}>{categoryName.get(i.categoryId) ?? ''}</span>, sortValue: (i) => categoryName.get(i.categoryId) ?? '' },
+    { key: 'price', label: t('desktop.catalog.colPrice'), align: 'right', render: (i) => (i.lastPriceCents !== null ? `€ ${formatCents(i.lastPriceCents)}` : '—'), sortValue: (i) => i.lastPriceCents },
+  ]
 
   const rowStyle = (active: boolean) => ({
     display: 'flex',
@@ -76,31 +84,14 @@ export function DesktopCatalogoScreen() {
               outline: 'none',
             }}
           />
-          {visible.length === 0 ? (
-            <div style={{ color: '#9B9B9F', fontSize: '14px', padding: '24px 0' }}>
-              {items.length === 0 ? t('catalogo.emptyItems') : t('desktop.catalog.noResults')}
-            </div>
-          ) : (
-            visible.map((i) => (
-              <div
-                key={i.id}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '16px',
-                  padding: '12px 0',
-                  borderBottom: '1px solid #F2F2F0',
-                  fontSize: '14px',
-                }}
-              >
-                <span style={{ flex: 1, minWidth: 0, color: '#2A2A2C' }}>{i.name}</span>
-                <span style={{ color: '#9B9B9F', fontSize: '13px' }}>{categoryName.get(i.categoryId) ?? ''}</span>
-                <span style={{ color: '#6B6B70', width: '80px', textAlign: 'right' }}>
-                  {i.lastPriceCents !== null ? `€ ${formatCents(i.lastPriceCents)}` : '—'}
-                </span>
-              </div>
-            ))
-          )}
+          <SortableTable
+            columns={columns}
+            rows={visible}
+            rowKey={(i) => i.id ?? 0}
+            defaultSort={{ key: 'name', dir: 'asc' }}
+            onRowClick={(i) => void navigate({ to: '/item/$itemId', params: { itemId: String(i.id) } })}
+            emptyMessage={items.length === 0 ? t('catalogo.emptyItems') : t('desktop.catalog.noResults')}
+          />
         </div>
       </div>
     </div>

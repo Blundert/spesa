@@ -283,3 +283,17 @@ Nota: il service worker è attivo solo in build di produzione (`npm run build` +
 5. Storico → tabella delle spese (data, supermercato, lista, buoni, di tasca, totale); filtro per supermercato e intervallo date (inclusi gli estremi); "Azzera filtri" li toglie; una spesa in corso mostra "In corso" al posto del totale
 6. Impostazioni → cambia lingua (tutto il desktop passa subito in inglese/italiano), valore predefinito del buono con − / +, giorno di inizio settimana (toast "Impostazione salvata", i grafici si ricalcolano), "Esporta dati" scarica il JSON, "Importa dati" con un file valido chiede conferma e poi toast "Dati importati"; con un file non valido → "File non valido"
 7. I valori impostati qui (lingua, buono, inizio settimana) sono gli stessi dell'app mobile: ricarica a viewport stretto e verifica che siano rimasti
+
+### Flusso 33 — Desktop: pagine, ordinamento, anno, colori
+1. Menu laterale desktop: Dashboard, Lista, Pasti, Storico, Statistiche; gruppo "Gestisci": Liste, Catalogo, Piatti, Supermercati; poi Impostazioni. In alto "Inizia la spesa" con il riepilogo della settimana (di tasca tua, speso, buoni)
+2. Tabelle ordinabili (Storico, Catalogo, dettaglio supermercati nelle Statistiche, Supermercati, Liste, Piatti, Pianificazioni, acquisti di una spesa, storico prezzi): clic sull'intestazione → ordina (▲), secondo clic → inverte (▼); i valori vuoti restano sempre in fondo
+3. Catalogo → ordina per Articolo, Categoria e Ultimo prezzo; clic su una riga apre il dettaglio articolo (prezzo medio/ultimo/min/max, storico prezzi, per supermercato)
+4. Storico → clic su una riga apre il dettaglio della spesa ("← Storico" per tornare); dentro: acquisti ordinabili, "Modifica importo/data/buoni/supermercato", "Elimina sessione"
+5. Date con anno ovunque (es. "7 giu 2026", settimana "31 ott – 6 nov 2026", a cavallo d'anno "29 dic 2025 – 4 gen 2026")
+6. Statistiche e Dashboard a colori: blu = totale, verde = coperto dai buoni, arancione = di tasca tua, categorie con colori distinti; nella Dashboard ogni supermercato mostra l'importo in euro accanto alla barra
+7. Lista → aggiungi voci (suggerimenti, chip), stepper quantità, ×, "Carica la tua spesa solita", schede delle liste (+ per crearne una, tocca la scheda per modificare/archiviare)
+8. Pasti → griglia settimanale giorni × pranzo/cena; clic su una cella: scegli o crea il piatto, spunta gli ingredienti, Salva/Rimuovi; "Importa piatti e vai alla lista" (con più liste chiede in quale); "Settimane" apre le pianificazioni
+9. "Inizia la spesa" → pannello con riepilogo, lista, buoni e valore → "Inizia la spesa" apre la spesa in corso (se la lista non ha supermercato chiede di sceglierlo). Clic su un prodotto → importo (accetta calcoli come `3,50-10%`) e quantità → "Aggiungi al carrello"; "Fine spesa" → importo calcolato precompilato → "Conferma spesa" porta allo Storico
+10. Supermercati → aggiungi/elimina, tessera fedeltà (carica/sostituisci/rimuovi), ultima visita con anno. Piatti → aggiungi/modifica/elimina con ingredienti. Liste → riordino con frecce, archiviate da ripristinare/eliminare
+11. Impostazioni → tutte quelle del mobile: versione (→ Novità), aggiorna/installa app, lingua, buoni, inizio settimana, tutorial, esporta/importa, azzera tutti i dati (con conferma), sincronizzazione GitHub (guida token, campi, sync automatico, sincronizza ora, scarica da remoto), debug viewport
+12. Con la finestra < 768 px (e ricarica) l'app mobile è identica a prima

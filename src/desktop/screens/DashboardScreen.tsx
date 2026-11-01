@@ -13,18 +13,15 @@ import {
   PieChart,
   Pie,
   Cell,
+  LabelList,
 } from 'recharts'
 import { StatCard } from '../components/StatCard'
 import { PageHeader, SectionTitle } from '../components/PageHeader'
 import { RangeSelector } from '../components/RangeSelector'
 import { useDesktopStats, type DesktopRange } from '../../hooks/useDesktopStats'
 import { formatCents } from '../../lib/money'
-import { formatWeekLabel } from '../../lib/date'
-
-const CATEGORY_COLORS = [
-  '#2A2A2C', '#6B6B70', '#9B9B9F', '#B5B5BA', '#D1D1D6', '#AEAEB2',
-  '#48484A', '#636366', '#8E8E93', '#C7C7CC',
-]
+import { formatWeekLabelWithYear } from '../../lib/date'
+import { CHART, seriesColor } from '../chartColors'
 
 interface CustomTooltipProps {
   active?: boolean
@@ -72,7 +69,7 @@ export function DashboardScreen() {
     const eff = efficiency.find((e) => e.weekKey === w.weekKey)
     return {
       weekKey: w.weekKey,
-      label: formatWeekLabel(w.weekKey),
+      label: formatWeekLabelWithYear(w.weekKey),
       totalCents: w.totalCents,
       outOfPocketCents: eff?.outOfPocketCents ?? w.totalCents,
     }
@@ -82,7 +79,7 @@ export function DashboardScreen() {
   const pieData = (s?.categoryBreakdown ?? []).map((c, i) => ({
     name: c.name,
     value: c.totalCents,
-    color: CATEGORY_COLORS[i % CATEGORY_COLORS.length],
+    color: seriesColor(i),
   }))
 
   // Bar chart: top supermarkets
@@ -153,20 +150,19 @@ export function DashboardScreen() {
                   type="monotone"
                   dataKey="totalCents"
                   name={t('desktop.dashboard.total')}
-                  stroke="#2A2A2C"
-                  strokeWidth={2}
+                  stroke={CHART.total}
+                  strokeWidth={2.5}
                   dot={false}
-                  activeDot={{ r: 4, fill: '#2A2A2C' }}
+                  activeDot={{ r: 4, fill: CHART.total }}
                 />
                 <Line
                   type="monotone"
                   dataKey="outOfPocketCents"
                   name={t('desktop.dashboard.outOfPocket')}
-                  stroke="#9B9B9F"
-                  strokeWidth={1.5}
-                  strokeDasharray="4 3"
+                  stroke={CHART.outOfPocket}
+                  strokeWidth={2}
                   dot={false}
-                  activeDot={{ r: 3, fill: '#9B9B9F' }}
+                  activeDot={{ r: 4, fill: CHART.outOfPocket }}
                 />
               </LineChart>
             </ResponsiveContainer>
@@ -252,19 +248,13 @@ export function DashboardScreen() {
             >
               <SectionTitle>{t('desktop.dashboard.supermarkets')}</SectionTitle>
               {smBarData.length > 0 ? (
-                <ResponsiveContainer width="100%" height={160}>
+                <ResponsiveContainer width="100%" height={Math.max(160, smBarData.length * 36)}>
                   <BarChart
                     data={smBarData}
                     layout="vertical"
-                    margin={{ top: 0, right: 8, left: 0, bottom: 0 }}
+                    margin={{ top: 0, right: 72, left: 0, bottom: 0 }}
                   >
-                    <XAxis
-                      type="number"
-                      tickFormatter={(v) => `€${(v / 100).toFixed(0)}`}
-                      tick={{ fontSize: 10, fill: '#9B9B9F' }}
-                      tickLine={false}
-                      axisLine={false}
-                    />
+                    <XAxis type="number" hide />
                     <YAxis
                       type="category"
                       dataKey="name"
@@ -283,7 +273,17 @@ export function DashboardScreen() {
                         fontSize: '13px',
                       }}
                     />
-                    <Bar dataKey="totalCents" fill="#2A2A2C" radius={[0, 6, 6, 0]} />
+                    <Bar dataKey="totalCents" radius={[0, 6, 6, 0]}>
+                      {smBarData.map((_, i) => (
+                        <Cell key={i} fill={seriesColor(i)} />
+                      ))}
+                      <LabelList
+                        dataKey="totalCents"
+                        position="right"
+                        formatter={(v) => `€ ${formatCents(Number(v))}`}
+                        style={{ fontSize: 12, fill: '#2A2A2C' }}
+                      />
+                    </Bar>
                   </BarChart>
                 </ResponsiveContainer>
               ) : (

@@ -1,5 +1,14 @@
 import { useRouter, useRouterState } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
+import { NewShoppingButton } from './NewShoppingModal'
+
+function Icon({ children }: { children: React.ReactNode }) {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      {children}
+    </svg>
+  )
+}
 
 type NavItem = {
   path: string
@@ -7,55 +16,115 @@ type NavItem = {
   icon: React.ReactNode
 }
 
-const NAV_ITEMS: NavItem[] = [
+type NavGroup = { titleKey?: string; items: NavItem[] }
+
+const NAV_GROUPS: NavGroup[] = [
   {
-    path: '/',
-    labelKey: 'desktop.nav.dashboard',
-    icon: (
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" />
-        <rect x="3" y="14" width="7" height="7" /><rect x="14" y="14" width="7" height="7" />
-      </svg>
-    ),
+    items: [
+      {
+        path: '/',
+        labelKey: 'desktop.nav.dashboard',
+        icon: (
+          <Icon>
+            <rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" />
+            <rect x="3" y="14" width="7" height="7" /><rect x="14" y="14" width="7" height="7" />
+          </Icon>
+        ),
+      },
+      {
+        path: '/lista',
+        labelKey: 'desktop.nav.lista',
+        icon: (
+          <Icon>
+            <path d="M9 6h12M9 12h12M9 18h12" /><path d="M3 6l1 1 2-2M3 12l1 1 2-2M3 18l1 1 2-2" />
+          </Icon>
+        ),
+      },
+      {
+        path: '/pasti',
+        labelKey: 'desktop.nav.meals',
+        icon: (
+          <Icon>
+            <rect x="3" y="4" width="18" height="18" rx="2" /><path d="M16 2v4M8 2v4M3 10h18" />
+          </Icon>
+        ),
+      },
+      {
+        path: '/storico',
+        labelKey: 'desktop.nav.history',
+        icon: (
+          <Icon>
+            <circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" />
+          </Icon>
+        ),
+      },
+      {
+        path: '/stats',
+        labelKey: 'desktop.nav.stats',
+        icon: (
+          <Icon>
+            <line x1="18" y1="20" x2="18" y2="10" /><line x1="12" y1="20" x2="12" y2="4" />
+            <line x1="6" y1="20" x2="6" y2="14" />
+          </Icon>
+        ),
+      },
+    ],
   },
   {
-    path: '/stats',
-    labelKey: 'desktop.nav.stats',
-    icon: (
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <line x1="18" y1="20" x2="18" y2="10" /><line x1="12" y1="20" x2="12" y2="4" />
-        <line x1="6" y1="20" x2="6" y2="14" />
-      </svg>
-    ),
+    titleKey: 'nav.groupManage',
+    items: [
+      {
+        path: '/liste',
+        labelKey: 'desktop.nav.lists',
+        icon: (
+          <Icon>
+            <rect x="8" y="3" width="13" height="14" rx="2" /><path d="M5 7v12a2 2 0 002 2h10" />
+          </Icon>
+        ),
+      },
+      {
+        path: '/catalogo',
+        labelKey: 'desktop.nav.catalog',
+        icon: (
+          <Icon>
+            <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z" /><line x1="3" y1="6" x2="21" y2="6" />
+            <path d="M16 10a4 4 0 01-8 0" />
+          </Icon>
+        ),
+      },
+      {
+        path: '/piatti',
+        labelKey: 'desktop.nav.dishes',
+        icon: (
+          <Icon>
+            <path d="M4 3v7a3 3 0 003 3v8M7 3v7M10 3v7a3 3 0 01-3 3M18 3c-2 2-3 5-3 8h3v10" />
+          </Icon>
+        ),
+      },
+      {
+        path: '/supermercati',
+        labelKey: 'desktop.nav.supermarkets',
+        icon: (
+          <Icon>
+            <path d="M3 9l2-5h14l2 5M3 9v11h18V9M3 9h18M9 20v-6h6v6" />
+          </Icon>
+        ),
+      },
+    ],
   },
   {
-    path: '/catalogo',
-    labelKey: 'desktop.nav.catalog',
-    icon: (
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z" /><line x1="3" y1="6" x2="21" y2="6" />
-        <path d="M16 10a4 4 0 01-8 0" />
-      </svg>
-    ),
-  },
-  {
-    path: '/storico',
-    labelKey: 'desktop.nav.history',
-    icon: (
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" />
-      </svg>
-    ),
-  },
-  {
-    path: '/impostazioni',
-    labelKey: 'desktop.nav.settings',
-    icon: (
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <circle cx="12" cy="12" r="3" />
-        <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z" />
-      </svg>
-    ),
+    items: [
+      {
+        path: '/impostazioni',
+        labelKey: 'desktop.nav.settings',
+        icon: (
+          <Icon>
+            <circle cx="12" cy="12" r="3" />
+            <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z" />
+          </Icon>
+        ),
+      },
+    ],
   },
 ]
 
@@ -87,38 +156,57 @@ export function Sidebar() {
         </div>
       </div>
 
+      <NewShoppingButton />
+
       {/* Nav items */}
-      <nav style={{ flex: 1, padding: '12px 12px' }}>
-        {NAV_ITEMS.map((item) => {
-          const isActive =
-            item.path === '/' ? currentPath === '/' : currentPath.startsWith(item.path)
-          return (
-            <button
-              key={item.path}
-              onClick={() => router.navigate({ to: item.path as never })}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '10px',
-                width: '100%',
-                padding: '10px 12px',
-                borderRadius: '10px',
-                border: 'none',
-                background: isActive ? '#F2F2F0' : 'transparent',
-                color: isActive ? '#2A2A2C' : '#9B9B9F',
-                fontSize: '14px',
-                fontWeight: isActive ? 500 : 400,
-                cursor: 'pointer',
-                textAlign: 'left',
-                marginBottom: '2px',
-                transition: 'background 0.15s, color 0.15s',
-              }}
-            >
-              {item.icon}
-              {t(item.labelKey)}
-            </button>
-          )
-        })}
+      <nav style={{ flex: 1, padding: '12px 12px', overflowY: 'auto' }}>
+        {NAV_GROUPS.map((group, g) => (
+          <div key={g} style={{ marginBottom: '12px' }}>
+            {group.titleKey && (
+              <div
+                style={{
+                  fontSize: '11px',
+                  color: '#9B9B9F',
+                  letterSpacing: '0.8px',
+                  textTransform: 'uppercase',
+                  padding: '8px 12px 6px',
+                }}
+              >
+                {t(group.titleKey)}
+              </div>
+            )}
+            {group.items.map((item) => {
+              const isActive =
+                item.path === '/' ? currentPath === '/' : currentPath.startsWith(item.path)
+              return (
+                <button
+                  key={item.path}
+                  onClick={() => router.navigate({ to: item.path as never })}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '10px',
+                    width: '100%',
+                    padding: '10px 12px',
+                    borderRadius: '10px',
+                    border: 'none',
+                    background: isActive ? '#F2F2F0' : 'transparent',
+                    color: isActive ? '#2A2A2C' : '#9B9B9F',
+                    fontSize: '14px',
+                    fontWeight: isActive ? 500 : 400,
+                    cursor: 'pointer',
+                    textAlign: 'left',
+                    marginBottom: '2px',
+                    transition: 'background 0.15s, color 0.15s',
+                  }}
+                >
+                  {item.icon}
+                  {t(item.labelKey)}
+                </button>
+              )
+            })}
+          </div>
+        ))}
       </nav>
     </aside>
   )

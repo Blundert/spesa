@@ -131,3 +131,26 @@ export function formatLongDate(ts: number): string {
   const dayIdx = (d.getDay() + 6) % 7 // convert Sun=0 to Mon=0
   return `${DAY_NAMES_SHORT[lang()][dayIdx].toLowerCase()} ${d.getDate()} ${MONTH_NAMES[lang()][d.getMonth()]} ${d.getFullYear()}`
 }
+
+/**
+ * Formats a timestamp (ms) as "7 giu 2026" (day + short month + year).
+ */
+export function formatDate(ts: number): string {
+  const d = new Date(ts)
+  return `${d.getDate()} ${MONTH_NAMES[lang()][d.getMonth()]} ${d.getFullYear()}`
+}
+
+/**
+ * Formats a week key with the year: "9 – 15 giu 2026" or, across a year end,
+ * "29 dic 2025 – 4 gen 2026".
+ */
+export function formatWeekLabelWithYear(weekKey: string): string {
+  const { start, end } = weekRange(weekKey)
+  const endYear = end.getUTCFullYear()
+  if (start.getUTCFullYear() !== endYear) {
+    const startMonth = MONTH_NAMES[lang()][start.getUTCMonth()]
+    const endMonth = MONTH_NAMES[lang()][end.getUTCMonth()]
+    return `${start.getUTCDate()} ${startMonth} ${start.getUTCFullYear()} – ${end.getUTCDate()} ${endMonth} ${endYear}`
+  }
+  return `${formatWeekLabel(weekKey)} ${endYear}`
+}

@@ -8,7 +8,10 @@ import { useShoppingLists } from '../../hooks/useShoppingLists'
 import { db } from '../../db/db'
 import { outOfPocketCents } from '../../lib/budgetSelectors'
 import { formatCents } from '../../lib/money'
-import { formatShortDate } from '../../lib/date'
+import { formatDate } from '../../lib/date'
+import { SortableTable, type Column } from '../components/SortableTable'
+import type { Session } from '../../db/types'
+import { useNavigate } from '@tanstack/react-router'
 
 /** Totale calcolato dagli acquisti, per sessione (fallback quando manca l'importo confermato). */
 function usePurchaseTotals() {
@@ -33,20 +36,9 @@ const inputStyle = {
   color: '#2A2A2C',
 }
 
-const thStyle = {
-  textAlign: 'left' as const,
-  padding: '8px 12px 12px 0',
-  fontSize: '11px',
-  fontWeight: 500,
-  color: '#9B9B9F',
-  borderBottom: '1px solid #F2F2F0',
-  letterSpacing: '0.3px',
-}
-
-const tdStyle = { padding: '12px 12px 12px 0', color: '#2A2A2C', fontSize: '14px' }
-
 export function DesktopStoricoScreen() {
   const { t } = useTranslation()
+  const navigate = useNavigate()
   const { data: sessions = [] } = useAllSessions()
   const { data: supermarkets = [] } = useSupermarkets()
   const { data: lists = [] } = useShoppingLists()
@@ -69,6 +61,19 @@ export function DesktopStoricoScreen() {
       (toTs === null || s.startedAt <= toTs),
   )
   const hasFilters = supermarketId !== null || from !== '' || to !== ''
+
+  const totalOf = (s: Session) => s.confirmedTotalCents ?? totals?.get(s.id ?? 0) ?? 0
+  const outOfPocketOf = (s: Session) =>
+    s.finishedAt === null ? null : outOfPocketCents(totalOf(s), s.buoniSpent, s.buoniValueCents)
+
+  const columns: Column<Session>[] = [
+    { key: 'date', label: t('desktop.history.colDate'), render: (s) => <span style={{ color: '#6B6B70' }}>{formatDate(s.startedAt)}</span>, sortValue: (s) => s.startedAt },
+    { key: 'supermarket', label: t('desktop.history.colSupermarket'), render: (s) => <span style={{ fontWeight: 500 }}>{smName.get(s.supermarketId) ?? '?'}</span>, sortValue: (s) => smName.get(s.supermarketId) ?? '' },
+    { key: 'list', label: t('desktop.history.colList'), render: (s) => <span style={{ color: '#9B9B9F' }}>{s.listId !== undefined ? (listName.get(s.listId) ?? '') : ''}</span>, sortValue: (s) => (s.listId !== undefined ? listName.get(s.listId) : null) },
+    { key: 'buoni', label: t('desktop.history.colBuoni'), render: (s) => s.buoniSpent, sortValue: (s) => s.buoniSpent },
+    { key: 'pocket', label: t('desktop.history.colOutOfPocket'), render: (s) => { const v = outOfPocketOf(s); return v === null ? '—' : `€ ${formatCents(v)}` }, sortValue: outOfPocketOf },
+    { key: 'total', label: t('desktop.history.colTotal'), align: 'right', render: (s) => (s.finishedAt === null ? t('desktop.history.inProgress') : `€ ${formatCents(totalOf(s))}`), sortValue: (s) => (s.finishedAt === null ? null : totalOf(s)) },
+  ]
 
   return (
     <div style={{ padding: '32px 36px', maxWidth: '1200px' }}>
@@ -111,46 +116,14 @@ export function DesktopStoricoScreen() {
       </div>
 
       <div style={{ background: '#fff', borderRadius: '16px', padding: '24px' }}>
-        {rows.length === 0 ? (
-          <div style={{ color: '#9B9B9F', fontSize: '14px', textAlign: 'center', padding: '48px 0' }}>
-            {sessions.length === 0 ? t('storico.empty') : t('desktop.history.noResults')}
-          </div>
-        ) : (
-          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-            <thead>
-              <tr>
-                <th style={thStyle}>{t('desktop.history.colDate')}</th>
-                <th style={thStyle}>{t('desktop.history.colSupermarket')}</th>
-                <th style={thStyle}>{t('desktop.history.colList')}</th>
-                <th style={thStyle}>{t('desktop.history.colBuoni')}</th>
-                <th style={thStyle}>{t('desktop.history.colOutOfPocket')}</th>
-                <th style={{ ...thStyle, textAlign: 'right', paddingRight: 0 }}>{t('desktop.history.colTotal')}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map((s) => {
-                const total = s.confirmedTotalCents ?? totals?.get(s.id ?? 0) ?? 0
-                const done = s.finishedAt !== null
-                return (
-                  <tr key={s.id} style={{ borderBottom: '1px solid #F2F2F0' }}>
-                    <td style={{ ...tdStyle, color: '#6B6B70' }}>{formatShortDate(s.startedAt)}</td>
-                    <td style={{ ...tdStyle, fontWeight: 500 }}>{smName.get(s.supermarketId) ?? '?'}</td>
-                    <td style={{ ...tdStyle, color: '#9B9B9F' }}>
-                      {s.listId !== undefined ? (listName.get(s.listId) ?? '') : ''}
-                    </td>
-                    <td style={{ ...tdStyle, color: '#6B6B70' }}>{s.buoniSpent}</td>
-                    <td style={{ ...tdStyle, color: '#6B6B70' }}>
-                      {done ? `€ ${formatCents(outOfPocketCents(total, s.buoniSpent, s.buoniValueCents))}` : '—'}
-                    </td>
-                    <td style={{ ...tdStyle, textAlign: 'right', paddingRight: 0 }}>
-                      {done ? `€ ${formatCents(total)}` : t('desktop.history.inProgress')}
-                    </td>
-                  </tr>
-                )
-              })}
-            </tbody>
-          </table>
-        )}
+        <SortableTable
+          columns={columns}
+          rows={rows}
+          rowKey={(s) => s.id ?? 0}
+          defaultSort={{ key: 'date', dir: 'desc' }}
+          onRowClick={(s) => void navigate({ to: '/storico/$sessionId', params: { sessionId: String(s.id) } })}
+          emptyMessage={sessions.length === 0 ? t('storico.empty') : t('desktop.history.noResults')}
+        />
       </div>
     </div>
   )

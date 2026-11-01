@@ -19,6 +19,8 @@ import {
   formatWeekLabel,
   formatShortDate,
   formatLongDate,
+  formatDate,
+  formatWeekLabelWithYear,
 } from './date'
 
 beforeEach(() => {
@@ -249,5 +251,31 @@ describe('formatLongDate', () => {
   it('inglese domenica: "sun 9 Jun 2024"', () => {
     mockI18n.language = 'en'
     expect(formatLongDate(tsSun)).toBe('sun 9 Jun 2024')
+  })
+})
+
+// ---------------------------------------------------------------------------
+// formatDate / formatWeekLabelWithYear
+// ---------------------------------------------------------------------------
+
+describe('formatDate', () => {
+  it('giorno, mese breve e anno (it)', () => {
+    expect(formatDate(new Date(2026, 5, 7, 12).getTime())).toBe('7 giu 2026')
+  })
+
+  it('segue la lingua attiva (en)', () => {
+    mockI18n.language = 'en'
+    expect(formatDate(new Date(2026, 5, 7, 12).getTime())).toBe('7 Jun 2026')
+  })
+})
+
+describe('formatWeekLabelWithYear', () => {
+  it('aggiunge l\'anno a una settimana nello stesso anno', () => {
+    expect(formatWeekLabelWithYear('2026-06-08')).toBe('8 – 14 giu 2026')
+    expect(formatWeekLabelWithYear('2026-06-29')).toBe('29 giu – 5 lug 2026')
+  })
+
+  it('mostra entrambi gli anni a cavallo di capodanno', () => {
+    expect(formatWeekLabelWithYear('2025-12-29')).toBe('29 dic 2025 – 4 gen 2026')
   })
 })

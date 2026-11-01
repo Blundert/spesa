@@ -2,6 +2,20 @@ export type ChangelogEntry = { it: string[]; en: string[] }
 
 // Ordine: più recente in cima. Aggiungere una entry ad ogni nuova versione.
 export const changelog: Record<string, ChangelogEntry> = {
+  '0.40.0': {
+    it: [
+      'Versione desktop completa: tutte le pagine dell\'app sono ora disponibili anche su schermo largo (Lista, Pasti, Spesa in corso, Storico e dettaglio spesa, Liste, Catalogo, Piatti, Supermercati, Novità e Impostazioni complete di sincronizzazione GitHub), con il pulsante "Inizia la spesa" nel menu laterale',
+      'Tabelle ordinabili: clicca sull\'intestazione di una colonna per ordinare, di nuovo per invertire. Nel Catalogo puoi ordinare per nome, categoria e prezzo',
+      'Le date mostrano anche l\'anno, e le settimane nei grafici pure',
+      'Statistiche e Dashboard a colori; nella Dashboard i supermercati mostrano l\'importo in euro',
+    ],
+    en: [
+      'Complete desktop version: every page of the app is now available on wide screens too (List, Meals, Shopping in progress, History and trip details, Lists, Catalogue, Dishes, Supermarkets, What\'s new and full Settings including GitHub sync), with the "Start shopping" button in the side menu',
+      'Sortable tables: click a column header to sort, click again to reverse. In the Catalogue you can sort by name, category and price',
+      'Dates now show the year too, and so do the weeks in the charts',
+      'Statistics and Dashboard in colour; on the Dashboard supermarkets show the amount in euros',
+    ],
+  },
   '0.39.0': {
     it: [
       'Versione desktop: aprendo l\'app su uno schermo largo (da 768 px) trovi un\'interfaccia dedicata con menu laterale fisso. Su telefono non cambia nulla',
