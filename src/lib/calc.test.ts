@@ -1,5 +1,15 @@
-import { describe, it, expect } from 'vitest'
-import { backspace, centsToExpr, evaluate, MAX_EXPR_LENGTH, pressKey, type CalcKey } from './calc'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import {
+  backspace,
+  centsToExpr,
+  evaluate,
+  getKeypadMode,
+  KEYPAD_MODE_KEY,
+  MAX_EXPR_LENGTH,
+  pressKey,
+  setKeypadMode,
+  type CalcKey,
+} from './calc'
 
 /** Digita una sequenza di tasti partendo da un'espressione. */
 function type(keys: CalcKey[], from = ''): string {
@@ -152,5 +162,40 @@ describe('evaluate', () => {
     expect(evaluate('1−2')).toBeNull()
     expect(evaluate('99999,99')).toBe(9_999_999)
     expect(evaluate('99999,99+0,01')).toBeNull()
+  })
+})
+
+describe('modalità del tastierino', () => {
+  const store: Record<string, string> = {}
+  beforeEach(() => {
+    for (const k of Object.keys(store)) delete store[k]
+    vi.stubGlobal('localStorage', {
+      getItem: (k: string) => store[k] ?? null,
+      setItem: (k: string, v: string) => {
+        store[k] = v
+      },
+    })
+  })
+  afterEach(() => {
+    vi.unstubAllGlobals()
+  })
+
+  it('di default è il tastierino semplice', () => {
+    expect(getKeypadMode()).toBe('simple')
+  })
+  it('ricorda l’ultima modalità scelta', () => {
+    setKeypadMode('calc')
+    expect(store[KEYPAD_MODE_KEY]).toBe('calc')
+    expect(getKeypadMode()).toBe('calc')
+    setKeypadMode('simple')
+    expect(getKeypadMode()).toBe('simple')
+  })
+  it('senza storage usa il semplice e non si rompe', () => {
+    const boom = () => {
+      throw new Error('blocked')
+    }
+    vi.stubGlobal('localStorage', { getItem: boom, setItem: boom })
+    expect(getKeypadMode()).toBe('simple')
+    expect(() => setKeypadMode('calc')).not.toThrow()
   })
 })

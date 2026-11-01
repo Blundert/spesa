@@ -12,6 +12,12 @@ export const en: typeof it = {
     save: 'Save',
     quantity: 'Quantity',
   },
+  keypad: {
+    simple: 'Simple keypad',
+    calculator: 'Calculator',
+    clear: 'Clear all',
+    backspace: 'Delete',
+  },
   nav: {
     meals: 'Meals',
     history: 'History',

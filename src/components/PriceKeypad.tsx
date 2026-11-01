@@ -2,6 +2,16 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Drawer } from 'vaul'
 import { formatCentsPlain } from '../lib/money'
+import {
+  backspace,
+  centsToExpr,
+  evaluate,
+  getKeypadMode,
+  pressKey,
+  setKeypadMode,
+  type CalcKey,
+  type KeypadMode,
+} from '../lib/calc'
 
 interface PriceKeypadProps {
   open: boolean
@@ -37,8 +47,12 @@ export function PriceKeypad({
 }: PriceKeypadProps) {
   const { t } = useTranslation()
   const confirmText = confirmLabel ?? t('common.confirm')
+  const [mode, setMode] = useState<KeypadMode>(getKeypadMode)
   const [cents, setCents] = useState(initialCents)
   const [quantity, setQuantity] = useState(initialQuantity)
+  // Modalità calcolatrice: espressione digitata e ultimo risultato valido.
+  const [expr, setExpr] = useState(() => centsToExpr(initialCents))
+  const [lastValid, setLastValid] = useState(initialCents)
 
   // All'apertura (o se cambiano i valori iniziali mentre è aperto) riparte da quelli:
   // stato aggiornato durante il render invece che in un effetto.
@@ -47,9 +61,36 @@ export function PriceKeypad({
   if (resetKey !== prevResetKey) {
     setPrevResetKey(resetKey)
     if (open) {
+      setMode(getKeypadMode())
       setCents(initialCents)
       setQuantity(initialQuantity)
+      setExpr(centsToExpr(initialCents))
+      setLastValid(initialCents)
     }
+  }
+
+  const result = mode === 'calc' ? evaluate(expr) : cents
+  // Con un'espressione non valida si mostra l'ultimo risultato valido, in grigio.
+  const shownCents = result ?? lastValid
+  const valid = result !== null
+
+  const setCalc = (next: string) => {
+    setExpr(next)
+    const r = evaluate(next)
+    if (r !== null) setLastValid(r)
+  }
+
+  // Il valore passa da una modalità all'altra.
+  const switchMode = (next: KeypadMode) => {
+    if (next === mode) return
+    if (next === 'calc') {
+      setExpr(centsToExpr(cents))
+      setLastValid(cents)
+    } else {
+      setCents(shownCents)
+    }
+    setMode(next)
+    setKeypadMode(next)
   }
 
   const digit = (d: number) => setCents((c) => Math.min(c * 10 + d, 9_999_999))
@@ -71,6 +112,30 @@ export function PriceKeypad({
     { label: '⌫', onTap: del },
   ]
 
+  const calcKey = (k: CalcKey) => ({ label: k, onTap: () => setCalc(pressKey(expr, k)) })
+  const calcKeys: Array<{ label: string; onTap: () => void; op?: boolean; danger?: boolean; aria?: string }> = [
+    calcKey('7'),
+    calcKey('8'),
+    calcKey('9'),
+    { ...calcKey('('), op: true },
+    { ...calcKey(')'), op: true },
+    calcKey('4'),
+    calcKey('5'),
+    calcKey('6'),
+    { ...calcKey('×'), op: true },
+    { ...calcKey('÷'), op: true },
+    calcKey('1'),
+    calcKey('2'),
+    calcKey('3'),
+    { ...calcKey('+'), op: true },
+    { ...calcKey('−'), op: true },
+    calcKey(','),
+    calcKey('0'),
+    { label: '⌫', onTap: () => setCalc(backspace(expr)), aria: t('keypad.backspace') },
+    { ...calcKey('%'), op: true },
+    { label: 'C', onTap: () => setCalc(''), op: true, danger: true, aria: t('keypad.clear') },
+  ]
+
   return (
     <Drawer.Root open={open} onOpenChange={(v) => !v && onClose()} dismissible>
       <Drawer.Portal>
@@ -81,16 +146,34 @@ export function PriceKeypad({
         <Drawer.Content className="fixed bottom-0 z-[90] w-full max-w-[430px] left-1/2 -translate-x-1/2 bg-white rounded-t-[30px] px-[22px] pb-[calc(22px+env(safe-area-inset-bottom))] pt-[10px] shadow-[0_-12px_44px_rgba(0,0,0,.16)] outline-none">
           <Drawer.Handle className="w-[38px] h-[5px] rounded-full bg-[#D8D8D6] mx-auto mb-4" />
 
+          {/* Modalità + nome */}
+          <div className="relative flex items-center justify-center min-h-[30px] mb-[6px]">
+            <div className="absolute left-0 flex bg-[#F2F2F0] rounded-full p-[3px]" role="group">
+              <ModeButton active={mode === 'simple'} label={t('keypad.simple')} onTap={() => switchMode('simple')}>
+                123
+              </ModeButton>
+              <ModeButton active={mode === 'calc'} label={t('keypad.calculator')} onTap={() => switchMode('calc')}>
+                ±×÷
+              </ModeButton>
+            </div>
+            <div className="text-sm text-[#9B9B9F] px-[100px] truncate">{label}</div>
+          </div>
+
           {/* Display */}
           <div className="text-center pb-[18px]">
-            <div className="text-sm text-[#9B9B9F] mb-[10px]">{label}</div>
-            <div className="flex items-baseline justify-center text-[#2A2A2C]">
+            {/* Espressione (solo calcolatrice; la riga c'è sempre così l'altezza non cambia) */}
+            <div
+              className={`min-h-[22px] whitespace-nowrap overflow-hidden text-[#9B9B9F] tracking-[.2px] ${expr.length > 22 ? 'text-[14px]' : 'text-[17px]'}`}
+            >
+              {mode === 'calc' ? formatExpr(expr) : ''}
+            </div>
+            <div className={`flex items-baseline justify-center ${valid ? 'text-[#2A2A2C]' : 'text-[#B5B5BA]'}`}>
               <span className="text-[30px] font-normal text-[#B5B5BA] mr-1">€</span>
               <span className="text-[62px] font-light leading-[.95] tabular-nums tracking-[-1.5px]">
-                {formatCentsPlain(cents)}
+                {formatCentsPlain(shownCents)}
               </span>
             </div>
-            <PriceCompareRow lastPriceCents={lastPriceCents} cents={cents} />
+            <PriceCompareRow lastPriceCents={lastPriceCents} cents={shownCents} />
           </div>
 
           {/* Quantità */}
@@ -124,17 +207,34 @@ export function PriceKeypad({
           )}
 
           {/* Keys */}
-          <div className="grid grid-cols-3 gap-[10px] mb-[14px]">
-            {keys.map((k) => (
-              <button
-                key={k.label}
-                onClick={k.onTap}
-                className="h-14 flex items-center justify-center bg-[#F2F2F0] rounded-2xl text-2xl font-normal text-[#2A2A2C] active:bg-[#E6E6E4] transition-colors select-none"
-              >
-                {k.label}
-              </button>
-            ))}
-          </div>
+          {mode === 'simple' ? (
+            <div className="grid grid-cols-3 gap-[10px] mb-[14px]">
+              {keys.map((k) => (
+                <button
+                  key={k.label}
+                  onClick={k.onTap}
+                  className="h-14 flex items-center justify-center bg-[#F2F2F0] rounded-2xl text-2xl font-normal text-[#2A2A2C] active:bg-[#E6E6E4] transition-colors select-none"
+                >
+                  {k.label}
+                </button>
+              ))}
+            </div>
+          ) : (
+            <div className="grid grid-cols-5 gap-[10px] mb-[14px]">
+              {calcKeys.map((k) => (
+                <button
+                  key={k.label}
+                  onClick={k.onTap}
+                  aria-label={k.aria}
+                  className={`h-14 flex items-center justify-center rounded-2xl text-2xl font-normal transition-colors select-none ${
+                    k.op ? 'bg-[#E6E6E4] active:bg-[#D8D8D6]' : 'bg-[#F2F2F0] active:bg-[#E6E6E4]'
+                  } ${k.danger ? 'text-[#D14343]' : 'text-[#2A2A2C]'}`}
+                >
+                  {k.label}
+                </button>
+              ))}
+            </div>
+          )}
 
           {secondaryAction && (
             <button
@@ -150,18 +250,50 @@ export function PriceKeypad({
 
           <button
             onClick={() => {
-              onConfirm(cents, quantity)
+              if (result === null) return
+              onConfirm(result, quantity)
               onClose()
             }}
-            className="w-full bg-[#2A2A2C] text-white text-[17px] font-normal py-[18px] rounded-[20px] active:scale-[.98] transition-transform"
+            disabled={!valid}
+            className="w-full bg-[#2A2A2C] text-white text-[17px] font-normal py-[18px] rounded-[20px] active:scale-[.98] transition-transform disabled:opacity-40 disabled:active:scale-100"
           >
-            {confirmText} €{formatCentsPlain(cents)}
+            {confirmText} €{formatCentsPlain(shownCents)}
             {quantity > 1 ? ` ×${quantity}` : ''}
           </button>
         </Drawer.Content>
       </Drawer.Portal>
     </Drawer.Root>
   )
+}
+
+function ModeButton({
+  active,
+  label,
+  onTap,
+  children,
+}: {
+  active: boolean
+  label: string
+  onTap: () => void
+  children: string
+}) {
+  return (
+    <button
+      onClick={onTap}
+      aria-label={label}
+      aria-pressed={active}
+      className={`text-[13px] px-[11px] py-[5px] rounded-full transition-colors ${
+        active ? 'bg-white text-[#2A2A2C] shadow-[0_1px_3px_rgba(0,0,0,.08)]' : 'text-[#9B9B9F]'
+      }`}
+    >
+      {children}
+    </button>
+  )
+}
+
+/** Spazi attorno alle operazioni, come nel mockup: "(4,50 − 30%) × 2". */
+function formatExpr(expr: string): string {
+  return expr.replace(/[+−×÷]/g, (op) => ` ${op} `)
 }
 
 function PriceCompareRow({

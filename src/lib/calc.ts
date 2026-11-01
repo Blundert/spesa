@@ -172,3 +172,26 @@ export function evaluate(expr: string): number | null {
   if (cents < 0 || cents > MAX_CENTS) return null
   return cents
 }
+
+// ---------------------------------------------------------------------------
+// Modalità del tastierino: si ricorda l'ultima usata (localStorage).
+// ---------------------------------------------------------------------------
+
+export type KeypadMode = 'simple' | 'calc'
+export const KEYPAD_MODE_KEY = 'keypad-mode'
+
+export function getKeypadMode(): KeypadMode {
+  try {
+    return localStorage.getItem(KEYPAD_MODE_KEY) === 'calc' ? 'calc' : 'simple'
+  } catch {
+    return 'simple'
+  }
+}
+
+export function setKeypadMode(mode: KeypadMode): void {
+  try {
+    localStorage.setItem(KEYPAD_MODE_KEY, mode)
+  } catch {
+    // Storage non disponibile: la modalità vale solo per questa apertura.
+  }
+}

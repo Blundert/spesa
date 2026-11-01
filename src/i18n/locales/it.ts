@@ -10,6 +10,12 @@ export const it = {
     save: 'Salva',
     quantity: 'Quantità',
   },
+  keypad: {
+    simple: 'Tastierino semplice',
+    calculator: 'Calcolatrice',
+    clear: 'Cancella tutto',
+    backspace: 'Cancella',
+  },
   nav: {
     meals: 'Pasti',
     history: 'Storico',
