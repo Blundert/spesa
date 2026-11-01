@@ -151,6 +151,10 @@ Nota: il service worker è attivo solo in build di produzione (`npm run build` +
 4. Vai su Catalogo → verifica che l'articolo sia comparso nella categoria corretta (quella del suggerimento), non in "Altro"
 5. Torna su Spesa, tocca di nuovo "Aggiungi fuori lista", digita un nome che non corrisponde a nulla → verifica che non compaia alcun suggerimento, solo il bottone "Continua" → conferma un prezzo
 6. Vai su Catalogo → verifica che questo secondo articolo sia comparso sotto "Altro"
+7. Tocca "Aggiungi fuori lista", digita un nome nuovo (es. "Zenzero candito") → "Continua" → nel tastierino verifica i due bottoni "Aggiungi senza prezzo" e "Aggiungi al carrello"
+8. Tocca "Aggiungi senza prezzo" → toast "… aggiunto da prendere" → l'oggetto compare tra le voci da prendere (categoria corretta, qui "Altro"), il totale non cambia
+9. Tocca l'oggetto → tastierino → inserisci un prezzo → "Aggiungi al carrello" → l'oggetto passa in "Nel carrello" col prezzo e il totale si aggiorna
+10. Ripeti con un suggerimento (es. "Latte"): toccando il suggerimento si apre il tastierino, "Aggiungi senza prezzo" lo mette da prendere nella sua categoria
 
 ### Flusso 18 — Bottom sheet con input e tastiera (test su dispositivo iOS reale)
 1. Su un iPhone reale (non simulabile in desktop), apri uno dei bottom sheet con un campo di testo: Catalogo → "Aggiungi categoria" (o "Rinomina categoria/articolo"), Supermercati → "Nuovo supermercato", Spesa → "Aggiungi fuori lista", Piatti → "Aggiungi piatto", Pasti → tocca uno slot vuoto, Statistiche → chip "Personalizzato"

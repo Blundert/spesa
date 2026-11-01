@@ -2,6 +2,10 @@ export type ChangelogEntry = { it: string[]; en: string[] }
 
 // Ordine: più recente in cima. Aggiungere una entry ad ogni nuova versione.
 export const changelog: Record<string, ChangelogEntry> = {
+  '0.31.0': {
+    it: ['Spesa → "Aggiungi fuori lista": nel tastierino c\'è ora "Aggiungi senza prezzo". L\'oggetto finisce tra quelli da prendere e il prezzo lo inserisci dopo, toccandolo'],
+    en: ['Shopping → "Add off-list item": the keypad now has "Add without price". The item goes to the ones to pick up and you enter the price later by tapping it'],
+  },
   '0.30.0': {
     it: ['Impostazioni → Buoni pasto: scegli il valore predefinito di un buono, proposto ogni volta che inizi una nuova spesa (prima era sempre €8,00)'],
     en: ['Settings → Meal vouchers: choose the default value of a voucher, suggested every time you start a new shopping trip (it used to be always €8.00)'],

@@ -24,6 +24,7 @@ import {
   useRemovePurchasedFromList,
   useRemoveFromList,
   useAddToList,
+  useAddNewItemToList,
 } from '../hooks/useListItems'
 import { useSupermarkets, useCategories, useItems } from '../hooks/useItems'
 import { normalizeName } from '../lib/normalize'
@@ -115,6 +116,7 @@ export function SpesaScreen() {
   const updateSession = useUpdateSession()
   const removeFromList = useRemoveFromList()
   const addToList = useAddToList()
+  const addNewItemToList = useAddNewItemToList(altroCategoryId)
   const removePurchasedFromList = useRemovePurchasedFromList()
   const qc = useQueryClient()
 
@@ -158,6 +160,34 @@ export function SpesaScreen() {
     )
   }
 
+  // Item fuori lista: nome (ed eventuale categoria, se scelto da un suggerimento) già inseriti.
+  // Se la categoria non è già nota (nessun suggerimento toccato), la si ricava da un eventuale
+  // match esatto (Item esistente o articolo base), altrimenti "Altro" — stesso comportamento di
+  // ListaScreen. Dati letti freschi (non dalla closure).
+  const resolveOffListCategory = async (target: { name: string; categoryId?: number }): Promise<number> => {
+    if (target.categoryId !== undefined) return target.categoryId
+    const { getItems } = await import('../db/repositories/items')
+    const { getCategories } = await import('../db/repositories/categories')
+    const [cats, allItems] = await Promise.all([getCategories(), getItems()])
+    const catIdByName = new Map(cats.map((c) => [c.name, c.id ?? 0]))
+    const altroId = catIdByName.get('Altro') ?? 0
+    const normalized = normalizeName(target.name)
+    const existingItem = allItems.find((it) => normalizeName(it.name) === normalized)
+    const baseMatch = BASE_ITEMS.find((b) => normalizeName(b.name) === normalized)
+    return existingItem?.categoryId ?? (baseMatch ? catIdByName.get(baseMatch.category) ?? altroId : altroId)
+  }
+
+  // Fuori lista senza prezzo: finisce tra le voci "da prendere"; il prezzo si inserisce
+  // dopo, toccando la voce come una qualsiasi voce della lista.
+  const handleAddOffListWithoutPrice = async (target: { name: string; categoryId?: number }) => {
+    const categoryId = await resolveOffListCategory(target)
+    await addNewItemToList.mutateAsync({ name: target.name, categoryId })
+    toast(t('spesa.addedWithoutPrice', { name: target.name }), {
+      description: t('spesa.addedWithoutPriceHint'),
+    })
+    setNewItemName('')
+  }
+
   const handleConfirmPrice = useCallback(
     async (cents: number, quantity: number) => {
       if (!activeSession?.id) return
@@ -179,22 +209,8 @@ export function SpesaScreen() {
         }
         setPriceTarget(null)
       } else if (newItemTarget) {
-        // Item fuori lista: nome (ed eventuale categoria, se scelto da un suggerimento) già inseriti.
-        // Se la categoria non è già nota (nessun suggerimento toccato), la si ricava da un eventuale
-        // match esatto (Item esistente o articolo base), altrimenti "Altro" — stesso comportamento di
-        // ListaScreen. Dati letti freschi (non dalla closure) per restare coerenti col resto della funzione.
-        const { upsertItem, getItems } = await import('../db/repositories/items')
-        const { getCategories } = await import('../db/repositories/categories')
-        let categoryId = newItemTarget.categoryId
-        if (categoryId === undefined) {
-          const [cats, allItems] = await Promise.all([getCategories(), getItems()])
-          const catIdByName = new Map(cats.map((c) => [c.name, c.id ?? 0]))
-          const altroId = catIdByName.get('Altro') ?? 0
-          const normalized = normalizeName(newItemTarget.name)
-          const existingItem = allItems.find((it) => normalizeName(it.name) === normalized)
-          const baseMatch = BASE_ITEMS.find((b) => normalizeName(b.name) === normalized)
-          categoryId = existingItem?.categoryId ?? (baseMatch ? catIdByName.get(baseMatch.category) ?? altroId : altroId)
-        }
+        const { upsertItem } = await import('../db/repositories/items')
+        const categoryId = await resolveOffListCategory(newItemTarget)
         const itemId = await upsertItem(newItemTarget.name, categoryId, cents)
         await addPurchase.mutateAsync({ sessionId: activeSession.id, itemId, priceCents: cents, quantity })
         toast(t('spesa.itemAdded', { name: newItemTarget.name }), {
@@ -570,6 +586,11 @@ export function SpesaScreen() {
         confirmLabel={t('spesa.addToCart')}
         showQuantity
         onConfirm={handleConfirmPrice}
+        secondaryAction={
+          newItemTarget
+            ? { label: t('spesa.addWithoutPrice'), onTap: () => void handleAddOffListWithoutPrice(newItemTarget) }
+            : undefined
+        }
       />
 
       {/* Conferma importo a fine spesa — pre-compilato col totale calcolato,
