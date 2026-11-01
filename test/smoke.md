@@ -268,3 +268,9 @@ Nota: il service worker è attivo solo in build di produzione (`npm run build` +
 2. Ripeti in fondo alla pagina, trascinando verso l'alto oltre la fine e poi subito verso il basso
 3. Ripeti dentro un pannello lungo (es. menu o riepilogo della pill) e sulle schede delle liste in orizzontale
 4. In nessun caso lo scroll resta "congelato" finché non si tocca lo schermo
+
+### Flusso 31 — Ordine alfabetico di categorie e prodotti
+1. Aggiungi alla lista prodotti di categorie diverse, in ordine sparso (es. Zucchine, Pane, Banane, Acqua, Latte)
+2. Lista → le categorie sono in ordine alfabetico e, dentro ognuna, i prodotti pure (Banane prima di Zucchine), indipendentemente dall'ordine di inserimento; maiuscole e accenti non contano
+3. Avvia una spesa → in corsia le categorie e i prodotti "da prendere" sono nello stesso ordine alfabetico (prima seguivano l'ordine di creazione delle categorie). Il carrello resta in ordine di acquisto
+4. Menu → Catalogo → dentro ogni categoria i prodotti sono in ordine alfabetico

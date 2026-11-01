@@ -2,6 +2,10 @@ export type ChangelogEntry = { it: string[]; en: string[] }
 
 // Ordine: più recente in cima. Aggiungere una entry ad ogni nuova versione.
 export const changelog: Record<string, ChangelogEntry> = {
+  '0.38.2': {
+    it: ['Ordine alfabetico ovunque: categorie e prodotti dentro ogni categoria in Lista, in corsia durante la spesa e nel Catalogo'],
+    en: ['Alphabetical order everywhere: categories and the items inside each one in the List, in the aisle while shopping and in the Catalogue'],
+  },
   '0.38.1': {
     it: ['iPhone: lo scroll non dovrebbe più bloccarsi dopo essere arrivati in cima o in fondo a una pagina (prima ripartiva solo con un tap)'],
     en: ['iPhone: scrolling should no longer get stuck after reaching the top or bottom of a page (before, it only came back after a tap)'],

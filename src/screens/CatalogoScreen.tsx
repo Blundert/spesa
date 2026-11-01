@@ -13,6 +13,7 @@ import {
 import { BottomSheet } from '../components/BottomSheet'
 import { db } from '../db/db'
 import type { Category, Item } from '../db/types'
+import { compareNames } from '../lib/normalize'
 import { BackButton } from '../components/BackButton'
 
 export function CatalogoScreen() {
@@ -124,7 +125,7 @@ export function CatalogoScreen() {
 
   // Raggruppa articoli per categoria
   const itemsByCategory = categories.reduce<Record<number, Item[]>>((acc, c) => {
-    if (c.id !== undefined) acc[c.id] = items.filter((i) => i.categoryId === c.id)
+    if (c.id !== undefined) acc[c.id] = items.filter((i) => i.categoryId === c.id).sort((a, b) => compareNames(a.name, b.name))
     return acc
   }, {})
 

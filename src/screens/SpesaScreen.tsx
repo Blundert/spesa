@@ -28,7 +28,7 @@ import {
 } from '../hooks/useListItems'
 import { useSupermarkets, useCategories, useItems } from '../hooks/useItems'
 import { useActiveList } from '../hooks/useShoppingLists'
-import { normalizeName } from '../lib/normalize'
+import { compareNames, normalizeName } from '../lib/normalize'
 import { BASE_ITEMS } from '../lib/baseItems'
 import { PriceKeypad } from '../components/PriceKeypad'
 import { BottomSheet } from '../components/BottomSheet'
@@ -281,13 +281,17 @@ export function SpesaScreen() {
       `item ${p.itemId}`,
   }))
 
-  // Raggruppa todo per categoria
-  const todoByCategory = todoItems.reduce<Record<string, typeof todoItems>>((acc, li) => {
-    const cat = li.itemCategoryId.toString()
-    if (!acc[cat]) acc[cat] = []
-    acc[cat].push(li)
-    return acc
-  }, {})
+  // Raggruppa todo per categoria: categorie e voci in ordine alfabetico
+  const todoByCategory = [...todoItems]
+    .sort((a, b) => compareNames(a.itemName, b.itemName))
+    .reduce<Record<string, typeof todoItems>>((acc, li) => {
+      const cat = li.itemCategoryId.toString()
+      if (!acc[cat]) acc[cat] = []
+      acc[cat].push(li)
+      return acc
+    }, {})
+  const categoryLabelOf = (catId: string) => catMap[Number(catId)] ?? t('categories.5')
+  const todoGroups = Object.entries(todoByCategory).sort(([a], [b]) => compareNames(categoryLabelOf(a), categoryLabelOf(b)))
 
   if (!activeSession) {
     return (
@@ -392,10 +396,10 @@ export function SpesaScreen() {
       {/* Scroll area */}
       <div className="flex-1 overflow-y-auto px-5 pb-[150px]">
         {/* Da prendere */}
-        {Object.entries(todoByCategory).map(([_catId, items]) => (
-          <div key={_catId} className="mb-4">
+        {todoGroups.map(([catId, items]) => (
+          <div key={catId} className="mb-4">
             <div className="text-[12px] font-normal tracking-[1.2px] text-[#9B9B9F] uppercase px-1.5 pb-[13px]">
-              {catMap[items[0]?.itemCategoryId ?? 0] ?? t('categories.5')}
+              {categoryLabelOf(catId)}
             </div>
             <div className="bg-white rounded-[20px] overflow-hidden">
               {items.map((li, i) => (

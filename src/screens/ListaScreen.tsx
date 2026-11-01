@@ -6,7 +6,7 @@ import { formatCentsPlain } from '../lib/money'
 import { useListItems, useAddNewItemToList, useAddToList, useRemoveFromList, useUpdateListQuantity, useClearList } from '../hooks/useListItems'
 import { toast } from 'sonner'
 import { useCategories, useItems, useSupermarkets } from '../hooks/useItems'
-import { normalizeName } from '../lib/normalize'
+import { compareNames, normalizeName } from '../lib/normalize'
 import { BASE_ITEMS } from '../lib/baseItems'
 import { BottomSheet } from '../components/BottomSheet'
 import { SectionTitle } from '../components/SectionTitle'
@@ -51,17 +51,18 @@ export function ListaScreen() {
   // Build category map id → name
   const catMap = Object.fromEntries(categories.map((c) => [c.id ?? 0, categoryLabel(t, c.name)]))
 
-  // Group by category
+  // Group by category (categorie già in ordine alfabetico; voci in ordine alfabetico)
+  const sortedListItems = [...listItems].sort((a, b) => compareNames(a.itemName, b.itemName))
   const grouped = categories
     .map((cat) => {
-      const catItems = listItems.filter((li) => li.itemCategoryId === cat.id)
+      const catItems = sortedListItems.filter((li) => li.itemCategoryId === cat.id)
       return { cat, items: catItems }
     })
     .filter(({ items }) => items.length > 0)
 
   // Also add uncategorized items (categoryId not in categories)
   const catIds = new Set(categories.map((c) => c.id))
-  const otherItems = listItems.filter((li) => !catIds.has(li.itemCategoryId))
+  const otherItems = sortedListItems.filter((li) => !catIds.has(li.itemCategoryId))
   if (otherItems.length > 0) {
     grouped.push({ cat: { id: 0, name: t('categories.5'), sortOrder: 99 }, items: otherItems })
   }

@@ -1,9 +1,10 @@
 import { db } from '../db'
 import type { Category } from '../types'
+import { compareNames } from '../../lib/normalize'
 
 export async function getCategories(): Promise<Category[]> {
   const cats = await db.categories.toArray()
-  return cats.sort((a, b) => a.name.localeCompare(b.name, 'it', { sensitivity: 'base' }))
+  return cats.sort((a, b) => compareNames(a.name, b.name))
 }
 
 export async function getCategoryById(id: number): Promise<Category | undefined> {
