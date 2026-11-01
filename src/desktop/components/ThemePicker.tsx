@@ -11,18 +11,13 @@ export function ThemePicker() {
   const inUse = resolveTheme(pref, systemDark)
 
   return (
-    <div style={{ background: 'var(--t-surface)', borderRadius: '16px', padding: '24px', gridColumn: '1 / -1', minWidth: 0 }}>
+    <div style={{ background: 'var(--t-surface)', borderRadius: '16px', padding: '24px', columnSpan: 'all', minWidth: 0, marginBottom: '24px', containerType: 'inline-size' }}>
       <SectionTitle>{t('theme.title')}</SectionTitle>
       <div
         role="radiogroup"
         aria-label={t('theme.label')}
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))',
-          gap: '10px',
-          opacity: pref.auto ? 0.55 : 1,
-          marginBottom: '20px',
-        }}
+        className="theme-grid"
+        style={{ opacity: pref.auto ? 0.55 : 1, marginBottom: '20px' }}
       >
         {THEME_IDS.map((id) => {
           const p = THEME_PREVIEW[id]

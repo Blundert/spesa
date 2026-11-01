@@ -34,7 +34,7 @@ const LANGS: { code: Lang; label: string }[] = [
 
 function Card({ title, hint, children }: { title: string; hint?: string; children: ReactNode }) {
   return (
-    <div style={{ background: 'var(--t-surface)', borderRadius: '16px', padding: '24px', minWidth: 0 }}>
+    <div style={{ background: 'var(--t-surface)', borderRadius: '16px', padding: '24px', minWidth: 0, breakInside: 'avoid', marginBottom: '24px' }}>
       <SectionTitle>{title}</SectionTitle>
       {hint && <div style={{ fontSize: '13px', color: 'var(--t-muted)', margin: '-8px 0 16px' }}>{hint}</div>}
       {children}
@@ -272,8 +272,8 @@ export function DesktopImpostazioniScreen() {
   return (
     <div style={{ padding: 'var(--page-pad-y) var(--page-pad-x)', maxWidth: '1200px' }}>
       <PageHeader title={t('settings.title')} subtitle={t('desktop.settings.subtitle')} />
-      {/* Schede tutte della stessa larghezza: una scheda sola in fondo non si allarga a tutta la riga. */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))', gap: '24px', alignItems: 'start' }}>
+      {/* Colonne in stile "muratura": schede della stessa larghezza, ognuna sotto la precedente, al massimo due colonne (con tre, la scheda alta della sincronizzazione lascia un buco). */}
+      <div style={{ columnWidth: '340px', columnCount: 2, columnGap: '24px' }}>
         <ThemePicker />
 
         <Card title={t('settings.language')}>

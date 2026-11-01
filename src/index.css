@@ -172,3 +172,22 @@ html[data-swapping] #root > div {
     --page-pad-x: 20px;
   }
 }
+
+/* Campioni dei temi nelle Impostazioni desktop: 6 in fila se c'è spazio, altrimenti 3 + 3 (mai uno da solo). */
+.theme-grid {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(2, 1fr);
+}
+
+@container (min-width: 520px) {
+  .theme-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@container (min-width: 900px) {
+  .theme-grid {
+    grid-template-columns: repeat(6, 1fr);
+  }
+}

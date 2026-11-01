@@ -335,5 +335,6 @@ Nota: il service worker è attivo solo in build di produzione (`npm run build` +
 8. Controlla in un tema scuro: Lista, Pasti, Storico (etichette verde/arancione dello scostamento), Statistiche, Catalogo, Supermercati, finestre di conferma, tastierino prezzi, tutorial
 
 ### Flusso 38 — Impostazioni desktop: schede della stessa larghezza
-1. Impostazioni su desktop (1280 px) → "Aspetto" occupa tutta la larghezza; sotto, Lingua, Buoni pasto, Inizio settimana, Dati, App, Tutorial, Sincronizzazione e Debug sono tutte larghe uguali, su due colonne. Nessuna scheda si allarga a tutta la riga, nemmeno Lingua e Debug
-2. A circa 1000 px restano due colonne più strette; sotto i 700 px diventano una colonna sola
+1. Impostazioni su desktop (1280 px) → "Aspetto" occupa tutta la larghezza; sotto, Lingua, Buoni pasto, Inizio settimana, Dati, App, Tutorial, Sincronizzazione e Debug sono tutte larghe uguali, su due colonne a muratura: ogni scheda sta sotto la precedente senza spazi vuoti in mezzo (a fine pagina una colonna può finire un po' più in alto dell'altra). Nessuna scheda si allarga a tutta la riga, nemmeno Lingua e Debug
+2. Su schermi molto larghi (1600–2560 px) restano due colonne, non tre: con tre la scheda alta della Sincronizzazione lasciava un grosso buco. A circa 1000 px due colonne più strette; sotto i 700 px una colonna sola
+3. I sei campioni dei temi stanno su una sola riga quando c'è spazio, altrimenti 3 + 3; mai un campione da solo su una riga
