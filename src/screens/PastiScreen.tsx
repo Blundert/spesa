@@ -5,6 +5,8 @@ import { dayShort, dayFull, formatWeekLabel, shiftWeek } from '../lib/date'
 import { useMealPlan, useSetMealSlotDish, useImportMealPlanToList } from '../hooks/useMealPlan'
 import { useDishes, useSaveDish } from '../hooks/useDishes'
 import { useActiveList } from '../hooks/useShoppingLists'
+import { activeLists, getMealsListId, pickList, setActiveListId, setMealsListId } from '../lib/activeList'
+import type { ShoppingList } from '../db/types'
 import { useCategories, useItems, useUpsertItem } from '../hooks/useItems'
 import { useWeekBudget, useSetBuoniAvailable } from '../hooks/useShopping'
 import { normalizeName } from '../lib/normalize'
@@ -47,7 +49,9 @@ export function PastiScreen() {
   const setBuoni = useSetBuoniAvailable(week)
   const setMealSlotDish = useSetMealSlotDish(week)
   const importToList = useImportMealPlanToList(week)
-  const activeListId = useActiveList().list?.id
+  const { lists } = useActiveList()
+  const [importPick, setImportPick] = useState<number | null>(null)
+  const importTarget = lists.find((l) => l.id === importPick)
   const saveDish = useSaveDish()
   const upsertItem = useUpsertItem()
   const buoniAvailable = budget?.buoniAvailable ?? 0
@@ -64,9 +68,26 @@ export function PastiScreen() {
     void navigate({ to: '/' })
   }
 
+  // Con più liste si sceglie dove mettere gli ingredienti (proposta: l'ultima usata per i pasti).
+  const importInto = (target: ShoppingList) => {
+    const listId = target.id as number
+    setImportPick(null)
+    setMealsListId(listId)
+    importToList.mutate(
+      { listId, listName: target.name },
+      {
+        onSuccess: () => {
+          setActiveListId(listId)
+          void navigate({ to: '/' })
+        },
+      },
+    )
+  }
+
   const handleImportAndGenerate = () => {
-    if (activeListId === undefined) return
-    importToList.mutate(activeListId, { onSuccess: () => void navigate({ to: '/' }) })
+    const choices = activeLists(lists)
+    if (choices.length > 1) setImportPick(pickList(lists, getMealsListId())?.id ?? null)
+    else if (choices[0]) importInto(choices[0])
   }
 
   const openSlot = (day: MealPlanDay, mealType: MealType) => {
@@ -359,6 +380,34 @@ export function PastiScreen() {
           {t('pasti.importAndGoToList')}
         </button>
       </div>
+
+      {/* Sheet: in quale lista importare gli ingredienti */}
+      <BottomSheet open={importPick !== null} onClose={() => setImportPick(null)}>
+        <div className="text-[20px] font-normal text-[#2A2A2C] px-0.5 pb-4">{t('pasti.chooseList')}</div>
+        <div className="bg-[#F6F6F4] rounded-[18px] overflow-hidden mb-5">
+          {activeLists(lists).map((l, i, arr) => (
+            <button
+              key={l.id}
+              onClick={() => setImportPick(l.id as number)}
+              className="w-full flex items-center justify-between px-[18px] py-[14px] text-left active:bg-[#ECECEC]"
+              style={{ borderBottom: i < arr.length - 1 ? '1px solid #E6E6E2' : 'none' }}
+            >
+              <span className="text-[16px] text-[#2A2A2C]">{l.name}</span>
+              {l.id === importPick && (
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2A2A2C" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M5 12l4 4 10-10" />
+                </svg>
+              )}
+            </button>
+          ))}
+        </div>
+        <button
+          onClick={() => importTarget && importInto(importTarget)}
+          className="w-full bg-[#2A2A2C] text-white text-[17px] py-[18px] rounded-[20px] active:scale-[.98] transition-transform"
+        >
+          {t('pasti.addToList', { name: importTarget?.name })}
+        </button>
+      </BottomSheet>
 
       {/* Sheet: piatto + ingredienti per uno slot pasto */}
       <BottomSheet

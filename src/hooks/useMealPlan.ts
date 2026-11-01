@@ -66,16 +66,16 @@ export function useImportMealPlanToList(isoWeek: string) {
   const qc = useQueryClient()
   const { t } = useTranslation()
   return useMutation({
-    mutationFn: async (listId: number) => {
+    mutationFn: async ({ listId }: { listId: number; listName: string }) => {
       const itemIds = await getSelectedItemIdsForWeek(isoWeek)
       for (const itemId of itemIds) {
         await addToList(listId, itemId)
       }
       return itemIds.length
     },
-    onSuccess: (count) => {
+    onSuccess: (count, { listName }) => {
       void qc.refetchQueries({ queryKey: qk.listItems(), type: 'all' })
-      if (count > 0) toast(t('pasti.importedToList', { count }))
+      if (count > 0) toast(t('pasti.importedToList', { count, name: listName }))
     },
   })
 }
