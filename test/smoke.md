@@ -128,13 +128,13 @@ Nota: il service worker è attivo solo in build di produzione (`npm run build` +
 
 ### Flusso 15 — Pianificazione pasti: piatto dal catalogo + checklist ingredienti
 1. Naviga su Pasti, tocca uno slot vuoto (es. "Pranzo" di lunedì) → si apre un bottom sheet con titolo "Lunedì · Pranzo"
-2. Digita il nome di un piatto non esistente → verifica il bottone "Crea piatto “…”" → toccalo
+2. Verifica che, finché stai scrivendo il nome del piatto, il bottone "Salva" **non** sia visibile. Digita il nome di un piatto non esistente → verifica il bottone "Crea piatto “…”" → toccalo → ora compare "Salva"
 3. Verifica che compaia la sezione INGREDIENTI con un campo "Aggiungi un ingrediente…"; digita e aggiungi 1-2 ingredienti (chip rimovibili) → tocca "Salva"
 4. Verifica che lo slot nella grid mostri il nome del piatto appena creato
 5. Vai su "Piatti" (catalogo) → verifica che il nuovo piatto sia presente con gli ingredienti aggiunti
 6. Torna su Pasti, riapri lo stesso slot → verifica che gli ingredienti siano mostrati come checklist con checkbox tutte spuntate di default
 7. Deseleziona un ingrediente → "Salva" → ricarica la pagina → riapri lo slot → verifica che la deselezione sia persistita
-8. Tocca "Cambia piatto" → verifica che il campo si svuoti e digitando il nome di un piatto già esistente compaia come suggerimento → selezionalo → verifica che gli ingredienti tornino tutti spuntati
+8. Tocca "Cambia piatto" → verifica che il campo si svuoti e digitando il nome di un piatto già esistente compaia come suggerimento (senza bottone "Salva" visibile durante la ricerca) → selezionalo → verifica che gli ingredienti tornino tutti spuntati e che "Salva" ricompaia
 9. Tocca "Rimuovi piatto" → verifica che lo slot torni a "—" e che il piatto resti comunque nel catalogo "Piatti"
 
 ### Flusso 16 — Import ingredienti pianificati nella lista della spesa

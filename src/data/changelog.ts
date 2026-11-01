@@ -2,6 +2,10 @@ export type ChangelogEntry = { it: string[]; en: string[] }
 
 // Ordine: più recente in cima. Aggiungere una entry ad ogni nuova versione.
 export const changelog: Record<string, ChangelogEntry> = {
+  '0.29.6': {
+    it: ['Pasti: il bottone "Salva" non compare più (disabilitato) mentre scrivi il nome del piatto, ma solo dopo aver scelto un piatto o toccato "Crea piatto"'],
+    en: ['Meals: the "Save" button no longer shows (disabled) while you type the dish name; it appears only after picking a dish or tapping "Create dish"'],
+  },
   '0.29.5': {
     it: ["Fix: secondo tentativo per la barra di stato in alto su iPhone: deve scurirsi quando si apre un menu dal basso e tornare chiara quando lo chiudi (la 0.29.3 la lasciava sempre chiara)"],
     en: ['Fix: second attempt at the iPhone status bar color: it should darken when a bottom sheet opens and turn light again when you close it (0.29.3 left it always light)'],

@@ -496,13 +496,17 @@ export function PastiScreen() {
               </>
             )}
 
-            <button
-              onClick={handleSaveSlot}
-              disabled={!canSave}
-              className="w-full bg-[#2A2A2C] text-white text-[17px] py-[18px] rounded-[20px] active:scale-[.98] transition-transform disabled:opacity-40 mb-3"
-            >
-              {t('common.save')}
-            </button>
+            {/* Nella fase di ricerca del nome non c'è nulla da salvare: il bottone compare
+                solo dopo aver scelto un piatto esistente o "Crea piatto". */}
+            {(slotState.dishId !== undefined || slotState.isNewDish) && (
+              <button
+                onClick={handleSaveSlot}
+                disabled={!canSave}
+                className="w-full bg-[#2A2A2C] text-white text-[17px] py-[18px] rounded-[20px] active:scale-[.98] transition-transform disabled:opacity-40 mb-3"
+              >
+                {t('common.save')}
+              </button>
+            )}
             {slotState.hadExisting && (
               <button
                 onClick={handleRemoveSlot}
