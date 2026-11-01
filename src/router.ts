@@ -2,7 +2,6 @@ import { createRouter, createRootRoute, createRoute, Outlet, redirect } from '@t
 import { currentWeek } from './lib/date'
 import { getDefaultBuonoValueCents } from './lib/buoniSettings'
 import { AppShell } from './components/AppShell'
-import { HomeScreen } from './screens/HomeScreen'
 import { SpesaScreen } from './screens/SpesaScreen'
 import { ListaScreen } from './screens/ListaScreen'
 import { StoricoScreen } from './screens/StoricoScreen'
@@ -40,12 +39,6 @@ const listaAliasRoute = createRoute({
   beforeLoad: () => {
     throw redirect({ to: '/', replace: true })
   },
-})
-
-const homeRoute = createRoute({
-  getParentRoute: () => shellRoute,
-  path: '/settimana',
-  component: HomeScreen,
 })
 
 const storicoRoute = createRoute({
@@ -137,7 +130,6 @@ const changelogRoute = createRoute({
 const routeTree = rootRoute.addChildren([
   shellRoute.addChildren([
     listaRoute,
-    homeRoute,
     pastiRoute,
     storicoRoute,
     supermercatiRoute,

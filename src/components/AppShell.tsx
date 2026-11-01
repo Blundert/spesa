@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Outlet, Link, useRouter, useNavigate } from '@tanstack/react-router'
 import { currentWeek } from '../lib/date'
@@ -13,6 +13,7 @@ import { useQuery } from '@tanstack/react-query'
 import { db } from '../db/db'
 import { BottomSheet } from './BottomSheet'
 import { BuoniSteppers } from './BuoniSheet'
+import { WeekSummary } from './WeekSummary'
 
 const isoWeek = currentWeek()
 
@@ -116,10 +117,19 @@ export function AppShell() {
         </div>
       </div>
 
-      {/* Box "Nuova spesa": buoni (pre-compilati coi rimanenti) + valore + Inizia */}
+      {/* Pannello della pill: riepilogo settimana + nuova spesa (buoni pre-compilati coi rimanenti) */}
       <NewShoppingSheet
         open={sheetOpen}
         onClose={() => setSheetOpen(false)}
+        summary={
+          <WeekSummary
+            isoWeek={isoWeek}
+            summary={summary}
+            sessions={sessions}
+            purchases={purchases}
+            onNavigate={() => setSheetOpen(false)}
+          />
+        }
         buoni={newBuoni}
         valueCents={newVal}
         onBuoni={setNewBuoni}
@@ -141,7 +151,9 @@ function NewShoppingSheet({
   onBuoni,
   onValue,
   onStart,
+  summary,
 }: {
+  summary: ReactNode
   open: boolean
   onClose: () => void
   buoni: number
@@ -153,6 +165,7 @@ function NewShoppingSheet({
   const { t } = useTranslation()
   return (
     <BottomSheet open={open} onClose={onClose}>
+      {summary}
       <div className="text-[12px] font-normal tracking-[1.4px] text-[#9B9B9F] uppercase px-0.5 pb-[14px]">
         {t('spesa.newTitle')}
       </div>
@@ -181,7 +194,6 @@ function MenuSheet({
 }) {
   const { t } = useTranslation()
   const items: { to: string; label: string }[] = [
-    { to: '/settimana', label: t('nav.week') },
     { to: '/storico', label: t('nav.history') },
     { to: '/supermercati', label: t('nav.supermarkets') },
     { to: '/catalogo', label: t('nav.catalog') },

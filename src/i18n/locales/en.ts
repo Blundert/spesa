@@ -49,6 +49,9 @@ export const en: typeof it = {
     outOfPocket: 'Out of pocket',
     buoni: 'VOUCHERS',
     buoniLine: '{{spent}} vouchers used · {{remaining}} left',
+    buoniSpent: 'Vouchers used',
+    buoniRemaining: 'Remaining',
+    seeAll: 'See all ({{count}})',
   },
   lista: {
     title: 'List',

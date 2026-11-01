@@ -47,6 +47,9 @@ export const it = {
     outOfPocket: 'Di tasca tua',
     buoni: 'BUONI',
     buoniLine: '{{spent}} buoni spesi · {{remaining}} rimanenti',
+    buoniSpent: 'Buoni spesi',
+    buoniRemaining: 'Rimanenti',
+    seeAll: 'Vedi tutte ({{count}})',
   },
   lista: {
     title: 'Lista',
