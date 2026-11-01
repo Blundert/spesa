@@ -20,7 +20,7 @@ export function RangeSelector({ value, onChange }: RangeSelectorProps) {
     <div
       style={{
         display: 'inline-flex',
-        background: '#ECECEC',
+        background: 'var(--t-line)',
         borderRadius: '10px',
         padding: '3px',
         gap: '2px',
@@ -36,8 +36,8 @@ export function RangeSelector({ value, onChange }: RangeSelectorProps) {
               padding: '6px 14px',
               borderRadius: '8px',
               border: 'none',
-              background: isActive ? '#fff' : 'transparent',
-              color: isActive ? '#2A2A2C' : '#9B9B9F',
+              background: isActive ? 'var(--t-surface)' : 'transparent',
+              color: isActive ? 'var(--t-fg)' : 'var(--t-muted)',
               fontSize: '13px',
               fontWeight: isActive ? 500 : 400,
               cursor: 'pointer',

@@ -61,17 +61,17 @@ export function StoricoScreen() {
     <div className="flex-1 overflow-y-auto px-5 pb-[120px]">
       <div className="flex items-center gap-2 pt-2 pb-[18px]">
         <BackButton />
-        <span className="text-[26px] font-normal tracking-[-0.5px] text-[#2A2A2C]">{t('storico.title')}</span>
+        <span className="text-[26px] font-normal tracking-[-0.5px] text-t-fg">{t('storico.title')}</span>
       </div>
 
       {sessions.length === 0 && (
-        <div className="text-center py-16 text-[#9B9B9F] text-sm">{t('storico.empty')}</div>
+        <div className="text-center py-16 text-t-muted text-sm">{t('storico.empty')}</div>
       )}
 
       {weekGroups.map(({ isoWeek, sessions: weekSessions }) => (
         <div key={isoWeek} className="mb-4">
           <div className="flex items-center justify-between px-1 mb-2">
-            <span className="text-[13px] font-normal text-[#9B9B9F] tracking-tight">
+            <span className="text-[13px] font-normal text-t-muted tracking-tight">
               {formatWeekLabel(isoWeek)}
             </span>
             <button
@@ -79,7 +79,7 @@ export function StoricoScreen() {
               className="w-7 h-7 flex items-center justify-center opacity-40 active:opacity-80"
               aria-label={t('storico.deleteWeekConfirm')}
             >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2A2A2C" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--t-fg)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <polyline points="3 6 5 6 21 6" />
                 <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
                 <path d="M10 11v6M14 11v6" />
@@ -104,21 +104,21 @@ export function StoricoScreen() {
       ))}
 
       <BottomSheet open={deleteWeekState !== null} onClose={() => setDeleteWeekState(null)}>
-        <div className="text-[20px] font-normal text-[#D14343] px-0.5 pb-2">
+        <div className="text-[20px] font-normal text-t-danger px-0.5 pb-2">
           {t('storico.deleteWeekTitle', { week: deleteWeekState ? formatWeekLabel(deleteWeekState) : '' })}
         </div>
-        <div className="text-[15px] text-[#9B9B9F] px-0.5 pb-6">
+        <div className="text-[15px] text-t-muted px-0.5 pb-6">
           {t('storico.deleteWeekBody')}
         </div>
         <button
           onClick={handleConfirmDelete}
-          className="w-full bg-[#D14343] text-white text-[17px] py-[18px] rounded-[20px] mb-3 active:scale-[.98] transition-transform"
+          className="w-full bg-t-danger text-t-on text-[17px] py-[18px] rounded-[20px] mb-3 active:scale-[.98] transition-transform"
         >
           {t('storico.deleteWeekConfirm')}
         </button>
         <button
           onClick={() => setDeleteWeekState(null)}
-          className="w-full bg-[#F2F2F0] text-[#2A2A2C] text-[17px] py-[18px] rounded-[20px] active:scale-[.98] transition-transform"
+          className="w-full bg-t-bg text-t-fg text-[17px] py-[18px] rounded-[20px] active:scale-[.98] transition-transform"
         >
           {t('common.cancel')}
         </button>
@@ -158,36 +158,36 @@ function SessionCard({
   const deviation = confirmedTotalCents !== null ? receiptDeviationPercent(confirmedTotalCents, computedCents) : null
   const deviationClass =
     deviation === null || deviation === 0
-      ? 'bg-[#F2F2F0] text-[#9B9B9F]'
+      ? 'bg-t-bg text-t-muted'
       : deviation > 0
-        ? 'bg-[#FBEDE4] text-[#C2612A]'
-        : 'bg-[#E6F2EA] text-[#3B8A57]'
+        ? 'bg-t-warn-bg text-t-warn-fg'
+        : 'bg-t-good-bg text-t-good-fg'
   const buoniCoveredCents = buoniSpent * buoniValueCents
 
   return (
     <Link
       to="/storico/$sessionId"
       params={{ sessionId: String(sessionId) }}
-      className="block bg-white rounded-[20px] px-5 py-[18px] mb-[10px] active:bg-[#F6F6F4]"
+      className="block bg-t-surface rounded-[20px] px-5 py-[18px] mb-[10px] active:bg-t-surface2"
     >
       <div className="flex items-center gap-[14px]">
         <div className="flex-1">
           {listName && (
-            <div className="text-[11px] tracking-[1px] uppercase text-[#9B9B9F] mb-0.5">{listName}</div>
+            <div className="text-[11px] tracking-[1px] uppercase text-t-muted mb-0.5">{listName}</div>
           )}
           <div className="flex items-center gap-2">
-            <span className="text-base font-normal text-[#2A2A2C]">{storeName}</span>
+            <span className="text-base font-normal text-t-fg">{storeName}</span>
             {!isCompleted && (
-              <span className="text-[11px] text-white bg-[#E07B39] rounded-full px-[7px] py-[2px] leading-none">{t('sessione.notCompleted')}</span>
+              <span className="text-[11px] text-t-on bg-t-warn rounded-full px-[7px] py-[2px] leading-none">{t('sessione.notCompleted')}</span>
             )}
           </div>
-          <div className="text-[13px] text-[#9B9B9F] mt-0.5">
+          <div className="text-[13px] text-t-muted mt-0.5">
             {formatShortDate(date)} · {t('storico.itemsCount', { count: purchases.length })}
             {deviation !== null && ` · ${t('storico.computed', { amount: formatCentsPlain(computedCents) })}`}
           </div>
         </div>
         <div className="flex flex-col items-end">
-          <span className="text-[22px] font-normal text-[#2A2A2C] tabular-nums">€{formatCentsPlain(totalCents)}</span>
+          <span className="text-[22px] font-normal text-t-fg tabular-nums">€{formatCentsPlain(totalCents)}</span>
           {deviation !== null && (
             <span className={`mt-1 text-[11px] leading-none rounded-full px-[7px] py-[3px] tabular-nums ${deviationClass}`}>
               {formatSignedPercent(deviation)}
@@ -197,14 +197,14 @@ function SessionCard({
       </div>
 
       {/* Buoni usati e spesa effettiva (di tasca tua) */}
-      <div className="flex items-baseline justify-between gap-3 border-t border-[#ECECEC] mt-[14px] pt-3 text-[13px] text-[#9B9B9F] tabular-nums">
+      <div className="flex items-baseline justify-between gap-3 border-t border-t-line mt-[14px] pt-3 text-[13px] text-t-muted tabular-nums">
         <span className="whitespace-nowrap">
           {t('storico.buoniCount', { count: buoniSpent })}
           {buoniSpent > 0 && ` · −€${formatCentsPlain(buoniCoveredCents)}`}
         </span>
         <span className="whitespace-nowrap">
           {t('storico.outOfPocket')}{' '}
-          <span className="text-[15px] text-[#2A2A2C]">
+          <span className="text-[15px] text-t-fg">
             €{formatCentsPlain(outOfPocketCents(totalCents, buoniSpent, buoniValueCents))}
           </span>
         </span>

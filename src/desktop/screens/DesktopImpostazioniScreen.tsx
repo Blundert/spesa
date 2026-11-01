@@ -5,6 +5,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import type { PWAInstallElement } from '@khmyznikov/pwa-install'
 import { PageHeader, SectionTitle } from '../components/PageHeader'
+import { ThemePicker } from '../components/ThemePicker'
 import { LANG_KEY, type Lang } from '../../i18n'
 import { getWeekStartDay, setWeekStartDay } from '../../lib/weekSettings'
 import { getDefaultBuonoValueCents, setDefaultBuonoValueCents } from '../../lib/buoniSettings'
@@ -33,9 +34,9 @@ const LANGS: { code: Lang; label: string }[] = [
 
 function Card({ title, hint, children }: { title: string; hint?: string; children: ReactNode }) {
   return (
-    <div style={{ background: '#fff', borderRadius: '16px', padding: '24px', flex: '1 1 340px', minWidth: 0 }}>
+    <div style={{ background: 'var(--t-surface)', borderRadius: '16px', padding: '24px', flex: '1 1 340px', minWidth: 0 }}>
       <SectionTitle>{title}</SectionTitle>
-      {hint && <div style={{ fontSize: '13px', color: '#9B9B9F', margin: '-8px 0 16px' }}>{hint}</div>}
+      {hint && <div style={{ fontSize: '13px', color: 'var(--t-muted)', margin: '-8px 0 16px' }}>{hint}</div>}
       {children}
     </div>
   )
@@ -45,8 +46,8 @@ const pill = (active: boolean) => ({
   padding: '8px 16px',
   borderRadius: '10px',
   border: 'none',
-  background: active ? '#2A2A2C' : '#F2F2F0',
-  color: active ? '#fff' : '#2A2A2C',
+  background: active ? 'var(--t-accent)' : 'var(--t-bg)',
+  color: active ? 'var(--t-on)' : 'var(--t-fg)',
   fontSize: '14px',
   cursor: 'pointer',
 })
@@ -54,25 +55,25 @@ const pill = (active: boolean) => ({
 const action = {
   padding: '10px 18px',
   borderRadius: '10px',
-  border: '1px solid #D8D8D6',
-  background: '#fff',
-  color: '#2A2A2C',
+  border: '1px solid var(--t-line2)',
+  background: 'var(--t-surface)',
+  color: 'var(--t-fg)',
   fontSize: '14px',
   cursor: 'pointer',
 }
 
-const primary = { ...action, background: '#2A2A2C', color: '#fff', border: '1px solid #2A2A2C' }
-const danger = { ...action, color: '#D14343', border: '1px solid #D14343' }
+const primary = { ...action, background: 'var(--t-accent)', color: 'var(--t-on)', border: '1px solid var(--t-fg)' }
+const danger = { ...action, color: 'var(--t-danger)', border: '1px solid var(--t-danger)' }
 
 const input = {
   width: '100%',
   boxSizing: 'border-box' as const,
   padding: '10px 12px',
   borderRadius: '10px',
-  border: '1px solid #D8D8D6',
-  background: '#fff',
+  border: '1px solid var(--t-line2)',
+  background: 'var(--t-surface)',
   fontSize: '14px',
-  color: '#2A2A2C',
+  color: 'var(--t-fg)',
   outline: 'none',
 }
 
@@ -90,7 +91,7 @@ function Toggle({ on, onClick, label }: { on: boolean; onClick: () => void; labe
         width: '46px',
         height: '28px',
         borderRadius: '999px',
-        background: on ? '#2A2A2C' : '#D8D8D6',
+        background: on ? 'var(--t-accent)' : 'var(--t-line2)',
         flex: 'none',
         transition: 'background .15s',
       }}
@@ -103,7 +104,7 @@ function Toggle({ on, onClick, label }: { on: boolean; onClick: () => void; labe
           width: '22px',
           height: '22px',
           borderRadius: '50%',
-          background: '#fff',
+          background: 'var(--t-surface)',
           transition: 'left .15s',
         }}
       />
@@ -282,9 +283,11 @@ export function DesktopImpostazioniScreen() {
           </div>
         </Card>
 
+        <ThemePicker />
+
         <Card title={t('settings.buoni')} hint={t('settings.defaultBuonoValueHint')}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <span style={{ fontSize: '14px', color: '#2A2A2C' }}>{t('settings.defaultBuonoValue')}</span>
+            <span style={{ fontSize: '14px', color: 'var(--t-fg)' }}>{t('settings.defaultBuonoValue')}</span>
             <BuonoValueStepper valueCents={buonoValue} onValue={handleBuonoValue} />
           </div>
         </Card>
@@ -322,10 +325,10 @@ export function DesktopImpostazioniScreen() {
 
         <Card title={t('settings.app')}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
-            <span style={{ fontSize: '14px', color: '#2A2A2C' }}>{t('settings.version')}</span>
+            <span style={{ fontSize: '14px', color: 'var(--t-fg)' }}>{t('settings.version')}</span>
             <button
               onClick={() => void navigate({ to: '/changelog' })}
-              style={{ all: 'unset', cursor: 'pointer', fontSize: '14px', color: '#9B9B9F', fontVariantNumeric: 'tabular-nums' }}
+              style={{ all: 'unset', cursor: 'pointer', fontSize: '14px', color: 'var(--t-muted)', fontVariantNumeric: 'tabular-nums' }}
             >
               {__APP_VERSION__} ›
             </button>
@@ -347,11 +350,11 @@ export function DesktopImpostazioniScreen() {
         </Card>
 
         <Card title={t('settings.sync')} hint={t('settings.syncHint')}>
-          <div style={{ background: '#F6F6F4', borderRadius: '12px', padding: '14px 16px', marginBottom: '16px' }}>
-            <div style={{ fontSize: '12px', color: '#9B9B9F', textTransform: 'uppercase', letterSpacing: '0.4px', marginBottom: '8px' }}>
+          <div style={{ background: 'var(--t-surface2)', borderRadius: '12px', padding: '14px 16px', marginBottom: '16px' }}>
+            <div style={{ fontSize: '12px', color: 'var(--t-muted)', textTransform: 'uppercase', letterSpacing: '0.4px', marginBottom: '8px' }}>
               {t('settings.syncStepsTitle')}
             </div>
-            <ol style={{ margin: 0, paddingLeft: '18px', fontSize: '13px', color: '#6E6E72', lineHeight: 1.6 }}>
+            <ol style={{ margin: 0, paddingLeft: '18px', fontSize: '13px', color: 'var(--t-text2)', lineHeight: 1.6 }}>
               {[
                 t('settings.syncStep1'),
                 t('settings.syncStep2'),
@@ -365,7 +368,7 @@ export function DesktopImpostazioniScreen() {
               href="https://github.com/settings/personal-access-tokens/new"
               target="_blank"
               rel="noopener noreferrer"
-              style={{ display: 'inline-block', marginTop: '10px', fontSize: '13px', color: '#2A2A2C' }}
+              style={{ display: 'inline-block', marginTop: '10px', fontSize: '13px', color: 'var(--t-fg)' }}
             >
               {t('settings.syncCreateToken')} ↗
             </a>
@@ -374,7 +377,7 @@ export function DesktopImpostazioniScreen() {
             {gitFields.map((row) => (
               <label
                 key={row.f}
-                style={{ display: 'flex', flexDirection: 'column', gap: '4px', fontSize: '12px', color: '#9B9B9F', gridColumn: row.f === 'token' || row.f === 'path' ? '1 / -1' : undefined }}
+                style={{ display: 'flex', flexDirection: 'column', gap: '4px', fontSize: '12px', color: 'var(--t-muted)', gridColumn: row.f === 'token' || row.f === 'path' ? '1 / -1' : undefined }}
               >
                 {row.label}
                 <input
@@ -390,7 +393,7 @@ export function DesktopImpostazioniScreen() {
             ))}
           </div>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
-            <span style={{ fontSize: '14px', color: '#2A2A2C' }}>{t('settings.syncAuto')}</span>
+            <span style={{ fontSize: '14px', color: 'var(--t-fg)' }}>{t('settings.syncAuto')}</span>
             <Toggle on={auto} onClick={handleToggleAuto} label={t('settings.syncAuto')} />
           </div>
           <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
@@ -408,7 +411,7 @@ export function DesktopImpostazioniScreen() {
 
         <Card title={t('settings.debug')}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <span style={{ fontSize: '14px', color: '#2A2A2C' }}>{t('settings.debugViewport')}</span>
+            <span style={{ fontSize: '14px', color: 'var(--t-fg)' }}>{t('settings.debugViewport')}</span>
             <Toggle
               on={debug}
               label={t('settings.debugViewport')}
@@ -423,19 +426,19 @@ export function DesktopImpostazioniScreen() {
       </div>
 
       <Modal open={showWipe} onClose={() => setShowWipe(false)} title={t('settings.confirmTitle')}>
-        <p style={{ fontSize: '14px', color: '#6E6E72', lineHeight: 1.5, margin: 0 }}>{t('settings.confirmBody')}</p>
+        <p style={{ fontSize: '14px', color: 'var(--t-text2)', lineHeight: 1.5, margin: 0 }}>{t('settings.confirmBody')}</p>
         <ModalActions>
           <button onClick={() => setShowWipe(false)} style={action}>
             {t('common.cancel')}
           </button>
-          <button onClick={() => void handleWipe()} style={{ ...primary, background: '#D14343', border: '1px solid #D14343' }}>
+          <button onClick={() => void handleWipe()} style={{ ...primary, background: 'var(--t-danger)', border: '1px solid var(--t-danger)' }}>
             {t('settings.deleteConfirm')}
           </button>
         </ModalActions>
       </Modal>
 
       <Modal open={pendingImport !== null} onClose={() => setPendingImport(null)} title={t('settings.importConfirmTitle')}>
-        <p style={{ fontSize: '14px', color: '#6E6E72', lineHeight: 1.5, margin: 0 }}>{t('settings.importConfirmBody')}</p>
+        <p style={{ fontSize: '14px', color: 'var(--t-text2)', lineHeight: 1.5, margin: 0 }}>{t('settings.importConfirmBody')}</p>
         <ModalActions>
           <button onClick={() => setPendingImport(null)} style={action}>
             {t('common.cancel')}
@@ -447,7 +450,7 @@ export function DesktopImpostazioniScreen() {
       </Modal>
 
       <Modal open={showPull} onClose={() => setShowPull(false)} title={t('settings.syncPullConfirmTitle')}>
-        <p style={{ fontSize: '14px', color: '#6E6E72', lineHeight: 1.5, margin: 0 }}>{t('settings.syncPullConfirmBody')}</p>
+        <p style={{ fontSize: '14px', color: 'var(--t-text2)', lineHeight: 1.5, margin: 0 }}>{t('settings.syncPullConfirmBody')}</p>
         <ModalActions>
           <button onClick={() => setShowPull(false)} style={action}>
             {t('common.cancel')}

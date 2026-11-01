@@ -11,7 +11,7 @@ export function StatCard({ label, value, sub, trend }: StatCardProps) {
   return (
     <div
       style={{
-        background: '#fff',
+        background: 'var(--t-surface)',
         borderRadius: '16px',
         padding: '20px 24px',
         display: 'flex',
@@ -21,14 +21,14 @@ export function StatCard({ label, value, sub, trend }: StatCardProps) {
         minWidth: 0,
       }}
     >
-      <div style={{ fontSize: '12px', color: '#9B9B9F', fontWeight: 400, letterSpacing: '0.2px' }}>
+      <div style={{ fontSize: '12px', color: 'var(--t-muted)', fontWeight: 400, letterSpacing: '0.2px' }}>
         {label}
       </div>
       <div
         style={{
           fontSize: '26px',
           fontWeight: 300,
-          color: '#2A2A2C',
+          color: 'var(--t-fg)',
           letterSpacing: '-0.5px',
           lineHeight: 1.1,
           whiteSpace: 'nowrap',
@@ -41,12 +41,12 @@ export function StatCard({ label, value, sub, trend }: StatCardProps) {
       {(sub || trend) && (
         <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
           {trend && trend !== 'neutral' && (
-            <span style={{ fontSize: '11px', color: trend === 'up' ? '#34C759' : '#FF3B30' }}>
+            <span style={{ fontSize: '11px', color: trend === 'up' ? 'var(--t-good)' : 'var(--t-bad)' }}>
               {trend === 'up' ? '↑' : '↓'}
             </span>
           )}
           {sub && (
-            <span style={{ fontSize: '12px', color: '#9B9B9F' }}>{sub}</span>
+            <span style={{ fontSize: '12px', color: 'var(--t-muted)' }}>{sub}</span>
           )}
         </div>
       )}

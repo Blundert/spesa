@@ -145,12 +145,12 @@ export function SessioneScreen() {
             <button
               onClick={() => setShowStorePicker(true)}
               aria-label={t('sessione.editStore')}
-              className="text-[26px] font-normal tracking-[-0.5px] text-[#2A2A2C] max-w-[200px] truncate active:opacity-50"
+              className="text-[26px] font-normal tracking-[-0.5px] text-t-fg max-w-[200px] truncate active:opacity-50"
             >
               {storeName}
             </button>
             {!isCompleted && (
-              <span className="text-[11px] text-[#9B9B9F] leading-none">{t('sessione.notCompleted')}</span>
+              <span className="text-[11px] text-t-muted leading-none">{t('sessione.notCompleted')}</span>
             )}
           </div>
           <button
@@ -158,16 +158,16 @@ export function SessioneScreen() {
             aria-label={t('sessione.deleteSession')}
             className="w-[34px] h-[34px] -mr-1.5 ml-auto flex items-center justify-center opacity-40 active:opacity-80"
           >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2A2A2C" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--t-fg)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6" />
             </svg>
           </button>
         </div>
 
         {/* Summary card */}
-        <div className="bg-white rounded-[22px] px-6 pt-6 pb-4 mb-[14px] text-center">
+        <div className="bg-t-surface rounded-[22px] px-6 pt-6 pb-4 mb-[14px] text-center">
           <div className="relative inline-block mb-2">
-            <span className="text-[13px] text-[#9B9B9F] underline decoration-dotted underline-offset-2 select-none">
+            <span className="text-[13px] text-t-muted underline decoration-dotted underline-offset-2 select-none">
               {session ? formatShortDate(session.startedAt) : '—'}
             </span>
             <input
@@ -182,16 +182,16 @@ export function SessioneScreen() {
             <button
               onClick={() => setShowEditTotal(true)}
               aria-label={t('sessione.editTotal')}
-              className="flex items-baseline justify-center text-[#2A2A2C] w-full active:opacity-50"
+              className="flex items-baseline justify-center text-t-fg w-full active:opacity-50"
             >
-              <span className="text-[30px] font-normal text-[#B5B5BA] mr-1">€</span>
+              <span className="text-[30px] font-normal text-t-faint mr-1">€</span>
               <span className="text-[64px] font-light tracking-[-1.5px] leading-[.95] tabular-nums">
                 {formatCentsPlain(totalCents)}
               </span>
             </button>
           ) : (
-            <div className="flex items-baseline justify-center text-[#2A2A2C]">
-              <span className="text-[30px] font-normal text-[#B5B5BA] mr-1">€</span>
+            <div className="flex items-baseline justify-center text-t-fg">
+              <span className="text-[30px] font-normal text-t-faint mr-1">€</span>
               <span className="text-[64px] font-light tracking-[-1.5px] leading-[.95] tabular-nums">
                 {formatCentsPlain(totalCents)}
               </span>
@@ -201,7 +201,7 @@ export function SessioneScreen() {
             <button
               onClick={() => setShowEditBuoni(true)}
               aria-label={t('spesa.editBuoni')}
-              className="block mx-auto text-[13px] text-[#9B9B9F] mt-2 tabular-nums underline decoration-dotted underline-offset-2 active:opacity-50"
+              className="block mx-auto text-[13px] text-t-muted mt-2 tabular-nums underline decoration-dotted underline-offset-2 active:opacity-50"
             >
               {session.buoniSpent} {t('common.buoni')} · €{formatCentsPlain(session.buoniSpent * session.buoniValueCents)}
             </button>
@@ -212,51 +212,51 @@ export function SessioneScreen() {
         {!isCompleted && (
           <button
             onClick={() => setShowFinishKeypad(true)}
-            className="w-full bg-[#2A2A2C] text-white text-[17px] font-normal py-[18px] rounded-[20px] mb-[14px] active:scale-[.98] transition-transform"
+            className="w-full bg-t-accent text-t-on text-[17px] font-normal py-[18px] rounded-[20px] mb-[14px] active:scale-[.98] transition-transform"
           >
             {t('sessione.finish')}
           </button>
         )}
 
         {/* Items list */}
-        <div className="bg-white rounded-[20px] overflow-hidden">
+        <div className="bg-t-surface rounded-[20px] overflow-hidden">
           {purchases.map((p, i) => (
             <button
               key={p.id}
               onClick={() => setEditingPurchaseId(p.id ?? null)}
-              className="w-full flex items-center justify-between px-5 py-4 active:bg-[#F9F9F7] text-left"
-              style={{ borderBottom: i < purchases.length - 1 ? '1px solid #ECECEC' : 'none' }}
+              className="w-full flex items-center justify-between px-5 py-4 active:bg-t-surface4 text-left"
+              style={{ borderBottom: i < purchases.length - 1 ? '1px solid var(--t-line)' : 'none' }}
             >
-              <span className="text-[15px] text-[#2A2A2C]">
+              <span className="text-[15px] text-t-fg">
                 {itemMap[p.itemId] ?? `#${p.itemId}`}
                 {p.quantity > 1 && (
-                  <span className="text-[#9B9B9F] ml-1">×{p.quantity}</span>
+                  <span className="text-t-muted ml-1">×{p.quantity}</span>
                 )}
               </span>
-              <span className="text-[15px] text-[#5A5A5E] tabular-nums">
+              <span className="text-[15px] text-t-text3 tabular-nums">
                 €{formatCentsPlain(p.priceCents * p.quantity)}
               </span>
             </button>
           ))}
           {purchases.length === 0 && (
-            <div className="text-center py-8 text-[#9B9B9F] text-sm">{t('sessione.noPurchases')}</div>
+            <div className="text-center py-8 text-t-muted text-sm">{t('sessione.noPurchases')}</div>
           )}
         </div>
       </div>
     </div>
 
     <BottomSheet open={showDeleteConfirm} onClose={() => setShowDeleteConfirm(false)}>
-      <div className="text-[20px] font-normal text-[#D14343] px-0.5 pb-2">{t('sessione.deleteConfirmTitle')}</div>
-      <div className="text-[15px] text-[#9B9B9F] px-0.5 pb-6">{t('sessione.deleteConfirmBody')}</div>
+      <div className="text-[20px] font-normal text-t-danger px-0.5 pb-2">{t('sessione.deleteConfirmTitle')}</div>
+      <div className="text-[15px] text-t-muted px-0.5 pb-6">{t('sessione.deleteConfirmBody')}</div>
       <button
         onClick={() => void handleDelete()}
-        className="w-full bg-[#D14343] text-white text-[17px] py-[18px] rounded-[20px] mb-3 active:scale-[.98] transition-transform"
+        className="w-full bg-t-danger text-t-on text-[17px] py-[18px] rounded-[20px] mb-3 active:scale-[.98] transition-transform"
       >
         {t('sessione.deleteConfirm')}
       </button>
       <button
         onClick={() => setShowDeleteConfirm(false)}
-        className="w-full bg-[#F2F2F0] text-[#2A2A2C] text-[17px] py-[18px] rounded-[20px] active:scale-[.98] transition-transform"
+        className="w-full bg-t-bg text-t-fg text-[17px] py-[18px] rounded-[20px] active:scale-[.98] transition-transform"
       >
         {t('common.cancel')}
       </button>
@@ -338,19 +338,19 @@ function StorePickerSheet({ open, onClose, supermarkets, currentId, onPick }: St
 
   return (
     <BottomSheet open={open} onClose={onClose} hasInput={showAdd}>
-      <div className="text-[20px] font-normal text-[#2A2A2C] px-0.5 pb-[14px]">{t('spesa.chooseStore')}</div>
+      <div className="text-[20px] font-normal text-t-fg px-0.5 pb-[14px]">{t('spesa.chooseStore')}</div>
       <div className="flex flex-col gap-0.5 pb-2">
         {supermarkets.map((s) => (
           <button
             key={s.id}
             onClick={() => s.id !== undefined && onPick(s.id)}
-            className="flex items-center justify-between px-1.5 py-[15px] border-b border-[#ECECEC] active:opacity-50 text-left"
+            className="flex items-center justify-between px-1.5 py-[15px] border-b border-t-line active:opacity-50 text-left"
           >
-            <span className={`text-[17px] text-[#2A2A2C] ${s.id === currentId ? 'font-semibold' : 'font-normal'}`}>
+            <span className={`text-[17px] text-t-fg ${s.id === currentId ? 'font-semibold' : 'font-normal'}`}>
               {s.name}
             </span>
             {s.id === currentId && (
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2A2A2C" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--t-fg)" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M5 12l4 4 10-10" />
               </svg>
             )}
@@ -364,7 +364,7 @@ function StorePickerSheet({ open, onClose, supermarkets, currentId, onPick }: St
             onChange={(e) => setNewName(e.target.value)}
             placeholder={t('spesa.storeNamePlaceholder')}
             autoFocus
-            className="w-full border-b border-[#ECECEC] outline-none bg-transparent px-0.5 py-3 text-[18px] text-[#2A2A2C] mb-3"
+            className="w-full border-b border-t-line outline-none bg-transparent px-0.5 py-3 text-[18px] text-t-fg mb-3"
           />
           <button
             onClick={async () => {
@@ -376,7 +376,7 @@ function StorePickerSheet({ open, onClose, supermarkets, currentId, onPick }: St
               setNewName('')
               setShowAdd(false)
             }}
-            className="w-full bg-[#2A2A2C] text-white py-[15px] rounded-2xl text-[16px] active:scale-[.98] transition-transform"
+            className="w-full bg-t-accent text-t-on py-[15px] rounded-2xl text-[16px] active:scale-[.98] transition-transform"
           >
             {t('spesa.addAndSelect')}
           </button>
@@ -384,7 +384,7 @@ function StorePickerSheet({ open, onClose, supermarkets, currentId, onPick }: St
       ) : (
         <button
           onClick={() => setShowAdd(true)}
-          className="mt-2 w-full border border-[#E0E0DE] bg-white text-[#2A2A2C] text-[16px] py-[15px] rounded-2xl active:bg-[#F6F6F4]"
+          className="mt-2 w-full border border-t-line6 bg-t-surface text-t-fg text-[16px] py-[15px] rounded-2xl active:bg-t-surface2"
         >
           {t('spesa.addStore')}
         </button>

@@ -104,10 +104,10 @@ export function AppShell() {
   }
 
   return (
-    <div className="relative w-full h-full bg-[#F2F2F0] overflow-hidden">
+    <div className="relative w-full h-full bg-t-bg overflow-hidden">
       {showDebug && <ViewportDebug />}
       {/* ── SCREEN ── */}
-      <div className="absolute inset-0 bg-[#F2F2F0] flex flex-col overflow-hidden">
+      <div className="absolute inset-0 bg-t-bg flex flex-col overflow-hidden">
         {/* Spazio in alto: con status bar 'default' la web view parte già sotto la status bar,
             quindi serve solo un po' di respiro (e si adatta se mai si riattiva viewport-fit=cover). */}
         <div className="flex-none" style={{ height: 'max(16px, env(safe-area-inset-top))' }} />
@@ -129,29 +129,29 @@ export function AppShell() {
           <button
             data-tour="session-pill"
             onClick={openNewShopping}
-            className="flex-1 bg-white rounded-3xl px-5 py-3 flex items-center justify-between active:scale-[.99] transition-transform text-left"
+            className="flex-1 bg-t-surface rounded-3xl px-5 py-3 flex items-center justify-between active:scale-[.99] transition-transform text-left"
           >
             <div>
-              <div className="flex items-baseline text-[#2A2A2C]">
-                <span className="text-base text-[#B5B5BA] mr-0.5">€</span>
+              <div className="flex items-baseline text-t-fg">
+                <span className="text-base text-t-faint mr-0.5">€</span>
                 <span className="text-2xl font-normal tabular-nums tracking-tight">
                   {formatCentsPlain(summary.outOfPocketCents)}
                 </span>
               </div>
-              <div className="text-[11px] text-[#9B9B9F] mt-0.5">{t('home.outOfPocket')}</div>
+              <div className="text-[11px] text-t-muted mt-0.5">{t('home.outOfPocket')}</div>
             </div>
             <div className="text-right">
-              <div className="text-[13px] text-[#6E6E72] tabular-nums">€{formatCentsPlain(summary.totalSpentCents)} {t('common.spentWord')}</div>
-              <div className="text-[13px] text-[#9B9B9F] mt-0.5 tabular-nums">{summary.buoniSpentCount} {t('common.buoni')}</div>
+              <div className="text-[13px] text-t-text2 tabular-nums">€{formatCentsPlain(summary.totalSpentCents)} {t('common.spentWord')}</div>
+              <div className="text-[13px] text-t-muted mt-0.5 tabular-nums">{summary.buoniSpentCount} {t('common.buoni')}</div>
             </div>
           </button>
           <button
             data-tour="menu-button"
             onClick={() => setMenuOpen(true)}
             aria-label={t('nav.openMenu')}
-            className="flex-none self-center w-14 h-14 rounded-full bg-[#2A2A2C] flex items-center justify-center active:scale-[.95] transition-transform"
+            className="flex-none self-center w-14 h-14 rounded-full bg-t-accent flex items-center justify-center active:scale-[.95] transition-transform"
           >
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--t-on)" strokeWidth="2" strokeLinecap="round">
               <path d="M4 7h16M4 12h16M4 17h16" />
             </svg>
           </button>
@@ -218,13 +218,13 @@ function NewShoppingSheet({
     <BottomSheet open={open} onClose={onClose}>
       {summary}
       <div data-tour="new-shopping">
-        <div className="text-[12px] font-normal tracking-[1.4px] text-[#9B9B9F] uppercase px-0.5 pb-[14px]">
+        <div className="text-[12px] font-normal tracking-[1.4px] text-t-muted uppercase px-0.5 pb-[14px]">
           {t('spesa.newTitle')}
         </div>
         <BuoniSteppers buoni={buoni} valueCents={valueCents} onBuoni={onBuoni} onValue={onValue} top={listRow} />
         <button
           onClick={onStart}
-          className="w-full bg-[#2A2A2C] text-white text-[17px] font-normal py-[17px] rounded-[18px] flex items-center justify-center gap-2 active:scale-[.98] transition-transform"
+          className="w-full bg-t-accent text-t-on text-[17px] font-normal py-[17px] rounded-[18px] flex items-center justify-center gap-2 active:scale-[.98] transition-transform"
         >
           {t('nav.startShopping')}
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -272,11 +272,11 @@ function MenuSheet({
       {groups.map((group, g) => (
         <div key={g} className={g < groups.length - 1 ? 'mb-[18px]' : ''}>
           {group.title && (
-            <div className="text-[12px] font-normal tracking-[1.4px] text-[#9B9B9F] uppercase px-0.5 pb-2">
+            <div className="text-[12px] font-normal tracking-[1.4px] text-t-muted uppercase px-0.5 pb-2">
               {group.title}
             </div>
           )}
-          <div className="bg-[#F6F6F4] rounded-[18px] overflow-hidden">
+          <div className="bg-t-surface2 rounded-[18px] overflow-hidden">
             {group.items.map((item, i) => {
               const active = pathname === item.to
               return (
@@ -286,13 +286,13 @@ function MenuSheet({
                   replace={replace}
                   onClick={onClose}
                   className="flex items-center justify-between px-[18px] py-[15px] active:opacity-50"
-                  style={{ borderBottom: i < group.items.length - 1 ? '1px solid #E6E6E2' : 'none' }}
+                  style={{ borderBottom: i < group.items.length - 1 ? '1px solid var(--t-line3)' : 'none' }}
                 >
-                  <span className={`text-[17px] text-[#2A2A2C] ${active ? 'font-semibold' : 'font-normal'}`}>
+                  <span className={`text-[17px] text-t-fg ${active ? 'font-semibold' : 'font-normal'}`}>
                     {item.label}
                   </span>
                   {active ? (
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2A2A2C" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--t-fg)" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M5 12l4 4 10-10" />
                     </svg>
                   ) : (
@@ -310,7 +310,7 @@ function MenuSheet({
 
 function ChevronRight() {
   return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#C5C5C9" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--t-chev)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <path d="M9 6l6 6-6 6" />
     </svg>
   )
@@ -362,7 +362,7 @@ function ViewportDebug() {
         left: 8,
         zIndex: 9999,
         background: 'rgba(200,0,0,.92)',
-        color: '#fff',
+        color: 'var(--t-on)',
         font: '10px/1.45 ui-monospace, monospace',
         padding: '6px 9px',
         borderRadius: 8,

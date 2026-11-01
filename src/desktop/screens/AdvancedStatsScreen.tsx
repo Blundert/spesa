@@ -73,7 +73,7 @@ export function AdvancedStatsScreen() {
     { key: 'sessions', label: t('desktop.stats.colSessions'), render: (r) => r.sessionCount, sortValue: (r) => r.sessionCount },
     { key: 'total', label: t('desktop.stats.colTotal'), render: (r) => `€ ${formatCents(r.totalCents)}`, sortValue: (r) => r.totalCents },
     { key: 'avg', label: t('desktop.stats.colAvg'), render: (r) => `€ ${formatCents(r.avgCents)}`, sortValue: (r) => r.avgCents },
-    { key: 'last', label: t('desktop.stats.colLastVisit'), render: (r) => <span style={{ color: '#9B9B9F' }}>{formatDate(r.lastVisitTs)}</span>, sortValue: (r) => r.lastVisitTs },
+    { key: 'last', label: t('desktop.stats.colLastVisit'), render: (r) => <span style={{ color: 'var(--t-muted)' }}>{formatDate(r.lastVisitTs)}</span>, sortValue: (r) => r.lastVisitTs },
   ]
 
   return (
@@ -85,15 +85,15 @@ export function AdvancedStatsScreen() {
       />
 
       {/* Day-of-week pattern */}
-      <div style={{ background: '#fff', borderRadius: '16px', padding: '24px', marginBottom: '24px' }}>
+      <div style={{ background: 'var(--t-surface)', borderRadius: '16px', padding: '24px', marginBottom: '24px' }}>
         <SectionTitle>{t('desktop.stats.dayPattern')}</SectionTitle>
         <ResponsiveContainer width="100%" height={180}>
           <BarChart data={dayData} margin={{ top: 4, right: 8, left: 0, bottom: 0 }}>
-            <CartesianGrid stroke="#F2F2F0" strokeDasharray="0" vertical={false} />
-            <XAxis dataKey="label" tick={{ fontSize: 12, fill: '#9B9B9F' }} tickLine={false} axisLine={false} />
+            <CartesianGrid stroke="var(--t-bg)" strokeDasharray="0" vertical={false} />
+            <XAxis dataKey="label" tick={{ fontSize: 12, fill: 'var(--t-muted)' }} tickLine={false} axisLine={false} />
             <YAxis
               allowDecimals={false}
-              tick={{ fontSize: 11, fill: '#9B9B9F' }}
+              tick={{ fontSize: 11, fill: 'var(--t-muted)' }}
               tickLine={false}
               axisLine={false}
               width={32}
@@ -101,8 +101,8 @@ export function AdvancedStatsScreen() {
             <Tooltip
               formatter={(v) => [Number(v), t('desktop.stats.sessions')]}
               contentStyle={{
-                background: '#2A2A2C', border: 'none', borderRadius: '10px',
-                color: '#fff', fontSize: '13px',
+                background: 'var(--t-accent)', border: 'none', borderRadius: '10px',
+                color: 'var(--t-on)', fontSize: '13px',
               }}
             />
             <Bar dataKey="sessions" fill={CHART.sessions} radius={[6, 6, 0, 0]} />
@@ -111,48 +111,48 @@ export function AdvancedStatsScreen() {
       </div>
 
       {/* Budget efficiency */}
-      <div style={{ background: '#fff', borderRadius: '16px', padding: '24px', marginBottom: '24px' }}>
+      <div style={{ background: 'var(--t-surface)', borderRadius: '16px', padding: '24px', marginBottom: '24px' }}>
         <SectionTitle>{t('desktop.stats.coverage')}</SectionTitle>
         {effData.length > 0 ? (
           <ResponsiveContainer width="100%" height={200}>
             <BarChart data={effData} margin={{ top: 4, right: 8, left: 0, bottom: 0 }}>
-              <CartesianGrid stroke="#F2F2F0" strokeDasharray="0" vertical={false} />
-              <XAxis dataKey="label" tick={{ fontSize: 11, fill: '#9B9B9F' }} tickLine={false} axisLine={false} interval="preserveStartEnd" />
-              <YAxis tickFormatter={(v) => `€${(v / 100).toFixed(0)}`} tick={{ fontSize: 11, fill: '#9B9B9F' }} tickLine={false} axisLine={false} width={52} />
+              <CartesianGrid stroke="var(--t-bg)" strokeDasharray="0" vertical={false} />
+              <XAxis dataKey="label" tick={{ fontSize: 11, fill: 'var(--t-muted)' }} tickLine={false} axisLine={false} interval="preserveStartEnd" />
+              <YAxis tickFormatter={(v) => `€${(v / 100).toFixed(0)}`} tick={{ fontSize: 11, fill: 'var(--t-muted)' }} tickLine={false} axisLine={false} width={52} />
               <Tooltip
                 formatter={(v, name) => [
                   `€ ${formatCents(Number(v))}`,
                   name === 'buoni' ? t('desktop.stats.buoni') : t('desktop.stats.outOfPocket'),
                 ]}
-                contentStyle={{ background: '#2A2A2C', border: 'none', borderRadius: '10px', color: '#fff', fontSize: '13px' }}
+                contentStyle={{ background: 'var(--t-accent)', border: 'none', borderRadius: '10px', color: 'var(--t-on)', fontSize: '13px' }}
               />
               <Legend
                 formatter={(v) => (v === 'buoni' ? t('desktop.stats.buoni') : t('desktop.stats.outOfPocket'))}
-                wrapperStyle={{ fontSize: '12px', color: '#9B9B9F' }}
+                wrapperStyle={{ fontSize: '12px', color: 'var(--t-muted)' }}
               />
               <Bar dataKey="buoni" stackId="a" fill={CHART.buoni} />
               <Bar dataKey="tasca" stackId="a" fill={CHART.outOfPocket} radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         ) : (
-          <div style={{ color: '#9B9B9F', fontSize: '13px' }}>{t('desktop.noData')}</div>
+          <div style={{ color: 'var(--t-muted)', fontSize: '13px' }}>{t('desktop.noData')}</div>
         )}
       </div>
 
       {/* Category evolution */}
       {areaData.length > 0 && (
-        <div style={{ background: '#fff', borderRadius: '16px', padding: '24px', marginBottom: '24px' }}>
+        <div style={{ background: 'var(--t-surface)', borderRadius: '16px', padding: '24px', marginBottom: '24px' }}>
           <SectionTitle>{t('desktop.stats.categoryEvolution')}</SectionTitle>
           <ResponsiveContainer width="100%" height={220}>
             <AreaChart data={areaData} margin={{ top: 4, right: 8, left: 0, bottom: 0 }}>
-              <CartesianGrid stroke="#F2F2F0" strokeDasharray="0" vertical={false} />
-              <XAxis dataKey="label" tick={{ fontSize: 11, fill: '#9B9B9F' }} tickLine={false} axisLine={false} interval="preserveStartEnd" />
-              <YAxis tickFormatter={(v) => `€${(v / 100).toFixed(0)}`} tick={{ fontSize: 11, fill: '#9B9B9F' }} tickLine={false} axisLine={false} width={52} />
+              <CartesianGrid stroke="var(--t-bg)" strokeDasharray="0" vertical={false} />
+              <XAxis dataKey="label" tick={{ fontSize: 11, fill: 'var(--t-muted)' }} tickLine={false} axisLine={false} interval="preserveStartEnd" />
+              <YAxis tickFormatter={(v) => `€${(v / 100).toFixed(0)}`} tick={{ fontSize: 11, fill: 'var(--t-muted)' }} tickLine={false} axisLine={false} width={52} />
               <Tooltip
                 formatter={(v, name) => [`€ ${formatCents(Number(v))}`, String(name)]}
-                contentStyle={{ background: '#2A2A2C', border: 'none', borderRadius: '10px', color: '#fff', fontSize: '13px' }}
+                contentStyle={{ background: 'var(--t-accent)', border: 'none', borderRadius: '10px', color: 'var(--t-on)', fontSize: '13px' }}
               />
-              <Legend wrapperStyle={{ fontSize: '12px', color: '#9B9B9F' }} />
+              <Legend wrapperStyle={{ fontSize: '12px', color: 'var(--t-muted)' }} />
               {allCategories.map((cat, i) => (
                 <Area
                   key={cat}
@@ -172,7 +172,7 @@ export function AdvancedStatsScreen() {
 
       {/* Supermarket detail table */}
       {smRows.length > 0 && (
-        <div style={{ background: '#fff', borderRadius: '16px', padding: '24px', marginBottom: '24px' }}>
+        <div style={{ background: 'var(--t-surface)', borderRadius: '16px', padding: '24px', marginBottom: '24px' }}>
           <SectionTitle>{t('desktop.stats.supermarketDetail')}</SectionTitle>
           <SortableTable columns={smColumns} rows={smRows} rowKey={(r) => r.id} defaultSort={{ key: 'total', dir: 'desc' }} />
         </div>

@@ -23,8 +23,8 @@ const thBase = {
   padding: '8px 12px 12px 0',
   fontSize: '11px',
   fontWeight: 500,
-  color: '#9B9B9F',
-  borderBottom: '1px solid #F2F2F0',
+  color: 'var(--t-muted)',
+  borderBottom: '1px solid var(--t-bg)',
   letterSpacing: '0.3px',
   whiteSpace: 'nowrap' as const,
 }
@@ -45,7 +45,7 @@ export function SortableTable<T>({
 
   if (rows.length === 0 && emptyMessage) {
     return (
-      <div style={{ color: '#9B9B9F', fontSize: '14px', textAlign: 'center', padding: '48px 0' }}>
+      <div style={{ color: 'var(--t-muted)', fontSize: '14px', textAlign: 'center', padding: '48px 0' }}>
         {emptyMessage}
       </div>
     )
@@ -63,7 +63,7 @@ export function SortableTable<T>({
                 ...thBase,
                 textAlign: c.align ?? 'left',
                 paddingRight: last ? 0 : '12px',
-                color: isActive ? '#2A2A2C' : '#9B9B9F',
+                color: isActive ? 'var(--t-fg)' : 'var(--t-muted)',
               }
               return (
                 <th
@@ -105,7 +105,7 @@ export function SortableTable<T>({
               key={rowKey(row)}
               onClick={onRowClick ? () => onRowClick(row) : undefined}
               style={{
-                borderBottom: '1px solid #F2F2F0',
+                borderBottom: '1px solid var(--t-bg)',
                 cursor: onRowClick ? 'pointer' : 'default',
               }}
             >
@@ -117,7 +117,7 @@ export function SortableTable<T>({
                     paddingRight: i === columns.length - 1 ? 0 : '12px',
                     textAlign: c.align ?? 'left',
                     fontSize: '14px',
-                    color: '#2A2A2C',
+                    color: 'var(--t-fg)',
                   }}
                 >
                   {c.render(row)}

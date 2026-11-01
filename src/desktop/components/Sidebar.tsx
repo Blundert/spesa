@@ -173,8 +173,8 @@ export function Sidebar() {
       style={{
         width: compact ? '68px' : '220px',
         flexShrink: 0,
-        background: '#fff',
-        borderRight: '1px solid #ECECEC',
+        background: 'var(--t-surface)',
+        borderRight: '1px solid var(--t-line)',
         display: 'flex',
         flexDirection: 'column',
         height: '100%',
@@ -183,12 +183,12 @@ export function Sidebar() {
       }}
     >
       {/* Logo / app name */}
-      <div style={{ padding: compact ? '28px 0 24px' : '28px 24px 24px', borderBottom: '1px solid #ECECEC', textAlign: compact ? 'center' : 'left' }}>
-        <div style={{ fontSize: '18px', fontWeight: 600, color: '#2A2A2C', letterSpacing: '-0.3px' }}>
+      <div style={{ padding: compact ? '28px 0 24px' : '28px 24px 24px', borderBottom: '1px solid var(--t-line)', textAlign: compact ? 'center' : 'left' }}>
+        <div style={{ fontSize: '18px', fontWeight: 600, color: 'var(--t-fg)', letterSpacing: '-0.3px' }}>
           {compact ? t('desktop.appName').charAt(0) : t('desktop.appName')}
         </div>
         {!compact && (
-          <div style={{ fontSize: '12px', color: '#9B9B9F', marginTop: '2px' }}>
+          <div style={{ fontSize: '12px', color: 'var(--t-muted)', marginTop: '2px' }}>
             {t('desktop.nav.dashboard')}
           </div>
         )}
@@ -201,13 +201,13 @@ export function Sidebar() {
         {NAV_GROUPS.map((group, g) => (
           <div key={g} style={{ marginBottom: '12px' }}>
             {group.titleKey && compact && (
-              <div style={{ height: '1px', background: '#ECECEC', margin: '8px 6px 12px' }} />
+              <div style={{ height: '1px', background: 'var(--t-line)', margin: '8px 6px 12px' }} />
             )}
             {group.titleKey && !compact && (
               <div
                 style={{
                   fontSize: '11px',
-                  color: '#9B9B9F',
+                  color: 'var(--t-muted)',
                   letterSpacing: '0.8px',
                   textTransform: 'uppercase',
                   padding: '8px 12px 6px',
@@ -234,8 +234,8 @@ export function Sidebar() {
                     padding: compact ? '10px 0' : '10px 12px',
                     borderRadius: '10px',
                     border: 'none',
-                    background: isActive ? '#F2F2F0' : 'transparent',
-                    color: isActive ? '#2A2A2C' : '#9B9B9F',
+                    background: isActive ? 'var(--t-bg)' : 'transparent',
+                    color: isActive ? 'var(--t-fg)' : 'var(--t-muted)',
                     fontSize: '14px',
                     fontWeight: isActive ? 500 : 400,
                     cursor: 'pointer',
@@ -253,7 +253,7 @@ export function Sidebar() {
         ))}
       </nav>
 
-      <div style={{ padding: compact ? '10px' : '10px 12px', borderTop: '1px solid #ECECEC' }}>
+      <div style={{ padding: compact ? '10px' : '10px 12px', borderTop: '1px solid var(--t-line)' }}>
         <button
           onClick={toggle}
           title={compact ? t('desktop.sidebar.expand') : t('desktop.sidebar.collapse')}
@@ -269,7 +269,7 @@ export function Sidebar() {
             borderRadius: '10px',
             border: 'none',
             background: 'transparent',
-            color: '#9B9B9F',
+            color: 'var(--t-muted)',
             fontSize: '14px',
             cursor: 'pointer',
           }}

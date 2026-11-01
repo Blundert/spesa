@@ -22,7 +22,7 @@ export function ListTabs({
   return (
     <div
       data-tour="list-tabs"
-      className="flex items-end gap-5 overflow-x-auto -mt-2 mb-[18px] px-1.5 border-b border-[#E0E0DD] [scrollbar-width:none]"
+      className="flex items-end gap-5 overflow-x-auto -mt-2 mb-[18px] px-1.5 border-b border-t-line7 [scrollbar-width:none]"
     >
       {lists.map((l) => {
         const active = l.id === activeId
@@ -33,23 +33,23 @@ export function ListTabs({
             onClick={() => (active ? onEdit() : onSelect(l.id as number))}
             aria-label={active ? t('lists.edit', { name: l.name }) : undefined}
             className={`flex-none whitespace-nowrap pt-1.5 pb-2.5 text-[15px] active:opacity-50 ${
-              active ? 'text-[#2A2A2C] border-b-2 border-[#2A2A2C] -mb-px' : 'text-[#9B9B9F]'
+              active ? 'text-t-fg border-b-2 border-t-fg -mb-px' : 'text-t-muted'
             }`}
           >
             {l.name}
             {active && (
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#2A2A2C" strokeWidth="2.4" strokeLinecap="round" className="inline-block ml-1 align-[-1px]">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--t-fg)" strokeWidth="2.4" strokeLinecap="round" className="inline-block ml-1 align-[-1px]">
                 <path d="M6 9l6 6 6-6" />
               </svg>
             )}
-            {store && <span className="text-[12px] text-[#9B9B9F]"> · {store}</span>}
+            {store && <span className="text-[12px] text-t-muted"> · {store}</span>}
           </button>
         )
       })}
       <button
         onClick={onCreate}
         aria-label={t('lists.newList')}
-        className="flex-none pt-1 pb-2.5 px-1 text-[20px] leading-none text-[#9B9B9F] active:opacity-50"
+        className="flex-none pt-1 pb-2.5 px-1 text-[20px] leading-none text-t-muted active:opacity-50"
       >
         +
       </button>

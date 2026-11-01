@@ -149,7 +149,7 @@ export function ListaScreen() {
       <div className="flex items-center justify-between px-1 pt-2 pb-[18px]">
         <SectionTitle active="lista" />
         {listItems.length > 0 && (
-          <button onClick={() => setShowClear(true)} className="text-[15px] text-[#9B9B9F] px-1 active:opacity-50">
+          <button onClick={() => setShowClear(true)} className="text-[15px] text-t-muted px-1 active:opacity-50">
             {t('lista.clear')}
           </button>
         )}
@@ -165,8 +165,8 @@ export function ListaScreen() {
       />
 
       {/* Add input */}
-      <div className="flex items-center gap-2.5 bg-white rounded-2xl px-[18px] py-4 mb-3">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9B9B9F" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <div className="flex items-center gap-2.5 bg-t-surface rounded-2xl px-[18px] py-4 mb-3">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--t-muted)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
           <path d="M12 5v14M5 12h14" />
         </svg>
         <input
@@ -175,30 +175,30 @@ export function ListaScreen() {
           onChange={(e) => setAddInput(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && handleAdd()}
           placeholder={t('lista.addPlaceholder')}
-          className="flex-1 border-none outline-none bg-transparent text-base text-[#2A2A2C] placeholder:text-[#9B9B9F]"
+          className="flex-1 border-none outline-none bg-transparent text-base text-t-fg placeholder:text-t-muted"
         />
       </div>
 
       {/* Autocomplete (input non vuoto) */}
       {addInput.trim() && (
-        <div className="bg-white rounded-2xl overflow-hidden mb-3 divide-y divide-[#ECECEC] shadow-[0_2px_12px_rgba(0,0,0,.05)]">
+        <div className="bg-t-surface rounded-2xl overflow-hidden mb-3 divide-y divide-t-line shadow-[0_2px_12px_rgba(0,0,0,.05)]">
           {matches.map((p) => (
             <button
               key={p.name}
               onClick={() => handleAdd(p.name, p.categoryId)}
-              className="w-full flex items-center justify-between px-[18px] py-[13px] text-left active:bg-[#F6F6F4]"
+              className="w-full flex items-center justify-between px-[18px] py-[13px] text-left active:bg-t-surface2"
             >
-              <span className="text-base text-[#2A2A2C]">{p.name}</span>
-              <span className="text-[12px] text-[#9B9B9F]">{catMap[p.categoryId] ?? t('categories.5')}</span>
+              <span className="text-base text-t-fg">{p.name}</span>
+              <span className="text-[12px] text-t-muted">{catMap[p.categoryId] ?? t('categories.5')}</span>
             </button>
           ))}
           {!exactInPool && (
             <button
               onClick={() => handleAdd()}
-              className="w-full flex items-center justify-between px-[18px] py-[13px] text-left active:bg-[#F6F6F4]"
+              className="w-full flex items-center justify-between px-[18px] py-[13px] text-left active:bg-t-surface2"
             >
-              <span className="text-base text-[#2A2A2C]">{t('lista.addNamed', { name: addInput.trim() })}</span>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9B9B9F" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <span className="text-base text-t-fg">{t('lista.addNamed', { name: addInput.trim() })}</span>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--t-muted)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M12 5v14M5 12h14" />
               </svg>
             </button>
@@ -213,7 +213,7 @@ export function ListaScreen() {
             <button
               key={p.name}
               onClick={() => handleAdd(p.name, p.categoryId)}
-              className="flex-none px-[14px] py-2 bg-white border border-[#ECECEC] rounded-full text-sm text-[#5A5A5E] active:bg-[#F0F0EE]"
+              className="flex-none px-[14px] py-2 bg-t-surface border border-t-line rounded-full text-sm text-t-text3 active:bg-t-surface3"
             >
               {p.name}
             </button>
@@ -223,10 +223,10 @@ export function ListaScreen() {
 
       {/* Template spesa solita */}
       {templateSuggestions.length > 0 && (
-        <div className="bg-white rounded-[20px] px-[18px] py-[15px] mb-4 flex items-center justify-between gap-3">
+        <div className="bg-t-surface rounded-[20px] px-[18px] py-[15px] mb-4 flex items-center justify-between gap-3">
           <div className="flex-1 min-w-0">
-            <div className="text-[15px] font-normal text-[#2A2A2C] mb-[3px]">{t('lista.templateTitle')}</div>
-            <div className="text-[12px] text-[#9B9B9F] truncate">
+            <div className="text-[15px] font-normal text-t-fg mb-[3px]">{t('lista.templateTitle')}</div>
+            <div className="text-[12px] text-t-muted truncate">
               {templateSuggestions
                 .slice(0, 5)
                 .map((s) => s.name)
@@ -239,7 +239,7 @@ export function ListaScreen() {
               if (listId === undefined) return
               templateSuggestions.forEach((s) => addToList.mutate({ listId, itemId: s.itemId }))
             }}
-            className="flex-none bg-[#2A2A2C] text-white text-[14px] px-4 py-[9px] rounded-full active:opacity-70"
+            className="flex-none bg-t-accent text-t-on text-[14px] px-4 py-[9px] rounded-full active:opacity-70"
           >
             {t('lista.templateLoad')}
           </button>
@@ -249,15 +249,15 @@ export function ListaScreen() {
       {/* Grouped list */}
       {grouped.map(({ cat, items: catItems }) => (
         <div key={cat.id} className="mb-[18px]">
-          <div className="text-[12px] font-normal tracking-[1.2px] text-[#9B9B9F] uppercase px-1.5 pb-[13px]">
+          <div className="text-[12px] font-normal tracking-[1.2px] text-t-muted uppercase px-1.5 pb-[13px]">
             {categoryLabel(t, cat.name)}
           </div>
-          <div className="bg-white rounded-[20px] overflow-hidden">
+          <div className="bg-t-surface rounded-[20px] overflow-hidden">
             {catItems.map((li, i) => (
               <div
                 key={li.id}
                 className="flex items-center gap-[13px] px-[18px] py-4"
-                style={{ borderBottom: i < catItems.length - 1 ? '1px solid #ECECEC' : 'none' }}
+                style={{ borderBottom: i < catItems.length - 1 ? '1px solid var(--t-line)' : 'none' }}
               >
                 {/* Stepper quantità */}
                 <div className="flex items-center gap-1.5 flex-none">
@@ -270,19 +270,19 @@ export function ListaScreen() {
                       }
                     }}
                     aria-label="-"
-                    className="w-7 h-7 rounded-full bg-[#F2F2F0] flex items-center justify-center active:bg-[#E6E6E4]"
+                    className="w-7 h-7 rounded-full bg-t-bg flex items-center justify-center active:bg-t-line4"
                   >
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#2A2A2C" strokeWidth="2.5" strokeLinecap="round">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--t-fg)" strokeWidth="2.5" strokeLinecap="round">
                       <path d="M5 12h14" />
                     </svg>
                   </button>
-                  <span className="text-[15px] text-[#2A2A2C] min-w-[18px] text-center tabular-nums">{li.quantity}</span>
+                  <span className="text-[15px] text-t-fg min-w-[18px] text-center tabular-nums">{li.quantity}</span>
                   <button
                     onClick={() => { if (li.id !== undefined) updateListQuantity.mutate({ id: li.id, quantity: li.quantity + 1 }) }}
                     aria-label="+"
-                    className="w-7 h-7 rounded-full bg-[#F2F2F0] flex items-center justify-center active:bg-[#E6E6E4]"
+                    className="w-7 h-7 rounded-full bg-t-bg flex items-center justify-center active:bg-t-line4"
                   >
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#2A2A2C" strokeWidth="2.5" strokeLinecap="round">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--t-fg)" strokeWidth="2.5" strokeLinecap="round">
                       <path d="M12 5v14M5 12h14" />
                     </svg>
                   </button>
@@ -290,8 +290,8 @@ export function ListaScreen() {
 
                 {/* Name + sub */}
                 <div className="flex-1 min-w-0">
-                  <div className="text-base text-[#2A2A2C] truncate">{li.itemName}</div>
-                  <div className="text-[12px] text-[#9B9B9F] mt-0.5">
+                  <div className="text-base text-t-fg truncate">{li.itemName}</div>
+                  <div className="text-[12px] text-t-muted mt-0.5">
                     {li.suggestedPriceCents !== null
                       ? `~ €${formatCentsPlain(li.suggestedPriceCents)}`
                       : t('lista.toGet')}
@@ -304,7 +304,7 @@ export function ListaScreen() {
                   params={{ itemId: String(li.itemId) }}
                   className="w-[30px] h-[30px] flex items-center justify-center flex-none active:opacity-50"
                 >
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#C5C5C9" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--t-chev)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M9 6l6 6-6 6" />
                   </svg>
                 </Link>
@@ -315,15 +315,15 @@ export function ListaScreen() {
       ))}
 
       {listItems.length === 0 && (
-        <div className="text-center py-16 text-[#9B9B9F] text-sm">
+        <div className="text-center py-16 text-t-muted text-sm">
           {t('lista.empty')}
         </div>
       )}
 
       {/* Conferma svuota lista */}
       <BottomSheet open={showClear} onClose={() => setShowClear(false)}>
-        <div className="text-[20px] font-normal text-[#D14343] px-0.5 pb-2">{t('lista.clearConfirmTitle', { name: list?.name })}</div>
-        <div className="text-[14px] text-[#9B9B9F] px-0.5 pb-6">
+        <div className="text-[20px] font-normal text-t-danger px-0.5 pb-2">{t('lista.clearConfirmTitle', { name: list?.name })}</div>
+        <div className="text-[14px] text-t-muted px-0.5 pb-6">
           {t('lista.clearConfirmBody', { count: listItems.length })}
         </div>
         <button
@@ -331,13 +331,13 @@ export function ListaScreen() {
             if (listId !== undefined) clearList.mutate(listId, { onSuccess: () => toast(t('lista.cleared')) })
             setShowClear(false)
           }}
-          className="w-full bg-[#D14343] text-white text-[17px] py-[18px] rounded-[20px] mb-3 active:scale-[.98] transition-transform"
+          className="w-full bg-t-danger text-t-on text-[17px] py-[18px] rounded-[20px] mb-3 active:scale-[.98] transition-transform"
         >
           {t('lista.clearConfirm')}
         </button>
         <button
           onClick={() => setShowClear(false)}
-          className="w-full bg-[#F2F2F0] text-[#2A2A2C] text-[17px] py-[18px] rounded-[20px] active:scale-[.98] transition-transform"
+          className="w-full bg-t-bg text-t-fg text-[17px] py-[18px] rounded-[20px] active:scale-[.98] transition-transform"
         >
           {t('common.cancel')}
         </button>
@@ -354,19 +354,19 @@ export function ListaScreen() {
 
       {/* Conferma rimuovi dalla lista */}
       <BottomSheet open={pendingListRemove !== null} onClose={() => setPendingListRemove(null)}>
-        <div className="text-[20px] font-normal text-[#D14343] px-0.5 pb-6">{t('spesa.removeListConfirmTitle')}</div>
+        <div className="text-[20px] font-normal text-t-danger px-0.5 pb-6">{t('spesa.removeListConfirmTitle')}</div>
         <button
           onClick={() => {
             if (pendingListRemove !== null) removeFromList.mutate(pendingListRemove)
             setPendingListRemove(null)
           }}
-          className="w-full bg-[#D14343] text-white text-[17px] py-[18px] rounded-[20px] mb-3 active:scale-[.98] transition-transform"
+          className="w-full bg-t-danger text-t-on text-[17px] py-[18px] rounded-[20px] mb-3 active:scale-[.98] transition-transform"
         >
           {t('spesa.removeListConfirm')}
         </button>
         <button
           onClick={() => setPendingListRemove(null)}
-          className="w-full bg-[#F2F2F0] text-[#2A2A2C] text-[17px] py-[18px] rounded-[20px] active:scale-[.98] transition-transform"
+          className="w-full bg-t-bg text-t-fg text-[17px] py-[18px] rounded-[20px] active:scale-[.98] transition-transform"
         >
           {t('common.cancel')}
         </button>

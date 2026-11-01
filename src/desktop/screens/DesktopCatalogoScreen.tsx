@@ -27,7 +27,7 @@ export function DesktopCatalogoScreen() {
 
   const columns: Column<Item>[] = [
     { key: 'name', label: t('desktop.catalog.colName'), render: (i) => i.name, sortValue: (i) => i.name },
-    { key: 'category', label: t('desktop.catalog.colCategory'), render: (i) => <span style={{ color: '#9B9B9F' }}>{categoryName.get(i.categoryId) ?? ''}</span>, sortValue: (i) => categoryName.get(i.categoryId) ?? '' },
+    { key: 'category', label: t('desktop.catalog.colCategory'), render: (i) => <span style={{ color: 'var(--t-muted)' }}>{categoryName.get(i.categoryId) ?? ''}</span>, sortValue: (i) => categoryName.get(i.categoryId) ?? '' },
     { key: 'price', label: t('desktop.catalog.colPrice'), align: 'right', render: (i) => (i.lastPriceCents !== null ? `€ ${formatCents(i.lastPriceCents)}` : '—'), sortValue: (i) => i.lastPriceCents },
   ]
 
@@ -38,8 +38,8 @@ export function DesktopCatalogoScreen() {
     padding: '10px 12px',
     borderRadius: '10px',
     border: 'none',
-    background: active ? '#F2F2F0' : 'transparent',
-    color: '#2A2A2C',
+    background: active ? 'var(--t-bg)' : 'transparent',
+    color: 'var(--t-fg)',
     fontSize: '14px',
     fontWeight: active ? 500 : 400,
     cursor: 'pointer',
@@ -50,21 +50,21 @@ export function DesktopCatalogoScreen() {
     <div style={{ padding: 'var(--page-pad-y) var(--page-pad-x)', maxWidth: '1200px' }}>
       <PageHeader title={t('catalogo.title')} subtitle={t('desktop.catalog.subtitle')} />
       <div style={{ display: 'flex', gap: '24px', alignItems: 'flex-start', flexWrap: 'wrap' }}>
-        <div style={{ background: '#fff', borderRadius: '16px', padding: '24px', flex: '0 0 280px' }}>
+        <div style={{ background: 'var(--t-surface)', borderRadius: '16px', padding: '24px', flex: '0 0 280px' }}>
           <SectionTitle>{t('catalogo.categoriesSection')}</SectionTitle>
           <button style={rowStyle(selected === ALL)} onClick={() => setSelected(ALL)}>
             <span>{t('desktop.catalog.allCategories')}</span>
-            <span style={{ color: '#9B9B9F' }}>{items.length}</span>
+            <span style={{ color: 'var(--t-muted)' }}>{items.length}</span>
           </button>
           {categories.map((c) => (
             <button key={c.id} style={rowStyle(selected === c.id)} onClick={() => setSelected(c.id ?? ALL)}>
               <span>{c.name}</span>
-              <span style={{ color: '#9B9B9F' }}>{countByCategory.get(c.id ?? 0) ?? 0}</span>
+              <span style={{ color: 'var(--t-muted)' }}>{countByCategory.get(c.id ?? 0) ?? 0}</span>
             </button>
           ))}
         </div>
 
-        <div style={{ background: '#fff', borderRadius: '16px', padding: '24px', flex: '1 1 400px', minWidth: 0 }}>
+        <div style={{ background: 'var(--t-surface)', borderRadius: '16px', padding: '24px', flex: '1 1 400px', minWidth: 0 }}>
           <SectionTitle>{t('desktop.catalog.itemsIn')}</SectionTitle>
           <input
             type="search"
@@ -77,10 +77,10 @@ export function DesktopCatalogoScreen() {
               padding: '10px 14px',
               marginBottom: '12px',
               borderRadius: '10px',
-              border: '1px solid #ECECEC',
-              background: '#F6F6F4',
+              border: '1px solid var(--t-line)',
+              background: 'var(--t-surface2)',
               fontSize: '14px',
-              color: '#2A2A2C',
+              color: 'var(--t-fg)',
               outline: 'none',
             }}
           />

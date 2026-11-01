@@ -41,14 +41,14 @@ export function TutorialIntro({ onComplete }: TutorialIntroProps) {
 
   return (
     <div
-      style={{ position: 'fixed', inset: 0, zIndex: 200, background: '#F2F2F0' }}
+      style={{ position: 'fixed', inset: 0, zIndex: 200, background: 'var(--t-bg)' }}
       className="flex flex-col"
     >
       {/* Skip */}
       <div className="flex justify-end px-6 pt-[max(20px,env(safe-area-inset-top))]">
         <button
           onClick={handleComplete}
-          className="text-[14px] text-[#9B9B9F] active:opacity-60 transition-opacity px-2 py-1"
+          className="text-[14px] text-t-muted active:opacity-60 transition-opacity px-2 py-1"
         >
           {t('tutorial.skip')}
         </button>
@@ -62,10 +62,10 @@ export function TutorialIntro({ onComplete }: TutorialIntroProps) {
             alt=""
             className="w-[240px] h-[180px] object-contain mb-10"
           />
-          <h2 className="text-[24px] font-normal text-[#2A2A2C] leading-tight mb-4">
+          <h2 className="text-[24px] font-normal text-t-fg leading-tight mb-4">
             {t(slide.titleKey)}
           </h2>
-          <p className="text-[15px] text-[#9B9B9F] leading-relaxed max-w-[280px]">
+          <p className="text-[15px] text-t-muted leading-relaxed max-w-[280px]">
             {t(slide.descKey)}
           </p>
         </div>
@@ -85,7 +85,7 @@ export function TutorialIntro({ onComplete }: TutorialIntroProps) {
               style={{
                 width: i === current ? 20 : 6,
                 height: 6,
-                background: i === current ? '#2A2A2C' : '#D8D8D6',
+                background: i === current ? 'var(--t-accent)' : 'var(--t-line2)',
               }}
             />
           ))}
@@ -94,7 +94,7 @@ export function TutorialIntro({ onComplete }: TutorialIntroProps) {
         {/* Action button */}
         <button
           onClick={handleNext}
-          className="w-full bg-[#2A2A2C] text-white rounded-[18px] py-4 text-[16px] font-normal active:scale-[.98] transition-transform"
+          className="w-full bg-t-accent text-t-on rounded-[18px] py-4 text-[16px] font-normal active:scale-[.98] transition-transform"
         >
           {isLast ? t('tutorial.start') : t('tutorial.next')}
         </button>

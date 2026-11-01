@@ -32,19 +32,19 @@ const primaryBtn = {
   padding: '10px 18px',
   borderRadius: '10px',
   border: 'none',
-  background: '#2A2A2C',
-  color: '#fff',
+  background: 'var(--t-accent)',
+  color: 'var(--t-on)',
   fontSize: '14px',
   cursor: 'pointer',
 }
-const secondaryBtn = { ...primaryBtn, background: '#F2F2F0', color: '#2A2A2C' }
+const secondaryBtn = { ...primaryBtn, background: 'var(--t-bg)', color: 'var(--t-fg)' }
 const iconBtn = {
   width: '34px',
   height: '34px',
   borderRadius: '50%',
   border: 'none',
-  background: '#F2F2F0',
-  color: '#2A2A2C',
+  background: 'var(--t-bg)',
+  color: 'var(--t-fg)',
   fontSize: '18px',
   cursor: 'pointer',
   lineHeight: 1,
@@ -54,10 +54,10 @@ const textInput = {
   boxSizing: 'border-box' as const,
   padding: '10px 14px',
   borderRadius: '10px',
-  border: '1px solid #ECECEC',
-  background: '#F6F6F4',
+  border: '1px solid var(--t-line)',
+  background: 'var(--t-surface2)',
   fontSize: '15px',
-  color: '#2A2A2C',
+  color: 'var(--t-fg)',
   outline: 'none',
 }
 const suggestionStyle = {
@@ -66,13 +66,13 @@ const suggestionStyle = {
   textAlign: 'left' as const,
   padding: '10px 14px',
   border: 'none',
-  borderBottom: '1px solid #ECECEC',
+  borderBottom: '1px solid var(--t-line)',
   background: 'transparent',
   fontSize: '14px',
-  color: '#2A2A2C',
+  color: 'var(--t-fg)',
   cursor: 'pointer',
 }
-const labelStyle = { fontSize: '11px', fontWeight: 500, letterSpacing: '1.2px', color: '#9B9B9F', margin: '16px 0 10px' }
+const labelStyle = { fontSize: '11px', fontWeight: 500, letterSpacing: '1.2px', color: 'var(--t-muted)', margin: '16px 0 10px' }
 
 export function DesktopPastiScreen() {
   const { t } = useTranslation()
@@ -225,7 +225,7 @@ export function DesktopPastiScreen() {
         title={t('nav.meals')}
         subtitle={t('desktop.pasti.subtitle')}
         right={
-          <Link to="/pasti/storico" style={{ fontSize: '14px', color: '#9B9B9F', textDecoration: 'none' }}>
+          <Link to="/pasti/storico" style={{ fontSize: '14px', color: 'var(--t-muted)', textDecoration: 'none' }}>
             {t('pianificazioni.link')}
           </Link>
         }
@@ -238,7 +238,7 @@ export function DesktopPastiScreen() {
           justifyContent: 'space-between',
           flexWrap: 'wrap',
           gap: '16px',
-          background: '#fff',
+          background: 'var(--t-surface)',
           borderRadius: '16px',
           padding: '16px 24px',
           marginBottom: '16px',
@@ -248,7 +248,7 @@ export function DesktopPastiScreen() {
           <button style={iconBtn} onClick={() => goToWeek(-1)} aria-label={t('pasti.prevWeek')}>
             ‹
           </button>
-          <span style={{ fontSize: '16px', color: '#2A2A2C', minWidth: '200px', textAlign: 'center' }}>
+          <span style={{ fontSize: '16px', color: 'var(--t-fg)', minWidth: '200px', textAlign: 'center' }}>
             {formatWeekLabelWithYear(week)}
           </span>
           <button style={iconBtn} onClick={() => goToWeek(1)} aria-label={t('pasti.nextWeek')}>
@@ -256,7 +256,7 @@ export function DesktopPastiScreen() {
           </button>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <span style={{ fontSize: '14px', color: '#2A2A2C' }}>{t('pasti.buoniAvailable')}</span>
+          <span style={{ fontSize: '14px', color: 'var(--t-fg)' }}>{t('pasti.buoniAvailable')}</span>
           <button style={iconBtn} onClick={() => setBuoni.mutate(Math.max(0, buoniAvailable - 1))} aria-label="-">
             −
           </button>
@@ -269,8 +269,8 @@ export function DesktopPastiScreen() {
         </div>
       </div>
 
-      <div style={{ background: '#fff', borderRadius: '16px', padding: '20px', overflowX: 'auto' }}>
-        <p style={{ fontSize: '13px', color: '#9B9B9F', margin: '0 0 16px' }}>{t('desktop.pasti.intro')}</p>
+      <div style={{ background: 'var(--t-surface)', borderRadius: '16px', padding: '20px', overflowX: 'auto' }}>
+        <p style={{ fontSize: '13px', color: 'var(--t-muted)', margin: '0 0 16px' }}>{t('desktop.pasti.intro')}</p>
         <div
           style={{
             display: 'grid',
@@ -283,7 +283,7 @@ export function DesktopPastiScreen() {
           {days.map((day) => (
             <div
               key={`h-${day.dayIndex}`}
-              style={{ fontSize: '12px', fontWeight: 500, color: '#9B9B9F', letterSpacing: '0.5px', padding: '0 4px' }}
+              style={{ fontSize: '12px', fontWeight: 500, color: 'var(--t-muted)', letterSpacing: '0.5px', padding: '0 4px' }}
             >
               {dayShort(day.dayIndex).toUpperCase()}
             </div>
@@ -305,13 +305,13 @@ export function DesktopPastiScreen() {
         <button style={primaryBtn} onClick={handleImport}>
           {t('pasti.importAndGoToList')}
         </button>
-        <button style={{ ...secondaryBtn, background: '#fff' }} onClick={() => void navigate({ to: '/lista' })}>
+        <button style={{ ...secondaryBtn, background: 'var(--t-surface)' }} onClick={() => void navigate({ to: '/lista' })}>
           {t('pasti.goToList')}
         </button>
       </div>
 
       <Modal open={importPick !== null} onClose={() => setImportPick(null)} title={t('pasti.chooseList')} width={420}>
-        <div style={{ background: '#F6F6F4', borderRadius: '12px', overflow: 'hidden', marginBottom: '20px' }}>
+        <div style={{ background: 'var(--t-surface2)', borderRadius: '12px', overflow: 'hidden', marginBottom: '20px' }}>
           {activeLists(lists).map((l) => (
             <button
               key={l.id}
@@ -343,7 +343,7 @@ export function DesktopPastiScreen() {
           <>
             {slot.dishId !== undefined ? (
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px' }}>
-                <span style={{ fontSize: '18px', color: '#2A2A2C' }}>{slot.nameInput}</span>
+                <span style={{ fontSize: '18px', color: 'var(--t-fg)' }}>{slot.nameInput}</span>
                 <button
                   style={{ ...secondaryBtn, padding: '6px 12px', fontSize: '13px' }}
                   onClick={() =>
@@ -366,7 +366,7 @@ export function DesktopPastiScreen() {
                   style={{ ...textInput, opacity: slot.isNewDish ? 0.6 : 1 }}
                 />
                 {!slot.isNewDish && dishQuery && (
-                  <div style={{ background: '#F6F6F4', borderRadius: '10px', overflow: 'hidden', marginTop: '6px' }}>
+                  <div style={{ background: 'var(--t-surface2)', borderRadius: '10px', overflow: 'hidden', marginTop: '6px' }}>
                     {dishMatches.map((d) => (
                       <button
                         key={d.id}
@@ -396,9 +396,9 @@ export function DesktopPastiScreen() {
                 <div style={labelStyle}>{t('piatti.ingredientsSection')}</div>
                 {slot.dishId !== undefined ? (
                   slot.ingredients.length === 0 ? (
-                    <div style={{ fontSize: '13px', color: '#9B9B9F' }}>{t('piatti.noIngredients')}</div>
+                    <div style={{ fontSize: '13px', color: 'var(--t-muted)' }}>{t('piatti.noIngredients')}</div>
                   ) : (
-                    <div style={{ background: '#F6F6F4', borderRadius: '12px', overflow: 'hidden' }}>
+                    <div style={{ background: 'var(--t-surface2)', borderRadius: '12px', overflow: 'hidden' }}>
                       {slot.ingredients.map((ing) => (
                         <label
                           key={ing.id}
@@ -407,9 +407,9 @@ export function DesktopPastiScreen() {
                             alignItems: 'center',
                             gap: '12px',
                             padding: '10px 14px',
-                            borderBottom: '1px solid #ECECEC',
+                            borderBottom: '1px solid var(--t-line)',
                             fontSize: '14px',
-                            color: '#2A2A2C',
+                            color: 'var(--t-fg)',
                             cursor: 'pointer',
                           }}
                         >
@@ -440,7 +440,7 @@ export function DesktopPastiScreen() {
             <div style={{ display: 'flex', justifyContent: 'space-between', gap: '10px', marginTop: '24px' }}>
               <div>
                 {slot.hadExisting && (
-                  <button style={{ ...secondaryBtn, color: '#D14343' }} onClick={handleRemove}>
+                  <button style={{ ...secondaryBtn, color: 'var(--t-danger)' }} onClick={handleRemove}>
                     {t('pasti.removeDish')}
                   </button>
                 )}
@@ -478,7 +478,7 @@ function MealRow({
 }) {
   return (
     <>
-      <div style={{ fontSize: '12px', color: '#9B9B9F', paddingTop: '14px' }}>{label}</div>
+      <div style={{ fontSize: '12px', color: 'var(--t-muted)', paddingTop: '14px' }}>{label}</div>
       {days.map((day) => {
         const value = mealType === 0 ? day.pranzo : day.cena
         return (
@@ -489,9 +489,9 @@ function MealRow({
               minHeight: '72px',
               padding: '10px 8px',
               borderRadius: '12px',
-              border: value ? '1px solid #ECECEC' : '1px dashed #D8D8D6',
-              background: value ? '#F6F6F4' : 'transparent',
-              color: value ? '#2A2A2C' : '#B5B5BA',
+              border: value ? '1px solid var(--t-line)' : '1px dashed var(--t-line2)',
+              background: value ? 'var(--t-surface2)' : 'transparent',
+              color: value ? 'var(--t-fg)' : 'var(--t-faint)',
               fontSize: 'clamp(11px, 1.3vw, 14px)',
               textAlign: 'left',
               cursor: 'pointer',

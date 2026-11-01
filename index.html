@@ -7,6 +7,20 @@
     <meta name="description" content="Gestione spesa con buoni pasto" />
     <!-- Barra di stato sempre chiara come lo sfondo dell'app; i veli scuri hanno gli angoli superiori arrotondati. -->
     <meta name="theme-color" content="#F2F2F0" />
+    <!-- Tema scelto nelle Impostazioni, applicato prima del primo disegno per evitare il lampo del tema chiaro.
+         La mappa dei colori deve coincidere con THEME_PREVIEW in src/lib/theme.ts (lo controlla un test). -->
+    <script>
+      (function () {
+        try {
+          var bg = { chiaro: '#F2F2F0', scuro: '#141416', salvia: '#EDF0EA', oceano: '#ECF1F6', notte: '#0E1626', contrasto: '#FFFFFF' };
+          var p = JSON.parse(localStorage.getItem('app-theme') || 'null') || {};
+          var t = bg[p.theme] ? p.theme : 'chiaro';
+          if (p.auto === true) t = matchMedia('(prefers-color-scheme: dark)').matches ? 'scuro' : 'chiaro';
+          document.documentElement.setAttribute('data-app-theme', t);
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', bg[t]);
+        } catch (e) {}
+      })();
+    </script>
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />

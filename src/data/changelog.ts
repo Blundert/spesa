@@ -2,6 +2,16 @@ export type ChangelogEntry = { it: string[]; en: string[] }
 
 // Ordine: più recente in cima. Aggiungere una entry ad ogni nuova versione.
 export const changelog: Record<string, ChangelogEntry> = {
+  '0.43.0': {
+    it: [
+      'Temi: in Impostazioni → Aspetto puoi scegliere fra Chiaro (quello di sempre, invariato), Scuro, Salvia, Oceano, Notte blu e Contrasto alto. Cambiano colori di pagine, grafici e pulsanti, su telefono e su desktop',
+      '"Segui il sistema" usa Chiaro di giorno e Scuro la sera, secondo il dispositivo; la scelta resta salvata',
+    ],
+    en: [
+      'Themes: in Settings → Appearance you can pick Light (the usual one, unchanged), Dark, Sage, Ocean, Midnight blue and High contrast. They change the colours of pages, charts and buttons, on phone and desktop',
+      '"Follow the system" uses Light by day and Dark at night, following your device; your choice is remembered',
+    ],
+  },
   '0.42.0': {
     it: [
       'Lista: per ogni lista puoi scegliere a mano i "Chip più proposti" (le scorciatoie sotto il campo di aggiunta) e la "Spesa solita". Dal pannello di modifica della lista passa da "Automatico" (come prima) a "Scelti da me" e spunta i prodotti del catalogo; i prodotti già in lista non vengono riproposti',

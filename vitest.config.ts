@@ -20,6 +20,7 @@ export default defineConfig({
         'src/lib/calc.ts',
         'src/lib/amountInput.ts',
         'src/lib/sortRows.ts',
+        'src/lib/theme.ts',
         'src/lib/listSuggestions.ts',
         'src/lib/statsRange.ts',
         'src/lib/viewMode.ts',

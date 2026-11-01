@@ -31,7 +31,7 @@ const linkBtn = {
   border: 'none',
   background: 'transparent',
   cursor: 'pointer',
-  color: '#9B9B9F',
+  color: 'var(--t-muted)',
   fontSize: '12px',
   padding: 0,
   textDecoration: 'underline dotted',
@@ -142,7 +142,7 @@ export function DesktopSessioneScreen() {
     <div style={{ padding: 'var(--page-pad-y) var(--page-pad-x)', maxWidth: '1200px' }}>
       <button
         onClick={() => void navigate({ to: '/storico' })}
-        style={{ background: 'none', border: 'none', padding: 0, marginBottom: '12px', color: '#9B9B9F', fontSize: '13px', cursor: 'pointer' }}
+        style={{ background: 'none', border: 'none', padding: 0, marginBottom: '12px', color: 'var(--t-muted)', fontSize: '13px', cursor: 'pointer' }}
       >
         ← {t('storico.title')}
       </button>
@@ -151,15 +151,15 @@ export function DesktopSessioneScreen() {
         subtitle={isCompleted ? undefined : t('sessione.notCompleted')}
         right={
           <div style={{ display: 'flex', gap: '8px' }}>
-            <button onClick={() => setShowStorePicker(true)} style={{ ...btn, background: '#fff', border: '1px solid #ECECEC', color: '#2A2A2C' }}>
+            <button onClick={() => setShowStorePicker(true)} style={{ ...btn, background: 'var(--t-surface)', border: '1px solid var(--t-line)', color: 'var(--t-fg)' }}>
               {t('sessione.editStore')}
             </button>
             {!isCompleted && (
-              <button onClick={() => setShowFinishKeypad(true)} style={{ ...btn, background: '#2A2A2C', color: '#fff' }}>
+              <button onClick={() => setShowFinishKeypad(true)} style={{ ...btn, background: 'var(--t-accent)', color: 'var(--t-on)' }}>
                 {t('sessione.finish')}
               </button>
             )}
-            <button onClick={() => setShowDeleteConfirm(true)} style={{ ...btn, background: '#fff', border: '1px solid #ECECEC', color: '#D14343' }}>
+            <button onClick={() => setShowDeleteConfirm(true)} style={{ ...btn, background: 'var(--t-surface)', border: '1px solid var(--t-line)', color: 'var(--t-danger)' }}>
               {t('sessione.deleteSession')}
             </button>
           </div>
@@ -206,7 +206,7 @@ export function DesktopSessioneScreen() {
         </div>
       </div>
 
-      <div style={{ background: '#fff', borderRadius: '16px', padding: '24px' }}>
+      <div style={{ background: 'var(--t-surface)', borderRadius: '16px', padding: '24px' }}>
         <SectionTitle>{t('desktop.sessione.purchases')}</SectionTitle>
         <SortableTable
           columns={columns}

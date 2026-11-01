@@ -5,7 +5,7 @@
     Manage your weekly grocery shopping with meal vouchers — local-first, no account needed.
   </p>
 
-  ![Version](https://img.shields.io/badge/version-0.42.0-2A2A2C?style=flat-square)
+  ![Version](https://img.shields.io/badge/version-0.43.0-2A2A2C?style=flat-square)
   ![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white)
   ![Vite](https://img.shields.io/badge/Vite-646CFF?style=flat-square&logo=vite&logoColor=white)
   ![Tailwind CSS](https://img.shields.io/badge/Tailwind-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white)
@@ -69,6 +69,7 @@ no server. It installs as a native app on iOS, Android, and desktop.
 - 🔄 Optional backup to GitHub (JSON in a private repo)
 - 🖥️ Dedicated desktop interface (from 768 px): collapsible side menu, sortable tables, colour charts; switching to/from mobile is instant
 - 📱 Installable PWA — iOS · Android · Desktop
+- 🎨 Selectable themes: Light, Dark, Sage, Ocean, Midnight blue, High contrast, or automatic with the system
 - 🌍 Italian · English
 
 ## Stack

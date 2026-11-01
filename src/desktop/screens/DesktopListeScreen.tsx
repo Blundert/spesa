@@ -18,7 +18,7 @@ import { Modal } from '../components/Modal'
 import { ListEditModal } from '../components/ListEditModal'
 import { btnDanger, btnPrimary, btnSecondary } from '../components/buttonStyles'
 
-const card = { background: '#fff', borderRadius: '16px', padding: '24px', marginBottom: '24px' } as const
+const card = { background: 'var(--t-surface)', borderRadius: '16px', padding: '24px', marginBottom: '24px' } as const
 const linkBtn = { background: 'none', border: 'none', padding: 0, cursor: 'pointer', fontSize: '14px' } as const
 
 export function DesktopListeScreen() {
@@ -60,8 +60,8 @@ export function DesktopListeScreen() {
           height: '30px',
           borderRadius: '50%',
           border: 'none',
-          background: '#F2F2F0',
-          color: '#2A2A2C',
+          background: 'var(--t-bg)',
+          color: 'var(--t-fg)',
           cursor: disabled ? 'default' : 'pointer',
           opacity: disabled ? 0.3 : 1,
           marginLeft: '6px',
@@ -134,11 +134,11 @@ export function DesktopListeScreen() {
             onClick={() =>
               restore.mutate(l.id as number, { onSuccess: () => toast(t('lists.restored', { name: l.name })) })
             }
-            style={{ ...linkBtn, color: '#2A2A2C' }}
+            style={{ ...linkBtn, color: 'var(--t-fg)' }}
           >
             {t('lists.restore')}
           </button>
-          <button onClick={() => setPendingDelete(l)} style={{ ...linkBtn, color: '#D14343' }}>
+          <button onClick={() => setPendingDelete(l)} style={{ ...linkBtn, color: 'var(--t-danger)' }}>
             {t('lists.delete')}
           </button>
         </span>
@@ -193,7 +193,7 @@ export function DesktopListeScreen() {
         onClose={() => setPendingDelete(null)}
         title={t('lists.deleteConfirmTitle', { name: pendingDelete?.name ?? '' })}
       >
-        <div style={{ fontSize: '14px', color: '#9B9B9F', marginBottom: '24px' }}>{t('lists.deleteConfirmBody')}</div>
+        <div style={{ fontSize: '14px', color: 'var(--t-muted)', marginBottom: '24px' }}>{t('lists.deleteConfirmBody')}</div>
         <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
           <button onClick={() => setPendingDelete(null)} style={btnSecondary}>
             {t('common.cancel')}

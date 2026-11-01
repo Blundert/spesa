@@ -1,6 +1,6 @@
 export const btnPrimary = {
-  background: '#2A2A2C',
-  color: '#fff',
+  background: 'var(--t-accent)',
+  color: 'var(--t-on)',
   border: 'none',
   borderRadius: '10px',
   padding: '10px 18px',
@@ -9,8 +9,8 @@ export const btnPrimary = {
 } as const
 
 export const btnSecondary = {
-  background: '#F2F2F0',
-  color: '#2A2A2C',
+  background: 'var(--t-bg)',
+  color: 'var(--t-fg)',
   border: 'none',
   borderRadius: '10px',
   padding: '10px 18px',
@@ -18,4 +18,4 @@ export const btnSecondary = {
   cursor: 'pointer',
 } as const
 
-export const btnDanger = { ...btnPrimary, background: '#D14343' } as const
+export const btnDanger = { ...btnPrimary, background: 'var(--t-danger)' } as const

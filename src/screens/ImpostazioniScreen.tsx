@@ -25,6 +25,7 @@ import { getDebugViewport, setDebugViewport } from '../lib/debugFlag'
 import { resetTutorial } from '../tutorial/tutorialStore'
 import { BottomSheet } from '../components/BottomSheet'
 import { BackButton } from '../components/BackButton'
+import { ThemePicker } from '../components/ThemePicker'
 
 const LANGS: { code: Lang; label: string }[] = [
   { code: 'it', label: 'Italiano' },
@@ -184,63 +185,63 @@ export function ImpostazioniScreen() {
       <div className="flex-1 overflow-y-auto px-5 pb-[120px]">
         <div className="flex items-center gap-2 pt-2 pb-[18px]">
           <BackButton />
-          <span className="text-[26px] font-normal tracking-[-0.5px] text-[#2A2A2C]">
+          <span className="text-[26px] font-normal tracking-[-0.5px] text-t-fg">
             {t('settings.title')}
           </span>
         </div>
 
         {/* App: versione, aggiorna, installa */}
-        <div className="text-[12px] font-normal tracking-[1.2px] text-[#9B9B9F] uppercase px-1.5 pb-[13px]">
+        <div className="text-[12px] font-normal tracking-[1.2px] text-t-muted uppercase px-1.5 pb-[13px]">
           {t('settings.app')}
         </div>
-        <div className="bg-white rounded-[20px] overflow-hidden mb-7">
+        <div className="bg-t-surface rounded-[20px] overflow-hidden mb-7">
           <button
             onClick={() => void navigate({ to: '/changelog' })}
-            className="w-full flex items-center justify-between px-5 py-[17px] border-b border-[#ECECEC] active:bg-[#F6F6F4] transition-colors text-left"
+            className="w-full flex items-center justify-between px-5 py-[17px] border-b border-t-line active:bg-t-surface2 transition-colors text-left"
           >
-            <span className="text-base text-[#2A2A2C]">{t('settings.version')}</span>
+            <span className="text-base text-t-fg">{t('settings.version')}</span>
             <div className="flex items-center gap-1.5">
-              <span className="text-[15px] text-[#9B9B9F] tabular-nums">{__APP_VERSION__}</span>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B5B5BA" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <span className="text-[15px] text-t-muted tabular-nums">{__APP_VERSION__}</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--t-faint)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M9 5l7 7-7 7" />
               </svg>
             </div>
           </button>
           <button
             onClick={() => void handleUpdate()}
-            className="w-full flex items-center justify-between px-5 py-[17px] border-b border-[#ECECEC] active:bg-[#F6F6F4] transition-colors text-left"
+            className="w-full flex items-center justify-between px-5 py-[17px] border-b border-t-line active:bg-t-surface2 transition-colors text-left"
           >
-            <span className="text-base text-[#2A2A2C]">{t('settings.refresh')}</span>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9B9B9F" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <span className="text-base text-t-fg">{t('settings.refresh')}</span>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--t-muted)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
               <path d="M21 12a9 9 0 1 1-2.64-6.36M21 4v5h-5" />
             </svg>
           </button>
           <button
             onClick={handleInstall}
-            className="w-full flex items-center justify-between px-5 py-[17px] active:bg-[#F6F6F4] transition-colors text-left"
+            className="w-full flex items-center justify-between px-5 py-[17px] active:bg-t-surface2 transition-colors text-left"
           >
-            <span className="text-base text-[#2A2A2C]">{t('install.title')}</span>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9B9B9F" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <span className="text-base text-t-fg">{t('install.title')}</span>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--t-muted)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
               <path d="M12 3v13M8 12l4 4 4-4M5 19h14" />
             </svg>
           </button>
         </div>
 
         {/* Lingua */}
-        <div className="text-[12px] font-normal tracking-[1.2px] text-[#9B9B9F] uppercase px-1.5 pb-[13px]">
+        <div className="text-[12px] font-normal tracking-[1.2px] text-t-muted uppercase px-1.5 pb-[13px]">
           {t('settings.language')}
         </div>
-        <div className="bg-white rounded-[20px] overflow-hidden mb-7">
+        <div className="bg-t-surface rounded-[20px] overflow-hidden mb-7">
           {LANGS.map((l, i) => (
             <button
               key={l.code}
               onClick={() => setLang(l.code)}
-              className="w-full flex items-center justify-between px-5 py-[17px] active:bg-[#F6F6F4] transition-colors text-left"
-              style={{ borderBottom: i < LANGS.length - 1 ? '1px solid #ECECEC' : 'none' }}
+              className="w-full flex items-center justify-between px-5 py-[17px] active:bg-t-surface2 transition-colors text-left"
+              style={{ borderBottom: i < LANGS.length - 1 ? '1px solid var(--t-line)' : 'none' }}
             >
-              <span className="text-base text-[#2A2A2C]">{l.label}</span>
+              <span className="text-base text-t-fg">{l.label}</span>
               {current === l.code && (
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2A2A2C" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--t-fg)" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M5 12l4 4 10-10" />
                 </svg>
               )}
@@ -248,31 +249,34 @@ export function ImpostazioniScreen() {
           ))}
         </div>
 
+        {/* Aspetto: tema dell'app */}
+        <ThemePicker />
+
         {/* Buoni pasto: valore predefinito per le nuove spese */}
-        <div className="text-[12px] font-normal tracking-[1.2px] text-[#9B9B9F] uppercase px-1.5 pb-[13px]">
+        <div className="text-[12px] font-normal tracking-[1.2px] text-t-muted uppercase px-1.5 pb-[13px]">
           {t('settings.buoni')}
         </div>
-        <div className="bg-white rounded-[20px] px-5 py-[13px] flex items-center justify-between mb-2">
-          <span className="text-base text-[#2A2A2C]">{t('settings.defaultBuonoValue')}</span>
+        <div className="bg-t-surface rounded-[20px] px-5 py-[13px] flex items-center justify-between mb-2">
+          <span className="text-base text-t-fg">{t('settings.defaultBuonoValue')}</span>
           <BuonoValueStepper valueCents={buonoValue} onValue={handleBuonoValue} />
         </div>
-        <div className="text-[13px] text-[#9B9B9F] px-1.5 mb-7">{t('settings.defaultBuonoValueHint')}</div>
+        <div className="text-[13px] text-t-muted px-1.5 mb-7">{t('settings.defaultBuonoValueHint')}</div>
 
         {/* Inizio settimana */}
-        <div className="text-[12px] font-normal tracking-[1.2px] text-[#9B9B9F] uppercase px-1.5 pb-[13px]">
+        <div className="text-[12px] font-normal tracking-[1.2px] text-t-muted uppercase px-1.5 pb-[13px]">
           {t('settings.weekStartDay')}
         </div>
-        <div className="bg-white rounded-[20px] overflow-hidden mb-7">
+        <div className="bg-t-surface rounded-[20px] overflow-hidden mb-7">
           {Array.from({ length: 7 }, (_, i) => (
             <button
               key={i}
               onClick={() => handleWeekStart(i)}
-              className="w-full flex items-center justify-between px-5 py-[17px] active:bg-[#F6F6F4] transition-colors text-left"
-              style={{ borderBottom: i < 6 ? '1px solid #ECECEC' : 'none' }}
+              className="w-full flex items-center justify-between px-5 py-[17px] active:bg-t-surface2 transition-colors text-left"
+              style={{ borderBottom: i < 6 ? '1px solid var(--t-line)' : 'none' }}
             >
-              <span className="text-base text-[#2A2A2C]">{dayShort(i)}</span>
+              <span className="text-base text-t-fg">{dayShort(i)}</span>
               {weekStart === i && (
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2A2A2C" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--t-fg)" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M5 12l4 4 10-10" />
                 </svg>
               )}
@@ -281,67 +285,67 @@ export function ImpostazioniScreen() {
         </div>
 
         {/* Tutorial */}
-        <div className="text-[12px] font-normal tracking-[1.2px] text-[#9B9B9F] uppercase px-1.5 pb-[13px]">
+        <div className="text-[12px] font-normal tracking-[1.2px] text-t-muted uppercase px-1.5 pb-[13px]">
           {t('tutorial.section')}
         </div>
         <button
           onClick={handleReplayTutorial}
-          className="w-full bg-white rounded-[20px] px-5 py-[17px] text-left text-base text-[#2A2A2C] active:bg-[#F6F6F4] transition-colors mb-7"
+          className="w-full bg-t-surface rounded-[20px] px-5 py-[17px] text-left text-base text-t-fg active:bg-t-surface2 transition-colors mb-7"
         >
           {t('tutorial.replay')}
         </button>
 
         {/* Dati */}
-        <div className="text-[12px] font-normal tracking-[1.2px] text-[#9B9B9F] uppercase px-1.5 pb-[13px]">
+        <div className="text-[12px] font-normal tracking-[1.2px] text-t-muted uppercase px-1.5 pb-[13px]">
           {t('settings.data')}
         </div>
-        <div className="bg-white rounded-[20px] overflow-hidden mb-3">
+        <div className="bg-t-surface rounded-[20px] overflow-hidden mb-3">
           <button
             onClick={() => void handleExport()}
-            className="w-full flex items-center justify-between px-5 py-[17px] border-b border-[#ECECEC] active:bg-[#F6F6F4] transition-colors text-left"
+            className="w-full flex items-center justify-between px-5 py-[17px] border-b border-t-line active:bg-t-surface2 transition-colors text-left"
           >
-            <span className="text-base text-[#2A2A2C]">{t('settings.exportData')}</span>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9B9B9F" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <span className="text-base text-t-fg">{t('settings.exportData')}</span>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--t-muted)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
               <path d="M12 4v11m0 0l-4-4m4 4l4-4M5 20h14" />
             </svg>
           </button>
           <button
             onClick={() => fileInputRef.current?.click()}
-            className="w-full flex items-center justify-between px-5 py-[17px] active:bg-[#F6F6F4] transition-colors text-left"
+            className="w-full flex items-center justify-between px-5 py-[17px] active:bg-t-surface2 transition-colors text-left"
           >
-            <span className="text-base text-[#2A2A2C]">{t('settings.importData')}</span>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9B9B9F" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <span className="text-base text-t-fg">{t('settings.importData')}</span>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--t-muted)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
               <path d="M12 20V9m0 0L8 13m4-4l4 4M5 4h14" />
             </svg>
           </button>
         </div>
         <button
           onClick={() => setShowWipe(true)}
-          className="w-full bg-white rounded-[20px] px-5 py-[17px] mb-7 text-left text-base text-[#D14343] active:bg-[#F6F6F4] transition-colors"
+          className="w-full bg-t-surface rounded-[20px] px-5 py-[17px] mb-7 text-left text-base text-t-danger active:bg-t-surface2 transition-colors"
         >
           {t('settings.deleteAll')}
         </button>
 
         {/* Sincronizzazione GitHub */}
-        <div className="text-[12px] font-normal tracking-[1.2px] text-[#9B9B9F] uppercase px-1.5 pb-[13px]">
+        <div className="text-[12px] font-normal tracking-[1.2px] text-t-muted uppercase px-1.5 pb-[13px]">
           {t('settings.sync')}
         </div>
-        <p className="text-[13px] text-[#9B9B9F] px-1.5 pb-[13px] leading-relaxed">
+        <p className="text-[13px] text-t-muted px-1.5 pb-[13px] leading-relaxed">
           {t('settings.syncHint')}
         </p>
         <a
           href="https://github.com/settings/personal-access-tokens/new"
           target="_blank"
           rel="noopener noreferrer"
-          className="w-full flex items-center justify-between bg-white rounded-[20px] px-5 py-[17px] mb-3 active:bg-[#F6F6F4] transition-colors text-left"
+          className="w-full flex items-center justify-between bg-t-surface rounded-[20px] px-5 py-[17px] mb-3 active:bg-t-surface2 transition-colors text-left"
         >
-          <span className="text-base text-[#2A2A2C]">{t('settings.syncCreateToken')}</span>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9B9B9F" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+          <span className="text-base text-t-fg">{t('settings.syncCreateToken')}</span>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--t-muted)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
             <path d="M14 5h5v5M19 5l-8 8M11 5H6a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-5" />
           </svg>
         </a>
-        <div className="bg-[#F6F6F4] rounded-[20px] px-5 py-4 mb-3">
-          <div className="text-[12px] font-normal tracking-[0.4px] text-[#9B9B9F] uppercase pb-2.5">
+        <div className="bg-t-surface2 rounded-[20px] px-5 py-4 mb-3">
+          <div className="text-[12px] font-normal tracking-[0.4px] text-t-muted uppercase pb-2.5">
             {t('settings.syncStepsTitle')}
           </div>
           <ol className="space-y-2">
@@ -351,8 +355,8 @@ export function ImpostazioniScreen() {
               t('settings.syncStep3'),
               t('settings.syncStep4'),
             ].map((step, i) => (
-              <li key={i} className="flex gap-2.5 text-[13px] text-[#6E6E72] leading-relaxed">
-                <span className="flex-none w-[18px] h-[18px] mt-px rounded-full bg-[#E3E3E1] text-[11px] flex items-center justify-center tabular-nums">
+              <li key={i} className="flex gap-2.5 text-[13px] text-t-text2 leading-relaxed">
+                <span className="flex-none w-[18px] h-[18px] mt-px rounded-full bg-t-line8 text-[11px] flex items-center justify-center tabular-nums">
                   {i + 1}
                 </span>
                 <span>{step}</span>
@@ -360,7 +364,7 @@ export function ImpostazioniScreen() {
             ))}
           </ol>
         </div>
-        <div className="bg-white rounded-[20px] overflow-hidden mb-3">
+        <div className="bg-t-surface rounded-[20px] overflow-hidden mb-3">
           {([
             { f: 'token', ph: t('settings.syncToken'), type: 'password' },
             { f: 'owner', ph: t('settings.syncOwner'), type: 'text' },
@@ -377,47 +381,47 @@ export function ImpostazioniScreen() {
               autoCapitalize="off"
               autoCorrect="off"
               spellCheck={false}
-              className="w-full px-5 py-[15px] text-base text-[#2A2A2C] placeholder:text-[#B5B5BA] bg-transparent outline-none"
-              style={{ borderBottom: i < arr.length - 1 ? '1px solid #ECECEC' : 'none' }}
+              className="w-full px-5 py-[15px] text-base text-t-fg placeholder:text-t-faint bg-transparent outline-none"
+              style={{ borderBottom: i < arr.length - 1 ? '1px solid var(--t-line)' : 'none' }}
             />
           ))}
         </div>
         <button
           onClick={handleGitSave}
-          className="w-full bg-white rounded-[20px] px-5 py-[17px] mb-3 text-left text-base text-[#2A2A2C] active:bg-[#F6F6F4] transition-colors"
+          className="w-full bg-t-surface rounded-[20px] px-5 py-[17px] mb-3 text-left text-base text-t-fg active:bg-t-surface2 transition-colors"
         >
           {t('settings.syncSave')}
         </button>
         <button
           onClick={handleToggleAuto}
-          className="w-full flex items-center justify-between bg-white rounded-[20px] px-5 py-[17px] mb-3 active:bg-[#F6F6F4] transition-colors text-left"
+          className="w-full flex items-center justify-between bg-t-surface rounded-[20px] px-5 py-[17px] mb-3 active:bg-t-surface2 transition-colors text-left"
         >
-          <span className="text-base text-[#2A2A2C]">{t('settings.syncAuto')}</span>
+          <span className="text-base text-t-fg">{t('settings.syncAuto')}</span>
           <span
-            className={`relative w-[46px] h-[28px] rounded-full transition-colors flex-none ${auto ? 'bg-[#2A2A2C]' : 'bg-[#D8D8D6]'}`}
+            className={`relative w-[46px] h-[28px] rounded-full transition-colors flex-none ${auto ? 'bg-t-accent' : 'bg-t-line2'}`}
           >
             <span
-              className={`absolute top-[3px] w-[22px] h-[22px] rounded-full bg-white transition-all ${auto ? 'left-[21px]' : 'left-[3px]'}`}
+              className={`absolute top-[3px] w-[22px] h-[22px] rounded-full bg-t-surface transition-all ${auto ? 'left-[21px]' : 'left-[3px]'}`}
             />
           </span>
         </button>
         <button
           onClick={() => void handlePush()}
           disabled={syncing}
-          className="w-full bg-[#2A2A2C] text-white rounded-[20px] px-5 py-[17px] mb-2.5 text-base active:scale-[.99] transition-transform disabled:opacity-50"
+          className="w-full bg-t-accent text-t-on rounded-[20px] px-5 py-[17px] mb-2.5 text-base active:scale-[.99] transition-transform disabled:opacity-50"
         >
           {t('settings.syncNow')}
         </button>
         <button
           onClick={() => setShowPull(true)}
           disabled={syncing}
-          className="w-full bg-white rounded-[20px] px-5 py-[17px] text-base text-[#2A2A2C] active:bg-[#F6F6F4] transition-colors disabled:opacity-50"
+          className="w-full bg-t-surface rounded-[20px] px-5 py-[17px] text-base text-t-fg active:bg-t-surface2 transition-colors disabled:opacity-50"
         >
           {t('settings.syncPull')}
         </button>
 
         {/* Debug (sviluppo) */}
-        <div className="text-[12px] font-normal tracking-[1.2px] text-[#9B9B9F] uppercase px-1.5 pt-7 pb-[13px]">
+        <div className="text-[12px] font-normal tracking-[1.2px] text-t-muted uppercase px-1.5 pt-7 pb-[13px]">
           {t('settings.debug')}
         </div>
         <button
@@ -426,14 +430,14 @@ export function ImpostazioniScreen() {
             setDebug(next)
             setDebugViewport(next)
           }}
-          className="w-full flex items-center justify-between bg-white rounded-[20px] px-5 py-[17px] active:bg-[#F6F6F4] transition-colors text-left"
+          className="w-full flex items-center justify-between bg-t-surface rounded-[20px] px-5 py-[17px] active:bg-t-surface2 transition-colors text-left"
         >
-          <span className="text-base text-[#2A2A2C]">{t('settings.debugViewport')}</span>
+          <span className="text-base text-t-fg">{t('settings.debugViewport')}</span>
           <span
-            className={`relative w-[46px] h-[28px] rounded-full transition-colors flex-none ${debug ? 'bg-[#2A2A2C]' : 'bg-[#D8D8D6]'}`}
+            className={`relative w-[46px] h-[28px] rounded-full transition-colors flex-none ${debug ? 'bg-t-accent' : 'bg-t-line2'}`}
           >
             <span
-              className={`absolute top-[3px] w-[22px] h-[22px] rounded-full bg-white transition-all ${debug ? 'left-[21px]' : 'left-[3px]'}`}
+              className={`absolute top-[3px] w-[22px] h-[22px] rounded-full bg-t-surface transition-all ${debug ? 'left-[21px]' : 'left-[3px]'}`}
             />
           </span>
         </button>
@@ -449,21 +453,21 @@ export function ImpostazioniScreen() {
 
       {/* Drawer di conferma azzeramento */}
       <BottomSheet open={showWipe} onClose={() => setShowWipe(false)}>
-        <div className="text-[20px] font-normal text-[#D14343] px-0.5 pb-2">
+        <div className="text-[20px] font-normal text-t-danger px-0.5 pb-2">
           {t('settings.confirmTitle')}
         </div>
-        <p className="text-sm text-[#6E6E72] px-0.5 pb-4 leading-relaxed">
+        <p className="text-sm text-t-text2 px-0.5 pb-4 leading-relaxed">
           {t('settings.confirmBody')}
         </p>
         <button
           onClick={() => void handleWipe()}
-          className="w-full bg-[#D14343] text-white text-[17px] py-[18px] rounded-[20px] mb-2 active:scale-[.98] transition-transform"
+          className="w-full bg-t-danger text-t-on text-[17px] py-[18px] rounded-[20px] mb-2 active:scale-[.98] transition-transform"
         >
           {t('settings.deleteConfirm')}
         </button>
         <button
           onClick={() => setShowWipe(false)}
-          className="w-full bg-[#ECECEA] text-[#2A2A2C] text-[17px] py-[18px] rounded-[20px] active:scale-[.98] transition-transform"
+          className="w-full bg-t-line5 text-t-fg text-[17px] py-[18px] rounded-[20px] active:scale-[.98] transition-transform"
         >
           {t('common.cancel')}
         </button>
@@ -471,21 +475,21 @@ export function ImpostazioniScreen() {
 
       {/* Drawer di conferma import (sovrascrive tutto) */}
       <BottomSheet open={pendingImport !== null} onClose={() => setPendingImport(null)}>
-        <div className="text-[20px] font-normal text-[#2A2A2C] px-0.5 pb-2">
+        <div className="text-[20px] font-normal text-t-fg px-0.5 pb-2">
           {t('settings.importConfirmTitle')}
         </div>
-        <p className="text-sm text-[#6E6E72] px-0.5 pb-4 leading-relaxed">
+        <p className="text-sm text-t-text2 px-0.5 pb-4 leading-relaxed">
           {t('settings.importConfirmBody')}
         </p>
         <button
           onClick={() => void handleImportConfirm()}
-          className="w-full bg-[#2A2A2C] text-white text-[17px] py-[18px] rounded-[20px] mb-2 active:scale-[.98] transition-transform"
+          className="w-full bg-t-accent text-t-on text-[17px] py-[18px] rounded-[20px] mb-2 active:scale-[.98] transition-transform"
         >
           {t('settings.importConfirm')}
         </button>
         <button
           onClick={() => setPendingImport(null)}
-          className="w-full bg-[#ECECEA] text-[#2A2A2C] text-[17px] py-[18px] rounded-[20px] active:scale-[.98] transition-transform"
+          className="w-full bg-t-line5 text-t-fg text-[17px] py-[18px] rounded-[20px] active:scale-[.98] transition-transform"
         >
           {t('common.cancel')}
         </button>
@@ -493,21 +497,21 @@ export function ImpostazioniScreen() {
 
       {/* Drawer di conferma pull (sovrascrive i dati locali) */}
       <BottomSheet open={showPull} onClose={() => setShowPull(false)}>
-        <div className="text-[20px] font-normal text-[#2A2A2C] px-0.5 pb-2">
+        <div className="text-[20px] font-normal text-t-fg px-0.5 pb-2">
           {t('settings.syncPullConfirmTitle')}
         </div>
-        <p className="text-sm text-[#6E6E72] px-0.5 pb-4 leading-relaxed">
+        <p className="text-sm text-t-text2 px-0.5 pb-4 leading-relaxed">
           {t('settings.syncPullConfirmBody')}
         </p>
         <button
           onClick={() => void handlePull()}
-          className="w-full bg-[#2A2A2C] text-white text-[17px] py-[18px] rounded-[20px] mb-2 active:scale-[.98] transition-transform"
+          className="w-full bg-t-accent text-t-on text-[17px] py-[18px] rounded-[20px] mb-2 active:scale-[.98] transition-transform"
         >
           {t('settings.syncPullConfirm')}
         </button>
         <button
           onClick={() => setShowPull(false)}
-          className="w-full bg-[#ECECEA] text-[#2A2A2C] text-[17px] py-[18px] rounded-[20px] active:scale-[.98] transition-transform"
+          className="w-full bg-t-line5 text-t-fg text-[17px] py-[18px] rounded-[20px] active:scale-[.98] transition-transform"
         >
           {t('common.cancel')}
         </button>

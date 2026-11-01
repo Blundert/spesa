@@ -134,13 +134,13 @@ export function CatalogoScreen() {
       <div className="flex-1 overflow-y-auto px-5 pb-[120px]">
         <div className="flex items-center gap-2 pt-2 pb-[18px]">
           <BackButton />
-          <span className="text-[26px] font-normal tracking-[-0.5px] text-[#2A2A2C]">
+          <span className="text-[26px] font-normal tracking-[-0.5px] text-t-fg">
             {t('catalogo.title')}
           </span>
         </div>
 
         {/* ── Sezione categorie ── */}
-        <div className="text-[11px] font-normal tracking-[1.4px] text-[#9B9B9F] uppercase px-1 pb-[10px]">
+        <div className="text-[11px] font-normal tracking-[1.4px] text-t-muted uppercase px-1 pb-[10px]">
           {t('catalogo.categoriesSection')}
         </div>
 
@@ -149,11 +149,11 @@ export function CatalogoScreen() {
           return (
             <div
               key={c.id}
-              className="flex items-center gap-3 bg-white rounded-[20px] px-5 py-[18px] mb-[10px]"
+              className="flex items-center gap-3 bg-t-surface rounded-[20px] px-5 py-[18px] mb-[10px]"
             >
               <div className="flex-1 min-w-0">
-                <div className="text-base font-normal text-[#2A2A2C] truncate">{c.name}</div>
-                <div className="text-[13px] text-[#9B9B9F] mt-0.5">
+                <div className="text-base font-normal text-t-fg truncate">{c.name}</div>
+                <div className="text-[13px] text-t-muted mt-0.5">
                   {t('catalogo.itemCount', { count })}
                 </div>
               </div>
@@ -172,7 +172,7 @@ export function CatalogoScreen() {
                   height="16"
                   viewBox="0 0 24 24"
                   fill="none"
-                  stroke="#2A2A2C"
+                  stroke="var(--t-fg)"
                   strokeWidth="2"
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -194,7 +194,7 @@ export function CatalogoScreen() {
                   height="16"
                   viewBox="0 0 24 24"
                   fill="none"
-                  stroke="#2A2A2C"
+                  stroke="var(--t-fg)"
                   strokeWidth="2"
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -209,15 +209,15 @@ export function CatalogoScreen() {
         {/* Aggiungi categoria */}
         <button
           onClick={() => setAddCatOpen(true)}
-          className="w-full flex items-center gap-3 bg-white rounded-[20px] px-5 py-[18px] mb-[28px] active:bg-[#F6F6F4] transition-colors"
+          className="w-full flex items-center gap-3 bg-t-surface rounded-[20px] px-5 py-[18px] mb-[28px] active:bg-t-surface2 transition-colors"
         >
-          <div className="w-[42px] h-[42px] rounded-[13px] bg-[#F2F2F0] flex items-center justify-center flex-none">
+          <div className="w-[42px] h-[42px] rounded-[13px] bg-t-bg flex items-center justify-center flex-none">
             <svg
               width="20"
               height="20"
               viewBox="0 0 24 24"
               fill="none"
-              stroke="#2A2A2C"
+              stroke="var(--t-fg)"
               strokeWidth="1.9"
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -225,16 +225,16 @@ export function CatalogoScreen() {
               <path d="M12 5v14M5 12h14" />
             </svg>
           </div>
-          <span className="text-base text-[#9B9B9F]">{t('catalogo.addCategory')}</span>
+          <span className="text-base text-t-muted">{t('catalogo.addCategory')}</span>
         </button>
 
         {/* ── Sezione articoli ── */}
-        <div className="text-[11px] font-normal tracking-[1.4px] text-[#9B9B9F] uppercase px-1 pb-[10px]">
+        <div className="text-[11px] font-normal tracking-[1.4px] text-t-muted uppercase px-1 pb-[10px]">
           {t('catalogo.itemsSection')}
         </div>
 
         {items.length === 0 && (
-          <div className="text-center py-10 text-[#9B9B9F] text-sm">
+          <div className="text-center py-10 text-t-muted text-sm">
             {t('catalogo.emptyItems')}
           </div>
         )}
@@ -244,19 +244,19 @@ export function CatalogoScreen() {
           if (catItems.length === 0) return null
           return (
             <div key={c.id} className="mb-[18px]">
-              <div className="text-[11px] font-normal tracking-[1.2px] text-[#9B9B9F] uppercase px-1 pb-[10px]">
+              <div className="text-[11px] font-normal tracking-[1.2px] text-t-muted uppercase px-1 pb-[10px]">
                 {c.name}
               </div>
-              <div className="bg-white rounded-[20px] overflow-hidden">
+              <div className="bg-t-surface rounded-[20px] overflow-hidden">
                 {catItems.map((item, idx) => (
                   <div
                     key={item.id}
                     className="flex items-center gap-3 px-5 py-[15px]"
                     style={{
-                      borderBottom: idx < catItems.length - 1 ? '1px solid #ECECEC' : 'none',
+                      borderBottom: idx < catItems.length - 1 ? '1px solid var(--t-line)' : 'none',
                     }}
                   >
-                    <span className="flex-1 text-base text-[#2A2A2C] truncate">{item.name}</span>
+                    <span className="flex-1 text-base text-t-fg truncate">{item.name}</span>
 
                     {/* Rinomina */}
                     <button
@@ -272,7 +272,7 @@ export function CatalogoScreen() {
                         height="16"
                         viewBox="0 0 24 24"
                         fill="none"
-                        stroke="#2A2A2C"
+                        stroke="var(--t-fg)"
                         strokeWidth="2"
                         strokeLinecap="round"
                         strokeLinejoin="round"
@@ -296,7 +296,7 @@ export function CatalogoScreen() {
                         height="16"
                         viewBox="0 0 24 24"
                         fill="none"
-                        stroke="#2A2A2C"
+                        stroke="var(--t-fg)"
                         strokeWidth="2"
                         strokeLinecap="round"
                         strokeLinejoin="round"
@@ -317,7 +317,7 @@ export function CatalogoScreen() {
                         height="16"
                         viewBox="0 0 24 24"
                         fill="none"
-                        stroke="#2A2A2C"
+                        stroke="var(--t-fg)"
                         strokeWidth="2"
                         strokeLinecap="round"
                         strokeLinejoin="round"
@@ -335,7 +335,7 @@ export function CatalogoScreen() {
 
       {/* Sheet: aggiungi categoria */}
       <BottomSheet open={addCatOpen} onClose={() => setAddCatOpen(false)} hasInput>
-        <div className="text-[20px] font-normal text-[#2A2A2C] px-0.5 pb-[6px]">
+        <div className="text-[20px] font-normal text-t-fg px-0.5 pb-[6px]">
           {t('catalogo.newCategoryTitle')}
         </div>
         <input
@@ -344,11 +344,11 @@ export function CatalogoScreen() {
           placeholder={t('catalogo.namePlaceholder')}
           data-autofocus
           onKeyDown={(e) => e.key === 'Enter' && handleAddCategory()}
-          className="w-full border-0 border-b border-[#ECECEC] outline-none bg-transparent px-0.5 py-3 text-[18px] text-[#2A2A2C] mb-3"
+          className="w-full border-0 border-b border-t-line outline-none bg-transparent px-0.5 py-3 text-[18px] text-t-fg mb-3"
         />
         <button
           onClick={handleAddCategory}
-          className="w-full bg-[#2A2A2C] text-white text-[17px] py-[18px] rounded-[20px] active:scale-[.98] transition-transform"
+          className="w-full bg-t-accent text-t-on text-[17px] py-[18px] rounded-[20px] active:scale-[.98] transition-transform"
         >
           {t('common.add')}
         </button>
@@ -356,7 +356,7 @@ export function CatalogoScreen() {
 
       {/* Sheet: rinomina categoria */}
       <BottomSheet open={renameCat !== null} onClose={() => setRenameCat(null)} hasInput>
-        <div className="text-[20px] font-normal text-[#2A2A2C] px-0.5 pb-[6px]">
+        <div className="text-[20px] font-normal text-t-fg px-0.5 pb-[6px]">
           {t('catalogo.renameCategoryTitle')}
         </div>
         <input
@@ -365,11 +365,11 @@ export function CatalogoScreen() {
           placeholder={t('catalogo.namePlaceholder')}
           data-autofocus
           onKeyDown={(e) => e.key === 'Enter' && handleRenameCategory()}
-          className="w-full border-0 border-b border-[#ECECEC] outline-none bg-transparent px-0.5 py-3 text-[18px] text-[#2A2A2C] mb-3"
+          className="w-full border-0 border-b border-t-line outline-none bg-transparent px-0.5 py-3 text-[18px] text-t-fg mb-3"
         />
         <button
           onClick={handleRenameCategory}
-          className="w-full bg-[#2A2A2C] text-white text-[17px] py-[18px] rounded-[20px] active:scale-[.98] transition-transform"
+          className="w-full bg-t-accent text-t-on text-[17px] py-[18px] rounded-[20px] active:scale-[.98] transition-transform"
         >
           {t('common.save')}
         </button>
@@ -377,21 +377,21 @@ export function CatalogoScreen() {
 
       {/* Sheet: conferma elimina categoria */}
       <BottomSheet open={deleteCat !== null} onClose={() => setDeleteCat(null)}>
-        <div className="text-[20px] font-normal text-[#D14343] px-0.5 pb-2">
+        <div className="text-[20px] font-normal text-t-danger px-0.5 pb-2">
           {t('catalogo.deleteCategoryTitle', { name: deleteCat?.name ?? '' })}
         </div>
-        <div className="text-[15px] text-[#9B9B9F] px-0.5 pb-6">
+        <div className="text-[15px] text-t-muted px-0.5 pb-6">
           {t('catalogo.deleteCategoryBody')}
         </div>
         <button
           onClick={handleDeleteCategory}
-          className="w-full bg-[#D14343] text-white text-[17px] py-[18px] rounded-[20px] mb-3 active:scale-[.98] transition-transform"
+          className="w-full bg-t-danger text-t-on text-[17px] py-[18px] rounded-[20px] mb-3 active:scale-[.98] transition-transform"
         >
           {t('catalogo.deleteCategoryConfirm')}
         </button>
         <button
           onClick={() => setDeleteCat(null)}
-          className="w-full bg-[#F2F2F0] text-[#2A2A2C] text-[17px] py-[18px] rounded-[20px] active:scale-[.98] transition-transform"
+          className="w-full bg-t-bg text-t-fg text-[17px] py-[18px] rounded-[20px] active:scale-[.98] transition-transform"
         >
           {t('common.cancel')}
         </button>
@@ -399,7 +399,7 @@ export function CatalogoScreen() {
 
       {/* Sheet: rinomina articolo */}
       <BottomSheet open={renameItem !== null} onClose={() => setRenameItem(null)} hasInput>
-        <div className="text-[20px] font-normal text-[#2A2A2C] px-0.5 pb-[6px]">
+        <div className="text-[20px] font-normal text-t-fg px-0.5 pb-[6px]">
           {t('catalogo.renameItemTitle')}
         </div>
         <input
@@ -408,11 +408,11 @@ export function CatalogoScreen() {
           placeholder={t('catalogo.itemNamePlaceholder')}
           data-autofocus
           onKeyDown={(e) => e.key === 'Enter' && handleRenameItem()}
-          className="w-full border-0 border-b border-[#ECECEC] outline-none bg-transparent px-0.5 py-3 text-[18px] text-[#2A2A2C] mb-4"
+          className="w-full border-0 border-b border-t-line outline-none bg-transparent px-0.5 py-3 text-[18px] text-t-fg mb-4"
         />
         <button
           onClick={handleRenameItem}
-          className="w-full bg-[#2A2A2C] text-white text-[17px] py-[18px] rounded-[20px] active:scale-[.98] transition-transform"
+          className="w-full bg-t-accent text-t-on text-[17px] py-[18px] rounded-[20px] active:scale-[.98] transition-transform"
         >
           {t('common.save')}
         </button>
@@ -420,27 +420,27 @@ export function CatalogoScreen() {
 
       {/* Sheet: cambia categoria articolo */}
       <BottomSheet open={moveCatItem !== null} onClose={() => setMoveCatItem(null)}>
-        <div className="text-[20px] font-normal text-[#2A2A2C] px-0.5 pb-[14px]">
+        <div className="text-[20px] font-normal text-t-fg px-0.5 pb-[14px]">
           {t('catalogo.changeCategoryTitle')}
         </div>
-        <div className="bg-[#F6F6F4] rounded-[16px] overflow-hidden">
+        <div className="bg-t-surface2 rounded-[16px] overflow-hidden">
           {categories.map((c, idx) => (
             <button
               key={c.id}
               onClick={() => c.id !== undefined && handleMoveCategory(c.id)}
               className="w-full flex items-center justify-between px-4 py-[15px] active:opacity-60 transition-opacity"
               style={{
-                borderBottom: idx < categories.length - 1 ? '1px solid #E6E6E2' : 'none',
+                borderBottom: idx < categories.length - 1 ? '1px solid var(--t-line3)' : 'none',
               }}
             >
-              <span className="text-[16px] text-[#2A2A2C]">{c.name}</span>
+              <span className="text-[16px] text-t-fg">{c.name}</span>
               {moveCatItemCatId === c.id && (
                 <svg
                   width="18"
                   height="18"
                   viewBox="0 0 24 24"
                   fill="none"
-                  stroke="#2A2A2C"
+                  stroke="var(--t-fg)"
                   strokeWidth="2.4"
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -455,21 +455,21 @@ export function CatalogoScreen() {
 
       {/* Sheet: conferma elimina articolo */}
       <BottomSheet open={deleteItemState !== null} onClose={() => setDeleteItemState(null)}>
-        <div className="text-[20px] font-normal text-[#D14343] px-0.5 pb-2">
+        <div className="text-[20px] font-normal text-t-danger px-0.5 pb-2">
           {t('catalogo.deleteItemTitle', { name: deleteItemState?.name ?? '' })}
         </div>
-        <div className="text-[15px] text-[#9B9B9F] px-0.5 pb-6">
+        <div className="text-[15px] text-t-muted px-0.5 pb-6">
           {t('catalogo.deleteItemBody')}
         </div>
         <button
           onClick={handleConfirmDeleteItem}
-          className="w-full bg-[#D14343] text-white text-[17px] py-[18px] rounded-[20px] mb-3 active:scale-[.98] transition-transform"
+          className="w-full bg-t-danger text-t-on text-[17px] py-[18px] rounded-[20px] mb-3 active:scale-[.98] transition-transform"
         >
           {t('catalogo.deleteItemConfirm')}
         </button>
         <button
           onClick={() => setDeleteItemState(null)}
-          className="w-full bg-[#F2F2F0] text-[#2A2A2C] text-[17px] py-[18px] rounded-[20px] active:scale-[.98] transition-transform"
+          className="w-full bg-t-bg text-t-fg text-[17px] py-[18px] rounded-[20px] active:scale-[.98] transition-transform"
         >
           {t('common.cancel')}
         </button>

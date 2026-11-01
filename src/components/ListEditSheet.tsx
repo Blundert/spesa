@@ -89,7 +89,7 @@ function ListForm({
 
   return (
     <>
-      <div className="text-[20px] font-normal text-[#2A2A2C] px-0.5 pb-[6px]">
+      <div className="text-[20px] font-normal text-t-fg px-0.5 pb-[6px]">
         {list ? t('lists.editTitle') : t('lists.newTitle')}
       </div>
       <input
@@ -98,23 +98,23 @@ function ListForm({
         placeholder={t('lists.namePlaceholder')}
         data-autofocus={list ? undefined : true}
         onKeyDown={(e) => e.key === 'Enter' && void handleSave()}
-        className="w-full border-0 border-b border-[#ECECEC] outline-none bg-transparent px-0.5 py-3 text-[18px] text-[#2A2A2C] mb-5"
+        className="w-full border-0 border-b border-t-line outline-none bg-transparent px-0.5 py-3 text-[18px] text-t-fg mb-5"
       />
 
-      <div className="text-[12px] font-normal tracking-[1.4px] text-[#9B9B9F] uppercase px-0.5 pb-2">
+      <div className="text-[12px] font-normal tracking-[1.4px] text-t-muted uppercase px-0.5 pb-2">
         {t('lists.supermarket')}
       </div>
-      <div className="bg-[#F6F6F4] rounded-[18px] overflow-hidden mb-5">
+      <div className="bg-t-surface2 rounded-[18px] overflow-hidden mb-5">
         {options.map((o, i) => (
           <button
             key={o.id ?? 'none'}
             onClick={() => setSupermarketId(o.id)}
-            className="w-full flex items-center justify-between px-[18px] py-[14px] text-left active:bg-[#ECECEC]"
-            style={{ borderBottom: i < options.length - 1 ? '1px solid #E6E6E2' : 'none' }}
+            className="w-full flex items-center justify-between px-[18px] py-[14px] text-left active:bg-t-line"
+            style={{ borderBottom: i < options.length - 1 ? '1px solid var(--t-line3)' : 'none' }}
           >
-            <span className={`text-[16px] ${o.id === null ? 'text-[#6E6E72]' : 'text-[#2A2A2C]'}`}>{o.label}</span>
+            <span className={`text-[16px] ${o.id === null ? 'text-t-text2' : 'text-t-fg'}`}>{o.label}</span>
             {supermarketId === o.id && (
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2A2A2C" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--t-fg)" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M5 12l4 4 10-10" />
               </svg>
             )}
@@ -149,14 +149,14 @@ function ListForm({
       <button
         onClick={() => void handleSave()}
         disabled={!name.trim()}
-        className="w-full bg-[#2A2A2C] text-white text-[17px] py-[18px] rounded-[20px] mb-3 active:scale-[.98] transition-transform disabled:opacity-40"
+        className="w-full bg-t-accent text-t-on text-[17px] py-[18px] rounded-[20px] mb-3 active:scale-[.98] transition-transform disabled:opacity-40"
       >
         {list ? t('common.save') : t('lists.create')}
       </button>
       {list && canArchive && (
         <button
           onClick={() => void handleArchive()}
-          className="w-full bg-[#F2F2F0] text-[#2A2A2C] text-[17px] py-[18px] rounded-[20px] active:scale-[.98] transition-transform"
+          className="w-full bg-t-bg text-t-fg text-[17px] py-[18px] rounded-[20px] active:scale-[.98] transition-transform"
         >
           {t('lists.archive')}
         </button>

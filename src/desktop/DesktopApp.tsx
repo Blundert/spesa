@@ -20,8 +20,8 @@ export function DesktopApp() {
         duration={2000}
         toastOptions={{
           style: {
-            background: '#2A2A2C',
-            color: '#fff',
+            background: 'var(--t-accent)',
+            color: 'var(--t-on)',
             borderRadius: '15px',
             border: 'none',
             fontSize: '14px',

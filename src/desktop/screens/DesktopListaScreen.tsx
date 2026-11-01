@@ -29,25 +29,25 @@ interface Suggestion {
   purchaseCount: number
 }
 
-const card = { background: '#fff', borderRadius: '16px', padding: '24px' } as const
+const card = { background: 'var(--t-surface)', borderRadius: '16px', padding: '24px' } as const
 const stepBtn = {
   width: '28px',
   height: '28px',
   borderRadius: '50%',
   border: 'none',
-  background: '#F2F2F0',
-  color: '#2A2A2C',
+  background: 'var(--t-bg)',
+  color: 'var(--t-fg)',
   fontSize: '16px',
   cursor: 'pointer',
   lineHeight: 1,
 } as const
 const chip = {
   padding: '7px 14px',
-  background: '#fff',
-  border: '1px solid #ECECEC',
+  background: 'var(--t-surface)',
+  border: '1px solid var(--t-line)',
   borderRadius: '999px',
   fontSize: '13px',
-  color: '#5A5A5E',
+  color: 'var(--t-text3)',
   cursor: 'pointer',
 } as const
 
@@ -182,7 +182,7 @@ export function DesktopListaScreen() {
       />
 
       {/* Schede delle liste */}
-      <div style={{ display: 'flex', alignItems: 'flex-end', gap: '24px', borderBottom: '1px solid #E0E0DD', marginBottom: '24px', overflowX: 'auto' }}>
+      <div style={{ display: 'flex', alignItems: 'flex-end', gap: '24px', borderBottom: '1px solid var(--t-line7)', marginBottom: '24px', overflowX: 'auto' }}>
         {tabs.map((l) => {
           const isActive = l.id === listId
           const store = l.supermarketId !== null ? supermarketNames[l.supermarketId] : undefined
@@ -194,25 +194,25 @@ export function DesktopListaScreen() {
               style={{
                 background: 'none',
                 border: 'none',
-                borderBottom: isActive ? '2px solid #2A2A2C' : '2px solid transparent',
+                borderBottom: isActive ? '2px solid var(--t-fg)' : '2px solid transparent',
                 marginBottom: '-1px',
                 padding: '6px 2px 12px',
                 fontSize: '15px',
-                color: isActive ? '#2A2A2C' : '#9B9B9F',
+                color: isActive ? 'var(--t-fg)' : 'var(--t-muted)',
                 cursor: 'pointer',
                 whiteSpace: 'nowrap',
               }}
             >
               {l.name}
               {isActive && <span aria-hidden> ⌄</span>}
-              {store && <span style={{ fontSize: '12px', color: '#9B9B9F' }}> · {store}</span>}
+              {store && <span style={{ fontSize: '12px', color: 'var(--t-muted)' }}> · {store}</span>}
             </button>
           )
         })}
         <button
           onClick={() => setListModal('new')}
           aria-label={t('lists.newList')}
-          style={{ background: 'none', border: 'none', padding: '4px 4px 10px', fontSize: '20px', color: '#9B9B9F', cursor: 'pointer' }}
+          style={{ background: 'none', border: 'none', padding: '4px 4px 10px', fontSize: '20px', color: 'var(--t-muted)', cursor: 'pointer' }}
         >
           +
         </button>
@@ -222,14 +222,14 @@ export function DesktopListaScreen() {
         {/* Colonna principale: aggiunta + voci */}
         <div style={{ flex: '1 1 520px', minWidth: 0 }}>
           <div style={{ ...card, padding: '16px 20px', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <span aria-hidden style={{ color: '#9B9B9F', fontSize: '20px' }}>+</span>
+            <span aria-hidden style={{ color: 'var(--t-muted)', fontSize: '20px' }}>+</span>
             <input
               ref={inputRef}
               value={addInput}
               onChange={(e) => setAddInput(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleAdd()}
               placeholder={t('lista.addPlaceholder')}
-              style={{ flex: 1, border: 'none', outline: 'none', background: 'transparent', fontSize: '15px', color: '#2A2A2C' }}
+              style={{ flex: 1, border: 'none', outline: 'none', background: 'transparent', fontSize: '15px', color: 'var(--t-fg)' }}
             />
           </div>
 
@@ -242,13 +242,13 @@ export function DesktopListaScreen() {
                   style={suggestRow}
                 >
                   <span>{p.name}</span>
-                  <span style={{ fontSize: '12px', color: '#9B9B9F' }}>{catMap[p.categoryId] ?? t('categories.5')}</span>
+                  <span style={{ fontSize: '12px', color: 'var(--t-muted)' }}>{catMap[p.categoryId] ?? t('categories.5')}</span>
                 </button>
               ))}
               {!exactInPool && (
                 <button onClick={() => handleAdd()} style={suggestRow}>
                   <span>{t('lista.addNamed', { name: addInput.trim() })}</span>
-                  <span style={{ color: '#9B9B9F' }}>+</span>
+                  <span style={{ color: 'var(--t-muted)' }}>+</span>
                 </button>
               )}
             </div>
@@ -265,7 +265,7 @@ export function DesktopListaScreen() {
           )}
 
           {listItems.length === 0 && (
-            <div style={{ textAlign: 'center', padding: '64px 0', color: '#9B9B9F', fontSize: '14px' }}>{t('lista.empty')}</div>
+            <div style={{ textAlign: 'center', padding: '64px 0', color: 'var(--t-muted)', fontSize: '14px' }}>{t('lista.empty')}</div>
           )}
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '20px', alignItems: 'start' }}>
@@ -280,7 +280,7 @@ export function DesktopListaScreen() {
                       alignItems: 'center',
                       gap: '12px',
                       padding: '12px 0',
-                      borderTop: i === 0 ? 'none' : '1px solid #F2F2F0',
+                      borderTop: i === 0 ? 'none' : '1px solid var(--t-bg)',
                     }}
                   >
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flex: 'none' }}>
@@ -295,7 +295,7 @@ export function DesktopListaScreen() {
                       >
                         −
                       </button>
-                      <span style={{ minWidth: '20px', textAlign: 'center', fontSize: '14px', color: '#2A2A2C' }}>{li.quantity}</span>
+                      <span style={{ minWidth: '20px', textAlign: 'center', fontSize: '14px', color: 'var(--t-fg)' }}>{li.quantity}</span>
                       <button
                         aria-label="+"
                         style={stepBtn}
@@ -310,10 +310,10 @@ export function DesktopListaScreen() {
                       onClick={() => openItem(li.itemId)}
                       style={{ flex: 1, minWidth: 0, background: 'none', border: 'none', padding: 0, textAlign: 'left', cursor: 'pointer' }}
                     >
-                      <div style={{ fontSize: '14px', color: '#2A2A2C', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      <div style={{ fontSize: '14px', color: 'var(--t-fg)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                         {li.itemName}
                       </div>
-                      <div style={{ fontSize: '12px', color: '#9B9B9F', marginTop: '2px' }}>
+                      <div style={{ fontSize: '12px', color: 'var(--t-muted)', marginTop: '2px' }}>
                         {li.suggestedPriceCents !== null ? `~ € ${formatCents(li.suggestedPriceCents)}` : t('lista.toGet')}
                       </div>
                     </button>
@@ -321,7 +321,7 @@ export function DesktopListaScreen() {
                       aria-label={t('desktop.lista.remove')}
                       title={t('desktop.lista.remove')}
                       onClick={() => li.id !== undefined && setPendingListRemove(li.id)}
-                      style={{ background: 'none', border: 'none', color: '#B5B5BA', fontSize: '18px', cursor: 'pointer' }}
+                      style={{ background: 'none', border: 'none', color: 'var(--t-faint)', fontSize: '18px', cursor: 'pointer' }}
                     >
                       ×
                     </button>
@@ -337,23 +337,23 @@ export function DesktopListaScreen() {
           <div style={card}>
             <SectionTitle>{t('desktop.lista.summary')}</SectionTitle>
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px', padding: '6px 0' }}>
-              <span style={{ color: '#9B9B9F' }}>{t('desktop.lista.products')}</span>
+              <span style={{ color: 'var(--t-muted)' }}>{t('desktop.lista.products')}</span>
               <span>{listItems.length}</span>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px', padding: '6px 0' }}>
-              <span style={{ color: '#9B9B9F' }}>{t('desktop.lista.pieces')}</span>
+              <span style={{ color: 'var(--t-muted)' }}>{t('desktop.lista.pieces')}</span>
               <span>{totalQty}</span>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0' }}>
-              <span style={{ color: '#9B9B9F', fontSize: '14px' }}>{t('desktop.lista.estimate')}</span>
+              <span style={{ color: 'var(--t-muted)', fontSize: '14px' }}>{t('desktop.lista.estimate')}</span>
               <span style={{ fontSize: '20px', fontWeight: 300 }}>€ {formatCents(estimate)}</span>
             </div>
           </div>
 
           {templateSuggestions.length > 0 && (
             <div style={card}>
-              <div style={{ fontSize: '15px', color: '#2A2A2C', marginBottom: '6px' }}>{t('lista.templateTitle')}</div>
-              <div style={{ fontSize: '12px', color: '#9B9B9F', marginBottom: '16px' }}>
+              <div style={{ fontSize: '15px', color: 'var(--t-fg)', marginBottom: '6px' }}>{t('lista.templateTitle')}</div>
+              <div style={{ fontSize: '12px', color: 'var(--t-muted)', marginBottom: '16px' }}>
                 {templateSuggestions.map((s) => s.name).join(' · ')}
               </div>
               <button
@@ -361,7 +361,7 @@ export function DesktopListaScreen() {
                   if (listId === undefined) return
                   templateSuggestions.forEach((s) => addToList.mutate({ listId, itemId: s.itemId }))
                 }}
-                style={{ ...btnSecondary, background: '#2A2A2C', color: '#fff' }}
+                style={{ ...btnSecondary, background: 'var(--t-accent)', color: 'var(--t-on)' }}
               >
                 {t('lista.templateLoad')}
               </button>
@@ -375,7 +375,7 @@ export function DesktopListaScreen() {
         onClose={() => setShowClear(false)}
         title={t('lista.clearConfirmTitle', { name: list?.name })}
       >
-        <div style={{ fontSize: '14px', color: '#9B9B9F', marginBottom: '24px' }}>
+        <div style={{ fontSize: '14px', color: 'var(--t-muted)', marginBottom: '24px' }}>
           {t('lista.clearConfirmBody', { count: listItems.length })}
         </div>
         <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
@@ -430,9 +430,9 @@ const suggestRow = {
   padding: '12px 20px',
   background: 'none',
   border: 'none',
-  borderBottom: '1px solid #F2F2F0',
+  borderBottom: '1px solid var(--t-bg)',
   fontSize: '14px',
-  color: '#2A2A2C',
+  color: 'var(--t-fg)',
   textAlign: 'left',
   cursor: 'pointer',
 } as const

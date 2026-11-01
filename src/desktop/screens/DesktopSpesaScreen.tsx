@@ -70,21 +70,21 @@ interface CartRow {
 
 const isoWeek = currentWeek()
 
-const card = { background: '#fff', borderRadius: '16px', padding: '24px' } as const
+const card = { background: 'var(--t-surface)', borderRadius: '16px', padding: '24px' } as const
 const primaryBtn = {
   border: 'none',
   borderRadius: '12px',
-  background: '#2A2A2C',
-  color: '#fff',
+  background: 'var(--t-accent)',
+  color: 'var(--t-on)',
   padding: '11px 20px',
   fontSize: '14px',
   cursor: 'pointer',
 } as const
 const ghostBtn = {
-  border: '1px solid #ECECEC',
+  border: '1px solid var(--t-line)',
   borderRadius: '12px',
-  background: '#fff',
-  color: '#2A2A2C',
+  background: 'var(--t-surface)',
+  color: 'var(--t-fg)',
   padding: '10px 16px',
   fontSize: '14px',
   cursor: 'pointer',
@@ -93,7 +93,7 @@ const iconBtn = {
   border: 'none',
   background: 'transparent',
   cursor: 'pointer',
-  color: '#9B9B9F',
+  color: 'var(--t-muted)',
   fontSize: '13px',
   padding: '4px 8px',
 } as const
@@ -392,8 +392,8 @@ export function DesktopSpesaScreen() {
             height: '22px',
             borderRadius: '50%',
             border: 'none',
-            background: '#2A2A2C',
-            color: '#fff',
+            background: 'var(--t-accent)',
+            color: 'var(--t-on)',
             fontSize: '12px',
             cursor: 'pointer',
           }}
@@ -458,7 +458,7 @@ export function DesktopSpesaScreen() {
       <div style={{ padding: 'var(--page-pad-y) var(--page-pad-x)', maxWidth: '1200px' }}>
         <PageHeader title={t('spesa.startTitle')} />
         <div style={{ ...card, textAlign: 'center', padding: '56px 24px' }}>
-          <p style={{ fontSize: '15px', color: '#9B9B9F', margin: '0 0 24px' }}>{t('spesa.choosePrompt')}</p>
+          <p style={{ fontSize: '15px', color: 'var(--t-muted)', margin: '0 0 24px' }}>{t('spesa.choosePrompt')}</p>
           <button onClick={() => setShowStorePicker(true)} style={{ ...primaryBtn, padding: '14px 28px', fontSize: '15px' }}>
             {t('spesa.chooseStore')}
           </button>
@@ -525,7 +525,7 @@ export function DesktopSpesaScreen() {
         <div style={{ flex: 1, minWidth: 0 }}>
           <SectionTitle>{t('spesa.toGet')}</SectionTitle>
           {todoGroups.length === 0 && (
-            <div style={{ ...card, color: '#9B9B9F', fontSize: '14px', textAlign: 'center' }}>
+            <div style={{ ...card, color: 'var(--t-muted)', fontSize: '14px', textAlign: 'center' }}>
               {t('desktop.spesa.nothingToGet')}
             </div>
           )}
@@ -536,7 +536,7 @@ export function DesktopSpesaScreen() {
                   fontSize: '12px',
                   letterSpacing: '0.5px',
                   textTransform: 'uppercase',
-                  color: '#9B9B9F',
+                  color: 'var(--t-muted)',
                   marginBottom: '4px',
                 }}
               >
@@ -612,7 +612,7 @@ export function DesktopSpesaScreen() {
           style={{
             width: '100%',
             boxSizing: 'border-box',
-            border: '1px solid #ECECEC',
+            border: '1px solid var(--t-line)',
             borderRadius: '10px',
             padding: '12px 14px',
             fontSize: '15px',
@@ -621,7 +621,7 @@ export function DesktopSpesaScreen() {
           }}
         />
         {offListMatches.length > 0 && (
-          <div style={{ background: '#F6F6F4', borderRadius: '12px', overflow: 'hidden', marginBottom: '12px' }}>
+          <div style={{ background: 'var(--t-surface2)', borderRadius: '12px', overflow: 'hidden', marginBottom: '12px' }}>
             {offListMatches.map((p) => (
               <button
                 key={p.name}
@@ -635,12 +635,12 @@ export function DesktopSpesaScreen() {
                   justifyContent: 'space-between',
                   padding: '10px 14px',
                   fontSize: '14px',
-                  color: '#2A2A2C',
-                  borderBottom: '1px solid #ECECEC',
+                  color: 'var(--t-fg)',
+                  borderBottom: '1px solid var(--t-line)',
                 }}
               >
                 <span>{p.name}</span>
-                <span style={{ fontSize: '12px', color: '#9B9B9F' }}>{catMap[p.categoryId] ?? t('categories.5')}</span>
+                <span style={{ fontSize: '12px', color: 'var(--t-muted)' }}>{catMap[p.categoryId] ?? t('categories.5')}</span>
               </button>
             ))}
           </div>

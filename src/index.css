@@ -1,4 +1,43 @@
 @import "tailwindcss";
+@import "./theme/themes.css";
+
+/* Colori del tema come utility Tailwind (bg-t-*, text-t-*, border-t-*): leggono le variabili a runtime. */
+@theme inline {
+  --color-t-bg: var(--t-bg);
+  --color-t-surface: var(--t-surface);
+  --color-t-on: var(--t-on);
+  --color-t-surface2: var(--t-surface2);
+  --color-t-surface3: var(--t-surface3);
+  --color-t-surface4: var(--t-surface4);
+  --color-t-fg: var(--t-fg);
+  --color-t-accent: var(--t-accent);
+  --color-t-text2: var(--t-text2);
+  --color-t-text2b: var(--t-text2b);
+  --color-t-text3: var(--t-text3);
+  --color-t-muted: var(--t-muted);
+  --color-t-faint: var(--t-faint);
+  --color-t-chev: var(--t-chev);
+  --color-t-faint2: var(--t-faint2);
+  --color-t-line: var(--t-line);
+  --color-t-line2: var(--t-line2);
+  --color-t-line3: var(--t-line3);
+  --color-t-line4: var(--t-line4);
+  --color-t-line5: var(--t-line5);
+  --color-t-line6: var(--t-line6);
+  --color-t-line7: var(--t-line7);
+  --color-t-line8: var(--t-line8);
+  --color-t-line9: var(--t-line9);
+  --color-t-danger: var(--t-danger);
+  --color-t-danger2: var(--t-danger2);
+  --color-t-warn-bg: var(--t-warn-bg);
+  --color-t-warn-fg: var(--t-warn-fg);
+  --color-t-warn: var(--t-warn);
+  --color-t-good-bg: var(--t-good-bg);
+  --color-t-good-fg: var(--t-good-fg);
+  --color-t-good2: var(--t-good2);
+  --color-t-good: var(--t-good);
+  --color-t-bad: var(--t-bad);
+}
 
 *,
 *::before,
@@ -11,7 +50,7 @@ html,
 body {
   height: 100%;
   margin: 0;
-  background: #f2f2f0;
+  background: var(--t-bg);
   /* L'app vive in uno shell fisso: il documento non deve mai scorrere. Su iOS (PWA) un
      trascinamento al bordo di un'area scrollabile passava al documento, che tentava il
      rimbalzo: gli scroll successivi restavano agganciati lì (tutto "congelato") fino a un tap. */
@@ -36,7 +75,7 @@ body {
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Hanken Grotesk',
     'Segoe UI', system-ui, sans-serif;
-  color: #2a2a2c;
+  color: var(--t-fg);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }

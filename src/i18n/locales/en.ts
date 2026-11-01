@@ -437,6 +437,30 @@ export const en: typeof it = {
     saved: '"{{name}}" saved',
     deleted: 'Dish deleted',
   },
+  theme: {
+    title: 'Appearance',
+    label: 'Theme',
+    inUse: 'In use: {{name}}',
+    auto: 'Follow the system',
+    autoHint: 'Light by day and dark at night, following your phone or computer.',
+    autoInUse: 'In use: {{name}} (chosen by the system)',
+    name: {
+      chiaro: 'Light',
+      scuro: 'Dark',
+      salvia: 'Sage',
+      oceano: 'Ocean',
+      notte: 'Midnight blue',
+      contrasto: 'High contrast',
+    },
+    note: {
+      chiaro: 'The usual one: warm grey and dark text.',
+      scuro: 'Near-black grey, easy on the eyes at night.',
+      salvia: 'Soft muted green, a more natural tone.',
+      oceano: 'Cool white with a strong blue.',
+      notte: 'Dark with a blue base, less cold than grey.',
+      contrasto: 'Black on white, the most readable in bright light.',
+    },
+  },
   desktop: {
     sidebar: {
       collapse: 'Collapse menu',

@@ -10,10 +10,10 @@ export function PageHeader({ title, subtitle, right }: PageHeaderProps) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px 16px', marginBottom: '28px' }}>
       <div>
-        <h1 style={{ fontSize: '22px', fontWeight: 600, color: '#2A2A2C', margin: 0, letterSpacing: '-0.3px' }}>
+        <h1 style={{ fontSize: '22px', fontWeight: 600, color: 'var(--t-fg)', margin: 0, letterSpacing: '-0.3px' }}>
           {title}
         </h1>
-        {subtitle && <div style={{ fontSize: '13px', color: '#9B9B9F', marginTop: '2px' }}>{subtitle}</div>}
+        {subtitle && <div style={{ fontSize: '13px', color: 'var(--t-muted)', marginTop: '2px' }}>{subtitle}</div>}
       </div>
       {right}
     </div>
@@ -26,7 +26,7 @@ export function SectionTitle({ children }: { children: ReactNode }) {
       style={{
         fontSize: '13px',
         fontWeight: 500,
-        color: '#9B9B9F',
+        color: 'var(--t-muted)',
         letterSpacing: '0.5px',
         textTransform: 'uppercase',
         margin: '0 0 16px',

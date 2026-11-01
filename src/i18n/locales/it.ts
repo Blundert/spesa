@@ -435,6 +435,30 @@ export const it = {
     saved: '"{{name}}" salvato',
     deleted: 'Piatto eliminato',
   },
+  theme: {
+    title: 'Aspetto',
+    label: 'Tema',
+    inUse: 'In uso: {{name}}',
+    auto: 'Segui il sistema',
+    autoHint: 'Chiaro di giorno e scuro la sera, secondo il telefono o il computer.',
+    autoInUse: 'In uso: {{name}} (scelto dal sistema)',
+    name: {
+      chiaro: 'Chiaro',
+      scuro: 'Scuro',
+      salvia: 'Salvia',
+      oceano: 'Oceano',
+      notte: 'Notte blu',
+      contrasto: 'Contrasto alto',
+    },
+    note: {
+      chiaro: 'Quello di sempre: grigio caldo e testo scuro.',
+      scuro: 'Grigio quasi nero, comodo la sera.',
+      salvia: 'Verde spento e morbido, un tono più naturale.',
+      oceano: 'Bianco freddo con un blu deciso.',
+      notte: 'Scuro con fondo blu, meno freddo del grigio.',
+      contrasto: 'Nero su bianco, il più leggibile in piena luce.',
+    },
+  },
   desktop: {
     sidebar: {
       collapse: 'Comprimi menu',

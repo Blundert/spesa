@@ -40,7 +40,7 @@ export function Modal({ open, onClose, title, children, width = 480 }: ModalProp
         aria-label={title}
         onClick={(e) => e.stopPropagation()}
         style={{
-          background: '#fff',
+          background: 'var(--t-surface)',
           borderRadius: '20px',
           padding: '28px',
           width: '100%',
@@ -51,7 +51,7 @@ export function Modal({ open, onClose, title, children, width = 480 }: ModalProp
         }}
       >
         {title && (
-          <div style={{ fontSize: '18px', fontWeight: 500, color: '#2A2A2C', marginBottom: '16px' }}>{title}</div>
+          <div style={{ fontSize: '18px', fontWeight: 500, color: 'var(--t-fg)', marginBottom: '16px' }}>{title}</div>
         )}
         {children}
       </div>

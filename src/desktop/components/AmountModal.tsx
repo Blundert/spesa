@@ -64,8 +64,8 @@ function AmountBody({
 
   return (
     <div>
-      <div style={{ display: 'flex', alignItems: 'baseline', borderBottom: '1px solid #ECECEC', paddingBottom: '8px' }}>
-        <span style={{ fontSize: '28px', color: '#B5B5BA', marginRight: '6px' }}>€</span>
+      <div style={{ display: 'flex', alignItems: 'baseline', borderBottom: '1px solid var(--t-line)', paddingBottom: '8px' }}>
+        <span style={{ fontSize: '28px', color: 'var(--t-faint)', marginRight: '6px' }}>€</span>
         <input
           autoFocus
           inputMode="decimal"
@@ -84,17 +84,17 @@ function AmountBody({
             background: 'transparent',
             fontSize: '40px',
             fontWeight: 300,
-            color: valid ? '#2A2A2C' : '#B5B5BA',
+            color: valid ? 'var(--t-fg)' : 'var(--t-faint)',
             fontVariantNumeric: 'tabular-nums',
           }}
         />
       </div>
-      <div style={{ minHeight: '20px', marginTop: '8px', fontSize: '13px', color: '#9B9B9F' }}>
+      <div style={{ minHeight: '20px', marginTop: '8px', fontSize: '13px', color: 'var(--t-muted)' }}>
         {isExpr && result !== null && `= ${formatCents(result)}`}
         {!valid && t('desktop.spesa.invalidAmount')}
       </div>
-      <div style={{ minHeight: '20px', fontSize: '13px', color: '#9B9B9F' }}>{hint}</div>
-      <div style={{ fontSize: '12px', color: '#B5B5BA', marginBottom: '16px' }}>{t('desktop.spesa.amountHelp')}</div>
+      <div style={{ minHeight: '20px', fontSize: '13px', color: 'var(--t-muted)' }}>{hint}</div>
+      <div style={{ fontSize: '12px', color: 'var(--t-faint)', marginBottom: '16px' }}>{t('desktop.spesa.amountHelp')}</div>
 
       {showQuantity && (
         <div
@@ -102,13 +102,13 @@ function AmountBody({
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            background: '#F6F6F4',
+            background: 'var(--t-surface2)',
             borderRadius: '12px',
             padding: '10px 16px',
             marginBottom: '16px',
           }}
         >
-          <span style={{ fontSize: '15px', color: '#2A2A2C' }}>{t('common.quantity')}</span>
+          <span style={{ fontSize: '15px', color: 'var(--t-fg)' }}>{t('common.quantity')}</span>
           <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
             <button aria-label="-" onClick={() => setQuantity((q) => Math.max(1, q - 1))} style={stepBtn}>
               −
@@ -124,18 +124,18 @@ function AmountBody({
       )}
 
       {secondaryAction && (
-        <button onClick={secondaryAction.onTap} style={{ ...btn, background: '#F2F2F0', color: '#2A2A2C', marginBottom: '8px' }}>
+        <button onClick={secondaryAction.onTap} style={{ ...btn, background: 'var(--t-bg)', color: 'var(--t-fg)', marginBottom: '8px' }}>
           {secondaryAction.label}
         </button>
       )}
       <div style={{ display: 'flex', gap: '8px' }}>
-        <button onClick={onClose} style={{ ...btn, background: '#F2F2F0', color: '#2A2A2C', flex: 1 }}>
+        <button onClick={onClose} style={{ ...btn, background: 'var(--t-bg)', color: 'var(--t-fg)', flex: 1 }}>
           {t('common.cancel')}
         </button>
         <button
           onClick={submit}
           disabled={!valid}
-          style={{ ...btn, flex: 2, background: '#2A2A2C', color: '#fff', opacity: valid ? 1 : 0.4 }}
+          style={{ ...btn, flex: 2, background: 'var(--t-accent)', color: 'var(--t-on)', opacity: valid ? 1 : 0.4 }}
         >
           {confirmLabel ?? t('common.confirm')}
         </button>
@@ -158,8 +158,8 @@ const stepBtn = {
   height: '32px',
   borderRadius: '50%',
   border: 'none',
-  background: '#fff',
+  background: 'var(--t-surface)',
   fontSize: '18px',
   cursor: 'pointer',
-  color: '#2A2A2C',
+  color: 'var(--t-fg)',
 } as const

@@ -75,7 +75,7 @@ export function StatisticheScreen() {
   if (isLoading) {
     return (
       <div className="flex-1 overflow-y-auto px-5 pb-[120px] flex items-center justify-center">
-        <div className="text-[#9B9B9F] text-sm">{t('common.confirm')}</div>
+        <div className="text-t-muted text-sm">{t('common.confirm')}</div>
       </div>
     )
   }
@@ -87,7 +87,7 @@ export function StatisticheScreen() {
       {/* Header */}
       <div className="flex items-center gap-2 pt-2 pb-[14px]">
         <BackButton />
-        <span className="text-[26px] font-normal tracking-[-0.5px] text-[#2A2A2C]">{t('statistiche.title')}</span>
+        <span className="text-[26px] font-normal tracking-[-0.5px] text-t-fg">{t('statistiche.title')}</span>
       </div>
 
       {/* Selettore range */}
@@ -99,8 +99,8 @@ export function StatisticheScreen() {
               onClick={() => handleRangeSelect(r)}
               className="px-3 py-[6px] rounded-full text-[13px] font-normal whitespace-nowrap transition-colors"
               style={{
-                background: range === r ? '#2A2A2C' : '#F2F2F0',
-                color: range === r ? '#fff' : '#9B9B9F',
+                background: range === r ? 'var(--t-accent)' : 'var(--t-bg)',
+                color: range === r ? 'var(--t-on)' : 'var(--t-muted)',
               }}
             >
               {rangeLabel(r)}
@@ -110,8 +110,8 @@ export function StatisticheScreen() {
             onClick={() => handleRangeSelect('custom')}
             className="px-3 py-[6px] rounded-full text-[13px] font-normal whitespace-nowrap transition-colors"
             style={{
-              background: range === 'custom' ? '#2A2A2C' : '#F2F2F0',
-              color: range === 'custom' ? '#fff' : '#9B9B9F',
+              background: range === 'custom' ? 'var(--t-accent)' : 'var(--t-bg)',
+              color: range === 'custom' ? 'var(--t-on)' : 'var(--t-muted)',
             }}
           >
             {rangeLabel('custom')}
@@ -122,14 +122,14 @@ export function StatisticheScreen() {
       {isEmpty ? (
         <div className="flex flex-col items-center justify-center pt-16 text-center">
           <div className="text-[48px] mb-4">📊</div>
-          <div className="text-[18px] font-normal text-[#2A2A2C] mb-2">{t('statistiche.emptyTitle')}</div>
-          <div className="text-[14px] text-[#9B9B9F]">{t('statistiche.emptyBody')}</div>
+          <div className="text-[18px] font-normal text-t-fg mb-2">{t('statistiche.emptyTitle')}</div>
+          <div className="text-[14px] text-t-muted">{t('statistiche.emptyBody')}</div>
         </div>
       ) : (
         <>
           {/* Riepilogo globale */}
-          <div className="bg-white rounded-[20px] p-[18px] mb-4">
-            <div className="text-[12px] font-normal tracking-[1.2px] text-[#9B9B9F] uppercase mb-3">
+          <div className="bg-t-surface rounded-[20px] p-[18px] mb-4">
+            <div className="text-[12px] font-normal tracking-[1.2px] text-t-muted uppercase mb-3">
               {t('statistiche.globalTitle')}
             </div>
             <div className="grid grid-cols-2 gap-3">
@@ -144,8 +144,8 @@ export function StatisticheScreen() {
 
           {/* Buoni pasto e di tasca tua */}
           {stats.totalCents > 0 && (
-            <div className="bg-white rounded-[20px] p-[18px] mb-4">
-              <div className="text-[12px] font-normal tracking-[1.2px] text-[#9B9B9F] uppercase mb-3">
+            <div className="bg-t-surface rounded-[20px] p-[18px] mb-4">
+              <div className="text-[12px] font-normal tracking-[1.2px] text-t-muted uppercase mb-3">
                 {t('statistiche.buoniTitle')}
               </div>
               <BuoniSplit
@@ -158,8 +158,8 @@ export function StatisticheScreen() {
           )}
 
           {/* Andamento settimanale */}
-          <div className="bg-white rounded-[20px] p-[18px] mb-4">
-            <div className="text-[12px] font-normal tracking-[1.2px] text-[#9B9B9F] uppercase mb-4">
+          <div className="bg-t-surface rounded-[20px] p-[18px] mb-4">
+            <div className="text-[12px] font-normal tracking-[1.2px] text-t-muted uppercase mb-4">
               {t('statistiche.weeklyTitle')}
             </div>
             <WeeklyBarChart weeklyTotals={stats.weeklyTotals} />
@@ -167,8 +167,8 @@ export function StatisticheScreen() {
 
           {/* Top articoli */}
           {stats.topItems.length > 0 && (
-            <div className="bg-white rounded-[20px] p-[18px] mb-4">
-              <div className="text-[12px] font-normal tracking-[1.2px] text-[#9B9B9F] uppercase mb-3">
+            <div className="bg-t-surface rounded-[20px] p-[18px] mb-4">
+              <div className="text-[12px] font-normal tracking-[1.2px] text-t-muted uppercase mb-3">
                 {t('statistiche.topItemsTitle')}
               </div>
               <div className="flex flex-col gap-0">
@@ -176,10 +176,10 @@ export function StatisticheScreen() {
                   <div
                     key={item.name}
                     className="flex items-center justify-between py-[11px]"
-                    style={{ borderBottom: i < stats.topItems.length - 1 ? '1px solid #ECECEC' : 'none' }}
+                    style={{ borderBottom: i < stats.topItems.length - 1 ? '1px solid var(--t-line)' : 'none' }}
                   >
-                    <span className="text-[15px] text-[#2A2A2C]">{item.name}</span>
-                    <span className="text-[13px] text-[#9B9B9F] tabular-nums">
+                    <span className="text-[15px] text-t-fg">{item.name}</span>
+                    <span className="text-[13px] text-t-muted tabular-nums">
                       ×{item.purchaseCount}
                     </span>
                   </div>
@@ -190,8 +190,8 @@ export function StatisticheScreen() {
 
           {/* Ripartizione per categoria */}
           {stats.categoryBreakdown.length > 0 && (
-            <div className="bg-white rounded-[20px] p-[18px] mb-4">
-              <div className="text-[12px] font-normal tracking-[1.2px] text-[#9B9B9F] uppercase mb-3">
+            <div className="bg-t-surface rounded-[20px] p-[18px] mb-4">
+              <div className="text-[12px] font-normal tracking-[1.2px] text-t-muted uppercase mb-3">
                 {t('statistiche.categoryTitle')}
               </div>
               <CategoryBreakdownList
@@ -205,18 +205,18 @@ export function StatisticheScreen() {
 
       {/* Bottom sheet range di date personalizzato */}
       <BottomSheet open={customOpen} onClose={() => setCustomOpen(false)} hasInput>
-        <div className="text-[20px] font-normal text-[#2A2A2C] px-0.5 pb-[14px]">
+        <div className="text-[20px] font-normal text-t-fg px-0.5 pb-[14px]">
           {t('statistiche.range.customTitle')}
         </div>
         <button
           onClick={handleCurrentMonth}
-          className="w-full mb-4 py-[13px] rounded-[14px] text-[15px] font-normal text-[#2A2A2C] bg-[#F6F6F4] active:bg-[#ECECEC]"
+          className="w-full mb-4 py-[13px] rounded-[14px] text-[15px] font-normal text-t-fg bg-t-surface2 active:bg-t-line"
         >
           {t('statistiche.range.currentMonth')}
         </button>
         <div className="flex items-center gap-3 mb-4">
           <div className="flex-1">
-            <div className="text-[11px] text-[#9B9B9F] mb-1 px-0.5">{t('statistiche.range.from')}</div>
+            <div className="text-[11px] text-t-muted mb-1 px-0.5">{t('statistiche.range.from')}</div>
             <input
               type="date"
               value={draftFrom}
@@ -224,11 +224,11 @@ export function StatisticheScreen() {
               onChange={(e) => setDraftFrom(e.target.value)}
               onPointerDown={(e) => e.stopPropagation()}
               data-vaul-no-drag
-              className="w-full bg-[#F6F6F4] rounded-[12px] px-3 py-[10px] text-[15px] text-[#2A2A2C] outline-none"
+              className="w-full bg-t-surface2 rounded-[12px] px-3 py-[10px] text-[15px] text-t-fg outline-none"
             />
           </div>
           <div className="flex-1">
-            <div className="text-[11px] text-[#9B9B9F] mb-1 px-0.5">{t('statistiche.range.to')}</div>
+            <div className="text-[11px] text-t-muted mb-1 px-0.5">{t('statistiche.range.to')}</div>
             <input
               type="date"
               value={draftTo}
@@ -237,15 +237,15 @@ export function StatisticheScreen() {
               onChange={(e) => setDraftTo(e.target.value)}
               onPointerDown={(e) => e.stopPropagation()}
               data-vaul-no-drag
-              className="w-full bg-[#F6F6F4] rounded-[12px] px-3 py-[10px] text-[15px] text-[#2A2A2C] outline-none"
+              className="w-full bg-t-surface2 rounded-[12px] px-3 py-[10px] text-[15px] text-t-fg outline-none"
             />
           </div>
         </div>
         <button
           onClick={handleCustomApply}
           disabled={!draftFrom || !draftTo || draftFrom > draftTo}
-          className="w-full py-[15px] rounded-[16px] text-[16px] font-normal text-white disabled:opacity-40"
-          style={{ background: '#2A2A2C' }}
+          className="w-full py-[15px] rounded-[16px] text-[16px] font-normal text-t-on disabled:opacity-40"
+          style={{ background: 'var(--t-accent)' }}
         >
           {t('statistiche.range.customApply')}
         </button>
@@ -256,9 +256,9 @@ export function StatisticheScreen() {
 
 function StatCell({ label, value, big }: { label: string; value: string; big?: boolean }) {
   return (
-    <div className="bg-[#F6F6F4] rounded-[14px] px-[14px] py-[12px]">
-      <div className="text-[11px] text-[#9B9B9F] mb-[3px]">{label}</div>
-      <div className={`text-[#2A2A2C] font-normal tabular-nums ${big ? 'text-[22px]' : 'text-[18px]'}`}>
+    <div className="bg-t-surface2 rounded-[14px] px-[14px] py-[12px]">
+      <div className="text-[11px] text-t-muted mb-[3px]">{label}</div>
+      <div className={`text-t-fg font-normal tabular-nums ${big ? 'text-[22px]' : 'text-[18px]'}`}>
         {value}
       </div>
     </div>
@@ -282,30 +282,30 @@ function BuoniSplit({
   const oopPct = 100 - buoniPct
   return (
     <>
-      <div className="flex h-[10px] rounded-full overflow-hidden bg-[#F2F2F0]">
-        <div className="h-full bg-[#B5B5BA]" style={{ width: `${(buoniCoveredCents / totalCents) * 100}%` }} />
-        <div className="h-full bg-[#2A2A2C]" style={{ width: `${(outOfPocketCents / totalCents) * 100}%` }} />
+      <div className="flex h-[10px] rounded-full overflow-hidden bg-t-bg">
+        <div className="h-full bg-t-faint" style={{ width: `${(buoniCoveredCents / totalCents) * 100}%` }} />
+        <div className="h-full bg-t-accent" style={{ width: `${(outOfPocketCents / totalCents) * 100}%` }} />
       </div>
       <div className="flex flex-col gap-[10px] mt-[14px] tabular-nums">
-        <div className="flex items-center justify-between text-[15px] text-[#2A2A2C]">
+        <div className="flex items-center justify-between text-[15px] text-t-fg">
           <span className="flex items-center gap-2">
-            <span className="w-[10px] h-[10px] rounded-[3px] bg-[#B5B5BA]" />
+            <span className="w-[10px] h-[10px] rounded-[3px] bg-t-faint" />
             {t('statistiche.buoniCovered')}
           </span>
           <span>
-            €{formatCentsPlain(buoniCoveredCents)} <span className="text-[13px] text-[#9B9B9F]">· {buoniPct}%</span>
+            €{formatCentsPlain(buoniCoveredCents)} <span className="text-[13px] text-t-muted">· {buoniPct}%</span>
           </span>
         </div>
-        <div className="flex items-center justify-between text-[15px] text-[#2A2A2C]">
+        <div className="flex items-center justify-between text-[15px] text-t-fg">
           <span className="flex items-center gap-2">
-            <span className="w-[10px] h-[10px] rounded-[3px] bg-[#2A2A2C]" />
+            <span className="w-[10px] h-[10px] rounded-[3px] bg-t-accent" />
             {t('statistiche.outOfPocket')}
           </span>
           <span>
-            €{formatCentsPlain(outOfPocketCents)} <span className="text-[13px] text-[#9B9B9F]">· {oopPct}%</span>
+            €{formatCentsPlain(outOfPocketCents)} <span className="text-[13px] text-t-muted">· {oopPct}%</span>
           </span>
         </div>
-        <div className="flex items-center justify-between text-[13px] text-[#9B9B9F]">
+        <div className="flex items-center justify-between text-[13px] text-t-muted">
           <span>{t('statistiche.buoniUsed')}</span>
           <span>{buoniCount}</span>
         </div>
@@ -329,16 +329,16 @@ function CategoryBreakdownList({
         return (
           <div key={cat.name}>
             <div className="flex items-center justify-between mb-1">
-              <span className="text-[14px] text-[#2A2A2C]">
+              <span className="text-[14px] text-t-fg">
                 {catLabelMap[cat.name] ?? cat.name}
               </span>
-              <span className="text-[13px] text-[#9B9B9F] tabular-nums">
+              <span className="text-[13px] text-t-muted tabular-nums">
                 €{formatCentsPlain(cat.totalCents)}
               </span>
             </div>
-            <div className="h-[6px] bg-[#F2F2F0] rounded-full overflow-hidden">
+            <div className="h-[6px] bg-t-bg rounded-full overflow-hidden">
               <div
-                className="h-full bg-[#2A2A2C] rounded-full"
+                className="h-full bg-t-accent rounded-full"
                 style={{ width: `${pct.toFixed(1)}%` }}
               />
             </div>
@@ -371,7 +371,7 @@ function WeeklyBarChart({ weeklyTotals }: { weeklyTotals: Array<{ weekKey: strin
               <div className="relative w-full" style={{ height: BAR_HEIGHT + AMOUNT_LABEL_HEIGHT }}>
                 {hasData && (
                   <div
-                    className="absolute left-0 right-0 text-center text-[9px] text-[#9B9B9F] tabular-nums leading-none"
+                    className="absolute left-0 right-0 text-center text-[9px] text-t-muted tabular-nums leading-none"
                     style={{ bottom: h + 3 }}
                   >
                     {euroLabel}
@@ -379,10 +379,10 @@ function WeeklyBarChart({ weeklyTotals }: { weeklyTotals: Array<{ weekKey: strin
                 )}
                 <div
                   className="absolute bottom-0 left-0 right-0 rounded-[4px]"
-                  style={{ height: h, background: hasData ? '#2A2A2C' : '#ECECEC' }}
+                  style={{ height: h, background: hasData ? 'var(--t-accent)' : 'var(--t-line)' }}
                 />
               </div>
-              <div className="text-[10px] text-[#9B9B9F] tabular-nums">{dayLabel}</div>
+              <div className="text-[10px] text-t-muted tabular-nums">{dayLabel}</div>
             </div>
           )
         })}

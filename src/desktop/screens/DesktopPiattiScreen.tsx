@@ -18,18 +18,18 @@ const primaryBtn = {
   padding: '10px 18px',
   borderRadius: '10px',
   border: 'none',
-  background: '#2A2A2C',
-  color: '#fff',
+  background: 'var(--t-accent)',
+  color: 'var(--t-on)',
   fontSize: '14px',
   cursor: 'pointer',
 }
-const secondaryBtn = { ...primaryBtn, background: '#F2F2F0', color: '#2A2A2C' }
+const secondaryBtn = { ...primaryBtn, background: 'var(--t-bg)', color: 'var(--t-fg)' }
 const linkBtn = {
   border: 'none',
   background: 'transparent',
   padding: '4px 8px',
   fontSize: '13px',
-  color: '#9B9B9F',
+  color: 'var(--t-muted)',
   cursor: 'pointer',
 }
 
@@ -72,7 +72,7 @@ export function DesktopPiattiScreen() {
     {
       key: 'ingredients',
       label: t('piatti.ingredientsSection'),
-      render: (d) => <span style={{ color: '#6B6B70' }}>{ingredientNames(d) || '—'}</span>,
+      render: (d) => <span style={{ color: 'var(--t-text2b)' }}>{ingredientNames(d) || '—'}</span>,
       sortValue: (d) => ingredientNames(d),
     },
     {
@@ -100,7 +100,7 @@ export function DesktopPiattiScreen() {
           >
             {t('piatti.editTitle')}
           </button>
-          <button style={{ ...linkBtn, color: '#D14343' }} onClick={() => setToDelete(d)}>
+          <button style={{ ...linkBtn, color: 'var(--t-danger)' }} onClick={() => setToDelete(d)}>
             {t('piatti.deleteConfirm')}
           </button>
         </span>
@@ -119,7 +119,7 @@ export function DesktopPiattiScreen() {
           </button>
         }
       />
-      <div style={{ background: '#fff', borderRadius: '16px', padding: '24px' }}>
+      <div style={{ background: 'var(--t-surface)', borderRadius: '16px', padding: '24px' }}>
         <SortableTable
           columns={columns}
           rows={dishes}
@@ -149,15 +149,15 @@ export function DesktopPiattiScreen() {
                 padding: '10px 14px',
                 marginBottom: '20px',
                 borderRadius: '10px',
-                border: '1px solid #ECECEC',
-                background: '#F6F6F4',
+                border: '1px solid var(--t-line)',
+                background: 'var(--t-surface2)',
                 fontSize: '15px',
-                color: '#2A2A2C',
+                color: 'var(--t-fg)',
                 outline: 'none',
               }}
             />
             <div
-              style={{ fontSize: '11px', fontWeight: 500, letterSpacing: '1.2px', color: '#9B9B9F', marginBottom: '10px' }}
+              style={{ fontSize: '11px', fontWeight: 500, letterSpacing: '1.2px', color: 'var(--t-muted)', marginBottom: '10px' }}
             >
               {t('piatti.ingredientsSection')}
             </div>
@@ -196,12 +196,12 @@ export function DesktopPiattiScreen() {
         title={t('piatti.deleteTitle', { name: toDelete?.name ?? '' })}
         width={420}
       >
-        <div style={{ fontSize: '14px', color: '#9B9B9F', marginBottom: '24px' }}>{t('piatti.deleteBody')}</div>
+        <div style={{ fontSize: '14px', color: 'var(--t-muted)', marginBottom: '24px' }}>{t('piatti.deleteBody')}</div>
         <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
           <button style={secondaryBtn} onClick={() => setToDelete(null)}>
             {t('common.cancel')}
           </button>
-          <button style={{ ...primaryBtn, background: '#D14343' }} onClick={handleDelete}>
+          <button style={{ ...primaryBtn, background: 'var(--t-danger)' }} onClick={handleDelete}>
             {t('piatti.deleteConfirm')}
           </button>
         </div>

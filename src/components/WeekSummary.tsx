@@ -49,14 +49,14 @@ export function WeekSummary({
 
   return (
     <div className="mb-[22px]">
-      <div className="text-[12px] font-normal tracking-[1.4px] text-[#9B9B9F] uppercase px-0.5 pb-[10px]">
+      <div className="text-[12px] font-normal tracking-[1.4px] text-t-muted uppercase px-0.5 pb-[10px]">
         {t('budget.thisWeek')} · {formatWeekLabel(isoWeek)}
       </div>
 
       {/* Di tasca tua */}
-      <div className="bg-[#2A2A2C] rounded-[22px] px-[22px] py-[18px] mb-[10px]">
-        <div className="text-[11px] font-normal tracking-[1.4px] text-white/55 uppercase">{t('home.outOfPocket')}</div>
-        <div className="flex items-baseline text-white mt-1">
+      <div className="bg-t-accent rounded-[22px] px-[22px] py-[18px] mb-[10px]">
+        <div className="text-[11px] font-normal tracking-[1.4px] text-t-on/55 uppercase">{t('home.outOfPocket')}</div>
+        <div className="flex items-baseline text-t-on mt-1">
           <span className="text-[26px] font-normal opacity-55 mr-1">€</span>
           <span className="text-[52px] font-light leading-none tabular-nums tracking-[-1px]">
             {formatCentsPlain(summary.outOfPocketCents)}
@@ -65,7 +65,7 @@ export function WeekSummary({
       </div>
 
       {/* Speso · buoni spesi · rimanenti */}
-      <div className="flex bg-[#F6F6F4] rounded-[18px] py-3 mb-[10px] text-center">
+      <div className="flex bg-t-surface2 rounded-[18px] py-3 mb-[10px] text-center">
         <SummaryCell value={`€${formatCentsPlain(summary.totalSpentCents)}`} label={t('home.spent')} />
         <SummaryCell value={String(summary.buoniSpentCount)} label={t('home.buoniSpent')} border />
         <SummaryCell value={String(summary.buoniRemaining)} label={t('home.buoniRemaining')} border />
@@ -73,31 +73,31 @@ export function WeekSummary({
 
       {/* Ultime spese della settimana */}
       {shown.length > 0 && (
-        <div className="bg-[#F6F6F4] rounded-[18px] overflow-hidden">
+        <div className="bg-t-surface2 rounded-[18px] overflow-hidden">
           {shown.map((sp, i) => (
             <Link
               key={sp.id}
               to="/storico/$sessionId"
               params={{ sessionId: String(sp.id) }}
               onClick={onNavigate}
-              className="flex items-center justify-between px-[18px] py-[13px] active:bg-[#ECECEC]"
-              style={{ borderBottom: i < shown.length - 1 ? '1px solid #E6E6E2' : 'none' }}
+              className="flex items-center justify-between px-[18px] py-[13px] active:bg-t-line"
+              style={{ borderBottom: i < shown.length - 1 ? '1px solid var(--t-line3)' : 'none' }}
             >
               <div>
-                <div className="text-[15px] text-[#2A2A2C]">{sp.store}</div>
-                <div className="text-[12px] text-[#9B9B9F]">
+                <div className="text-[15px] text-t-fg">{sp.store}</div>
+                <div className="text-[12px] text-t-muted">
                   {sp.list ? `${sp.list} · ` : ''}
                   {formatShortDate(sp.date)}
                 </div>
               </div>
-              <span className="text-[17px] text-[#2A2A2C] tabular-nums">€{formatCentsPlain(sp.amountCents)}</span>
+              <span className="text-[17px] text-t-fg tabular-nums">€{formatCentsPlain(sp.amountCents)}</span>
             </Link>
           ))}
           {weekSpese.length > MAX_WEEK_SPESE && (
             <Link
               to="/storico"
               onClick={onNavigate}
-              className="block px-[18px] py-[13px] text-[15px] text-[#9B9B9F] border-t border-[#E6E6E2] active:bg-[#ECECEC]"
+              className="block px-[18px] py-[13px] text-[15px] text-t-muted border-t border-t-line3 active:bg-t-line"
             >
               {t('home.seeAll', { count: weekSpese.length })}
             </Link>
@@ -110,9 +110,9 @@ export function WeekSummary({
 
 function SummaryCell({ value, label, border = false }: { value: string; label: string; border?: boolean }) {
   return (
-    <div className={`flex-1 ${border ? 'border-l border-[#E6E6E2]' : ''}`}>
-      <div className="text-[18px] text-[#2A2A2C] tabular-nums">{value}</div>
-      <div className="text-[10px] tracking-[1px] text-[#9B9B9F] uppercase mt-0.5">{label}</div>
+    <div className={`flex-1 ${border ? 'border-l border-t-line3' : ''}`}>
+      <div className="text-[18px] text-t-fg tabular-nums">{value}</div>
+      <div className="text-[10px] tracking-[1px] text-t-muted uppercase mt-0.5">{label}</div>
     </div>
   )
 }

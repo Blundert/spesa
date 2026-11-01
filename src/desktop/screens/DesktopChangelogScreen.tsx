@@ -15,9 +15,9 @@ export function DesktopChangelogScreen() {
           const entry = changelog[version]
           const isCurrent = version === __APP_VERSION__
           return (
-            <div key={version} style={{ background: '#fff', borderRadius: '16px', padding: '24px' }}>
+            <div key={version} style={{ background: 'var(--t-surface)', borderRadius: '16px', padding: '24px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
-                <span style={{ fontSize: '17px', fontWeight: 500, color: '#2A2A2C', fontVariantNumeric: 'tabular-nums' }}>
+                <span style={{ fontSize: '17px', fontWeight: 500, color: 'var(--t-fg)', fontVariantNumeric: 'tabular-nums' }}>
                   {version}
                 </span>
                 {isCurrent && (
@@ -25,8 +25,8 @@ export function DesktopChangelogScreen() {
                     style={{
                       fontSize: '11px',
                       fontWeight: 500,
-                      color: '#fff',
-                      background: '#2A2A2C',
+                      color: 'var(--t-on)',
+                      background: 'var(--t-accent)',
                       borderRadius: '999px',
                       padding: '2px 9px',
                       lineHeight: 1,
@@ -39,8 +39,8 @@ export function DesktopChangelogScreen() {
               <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: '6px' }}>
                 {entry[lang].map((item, i) => (
                   <li key={i} style={{ display: 'flex', gap: '8px', alignItems: 'flex-start' }}>
-                    <span style={{ color: '#B5B5BA', fontSize: '15px', lineHeight: '22px' }}>•</span>
-                    <span style={{ fontSize: '15px', color: '#2A2A2C', lineHeight: '22px' }}>{item}</span>
+                    <span style={{ color: 'var(--t-faint)', fontSize: '15px', lineHeight: '22px' }}>•</span>
+                    <span style={{ fontSize: '15px', color: 'var(--t-fg)', lineHeight: '22px' }}>{item}</span>
                   </li>
                 ))}
               </ul>

@@ -323,3 +323,13 @@ Nota: il service worker è attivo solo in build di produzione (`npm run build` +
 6. Torna ad "Automatico" e Salva → tornano i chip più comprati (6 su mobile, 10 su desktop) e la spesa solita calcolata dalle spese (8)
 7. Con due liste le scelte sono indipendenti; elimina dal catalogo un prodotto scelto → sparisce dai suggerimenti senza errori
 8. Passa da desktop a mobile (e viceversa) ridimensionando la finestra: le stesse scelte compaiono nell'altra interfaccia. Esporta e reimporta un backup: le scelte restano
+
+### Flusso 37 — Temi (mobile e desktop)
+1. Impostazioni → sezione "Aspetto" (sotto Lingua): sei temi con campioni di colore e una riga di descrizione (Chiaro, Scuro, Salvia, Oceano, Notte blu, Contrasto alto), poi "Segui il sistema". Il tema attivo ha il segno di spunta (su desktop anche il bordo marcato)
+2. Primo avvio o dati vecchi: il tema è Chiaro e l'app è identica a prima di questa versione (stessi colori, nessuna differenza visibile)
+3. Tocca "Scuro" → cambia subito tutta l'app, senza ricaricare: sfondo, schede, testi, pulsanti, grafici (desktop e Statistiche mobile), toast e finestre. Ricarica la pagina → resta Scuro e non compare nemmeno un lampo di tema chiaro all'avvio
+4. Prova uno per uno Salvia, Oceano, Notte blu, Contrasto alto: testo sempre leggibile, i pulsanti principali cambiano colore col tema (verde, blu…), i grafici mantengono riconoscibili totale, buoni e di tasca tua
+5. "Segui il sistema" attivo: i campioni dei temi si disattivano e compare "In uso: … (scelto dal sistema)"; con il dispositivo in chiaro l'app è Chiaro, in scuro è Scuro, e cambia da sola se il dispositivo cambia tema. Disattivalo → torna il tema scelto
+6. Cambia tema da desktop, poi restringi la finestra sotto i 768 px: l'app mobile ha lo stesso tema (e viceversa)
+7. Il colore della barra del browser (Android/Chrome, Safari) segue lo sfondo del tema. Su iPhone con l'app installata in Home la barra di stato resta chiara: limite noto di iOS
+8. Controlla in un tema scuro: Lista, Pasti, Storico (etichette verde/arancione dello scostamento), Statistiche, Catalogo, Supermercati, finestre di conferma, tastierino prezzi, tutorial

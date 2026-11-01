@@ -25,10 +25,10 @@ const inputStyle = {
   boxSizing: 'border-box' as const,
   padding: '10px 14px',
   borderRadius: '10px',
-  border: '1px solid #ECECEC',
-  background: '#F6F6F4',
+  border: '1px solid var(--t-line)',
+  background: 'var(--t-surface2)',
   fontSize: '14px',
-  color: '#2A2A2C',
+  color: 'var(--t-fg)',
   outline: 'none',
 }
 
@@ -38,10 +38,10 @@ const suggestionStyle = {
   textAlign: 'left' as const,
   padding: '10px 14px',
   border: 'none',
-  borderBottom: '1px solid #ECECEC',
+  borderBottom: '1px solid var(--t-line)',
   background: 'transparent',
   fontSize: '14px',
-  color: '#2A2A2C',
+  color: 'var(--t-fg)',
   cursor: 'pointer',
 }
 
@@ -95,7 +95,7 @@ export function IngredientEditor({ ingredients, onAdd, onRemove }: IngredientEdi
   return (
     <div>
       {ingredients.length === 0 ? (
-        <div style={{ fontSize: '13px', color: '#9B9B9F', marginBottom: '12px' }}>{t('piatti.noIngredients')}</div>
+        <div style={{ fontSize: '13px', color: 'var(--t-muted)', marginBottom: '12px' }}>{t('piatti.noIngredients')}</div>
       ) : (
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '12px' }}>
           {ingredients.map((ing) => (
@@ -110,14 +110,14 @@ export function IngredientEditor({ ingredients, onAdd, onRemove }: IngredientEdi
                 padding: '6px 12px',
                 border: 'none',
                 borderRadius: '999px',
-                background: '#F2F2F0',
+                background: 'var(--t-bg)',
                 fontSize: '13px',
-                color: '#2A2A2C',
+                color: 'var(--t-fg)',
                 cursor: 'pointer',
               }}
             >
               {ing.name}
-              <span aria-hidden style={{ color: '#9B9B9F' }}>×</span>
+              <span aria-hidden style={{ color: 'var(--t-muted)' }}>×</span>
             </button>
           ))}
         </div>
@@ -130,7 +130,7 @@ export function IngredientEditor({ ingredients, onAdd, onRemove }: IngredientEdi
         style={inputStyle}
       />
       {input.trim() && (
-        <div style={{ background: '#F6F6F4', borderRadius: '10px', overflow: 'hidden', marginTop: '6px' }}>
+        <div style={{ background: 'var(--t-surface2)', borderRadius: '10px', overflow: 'hidden', marginTop: '6px' }}>
           {matches.map((p) => (
             <button key={p.name} onClick={() => add(p.name, p.categoryId)} style={suggestionStyle}>
               {p.name}

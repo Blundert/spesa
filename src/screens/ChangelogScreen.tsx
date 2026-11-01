@@ -13,7 +13,7 @@ export function ChangelogScreen() {
         {/* Header */}
         <div className="relative flex items-center pt-2 pb-[18px]">
           <BackButton fallback="/impostazioni" />
-          <span className="absolute left-1/2 -translate-x-1/2 text-[26px] font-normal tracking-[-0.5px] text-[#2A2A2C]">
+          <span className="absolute left-1/2 -translate-x-1/2 text-[26px] font-normal tracking-[-0.5px] text-t-fg">
             {t('settings.changelog')}
           </span>
         </div>
@@ -24,13 +24,13 @@ export function ChangelogScreen() {
             const entry = changelog[version]
             const isCurrent = version === __APP_VERSION__
             return (
-              <div key={version} className="bg-white rounded-[20px] px-5 pt-5 pb-4">
+              <div key={version} className="bg-t-surface rounded-[20px] px-5 pt-5 pb-4">
                 <div className="flex items-center gap-2 mb-3">
-                  <span className="text-[17px] font-medium text-[#2A2A2C] tabular-nums">
+                  <span className="text-[17px] font-medium text-t-fg tabular-nums">
                     {version}
                   </span>
                   {isCurrent && (
-                    <span className="text-[11px] font-medium text-white bg-[#2A2A2C] rounded-full px-[9px] py-[2px] leading-none">
+                    <span className="text-[11px] font-medium text-t-on bg-t-accent rounded-full px-[9px] py-[2px] leading-none">
                       {t('settings.current')}
                     </span>
                   )}
@@ -38,8 +38,8 @@ export function ChangelogScreen() {
                 <ul className="flex flex-col gap-[6px]">
                   {entry[lang].map((item, i) => (
                     <li key={i} className="flex items-start gap-2">
-                      <span className="text-[#B5B5BA] text-[15px] leading-[22px] select-none">•</span>
-                      <span className="text-[15px] text-[#2A2A2C] leading-[22px]">{item}</span>
+                      <span className="text-t-faint text-[15px] leading-[22px] select-none">•</span>
+                      <span className="text-[15px] text-t-fg leading-[22px]">{item}</span>
                     </li>
                   ))}
                 </ul>

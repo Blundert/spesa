@@ -43,9 +43,9 @@ export function StorePickerModal({ open, onClose, supermarkets, currentId, onPic
               display: 'flex',
               justifyContent: 'space-between',
               padding: '13px 6px',
-              borderBottom: '1px solid #F2F2F0',
+              borderBottom: '1px solid var(--t-bg)',
               fontSize: '15px',
-              color: '#2A2A2C',
+              color: 'var(--t-fg)',
               fontWeight: s.id === currentId ? 600 : 400,
             }}
           >
@@ -64,11 +64,11 @@ export function StorePickerModal({ open, onClose, supermarkets, currentId, onPic
               if (e.key === 'Enter') void addAndPick()
             }}
             placeholder={t('spesa.storeNamePlaceholder')}
-            style={{ flex: 1, border: '1px solid #ECECEC', borderRadius: '10px', padding: '10px 12px', fontSize: '14px', outline: 'none' }}
+            style={{ flex: 1, border: '1px solid var(--t-line)', borderRadius: '10px', padding: '10px 12px', fontSize: '14px', outline: 'none' }}
           />
           <button
             onClick={() => void addAndPick()}
-            style={{ border: 'none', borderRadius: '10px', background: '#2A2A2C', color: '#fff', padding: '0 16px', fontSize: '14px', cursor: 'pointer' }}
+            style={{ border: 'none', borderRadius: '10px', background: 'var(--t-accent)', color: 'var(--t-on)', padding: '0 16px', fontSize: '14px', cursor: 'pointer' }}
           >
             {t('spesa.addAndSelect')}
           </button>
@@ -76,7 +76,7 @@ export function StorePickerModal({ open, onClose, supermarkets, currentId, onPic
       ) : (
         <button
           onClick={() => setShowAdd(true)}
-          style={{ width: '100%', border: '1px solid #ECECEC', borderRadius: '12px', background: '#fff', padding: '12px', fontSize: '14px', cursor: 'pointer', color: '#2A2A2C' }}
+          style={{ width: '100%', border: '1px solid var(--t-line)', borderRadius: '12px', background: 'var(--t-surface)', padding: '12px', fontSize: '14px', cursor: 'pointer', color: 'var(--t-fg)' }}
         >
           {t('spesa.addStore')}
         </button>

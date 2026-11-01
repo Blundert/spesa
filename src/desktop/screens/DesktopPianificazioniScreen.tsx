@@ -12,8 +12,8 @@ const btn = {
   padding: '10px 18px',
   borderRadius: '10px',
   border: 'none',
-  background: '#2A2A2C',
-  color: '#fff',
+  background: 'var(--t-accent)',
+  color: 'var(--t-on)',
   fontSize: '14px',
   cursor: 'pointer',
 }
@@ -22,7 +22,7 @@ const linkBtn = {
   background: 'transparent',
   padding: '4px 8px',
   fontSize: '13px',
-  color: '#9B9B9F',
+  color: 'var(--t-muted)',
   cursor: 'pointer',
 }
 
@@ -65,7 +65,7 @@ export function DesktopPianificazioniScreen() {
             {t('desktop.pianificazioni.open')}
           </button>
           <button
-            style={{ ...linkBtn, color: '#D14343' }}
+            style={{ ...linkBtn, color: 'var(--t-danger)' }}
             onClick={(e) => {
               e.stopPropagation()
               setToDelete(w.isoWeek)
@@ -81,7 +81,7 @@ export function DesktopPianificazioniScreen() {
   return (
     <div style={{ padding: 'var(--page-pad-y) var(--page-pad-x)', maxWidth: '1200px' }}>
       <PageHeader title={t('pianificazioni.title')} subtitle={t('desktop.pianificazioni.subtitle', { count: weeks.length })} />
-      <div style={{ background: '#fff', borderRadius: '16px', padding: '24px' }}>
+      <div style={{ background: 'var(--t-surface)', borderRadius: '16px', padding: '24px' }}>
         <SortableTable
           columns={columns}
           rows={weeks}
@@ -98,13 +98,13 @@ export function DesktopPianificazioniScreen() {
         title={t('pianificazioni.deleteTitle', { week: toDelete ? formatWeekLabelWithYear(toDelete) : '' })}
         width={420}
       >
-        <div style={{ fontSize: '14px', color: '#9B9B9F', marginBottom: '24px' }}>{t('pianificazioni.deleteBody')}</div>
+        <div style={{ fontSize: '14px', color: 'var(--t-muted)', marginBottom: '24px' }}>{t('pianificazioni.deleteBody')}</div>
         <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
-          <button style={{ ...btn, background: '#F2F2F0', color: '#2A2A2C' }} onClick={() => setToDelete(null)}>
+          <button style={{ ...btn, background: 'var(--t-bg)', color: 'var(--t-fg)' }} onClick={() => setToDelete(null)}>
             {t('common.cancel')}
           </button>
           <button
-            style={{ ...btn, background: '#D14343' }}
+            style={{ ...btn, background: 'var(--t-danger)' }}
             onClick={() => toDelete && deleteWeek.mutate(toDelete, { onSuccess: () => setToDelete(null) })}
           >
             {t('pianificazioni.deleteConfirm')}

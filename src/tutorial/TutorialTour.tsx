@@ -188,24 +188,24 @@ export function TutorialTour({ onComplete }: TutorialTourProps) {
           ...tooltipStyle,
         }}
       >
-        <div className="bg-white rounded-[22px] p-5 shadow-lg">
+        <div className="bg-t-surface rounded-[22px] p-5 shadow-lg">
           {/* Step counter */}
           <div className="flex justify-between items-center mb-3">
-            <span className="text-[11px] text-[#9B9B9F] uppercase tracking-[1px]">
+            <span className="text-[11px] text-t-muted uppercase tracking-[1px]">
               {step + 1} / {STEPS.length}
             </span>
             <button
               onClick={handleComplete}
-              className="text-[13px] text-[#9B9B9F] active:opacity-60 transition-opacity"
+              className="text-[13px] text-t-muted active:opacity-60 transition-opacity"
             >
               {t('tutorial.skip')}
             </button>
           </div>
 
-          <h3 className="text-[17px] font-normal text-[#2A2A2C] mb-2">
+          <h3 className="text-[17px] font-normal text-t-fg mb-2">
             {t(currentStep.titleKey)}
           </h3>
-          <p className="text-[14px] text-[#9B9B9F] leading-relaxed mb-5">
+          <p className="text-[14px] text-t-muted leading-relaxed mb-5">
             {t(currentStep.descKey)}
           </p>
 
@@ -214,14 +214,14 @@ export function TutorialTour({ onComplete }: TutorialTourProps) {
             {step > 0 && (
               <button
                 onClick={() => setStep(step - 1)}
-                className="flex-none px-4 py-3 rounded-[14px] bg-[#F2F2F0] text-[#2A2A2C] text-[14px] active:scale-[.97] transition-transform"
+                className="flex-none px-4 py-3 rounded-[14px] bg-t-bg text-t-fg text-[14px] active:scale-[.97] transition-transform"
               >
                 {t('tutorial.prev')}
               </button>
             )}
             <button
               onClick={handleNext}
-              className="flex-1 py-3 rounded-[14px] bg-[#2A2A2C] text-white text-[14px] active:scale-[.97] transition-transform"
+              className="flex-1 py-3 rounded-[14px] bg-t-accent text-t-on text-[14px] active:scale-[.97] transition-transform"
             >
               {isLast ? t('tutorial.done') : t('tutorial.next')}
             </button>

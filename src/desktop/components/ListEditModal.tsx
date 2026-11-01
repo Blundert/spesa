@@ -96,16 +96,16 @@ function ListForm({
           padding: '10px 14px',
           marginBottom: '18px',
           borderRadius: '10px',
-          border: '1px solid #ECECEC',
-          background: '#F6F6F4',
+          border: '1px solid var(--t-line)',
+          background: 'var(--t-surface2)',
           fontSize: '15px',
-          color: '#2A2A2C',
+          color: 'var(--t-fg)',
           outline: 'none',
         }}
       />
       <label
         htmlFor="list-supermarket"
-        style={{ display: 'block', fontSize: '12px', color: '#9B9B9F', letterSpacing: '0.5px', textTransform: 'uppercase', marginBottom: '8px' }}
+        style={{ display: 'block', fontSize: '12px', color: 'var(--t-muted)', letterSpacing: '0.5px', textTransform: 'uppercase', marginBottom: '8px' }}
       >
         {t('lists.supermarket')}
       </label>
@@ -118,10 +118,10 @@ function ListForm({
           padding: '10px 12px',
           marginBottom: '24px',
           borderRadius: '10px',
-          border: '1px solid #ECECEC',
-          background: '#F6F6F4',
+          border: '1px solid var(--t-line)',
+          background: 'var(--t-surface2)',
           fontSize: '14px',
-          color: '#2A2A2C',
+          color: 'var(--t-fg)',
         }}
       >
         <option value="">{t('lists.noSupermarket')}</option>

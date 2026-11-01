@@ -16,13 +16,13 @@ export function ConfirmModal({ open, onClose, title, body, confirmLabel, onConfi
   const btn = { border: 'none', borderRadius: '12px', padding: '12px 20px', fontSize: '14px', cursor: 'pointer' } as const
   return (
     <Modal open={open} onClose={onClose} width={400}>
-      <div style={{ fontSize: '18px', fontWeight: 500, color: '#D14343', marginBottom: '8px' }}>{title}</div>
-      {body && <div style={{ fontSize: '14px', color: '#9B9B9F', marginBottom: '8px' }}>{body}</div>}
+      <div style={{ fontSize: '18px', fontWeight: 500, color: 'var(--t-danger)', marginBottom: '8px' }}>{title}</div>
+      {body && <div style={{ fontSize: '14px', color: 'var(--t-muted)', marginBottom: '8px' }}>{body}</div>}
       <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px', marginTop: '20px' }}>
-        <button onClick={onClose} style={{ ...btn, background: '#F2F2F0', color: '#2A2A2C' }}>
+        <button onClick={onClose} style={{ ...btn, background: 'var(--t-bg)', color: 'var(--t-fg)' }}>
           {t('common.cancel')}
         </button>
-        <button onClick={onConfirm} style={{ ...btn, background: '#D14343', color: '#fff' }}>
+        <button onClick={onConfirm} style={{ ...btn, background: 'var(--t-danger)', color: 'var(--t-on)' }}>
           {confirmLabel}
         </button>
       </div>

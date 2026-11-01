@@ -34,8 +34,8 @@ function EuroTooltip({ active, payload, label }: CustomTooltipProps) {
   return (
     <div
       style={{
-        background: '#2A2A2C',
-        color: '#fff',
+        background: 'var(--t-accent)',
+        color: 'var(--t-on)',
         borderRadius: '10px',
         padding: '10px 14px',
         fontSize: '13px',
@@ -43,11 +43,11 @@ function EuroTooltip({ active, payload, label }: CustomTooltipProps) {
         boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
       }}
     >
-      {label && <div style={{ marginBottom: '6px', color: '#9B9B9F', fontSize: '11px' }}>{label}</div>}
+      {label && <div style={{ marginBottom: '6px', color: 'var(--t-muted)', fontSize: '11px' }}>{label}</div>}
       {payload.map((p) => (
         <div key={p.name} style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
           <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: p.color, flexShrink: 0 }} />
-          <span style={{ color: '#B5B5BA' }}>{p.name}:</span>
+          <span style={{ color: 'var(--t-faint)' }}>{p.name}:</span>
           <span style={{ fontWeight: 500 }}>€ {formatCents(p.value)}</span>
         </div>
       ))}
@@ -100,7 +100,7 @@ export function DashboardScreen() {
       />
 
       {isEmpty ? (
-        <div style={{ textAlign: 'center', padding: '80px 0', color: '#9B9B9F', fontSize: '15px' }}>
+        <div style={{ textAlign: 'center', padding: '80px 0', color: 'var(--t-muted)', fontSize: '15px' }}>
           {t('desktop.dashboard.empty')}
         </div>
       ) : (
@@ -126,21 +126,21 @@ export function DashboardScreen() {
           </div>
 
           {/* Spending trend */}
-          <div style={{ background: '#fff', borderRadius: '16px', padding: '24px', marginBottom: '24px' }}>
+          <div style={{ background: 'var(--t-surface)', borderRadius: '16px', padding: '24px', marginBottom: '24px' }}>
             <SectionTitle>{t('desktop.dashboard.trendTitle')}</SectionTitle>
             <ResponsiveContainer width="100%" height={240}>
               <LineChart data={lineData} margin={{ top: 4, right: 8, left: 0, bottom: 0 }}>
-                <CartesianGrid stroke="#F2F2F0" strokeDasharray="0" vertical={false} />
+                <CartesianGrid stroke="var(--t-bg)" strokeDasharray="0" vertical={false} />
                 <XAxis
                   dataKey="label"
-                  tick={{ fontSize: 11, fill: '#9B9B9F' }}
+                  tick={{ fontSize: 11, fill: 'var(--t-muted)' }}
                   tickLine={false}
                   axisLine={false}
                   interval="preserveStartEnd"
                 />
                 <YAxis
                   tickFormatter={(v) => `€${(v / 100).toFixed(0)}`}
-                  tick={{ fontSize: 11, fill: '#9B9B9F' }}
+                  tick={{ fontSize: 11, fill: 'var(--t-muted)' }}
                   tickLine={false}
                   axisLine={false}
                   width={52}
@@ -173,7 +173,7 @@ export function DashboardScreen() {
             {/* Category pie */}
             <div
               style={{
-                background: '#fff',
+                background: 'var(--t-surface)',
                 borderRadius: '16px',
                 padding: '24px',
                 flex: '1 1 320px',
@@ -220,10 +220,10 @@ export function DashboardScreen() {
                               flexShrink: 0,
                             }}
                           />
-                          <span style={{ fontSize: '13px', color: '#2A2A2C', flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                          <span style={{ fontSize: '13px', color: 'var(--t-fg)', flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                             {entry.name}
                           </span>
-                          <span style={{ fontSize: '12px', color: '#9B9B9F', flexShrink: 0 }}>
+                          <span style={{ fontSize: '12px', color: 'var(--t-muted)', flexShrink: 0 }}>
                             {pct}%
                           </span>
                         </div>
@@ -232,14 +232,14 @@ export function DashboardScreen() {
                   </div>
                 </div>
               ) : (
-                <div style={{ color: '#9B9B9F', fontSize: '13px' }}>{t('desktop.noData')}</div>
+                <div style={{ color: 'var(--t-muted)', fontSize: '13px' }}>{t('desktop.noData')}</div>
               )}
             </div>
 
             {/* Supermarket bar chart */}
             <div
               style={{
-                background: '#fff',
+                background: 'var(--t-surface)',
                 borderRadius: '16px',
                 padding: '24px',
                 flex: '1 1 320px',
@@ -258,7 +258,7 @@ export function DashboardScreen() {
                     <YAxis
                       type="category"
                       dataKey="name"
-                      tick={{ fontSize: 12, fill: '#2A2A2C' }}
+                      tick={{ fontSize: 12, fill: 'var(--t-fg)' }}
                       tickLine={false}
                       axisLine={false}
                       width={90}
@@ -266,10 +266,10 @@ export function DashboardScreen() {
                     <Tooltip
                       formatter={(v) => [`€ ${formatCents(Number(v))}`, t('desktop.dashboard.total')]}
                       contentStyle={{
-                        background: '#2A2A2C',
+                        background: 'var(--t-accent)',
                         border: 'none',
                         borderRadius: '10px',
-                        color: '#fff',
+                        color: 'var(--t-on)',
                         fontSize: '13px',
                       }}
                     />
@@ -281,13 +281,13 @@ export function DashboardScreen() {
                         dataKey="totalCents"
                         position="right"
                         formatter={(v) => `€ ${formatCents(Number(v))}`}
-                        style={{ fontSize: 12, fill: '#2A2A2C' }}
+                        style={{ fontSize: 12, fill: 'var(--t-fg)' }}
                       />
                     </Bar>
                   </BarChart>
                 </ResponsiveContainer>
               ) : (
-                <div style={{ color: '#9B9B9F', fontSize: '13px' }}>{t('desktop.noData')}</div>
+                <div style={{ color: 'var(--t-muted)', fontSize: '13px' }}>{t('desktop.noData')}</div>
               )}
             </div>
           </div>

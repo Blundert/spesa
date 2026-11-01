@@ -6,18 +6,18 @@ import { currentWeek } from '../lib/date'
 export function SectionTitle({ active }: { active: 'lista' | 'pasti' }) {
   const { t } = useTranslation()
   const base = 'text-[26px] font-normal tracking-[-0.5px]'
-  const inactive = `${base} text-[#C5C5C9] active:opacity-50`
+  const inactive = `${base} text-t-chev active:opacity-50`
   return (
     <div data-tour="section-title" className="flex items-baseline gap-[18px]">
       {active === 'lista' ? (
-        <span className={`${base} text-[#2A2A2C]`}>{t('lista.title')}</span>
+        <span className={`${base} text-t-fg`}>{t('lista.title')}</span>
       ) : (
         <Link to="/" className={inactive}>
           {t('lista.title')}
         </Link>
       )}
       {active === 'pasti' ? (
-        <span className={`${base} text-[#2A2A2C]`}>{t('nav.meals')}</span>
+        <span className={`${base} text-t-fg`}>{t('nav.meals')}</span>
       ) : (
         <Link to="/pasti" search={{ week: currentWeek() }} className={inactive}>
           {t('nav.meals')}

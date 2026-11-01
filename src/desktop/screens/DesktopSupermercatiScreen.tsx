@@ -27,26 +27,26 @@ const primaryBtn = {
   padding: '10px 18px',
   borderRadius: '10px',
   border: 'none',
-  background: '#2A2A2C',
-  color: '#fff',
+  background: 'var(--t-accent)',
+  color: 'var(--t-on)',
   fontSize: '14px',
   cursor: 'pointer',
 }
 const secondaryBtn = {
   padding: '10px 18px',
   borderRadius: '10px',
-  border: '1px solid #D8D8D6',
-  background: '#fff',
-  color: '#2A2A2C',
+  border: '1px solid var(--t-line2)',
+  background: 'var(--t-surface)',
+  color: 'var(--t-fg)',
   fontSize: '14px',
   cursor: 'pointer',
 }
-const dangerBtn = { ...primaryBtn, background: '#D14343' }
+const dangerBtn = { ...primaryBtn, background: 'var(--t-danger)' }
 const linkBtn = {
   all: 'unset' as const,
   cursor: 'pointer',
   fontSize: '13px',
-  color: '#9B9B9F',
+  color: 'var(--t-muted)',
 }
 
 export function DesktopSupermercatiScreen() {
@@ -156,7 +156,7 @@ export function DesktopSupermercatiScreen() {
       label: t('desktop.supermercati.colLast'),
       render: (r) =>
         r.lastVisit === null ? (
-          <span style={{ color: '#9B9B9F' }}>{t('desktop.supermercati.never')}</span>
+          <span style={{ color: 'var(--t-muted)' }}>{t('desktop.supermercati.never')}</span>
         ) : (
           formatDate(r.lastVisit)
         ),
@@ -194,9 +194,9 @@ export function DesktopSupermercatiScreen() {
                 width: '100%',
                 height: '100%',
                 boxSizing: 'border-box',
-                border: '1px dashed #D8D8D6',
+                border: '1px dashed var(--t-line2)',
                 borderRadius: '7px',
-                color: '#B5B5BA',
+                color: 'var(--t-faint)',
                 fontSize: '16px',
               }}
             >
@@ -219,7 +219,7 @@ export function DesktopSupermercatiScreen() {
           aria-label={t('supermercati.deleteConfirm')}
           style={{ all: 'unset', cursor: 'pointer', opacity: 0.4, display: 'inline-flex' }}
         >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2A2A2C" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--t-fg)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6" />
           </svg>
         </button>
@@ -245,7 +245,7 @@ export function DesktopSupermercatiScreen() {
           </button>
         }
       />
-      <div style={{ background: '#fff', borderRadius: '16px', padding: '24px' }}>
+      <div style={{ background: 'var(--t-surface)', borderRadius: '16px', padding: '24px' }}>
         <SortableTable
           columns={columns}
           rows={rows}
@@ -266,12 +266,12 @@ export function DesktopSupermercatiScreen() {
             width: '100%',
             boxSizing: 'border-box',
             border: 'none',
-            borderBottom: '1px solid #ECECEC',
+            borderBottom: '1px solid var(--t-line)',
             outline: 'none',
             background: 'transparent',
             padding: '10px 2px',
             fontSize: '16px',
-            color: '#2A2A2C',
+            color: 'var(--t-fg)',
             marginBottom: '20px',
           }}
         />
@@ -290,7 +290,7 @@ export function DesktopSupermercatiScreen() {
         onClose={() => setPendingDelete(null)}
         title={t('supermercati.deleteConfirmTitle', { name: pendingDelete?.name ?? '' })}
       >
-        <div style={{ fontSize: '14px', color: '#9B9B9F', marginBottom: '20px' }}>
+        <div style={{ fontSize: '14px', color: 'var(--t-muted)', marginBottom: '20px' }}>
           {t('supermercati.deleteConfirmBody')}
         </div>
         <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
@@ -315,10 +315,10 @@ export function DesktopSupermercatiScreen() {
             <img
               src={cardTarget.loyaltyCard}
               alt={t('supermercati.cardOf', { name: cardTarget.name })}
-              style={{ width: '100%', maxHeight: '260px', objectFit: 'contain', borderRadius: '12px', background: '#F6F6F4' }}
+              style={{ width: '100%', maxHeight: '260px', objectFit: 'contain', borderRadius: '12px', background: 'var(--t-surface2)' }}
             />
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '20px' }}>
-              <button onClick={() => setRemoveCardOpen(true)} style={{ ...linkBtn, color: '#D14343', fontSize: '14px' }}>
+              <button onClick={() => setRemoveCardOpen(true)} style={{ ...linkBtn, color: 'var(--t-danger)', fontSize: '14px' }}>
                 {t('supermercati.removeCard')}
               </button>
               <button onClick={() => fileInputRef.current?.click()} style={secondaryBtn}>

@@ -295,15 +295,15 @@ export function SpesaScreen() {
 
   if (!activeSession) {
     return (
-      <div className="flex flex-col h-full bg-[#F2F2F0]">
+      <div className="flex flex-col h-full bg-t-bg">
         {/* Status bar placeholder */}
         <div className="flex-none" style={{ height: 'max(16px, env(safe-area-inset-top))' }} />
         <div className="flex-1 flex flex-col items-center justify-center gap-6 p-8">
-          <h1 className="text-[26px] font-normal text-[#2A2A2C] tracking-tight">{t('spesa.startTitle')}</h1>
-          <p className="text-sm text-[#9B9B9F] text-center">{t('spesa.choosePrompt')}</p>
+          <h1 className="text-[26px] font-normal text-t-fg tracking-tight">{t('spesa.startTitle')}</h1>
+          <p className="text-sm text-t-muted text-center">{t('spesa.choosePrompt')}</p>
           <button
             onClick={() => setShowStorePicker(true)}
-            className="bg-[#2A2A2C] text-white text-[17px] font-normal py-[18px] px-8 rounded-[22px] w-full max-w-xs active:scale-[.98] transition-transform flex items-center justify-center gap-2"
+            className="bg-t-accent text-t-on text-[17px] font-normal py-[18px] px-8 rounded-[22px] w-full max-w-xs active:scale-[.98] transition-transform flex items-center justify-center gap-2"
           >
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
               <circle cx="9" cy="20" r="1.4" /><circle cx="18" cy="20" r="1.4" />
@@ -311,7 +311,7 @@ export function SpesaScreen() {
             </svg>
             {t('spesa.chooseStore')}
           </button>
-          <button onClick={() => void navigate({ to: '/' })} className="text-[#9B9B9F] text-sm mt-2">
+          <button onClick={() => void navigate({ to: '/' })} className="text-t-muted text-sm mt-2">
             {t('spesa.backToWeek')}
           </button>
         </div>
@@ -329,23 +329,23 @@ export function SpesaScreen() {
   }
 
   return (
-    <div className="flex flex-col h-full bg-[#F2F2F0]">
+    <div className="flex flex-col h-full bg-t-bg">
       {/* Status bar */}
       <div className="flex-none" style={{ height: 'max(16px, env(safe-area-inset-top))' }} />
 
       {/* Header */}
       <div className="flex items-center justify-between px-5 py-2 flex-none">
         <button onClick={() => void navigate({ to: '/' })} className="w-[34px] h-[34px] -ml-1.5 flex items-center justify-center active:opacity-50">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2A2A2C" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 5l-7 7 7 7" /></svg>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--t-fg)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 5l-7 7 7 7" /></svg>
         </button>
         {/* Lista della spesa sopra al supermercato: si cambia solo il negozio */}
         <div className="flex flex-col items-center gap-[3px] min-w-0">
           {sessionList && (
-            <span className="text-[10px] tracking-[1.2px] uppercase text-[#9B9B9F] max-w-[180px] truncate">{sessionList.name}</span>
+            <span className="text-[10px] tracking-[1.2px] uppercase text-t-muted max-w-[180px] truncate">{sessionList.name}</span>
           )}
-          <button onClick={() => setShowStorePicker(true)} className="flex items-center gap-1.5 px-[14px] py-[7px] bg-white rounded-full active:bg-[#EDEDEB]">
-            <span className="text-[15px] text-[#2A2A2C]">{supermarketName}</span>
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#9B9B9F" strokeWidth="2.2" strokeLinecap="round"><path d="M6 9l6 6 6-6" /></svg>
+          <button onClick={() => setShowStorePicker(true)} className="flex items-center gap-1.5 px-[14px] py-[7px] bg-t-surface rounded-full active:bg-t-line9">
+            <span className="text-[15px] text-t-fg">{supermarketName}</span>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--t-muted)" strokeWidth="2.2" strokeLinecap="round"><path d="M6 9l6 6 6-6" /></svg>
           </button>
         </div>
         <div className="flex items-center gap-2">
@@ -355,30 +355,30 @@ export function SpesaScreen() {
               aria-label={t('supermercati.viewCard')}
               className="w-[34px] h-[34px] flex items-center justify-center active:opacity-50"
             >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2A2A2C" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--t-fg)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                 <rect x="2" y="5" width="20" height="14" rx="2" />
                 <path d="M2 10h20" />
               </svg>
             </button>
           )}
           <button onClick={handleFinish} className="px-1 py-[7px] active:opacity-50">
-            <span className="text-[15px] text-[#2A2A2C]">{t('spesa.finish')}</span>
+            <span className="text-[15px] text-t-fg">{t('spesa.finish')}</span>
           </button>
         </div>
       </div>
 
       {/* Hero budget */}
       <div className="px-5 pb-4 flex-none">
-        <div className="bg-[#2A2A2C] rounded-[28px] p-[26px] mb-[22px]">
-          <div className="text-[12px] font-normal tracking-[1.6px] text-white/55 uppercase mb-3">{t('home.outOfPocket')}</div>
-          <div className="flex items-baseline text-white">
+        <div className="bg-t-accent rounded-[28px] p-[26px] mb-[22px]">
+          <div className="text-[12px] font-normal tracking-[1.6px] text-t-on/55 uppercase mb-3">{t('home.outOfPocket')}</div>
+          <div className="flex items-baseline text-t-on">
             <span className="text-[36px] font-normal opacity-55 mr-1">€</span>
             <span className="text-[76px] font-light leading-[.92] tabular-nums tracking-[-2px]">
               {formatCentsPlain(summary.outOfPocketCents)}
             </span>
           </div>
         </div>
-        <div className="flex justify-center gap-0 text-[#9B9B9F] text-[13px]">
+        <div className="flex justify-center gap-0 text-t-muted text-[13px]">
           <span className="tabular-nums">€{formatCentsPlain(summary.spentCents)} {t('common.spentWord')}</span>
           <span className="mx-[10px] opacity-50">·</span>
           <span className="tabular-nums">{t('spesa.itemsInCart', { count: doneItems.length })}</span>
@@ -398,24 +398,24 @@ export function SpesaScreen() {
         {/* Da prendere */}
         {todoGroups.map(([catId, items]) => (
           <div key={catId} className="mb-4">
-            <div className="text-[12px] font-normal tracking-[1.2px] text-[#9B9B9F] uppercase px-1.5 pb-[13px]">
+            <div className="text-[12px] font-normal tracking-[1.2px] text-t-muted uppercase px-1.5 pb-[13px]">
               {categoryLabelOf(catId)}
             </div>
-            <div className="bg-white rounded-[20px] overflow-hidden">
+            <div className="bg-t-surface rounded-[20px] overflow-hidden">
               {items.map((li, i) => (
                 <div
                   key={li.id}
                   className="flex items-center px-[18px] py-[17px]"
-                  style={{ borderBottom: i < items.length - 1 ? '1px solid #ECECEC' : 'none' }}
+                  style={{ borderBottom: i < items.length - 1 ? '1px solid var(--t-line)' : 'none' }}
                 >
                   <button
                     onClick={() => setPriceTarget({ itemId: li.itemId, name: li.itemName, lastPriceCents: itemLastPriceMap[li.itemId] ?? null })}
                     className="flex flex-1 items-center gap-[13px] text-left active:opacity-60 transition-opacity"
                   >
-                    <div className="w-6 h-6 flex-none rounded-full border-2 border-[#D8D8D6]" />
-                    <div className="flex-1 text-base text-[#2A2A2C]">{li.itemName}</div>
+                    <div className="w-6 h-6 flex-none rounded-full border-2 border-t-line2" />
+                    <div className="flex-1 text-base text-t-fg">{li.itemName}</div>
                     {li.suggestedPriceCents !== null && (
-                      <span className="text-sm text-[#B5B5BA] tabular-nums">
+                      <span className="text-sm text-t-faint tabular-nums">
                         {t('spesa.about')} €{formatCentsPlain(li.suggestedPriceCents)}
                       </span>
                     )}
@@ -425,7 +425,7 @@ export function SpesaScreen() {
                     aria-label={t('spesa.removeItem')}
                     className="w-9 h-9 -mr-1.5 ml-2 flex-none flex items-center justify-center opacity-40 active:opacity-90"
                   >
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2A2A2C" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--t-fg)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6" />
                     </svg>
                   </button>
@@ -438,21 +438,21 @@ export function SpesaScreen() {
         {/* Nel carrello */}
         {doneItems.length > 0 && (
           <div className="mt-1.5">
-            <div className="text-[12px] font-normal tracking-[1.2px] text-[#9B9B9F] uppercase px-1.5 pb-[13px]">
+            <div className="text-[12px] font-normal tracking-[1.2px] text-t-muted uppercase px-1.5 pb-[13px]">
               {t('spesa.inCart')}
             </div>
-            <div className="bg-white rounded-[20px] overflow-hidden">
+            <div className="bg-t-surface rounded-[20px] overflow-hidden">
               {doneItems.map((p, i) => (
                 <div
                   key={p.id}
                   className="flex items-center px-[18px] py-4"
-                  style={{ borderBottom: i < doneItems.length - 1 ? '1px solid #ECECEC' : 'none' }}
+                  style={{ borderBottom: i < doneItems.length - 1 ? '1px solid var(--t-line)' : 'none' }}
                 >
                   {/* Spunta = depenna (rimette tra "da prendere") */}
                   <button
                     onClick={() => p.id !== undefined && void uncheckCart(p.id, p.itemId)}
                     aria-label={t('spesa.uncheck')}
-                    className="w-6 h-6 flex-none rounded-full bg-[#2A2A2C] flex items-center justify-center active:opacity-50"
+                    className="w-6 h-6 flex-none rounded-full bg-t-accent flex items-center justify-center active:opacity-50"
                   >
                     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M5 12l4 4 10-10" />
@@ -472,10 +472,10 @@ export function SpesaScreen() {
                     }
                     className="flex flex-1 items-center gap-[13px] ml-[13px] text-left active:opacity-60 transition-opacity"
                   >
-                    <div className="flex-1 opacity-50 text-base text-[#2A2A2C]">{p.name}</div>
-                    <span className="text-[15px] text-[#2A2A2C] font-normal tabular-nums">
+                    <div className="flex-1 opacity-50 text-base text-t-fg">{p.name}</div>
+                    <span className="text-[15px] text-t-fg font-normal tabular-nums">
                       €{formatCentsPlain(p.priceCents)}
-                      {p.quantity > 1 && <span className="text-[#9B9B9F]"> ×{p.quantity}</span>}
+                      {p.quantity > 1 && <span className="text-t-muted"> ×{p.quantity}</span>}
                     </span>
                   </button>
                   {/* Cestino = elimina del tutto */}
@@ -484,7 +484,7 @@ export function SpesaScreen() {
                     aria-label={t('spesa.removeItem')}
                     className="w-9 h-9 -mr-1.5 ml-2 flex-none flex items-center justify-center opacity-40 active:opacity-90"
                   >
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2A2A2C" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--t-fg)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6" />
                     </svg>
                   </button>
@@ -498,7 +498,7 @@ export function SpesaScreen() {
       {/* FAB Aggiungi fuori lista */}
       <button
         onClick={() => setShowNewItem(true)}
-        className="absolute bottom-[30px] left-1/2 -translate-x-1/2 z-[24] flex items-center gap-2 bg-[#2A2A2C] text-white px-[22px] py-[14px] rounded-full text-[15px] font-normal shadow-[0_10px_30px_rgba(0,0,0,.3)] active:-translate-x-1/2 active:scale-[.96] transition-transform"
+        className="absolute bottom-[30px] left-1/2 -translate-x-1/2 z-[24] flex items-center gap-2 bg-t-accent text-t-on px-[22px] py-[14px] rounded-full text-[15px] font-normal shadow-[0_10px_30px_rgba(0,0,0,.3)] active:-translate-x-1/2 active:scale-[.96] transition-transform"
       >
         <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <path d="M12 5v14M5 12h14" />
@@ -538,13 +538,13 @@ export function SpesaScreen() {
 
       {/* New item fuori lista */}
       <BottomSheet open={showNewItem} onClose={() => setShowNewItem(false)} hasInput>
-        <div className="text-[20px] font-normal text-[#2A2A2C] px-0.5 pb-[6px]">{t('spesa.offListTitle')}</div>
+        <div className="text-[20px] font-normal text-t-fg px-0.5 pb-[6px]">{t('spesa.offListTitle')}</div>
         <input
           value={newItemName}
           onChange={(e) => setNewItemName(e.target.value)}
           placeholder={t('spesa.itemNamePlaceholder')}
           data-autofocus
-          className="w-full border-0 border-b border-[#ECECEC] outline-none bg-transparent px-0.5 py-3 text-[18px] text-[#2A2A2C] mb-2"
+          className="w-full border-0 border-b border-t-line outline-none bg-transparent px-0.5 py-3 text-[18px] text-t-fg mb-2"
           onKeyDown={(e) => {
             if (e.key === 'Enter' && newItemName.trim()) {
               setNewItemTarget({ name: newItemName.trim() })
@@ -553,7 +553,7 @@ export function SpesaScreen() {
           }}
         />
         {offListMatches.length > 0 && (
-          <div className="bg-[#F6F6F4] rounded-[14px] overflow-hidden mb-3 divide-y divide-[#ECECEC]">
+          <div className="bg-t-surface2 rounded-[14px] overflow-hidden mb-3 divide-y divide-t-line">
             {offListMatches.map((p) => (
               <button
                 key={p.name}
@@ -561,10 +561,10 @@ export function SpesaScreen() {
                   setNewItemTarget({ name: p.name, categoryId: p.categoryId })
                   setShowNewItem(false)
                 }}
-                className="w-full flex items-center justify-between px-4 py-[11px] text-left active:bg-[#ECECEC]"
+                className="w-full flex items-center justify-between px-4 py-[11px] text-left active:bg-t-line"
               >
-                <span className="text-[15px] text-[#2A2A2C]">{p.name}</span>
-                <span className="text-[12px] text-[#9B9B9F]">{catMap[p.categoryId] ?? t('categories.5')}</span>
+                <span className="text-[15px] text-t-fg">{p.name}</span>
+                <span className="text-[12px] text-t-muted">{catMap[p.categoryId] ?? t('categories.5')}</span>
               </button>
             ))}
           </div>
@@ -575,7 +575,7 @@ export function SpesaScreen() {
             setNewItemTarget({ name: newItemName.trim() })
             setShowNewItem(false)
           }}
-          className="mt-1 w-full bg-[#2A2A2C] text-white text-[17px] py-[18px] rounded-[20px] active:scale-[.98] transition-transform"
+          className="mt-1 w-full bg-t-accent text-t-on text-[17px] py-[18px] rounded-[20px] active:scale-[.98] transition-transform"
         >
           {t('spesa.continue')}
         </button>
@@ -609,19 +609,19 @@ export function SpesaScreen() {
 
       {/* Conferma rimuovi dalla lista */}
       <BottomSheet open={pendingListRemove !== null} onClose={() => setPendingListRemove(null)}>
-        <div className="text-[20px] font-normal text-[#D14343] px-0.5 pb-6">{t('spesa.removeListConfirmTitle')}</div>
+        <div className="text-[20px] font-normal text-t-danger px-0.5 pb-6">{t('spesa.removeListConfirmTitle')}</div>
         <button
           onClick={() => {
             if (pendingListRemove !== null) removeFromList.mutate(pendingListRemove)
             setPendingListRemove(null)
           }}
-          className="w-full bg-[#D14343] text-white text-[17px] py-[18px] rounded-[20px] mb-3 active:scale-[.98] transition-transform"
+          className="w-full bg-t-danger text-t-on text-[17px] py-[18px] rounded-[20px] mb-3 active:scale-[.98] transition-transform"
         >
           {t('spesa.removeListConfirm')}
         </button>
         <button
           onClick={() => setPendingListRemove(null)}
-          className="w-full bg-[#F2F2F0] text-[#2A2A2C] text-[17px] py-[18px] rounded-[20px] active:scale-[.98] transition-transform"
+          className="w-full bg-t-bg text-t-fg text-[17px] py-[18px] rounded-[20px] active:scale-[.98] transition-transform"
         >
           {t('common.cancel')}
         </button>
@@ -629,19 +629,19 @@ export function SpesaScreen() {
 
       {/* Conferma rimuovi dal carrello */}
       <BottomSheet open={pendingCartRemove !== null} onClose={() => setPendingCartRemove(null)}>
-        <div className="text-[20px] font-normal text-[#D14343] px-0.5 pb-6">{t('spesa.removeCartConfirmTitle')}</div>
+        <div className="text-[20px] font-normal text-t-danger px-0.5 pb-6">{t('spesa.removeCartConfirmTitle')}</div>
         <button
           onClick={() => {
             if (pendingCartRemove) void eliminateCart(pendingCartRemove.id, pendingCartRemove.itemId)
             setPendingCartRemove(null)
           }}
-          className="w-full bg-[#D14343] text-white text-[17px] py-[18px] rounded-[20px] mb-3 active:scale-[.98] transition-transform"
+          className="w-full bg-t-danger text-t-on text-[17px] py-[18px] rounded-[20px] mb-3 active:scale-[.98] transition-transform"
         >
           {t('spesa.removeCartConfirm')}
         </button>
         <button
           onClick={() => setPendingCartRemove(null)}
-          className="w-full bg-[#F2F2F0] text-[#2A2A2C] text-[17px] py-[18px] rounded-[20px] active:scale-[.98] transition-transform"
+          className="w-full bg-t-bg text-t-fg text-[17px] py-[18px] rounded-[20px] active:scale-[.98] transition-transform"
         >
           {t('common.cancel')}
         </button>
@@ -683,19 +683,19 @@ function StorePickerSheet({ open, onClose, supermarkets, currentId, onPick }: St
 
   return (
     <BottomSheet open={open} onClose={onClose} hasInput={showAdd}>
-      <div className="text-[20px] font-normal text-[#2A2A2C] px-0.5 pb-[14px]">{t('spesa.chooseStore')}</div>
+      <div className="text-[20px] font-normal text-t-fg px-0.5 pb-[14px]">{t('spesa.chooseStore')}</div>
       <div className="flex flex-col gap-0.5 pb-2">
         {supermarkets.map((s) => (
           <button
             key={s.id}
             onClick={() => s.id !== undefined && onPick(s.id)}
-            className="flex items-center justify-between px-1.5 py-[15px] border-b border-[#ECECEC] active:opacity-50 text-left"
+            className="flex items-center justify-between px-1.5 py-[15px] border-b border-t-line active:opacity-50 text-left"
           >
-            <span className={`text-[17px] text-[#2A2A2C] ${s.id === currentId ? 'font-semibold' : 'font-normal'}`}>
+            <span className={`text-[17px] text-t-fg ${s.id === currentId ? 'font-semibold' : 'font-normal'}`}>
               {s.name}
             </span>
             {s.id === currentId && (
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2A2A2C" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--t-fg)" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M5 12l4 4 10-10" />
               </svg>
             )}
@@ -709,7 +709,7 @@ function StorePickerSheet({ open, onClose, supermarkets, currentId, onPick }: St
             onChange={(e) => setNewName(e.target.value)}
             placeholder={t('spesa.storeNamePlaceholder')}
             autoFocus
-            className="w-full border-b border-[#ECECEC] outline-none bg-transparent px-0.5 py-3 text-[18px] text-[#2A2A2C] mb-3"
+            className="w-full border-b border-t-line outline-none bg-transparent px-0.5 py-3 text-[18px] text-t-fg mb-3"
           />
           <button
             onClick={async () => {
@@ -723,7 +723,7 @@ function StorePickerSheet({ open, onClose, supermarkets, currentId, onPick }: St
               setNewName('')
               setShowAdd(false)
             }}
-            className="w-full bg-[#2A2A2C] text-white py-[15px] rounded-2xl text-[16px] active:scale-[.98] transition-transform"
+            className="w-full bg-t-accent text-t-on py-[15px] rounded-2xl text-[16px] active:scale-[.98] transition-transform"
           >
             {t('spesa.addAndSelect')}
           </button>
@@ -731,7 +731,7 @@ function StorePickerSheet({ open, onClose, supermarkets, currentId, onPick }: St
       ) : (
         <button
           onClick={() => setShowAdd(true)}
-          className="mt-2 w-full border border-[#E0E0DE] bg-white text-[#2A2A2C] text-[16px] py-[15px] rounded-2xl active:bg-[#F6F6F4]"
+          className="mt-2 w-full border border-t-line6 bg-t-surface text-t-fg text-[16px] py-[15px] rounded-2xl active:bg-t-surface2"
         >
           {t('spesa.addStore')}
         </button>

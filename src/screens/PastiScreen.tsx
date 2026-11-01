@@ -277,75 +277,75 @@ export function PastiScreen() {
         {/* Header — sezione principale accanto alla Lista */}
         <div className="flex items-center justify-between px-1 pt-2 pb-[18px]">
           <SectionTitle active="pasti" />
-          <Link to="/pasti/storico" className="text-[15px] text-[#9B9B9F] px-1 active:opacity-50">
+          <Link to="/pasti/storico" className="text-[15px] text-t-muted px-1 active:opacity-50">
             {t('pianificazioni.link')}
           </Link>
         </div>
 
         {/* Selettore settimana */}
-        <div className="flex items-center justify-between bg-white rounded-[18px] px-2 py-2 mb-[14px]">
+        <div className="flex items-center justify-between bg-t-surface rounded-[18px] px-2 py-2 mb-[14px]">
           <button
             onClick={() => goToWeek(-1)}
             aria-label={t('pasti.prevWeek')}
             className="w-9 h-9 flex items-center justify-center active:opacity-50"
           >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2A2A2C" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--t-fg)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M15 5l-7 7 7 7" />
             </svg>
           </button>
-          <span className="text-[15px] text-[#2A2A2C] tabular-nums">{formatWeekLabel(week)}</span>
+          <span className="text-[15px] text-t-fg tabular-nums">{formatWeekLabel(week)}</span>
           <button
             onClick={() => goToWeek(1)}
             aria-label={t('pasti.nextWeek')}
             className="w-9 h-9 flex items-center justify-center active:opacity-50"
           >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2A2A2C" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--t-fg)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M9 6l6 6-6 6" />
             </svg>
           </button>
         </div>
 
         {/* Buoni disponibili questa settimana (opzionale) */}
-        <div className="flex items-center justify-between bg-white rounded-[18px] px-4 py-[14px] mb-[14px]">
-          <span className="text-base text-[#2A2A2C]">{t('pasti.buoniAvailable')}</span>
+        <div className="flex items-center justify-between bg-t-surface rounded-[18px] px-4 py-[14px] mb-[14px]">
+          <span className="text-base text-t-fg">{t('pasti.buoniAvailable')}</span>
           <div className="flex items-center gap-4">
             <button
               onClick={() => setBuoni.mutate(Math.max(0, buoniAvailable - 1))}
               aria-label="-"
-              className="w-8 h-8 rounded-full bg-[#F2F2F0] flex items-center justify-center active:opacity-50"
+              className="w-8 h-8 rounded-full bg-t-bg flex items-center justify-center active:opacity-50"
             >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2A2A2C" strokeWidth="2.4" strokeLinecap="round">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--t-fg)" strokeWidth="2.4" strokeLinecap="round">
                 <path d="M5 12h14" />
               </svg>
             </button>
-            <span className="text-[18px] font-normal text-[#2A2A2C] min-w-[20px] text-center tabular-nums">
+            <span className="text-[18px] font-normal text-t-fg min-w-[20px] text-center tabular-nums">
               {buoniAvailable}
             </span>
             <button
               onClick={() => setBuoni.mutate(buoniAvailable + 1)}
               aria-label="+"
-              className="w-8 h-8 rounded-full bg-[#F2F2F0] flex items-center justify-center active:opacity-50"
+              className="w-8 h-8 rounded-full bg-t-bg flex items-center justify-center active:opacity-50"
             >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2A2A2C" strokeWidth="2.4" strokeLinecap="round">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--t-fg)" strokeWidth="2.4" strokeLinecap="round">
                 <path d="M12 5v14M5 12h14" />
               </svg>
             </button>
           </div>
         </div>
 
-        <p className="text-sm text-[#9B9B9F] leading-relaxed mx-1 mb-[18px]">
+        <p className="text-sm text-t-muted leading-relaxed mx-1 mb-[18px]">
           {t('pasti.intro')}
         </p>
 
-        <div className="bg-white rounded-[22px] overflow-hidden">
+        <div className="bg-t-surface rounded-[22px] overflow-hidden">
           {days.map((day, i) => (
             <div
               key={`${week}-${day.dayIndex}`}
-              className="border-b border-[#ECECEC] last:border-0"
+              className="border-b border-t-line last:border-0"
             >
               {/* Day label row */}
               <div className="flex items-center px-[18px] pt-3 pb-0">
-                <span className="w-[42px] flex-none text-[13px] font-normal text-[#2A2A2C] tracking-[.2px]">
+                <span className="w-[42px] flex-none text-[13px] font-normal text-t-fg tracking-[.2px]">
                   {dayShort(day.dayIndex).toUpperCase()}
                 </span>
               </div>
@@ -369,13 +369,13 @@ export function PastiScreen() {
 
         <button
           onClick={handleGenerate}
-          className="w-full mt-4 bg-[#2A2A2C] text-white text-[17px] font-normal py-[18px] rounded-[22px] active:scale-[.98] transition-transform"
+          className="w-full mt-4 bg-t-accent text-t-on text-[17px] font-normal py-[18px] rounded-[22px] active:scale-[.98] transition-transform"
         >
           {t('pasti.goToList')}
         </button>
         <button
           onClick={handleImportAndGenerate}
-          className="w-full mt-2.5 bg-white text-[#2A2A2C] text-[17px] font-normal py-[18px] rounded-[22px] active:scale-[.98] transition-transform"
+          className="w-full mt-2.5 bg-t-surface text-t-fg text-[17px] font-normal py-[18px] rounded-[22px] active:scale-[.98] transition-transform"
         >
           {t('pasti.importAndGoToList')}
         </button>
@@ -383,18 +383,18 @@ export function PastiScreen() {
 
       {/* Sheet: in quale lista importare gli ingredienti */}
       <BottomSheet open={importPick !== null} onClose={() => setImportPick(null)}>
-        <div className="text-[20px] font-normal text-[#2A2A2C] px-0.5 pb-4">{t('pasti.chooseList')}</div>
-        <div className="bg-[#F6F6F4] rounded-[18px] overflow-hidden mb-5">
+        <div className="text-[20px] font-normal text-t-fg px-0.5 pb-4">{t('pasti.chooseList')}</div>
+        <div className="bg-t-surface2 rounded-[18px] overflow-hidden mb-5">
           {activeLists(lists).map((l, i, arr) => (
             <button
               key={l.id}
               onClick={() => setImportPick(l.id as number)}
-              className="w-full flex items-center justify-between px-[18px] py-[14px] text-left active:bg-[#ECECEC]"
-              style={{ borderBottom: i < arr.length - 1 ? '1px solid #E6E6E2' : 'none' }}
+              className="w-full flex items-center justify-between px-[18px] py-[14px] text-left active:bg-t-line"
+              style={{ borderBottom: i < arr.length - 1 ? '1px solid var(--t-line3)' : 'none' }}
             >
-              <span className="text-[16px] text-[#2A2A2C]">{l.name}</span>
+              <span className="text-[16px] text-t-fg">{l.name}</span>
               {l.id === importPick && (
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2A2A2C" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--t-fg)" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M5 12l4 4 10-10" />
                 </svg>
               )}
@@ -403,7 +403,7 @@ export function PastiScreen() {
         </div>
         <button
           onClick={() => importTarget && importInto(importTarget)}
-          className="w-full bg-[#2A2A2C] text-white text-[17px] py-[18px] rounded-[20px] active:scale-[.98] transition-transform"
+          className="w-full bg-t-accent text-t-on text-[17px] py-[18px] rounded-[20px] active:scale-[.98] transition-transform"
         >
           {t('pasti.addToList', { name: importTarget?.name })}
         </button>
@@ -417,16 +417,16 @@ export function PastiScreen() {
       >
         {slotState && (
           <>
-            <div className="text-[12px] font-normal tracking-[1.4px] text-[#9B9B9F] uppercase px-0.5 pb-[6px]">
+            <div className="text-[12px] font-normal tracking-[1.4px] text-t-muted uppercase px-0.5 pb-[6px]">
               {dayFull(slotState.dayIndex)} · {t(slotState.mealType === 0 ? 'pasti.lunch' : 'pasti.dinner')}
             </div>
 
             {slotState.dishId !== undefined ? (
               <div className="flex items-center justify-between gap-3 mb-4">
-                <span className="text-[20px] font-normal text-[#2A2A2C] truncate">{slotState.nameInput}</span>
+                <span className="text-[20px] font-normal text-t-fg truncate">{slotState.nameInput}</span>
                 <button
                   onClick={handleChangeDish}
-                  className="flex-none text-[13px] text-[#9B9B9F] px-2 py-1 active:opacity-60"
+                  className="flex-none text-[13px] text-t-muted px-2 py-1 active:opacity-60"
                 >
                   {t('pasti.changeDish')}
                 </button>
@@ -439,15 +439,15 @@ export function PastiScreen() {
                   placeholder={t('piatti.namePlaceholder')}
                   data-autofocus
                   disabled={slotState.isNewDish}
-                  className="w-full border-0 border-b border-[#ECECEC] outline-none bg-transparent px-0.5 py-3 text-[18px] text-[#2A2A2C] mb-2 disabled:opacity-60"
+                  className="w-full border-0 border-b border-t-line outline-none bg-transparent px-0.5 py-3 text-[18px] text-t-fg mb-2 disabled:opacity-60"
                 />
                 {!slotState.isNewDish && dishQuery && (
-                  <div className="bg-[#F6F6F4] rounded-[14px] overflow-hidden mb-4 divide-y divide-[#ECECEC]">
+                  <div className="bg-t-surface2 rounded-[14px] overflow-hidden mb-4 divide-y divide-t-line">
                     {dishMatches.map((d) => (
                       <button
                         key={d.id}
                         onClick={() => d.id !== undefined && selectExistingDish(d.id, d.name)}
-                        className="w-full text-left px-4 py-[11px] text-[14px] text-[#2A2A2C] active:bg-[#ECECEC]"
+                        className="w-full text-left px-4 py-[11px] text-[14px] text-t-fg active:bg-t-line"
                       >
                         {d.name}
                       </button>
@@ -455,7 +455,7 @@ export function PastiScreen() {
                     {!dishExactMatch && (
                       <button
                         onClick={handleCreateNewDish}
-                        className="w-full text-left px-4 py-[11px] text-[14px] text-[#2A2A2C] active:bg-[#ECECEC]"
+                        className="w-full text-left px-4 py-[11px] text-[14px] text-t-fg active:bg-t-line"
                       >
                         {t('pasti.createDish', { name: slotState.nameInput.trim() })}
                       </button>
@@ -467,25 +467,25 @@ export function PastiScreen() {
 
             {(slotState.dishId !== undefined || slotState.isNewDish) && (
               <>
-                <div className="text-[11px] font-normal tracking-[1.2px] text-[#9B9B9F] uppercase px-0.5 pb-2">
+                <div className="text-[11px] font-normal tracking-[1.2px] text-t-muted uppercase px-0.5 pb-2">
                   {t('piatti.ingredientsSection')}
                 </div>
 
                 {slotState.dishId !== undefined ? (
                   slotState.ingredients.length === 0 ? (
-                    <div className="text-[13px] text-[#9B9B9F] mb-3">{t('piatti.noIngredients')}</div>
+                    <div className="text-[13px] text-t-muted mb-3">{t('piatti.noIngredients')}</div>
                   ) : (
-                    <div className="bg-[#F6F6F4] rounded-[16px] overflow-hidden mb-4">
+                    <div className="bg-t-surface2 rounded-[16px] overflow-hidden mb-4">
                       {slotState.ingredients.map((ing, idx) => (
                         <button
                           key={ing.id}
                           onClick={() => toggleIngredient(ing.id)}
                           className="w-full flex items-center justify-between px-4 py-[13px] text-left active:opacity-70"
                           style={{
-                            borderBottom: idx < slotState.ingredients.length - 1 ? '1px solid #E6E6E2' : 'none',
+                            borderBottom: idx < slotState.ingredients.length - 1 ? '1px solid var(--t-line3)' : 'none',
                           }}
                         >
-                          <span className="text-[15px] text-[#2A2A2C]">{ing.name}</span>
+                          <span className="text-[15px] text-t-fg">{ing.name}</span>
                           <CheckboxIcon checked={ing.checked} />
                         </button>
                       ))}
@@ -499,7 +499,7 @@ export function PastiScreen() {
                           <button
                             key={ing.id}
                             onClick={() => handleRemoveIngredient(ing.id)}
-                            className="flex items-center gap-1.5 px-3 py-[7px] bg-[#F2F2F0] rounded-full text-[13px] text-[#2A2A2C] active:bg-[#E6E6E4]"
+                            className="flex items-center gap-1.5 px-3 py-[7px] bg-t-bg rounded-full text-[13px] text-t-fg active:bg-t-line4"
                           >
                             {ing.name}
                             <CloseIcon />
@@ -512,15 +512,15 @@ export function PastiScreen() {
                       onChange={(e) => setIngredientInput(e.target.value)}
                       onKeyDown={(e) => e.key === 'Enter' && handleAddIngredient()}
                       placeholder={t('piatti.ingredientsPlaceholder')}
-                      className="w-full border-0 border-b border-[#ECECEC] outline-none bg-transparent px-0.5 py-3 text-[15px] text-[#2A2A2C] mb-2"
+                      className="w-full border-0 border-b border-t-line outline-none bg-transparent px-0.5 py-3 text-[15px] text-t-fg mb-2"
                     />
                     {ingredientInput.trim() && (
-                      <div className="bg-[#F6F6F4] rounded-[14px] overflow-hidden mb-4 divide-y divide-[#ECECEC]">
+                      <div className="bg-t-surface2 rounded-[14px] overflow-hidden mb-4 divide-y divide-t-line">
                         {ingredientMatches.map((p) => (
                           <button
                             key={p.name}
                             onClick={() => handleAddIngredient(p.name, p.categoryId)}
-                            className="w-full text-left px-4 py-[11px] text-[14px] text-[#2A2A2C] active:bg-[#ECECEC]"
+                            className="w-full text-left px-4 py-[11px] text-[14px] text-t-fg active:bg-t-line"
                           >
                             {p.name}
                           </button>
@@ -528,7 +528,7 @@ export function PastiScreen() {
                         {!ingredientExactInPool && (
                           <button
                             onClick={() => handleAddIngredient()}
-                            className="w-full text-left px-4 py-[11px] text-[14px] text-[#2A2A2C] active:bg-[#ECECEC]"
+                            className="w-full text-left px-4 py-[11px] text-[14px] text-t-fg active:bg-t-line"
                           >
                             {t('piatti.addNamed', { name: ingredientInput.trim() })}
                           </button>
@@ -546,7 +546,7 @@ export function PastiScreen() {
               <button
                 onClick={handleSaveSlot}
                 disabled={!canSave}
-                className="w-full bg-[#2A2A2C] text-white text-[17px] py-[18px] rounded-[20px] active:scale-[.98] transition-transform disabled:opacity-40 mb-3"
+                className="w-full bg-t-accent text-t-on text-[17px] py-[18px] rounded-[20px] active:scale-[.98] transition-transform disabled:opacity-40 mb-3"
               >
                 {t('common.save')}
               </button>
@@ -554,7 +554,7 @@ export function PastiScreen() {
             {slotState.hadExisting && (
               <button
                 onClick={handleRemoveSlot}
-                className="w-full bg-[#F2F2F0] text-[#D14343] text-[17px] py-[18px] rounded-[20px] active:scale-[.98] transition-transform"
+                className="w-full bg-t-bg text-t-danger text-[17px] py-[18px] rounded-[20px] active:scale-[.98] transition-transform"
               >
                 {t('pasti.removeDish')}
               </button>
@@ -581,10 +581,10 @@ function MealSlotRow({
     <button
       onClick={onClick}
       className="w-full flex items-center gap-3 px-[18px] text-left"
-      style={{ borderBottom: borderBottom ? '1px solid #ECECEC' : 'none' }}
+      style={{ borderBottom: borderBottom ? '1px solid var(--t-line)' : 'none' }}
     >
-      <span className="w-[42px] flex-none text-[12px] text-[#9B9B9F]">{label}</span>
-      <span className={`flex-1 py-4 text-base truncate ${value ? 'text-[#2A2A2C]' : 'text-[#D0D0D4]'}`}>
+      <span className="w-[42px] flex-none text-[12px] text-t-muted">{label}</span>
+      <span className={`flex-1 py-4 text-base truncate ${value ? 'text-t-fg' : 'text-t-faint2'}`}>
         {value || '—'}
       </span>
     </button>
@@ -594,14 +594,14 @@ function MealSlotRow({
 function CheckboxIcon({ checked }: { checked: boolean }) {
   if (checked) {
     return (
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2A2A2C" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
-        <rect x="3" y="3" width="18" height="18" rx="5" fill="#2A2A2C" stroke="none" />
-        <path d="M7 12.5l3 3 7-7" stroke="#fff" />
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--t-fg)" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+        <rect x="3" y="3" width="18" height="18" rx="5" fill="var(--t-fg)" stroke="none" />
+        <path d="M7 12.5l3 3 7-7" stroke="var(--t-on)" />
       </svg>
     )
   }
   return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#D0D0D4" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--t-faint2)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <rect x="3" y="3" width="18" height="18" rx="5" />
     </svg>
   )
@@ -609,7 +609,7 @@ function CheckboxIcon({ checked }: { checked: boolean }) {
 
 function CloseIcon() {
   return (
-    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#9B9B9F" strokeWidth="2.4" strokeLinecap="round">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--t-muted)" strokeWidth="2.4" strokeLinecap="round">
       <path d="M6 6l12 12M18 6L6 18" />
     </svg>
   )

@@ -73,7 +73,7 @@ export function NewShoppingButton({ compact = false }: { compact?: boolean }) {
     void navigate({ to: '/spesa', search: { buoni: newBuoni, val: newVal, list: listId } })
   }
 
-  const muted = { fontSize: '12px', color: '#9B9B9F' } as const
+  const muted = { fontSize: '12px', color: 'var(--t-muted)' } as const
 
   return (
     <div style={{ padding: compact ? '16px 10px 4px' : '16px 12px 4px' }}>
@@ -85,8 +85,8 @@ export function NewShoppingButton({ compact = false }: { compact?: boolean }) {
           width: '100%',
           border: 'none',
           borderRadius: '12px',
-          background: '#2A2A2C',
-          color: '#fff',
+          background: 'var(--t-accent)',
+          color: 'var(--t-on)',
           padding: compact ? '12px 0' : '12px 14px',
           fontSize: '14px',
           fontWeight: 500,
@@ -107,8 +107,8 @@ export function NewShoppingButton({ compact = false }: { compact?: boolean }) {
       </button>
       {!compact && (
         <div style={{ padding: '12px 4px 0' }}>
-          <div style={{ display: 'flex', alignItems: 'baseline', color: '#2A2A2C' }}>
-            <span style={{ fontSize: '14px', color: '#B5B5BA', marginRight: '2px' }}>€</span>
+          <div style={{ display: 'flex', alignItems: 'baseline', color: 'var(--t-fg)' }}>
+            <span style={{ fontSize: '14px', color: 'var(--t-faint)', marginRight: '2px' }}>€</span>
             <span style={{ fontSize: '22px', fontVariantNumeric: 'tabular-nums' }}>{formatCentsPlain(summary.outOfPocketCents)}</span>
           </div>
           <div style={muted}>{t('home.outOfPocket')}</div>
@@ -122,7 +122,7 @@ export function NewShoppingButton({ compact = false }: { compact?: boolean }) {
         <div style={{ ...muted, letterSpacing: '0.5px', textTransform: 'uppercase', marginBottom: '10px' }}>
           {t('budget.thisWeek')} · {formatWeekLabelWithYear(isoWeek)}
         </div>
-        <div style={{ background: '#2A2A2C', borderRadius: '16px', padding: '16px 20px', marginBottom: '8px', color: '#fff' }}>
+        <div style={{ background: 'var(--t-accent)', borderRadius: '16px', padding: '16px 20px', marginBottom: '8px', color: 'var(--t-on)' }}>
           <div style={{ fontSize: '11px', letterSpacing: '1.2px', textTransform: 'uppercase', opacity: 0.55 }}>
             {t('home.outOfPocket')}
           </div>
@@ -153,7 +153,7 @@ export function NewShoppingButton({ compact = false }: { compact?: boolean }) {
         />
         <button
           onClick={() => void startShopping()}
-          style={{ width: '100%', border: 'none', borderRadius: '12px', background: '#2A2A2C', color: '#fff', padding: '14px', fontSize: '15px', cursor: 'pointer' }}
+          style={{ width: '100%', border: 'none', borderRadius: '12px', background: 'var(--t-accent)', color: 'var(--t-on)', padding: '14px', fontSize: '15px', cursor: 'pointer' }}
         >
           {t('nav.startShopping')}
         </button>

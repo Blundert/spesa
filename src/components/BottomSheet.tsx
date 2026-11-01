@@ -86,10 +86,10 @@ export function BottomSheet({
         </Drawer.Overlay>
         <Drawer.Content
           style={contentStyle}
-          className="fixed bottom-0 z-[90] bg-white rounded-t-[30px] pt-[10px] shadow-[0_-12px_44px_rgba(0,0,0,.16)] outline-none w-full max-w-[430px] left-1/2 -translate-x-1/2 flex flex-col"
+          className="fixed bottom-0 z-[90] bg-t-surface rounded-t-[30px] pt-[10px] shadow-[0_-12px_44px_rgba(0,0,0,.16)] outline-none w-full max-w-[430px] left-1/2 -translate-x-1/2 flex flex-col"
         >
           {showHandle && (
-            <Drawer.Handle className="w-[38px] h-[5px] rounded-full bg-[#D8D8D6] mx-auto mb-4 shrink-0" />
+            <Drawer.Handle className="w-[38px] h-[5px] rounded-full bg-t-line2 mx-auto mb-4 shrink-0" />
           )}
           <div
             ref={scrollRef}

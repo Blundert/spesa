@@ -143,12 +143,12 @@ export function PriceKeypad({
         <Drawer.Overlay className="fixed inset-0 z-[80] overflow-hidden">
           <div className="absolute inset-y-0 -inset-x-3 bg-black/32 rounded-t-[42px]" />
         </Drawer.Overlay>
-        <Drawer.Content className="fixed bottom-0 z-[90] w-full max-w-[430px] left-1/2 -translate-x-1/2 bg-white rounded-t-[30px] px-[22px] pb-[calc(22px+env(safe-area-inset-bottom))] pt-[10px] shadow-[0_-12px_44px_rgba(0,0,0,.16)] outline-none">
-          <Drawer.Handle className="w-[38px] h-[5px] rounded-full bg-[#D8D8D6] mx-auto mb-4" />
+        <Drawer.Content className="fixed bottom-0 z-[90] w-full max-w-[430px] left-1/2 -translate-x-1/2 bg-t-surface rounded-t-[30px] px-[22px] pb-[calc(22px+env(safe-area-inset-bottom))] pt-[10px] shadow-[0_-12px_44px_rgba(0,0,0,.16)] outline-none">
+          <Drawer.Handle className="w-[38px] h-[5px] rounded-full bg-t-line2 mx-auto mb-4" />
 
           {/* Modalità + nome */}
           <div className="relative flex items-center justify-center min-h-[30px] mb-[6px]">
-            <div className="absolute left-0 flex bg-[#F2F2F0] rounded-full p-[3px]" role="group">
+            <div className="absolute left-0 flex bg-t-bg rounded-full p-[3px]" role="group">
               <ModeButton active={mode === 'simple'} label={t('keypad.simple')} onTap={() => switchMode('simple')}>
                 123
               </ModeButton>
@@ -156,19 +156,19 @@ export function PriceKeypad({
                 ±×÷
               </ModeButton>
             </div>
-            <div className="text-sm text-[#9B9B9F] px-[100px] truncate">{label}</div>
+            <div className="text-sm text-t-muted px-[100px] truncate">{label}</div>
           </div>
 
           {/* Display */}
           <div className="text-center pb-[18px]">
             {/* Espressione (solo calcolatrice; la riga c'è sempre così l'altezza non cambia) */}
             <div
-              className={`min-h-[22px] whitespace-nowrap overflow-hidden text-[#9B9B9F] tracking-[.2px] ${expr.length > 22 ? 'text-[14px]' : 'text-[17px]'}`}
+              className={`min-h-[22px] whitespace-nowrap overflow-hidden text-t-muted tracking-[.2px] ${expr.length > 22 ? 'text-[14px]' : 'text-[17px]'}`}
             >
               {mode === 'calc' ? formatExpr(expr) : ''}
             </div>
-            <div className={`flex items-baseline justify-center ${valid ? 'text-[#2A2A2C]' : 'text-[#B5B5BA]'}`}>
-              <span className="text-[30px] font-normal text-[#B5B5BA] mr-1">€</span>
+            <div className={`flex items-baseline justify-center ${valid ? 'text-t-fg' : 'text-t-faint'}`}>
+              <span className="text-[30px] font-normal text-t-faint mr-1">€</span>
               <span className="text-[62px] font-light leading-[.95] tabular-nums tracking-[-1.5px]">
                 {formatCentsPlain(shownCents)}
               </span>
@@ -178,27 +178,27 @@ export function PriceKeypad({
 
           {/* Quantità */}
           {showQuantity && (
-            <div className="flex items-center justify-between bg-[#F2F2F0] rounded-2xl px-4 py-3 mb-[14px]">
-              <span className="text-base text-[#2A2A2C]">{t('common.quantity')}</span>
+            <div className="flex items-center justify-between bg-t-bg rounded-2xl px-4 py-3 mb-[14px]">
+              <span className="text-base text-t-fg">{t('common.quantity')}</span>
               <div className="flex items-center gap-4">
                 <button
                   onClick={() => setQuantity((q) => Math.max(1, q - 1))}
                   aria-label="-"
-                  className="w-8 h-8 rounded-full bg-white flex items-center justify-center shadow-[0_1px_3px_rgba(0,0,0,.08)] active:opacity-50"
+                  className="w-8 h-8 rounded-full bg-t-surface flex items-center justify-center shadow-[0_1px_3px_rgba(0,0,0,.08)] active:opacity-50"
                 >
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2A2A2C" strokeWidth="2.4" strokeLinecap="round">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--t-fg)" strokeWidth="2.4" strokeLinecap="round">
                     <path d="M5 12h14" />
                   </svg>
                 </button>
-                <span className="text-[18px] font-normal text-[#2A2A2C] min-w-[20px] text-center tabular-nums">
+                <span className="text-[18px] font-normal text-t-fg min-w-[20px] text-center tabular-nums">
                   {quantity}
                 </span>
                 <button
                   onClick={() => setQuantity((q) => q + 1)}
                   aria-label="+"
-                  className="w-8 h-8 rounded-full bg-white flex items-center justify-center shadow-[0_1px_3px_rgba(0,0,0,.08)] active:opacity-50"
+                  className="w-8 h-8 rounded-full bg-t-surface flex items-center justify-center shadow-[0_1px_3px_rgba(0,0,0,.08)] active:opacity-50"
                 >
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2A2A2C" strokeWidth="2.4" strokeLinecap="round">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--t-fg)" strokeWidth="2.4" strokeLinecap="round">
                     <path d="M12 5v14M5 12h14" />
                   </svg>
                 </button>
@@ -213,7 +213,7 @@ export function PriceKeypad({
                 <button
                   key={k.label}
                   onClick={k.onTap}
-                  className="h-14 flex items-center justify-center bg-[#F2F2F0] rounded-2xl text-2xl font-normal text-[#2A2A2C] active:bg-[#E6E6E4] transition-colors select-none"
+                  className="h-14 flex items-center justify-center bg-t-bg rounded-2xl text-2xl font-normal text-t-fg active:bg-t-line4 transition-colors select-none"
                 >
                   {k.label}
                 </button>
@@ -227,8 +227,8 @@ export function PriceKeypad({
                   onClick={k.onTap}
                   aria-label={k.aria}
                   className={`h-14 flex items-center justify-center rounded-2xl text-2xl font-normal transition-colors select-none ${
-                    k.op ? 'bg-[#E6E6E4] active:bg-[#D8D8D6]' : 'bg-[#F2F2F0] active:bg-[#E6E6E4]'
-                  } ${k.danger ? 'text-[#D14343]' : 'text-[#2A2A2C]'}`}
+                    k.op ? 'bg-t-line4 active:bg-t-line2' : 'bg-t-bg active:bg-t-line4'
+                  } ${k.danger ? 'text-t-danger' : 'text-t-fg'}`}
                 >
                   {k.label}
                 </button>
@@ -242,7 +242,7 @@ export function PriceKeypad({
                 secondaryAction.onTap()
                 onClose()
               }}
-              className="w-full bg-[#F2F2F0] text-[#2A2A2C] text-[15px] font-normal py-[14px] rounded-[20px] mb-[10px] active:scale-[.98] transition-transform"
+              className="w-full bg-t-bg text-t-fg text-[15px] font-normal py-[14px] rounded-[20px] mb-[10px] active:scale-[.98] transition-transform"
             >
               {secondaryAction.label}
             </button>
@@ -255,7 +255,7 @@ export function PriceKeypad({
               onClose()
             }}
             disabled={!valid}
-            className="w-full bg-[#2A2A2C] text-white text-[17px] font-normal py-[18px] rounded-[20px] active:scale-[.98] transition-transform disabled:opacity-40 disabled:active:scale-100"
+            className="w-full bg-t-accent text-t-on text-[17px] font-normal py-[18px] rounded-[20px] active:scale-[.98] transition-transform disabled:opacity-40 disabled:active:scale-100"
           >
             {confirmText} €{formatCentsPlain(shownCents)}
             {quantity > 1 ? ` ×${quantity}` : ''}
@@ -283,7 +283,7 @@ function ModeButton({
       aria-label={label}
       aria-pressed={active}
       className={`text-[13px] px-[11px] py-[5px] rounded-full transition-colors ${
-        active ? 'bg-white text-[#2A2A2C] shadow-[0_1px_3px_rgba(0,0,0,.08)]' : 'text-[#9B9B9F]'
+        active ? 'bg-t-surface text-t-fg shadow-[0_1px_3px_rgba(0,0,0,.08)]' : 'text-t-muted'
       }`}
     >
       {children}
@@ -306,21 +306,21 @@ function PriceCompareRow({
   const { t } = useTranslation()
   if (lastPriceCents === undefined || cents === 0) return null
   if (lastPriceCents === null) {
-    return <div className="text-[13px] text-[#9B9B9F] mt-2">{t('spesa.priceFirstBuy')}</div>
+    return <div className="text-[13px] text-t-muted mt-2">{t('spesa.priceFirstBuy')}</div>
   }
   const diff = cents - lastPriceCents
   if (diff === 0) {
-    return <div className="text-[13px] text-[#9B9B9F] mt-2">{t('spesa.priceSame')}</div>
+    return <div className="text-[13px] text-t-muted mt-2">{t('spesa.priceSame')}</div>
   }
   if (diff > 0) {
     return (
-      <div className="text-[13px] mt-2" style={{ color: '#D14343' }}>
+      <div className="text-[13px] mt-2" style={{ color: 'var(--t-danger)' }}>
         {t('spesa.priceHigher', { diff: formatCentsPlain(diff), last: formatCentsPlain(lastPriceCents) })}
       </div>
     )
   }
   return (
-    <div className="text-[13px] mt-2" style={{ color: '#2E9E6B' }}>
+    <div className="text-[13px] mt-2" style={{ color: 'var(--t-good2)' }}>
       {t('spesa.priceLower', { diff: formatCentsPlain(-diff), last: formatCentsPlain(lastPriceCents) })}
     </div>
   )

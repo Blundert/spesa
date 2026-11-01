@@ -60,26 +60,26 @@ export function ItemDetailScreen() {
         {/* Header */}
         <div className="flex items-center gap-2 pt-2 pb-4">
           <BackButton fallback="/" />
-          <span className="text-[24px] font-normal tracking-[-0.5px] text-[#2A2A2C]">
+          <span className="text-[24px] font-normal tracking-[-0.5px] text-t-fg">
             {item?.name ?? '…'}
           </span>
         </div>
 
         {/* Price stats card */}
-        <div className="bg-white rounded-[22px] px-[22px] pt-[22px] pb-2 mb-[14px]">
+        <div className="bg-t-surface rounded-[22px] px-[22px] pt-[22px] pb-2 mb-[14px]">
           <div className="flex items-end justify-between">
             <div>
-              <div className="text-[12px] font-normal tracking-[1px] text-[#9B9B9F] uppercase">{t('item.avgPrice')}</div>
-              <div className="flex items-baseline text-[#2A2A2C] mt-1.5">
-                <span className="text-[26px] font-normal text-[#B5B5BA] mr-0.5">€</span>
+              <div className="text-[12px] font-normal tracking-[1px] text-t-muted uppercase">{t('item.avgPrice')}</div>
+              <div className="flex items-baseline text-t-fg mt-1.5">
+                <span className="text-[26px] font-normal text-t-faint mr-0.5">€</span>
                 <span className="text-[52px] font-light tracking-[-1px] leading-[.95] tabular-nums">
                   {stats ? formatCentsPlain(stats.avgCents) : '—'}
                 </span>
               </div>
             </div>
             <div className="text-right pb-1.5">
-              <div className="text-[13px] text-[#9B9B9F]">{t('item.last')}</div>
-              <div className="text-[18px] font-normal text-[#2A2A2C] tabular-nums">
+              <div className="text-[13px] text-t-muted">{t('item.last')}</div>
+              <div className="text-[18px] font-normal text-t-fg tabular-nums">
                 {stats ? `€${formatCentsPlain(stats.lastCents)}` : '—'}
               </div>
             </div>
@@ -88,9 +88,9 @@ export function ItemDetailScreen() {
           {/* Sparkline */}
           {stats && stats.history.length > 1 && (
             <svg viewBox="0 0 300 86" preserveAspectRatio="none" className="w-full mt-[14px] mb-2 overflow-visible" style={{ height: 86 }}>
-              <polyline points={sparkPoints} fill="none" stroke="#2A2A2C" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-              <circle cx={lastPt.x} cy={lastPt.y} r="4" fill="#2A2A2C" />
-              <circle cx={lastPt.x} cy={lastPt.y} r="8" fill="#2A2A2C" fillOpacity="0.12" />
+              <polyline points={sparkPoints} fill="none" stroke="var(--t-fg)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              <circle cx={lastPt.x} cy={lastPt.y} r="4" fill="var(--t-fg)" />
+              <circle cx={lastPt.x} cy={lastPt.y} r="8" fill="var(--t-fg)" fillOpacity="0.12" />
             </svg>
           )}
         </div>
@@ -102,9 +102,9 @@ export function ItemDetailScreen() {
             { label: t('item.max'), value: stats ? `€${formatCentsPlain(stats.maxCents)}` : '—' },
             { label: t('item.buys'), value: String(stats?.buyCount ?? 0) },
           ].map((s) => (
-            <div key={s.label} className="flex-1 bg-white rounded-2xl p-[14px] text-center">
-              <div className="text-[11px] text-[#9B9B9F] tracking-[.4px]">{s.label}</div>
-              <div className="text-[19px] font-normal text-[#2A2A2C] mt-0.5 tabular-nums">{s.value}</div>
+            <div key={s.label} className="flex-1 bg-t-surface rounded-2xl p-[14px] text-center">
+              <div className="text-[11px] text-t-muted tracking-[.4px]">{s.label}</div>
+              <div className="text-[19px] font-normal text-t-fg mt-0.5 tabular-nums">{s.value}</div>
             </div>
           ))}
         </div>
@@ -112,23 +112,23 @@ export function ItemDetailScreen() {
         {/* Per store */}
         {byStore.length > 0 && (
           <>
-            <div className="text-[12px] font-normal tracking-[1.2px] text-[#9B9B9F] uppercase px-1 pt-2 pb-2">{t('item.byStore')}</div>
-            <div className="bg-white rounded-[20px] overflow-hidden mb-[14px]">
+            <div className="text-[12px] font-normal tracking-[1.2px] text-t-muted uppercase px-1 pt-2 pb-2">{t('item.byStore')}</div>
+            <div className="bg-t-surface rounded-[20px] overflow-hidden mb-[14px]">
               {byStore.map((s, i) => (
                 <div
                   key={s.supermarketId}
                   className="px-[18px] py-4"
-                  style={{ borderBottom: i < byStore.length - 1 ? '1px solid #ECECEC' : 'none' }}
+                  style={{ borderBottom: i < byStore.length - 1 ? '1px solid var(--t-line)' : 'none' }}
                 >
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-[15px] text-[#2A2A2C]">{s.supermarketName}</span>
-                    <span className="text-[15px] font-normal text-[#2A2A2C] tabular-nums">
+                    <span className="text-[15px] text-t-fg">{s.supermarketName}</span>
+                    <span className="text-[15px] font-normal text-t-fg tabular-nums">
                       €{formatCentsPlain(s.bestPriceCents)}
                     </span>
                   </div>
-                  <div className="h-[5px] bg-[#F0F0EE] rounded-full overflow-hidden">
+                  <div className="h-[5px] bg-t-surface3 rounded-full overflow-hidden">
                     <div
-                      className="h-full bg-[#2A2A2C] rounded-full"
+                      className="h-full bg-t-accent rounded-full"
                       style={{ width: `${Math.round((s.bestPriceCents / maxPrice) * 100)}%` }}
                     />
                   </div>
@@ -141,19 +141,19 @@ export function ItemDetailScreen() {
         {/* Price history */}
         {stats && stats.history.length > 0 && (
           <>
-            <div className="text-[12px] font-normal tracking-[1.2px] text-[#9B9B9F] uppercase px-1 pt-2 pb-2">{t('item.priceHistory')}</div>
-            <div className="bg-white rounded-[20px] overflow-hidden">
+            <div className="text-[12px] font-normal tracking-[1.2px] text-t-muted uppercase px-1 pt-2 pb-2">{t('item.priceHistory')}</div>
+            <div className="bg-t-surface rounded-[20px] overflow-hidden">
               {[...stats.history].reverse().map((h, i) => (
                 <div
                   key={i}
                   className="flex items-center justify-between px-[18px] py-4"
-                  style={{ borderBottom: i < stats.history.length - 1 ? '1px solid #ECECEC' : 'none' }}
+                  style={{ borderBottom: i < stats.history.length - 1 ? '1px solid var(--t-line)' : 'none' }}
                 >
                   <div>
-                    <span className="text-[15px] text-[#2A2A2C]">{h.supermarketName}</span>
-                    <span className="text-[13px] text-[#9B9B9F] ml-2">{formatShortDate(h.date)}</span>
+                    <span className="text-[15px] text-t-fg">{h.supermarketName}</span>
+                    <span className="text-[13px] text-t-muted ml-2">{formatShortDate(h.date)}</span>
                   </div>
-                  <span className="text-[15px] text-[#5A5A5E] tabular-nums">
+                  <span className="text-[15px] text-t-text3 tabular-nums">
                     €{formatCentsPlain(h.priceCents)}
                   </span>
                 </div>
@@ -163,7 +163,7 @@ export function ItemDetailScreen() {
         )}
 
         {(!stats || stats.history.length === 0) && (
-          <div className="text-center py-10 text-[#9B9B9F] text-sm">{t('item.noPurchases')}</div>
+          <div className="text-center py-10 text-t-muted text-sm">{t('item.noPurchases')}</div>
         )}
       </div>
     </div>

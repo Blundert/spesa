@@ -9,7 +9,7 @@ export function DesktopShell() {
         display: 'flex',
         width: '100%',
         height: '100%',
-        background: '#F2F2F0',
+        background: 'var(--t-bg)',
         fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Hanken Grotesk', sans-serif",
       }}
     >

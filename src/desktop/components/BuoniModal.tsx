@@ -27,13 +27,13 @@ function BuoniBody({ buoni, valueCents, onSave }: Pick<BuoniModalProps, 'buoni' 
   const [draftVal, setDraftVal] = useState(valueCents)
   return (
     <>
-      <div style={{ fontSize: '18px', fontWeight: 500, color: '#2A2A2C', marginBottom: '16px' }}>
+      <div style={{ fontSize: '18px', fontWeight: 500, color: 'var(--t-fg)', marginBottom: '16px' }}>
         {t('spesa.editBuoniTitle')}
       </div>
       <BuoniSteppers buoni={draftBuoni} valueCents={draftVal} onBuoni={setDraftBuoni} onValue={setDraftVal} />
       <button
         onClick={() => onSave(draftBuoni, draftVal)}
-        style={{ width: '100%', border: 'none', borderRadius: '12px', background: '#2A2A2C', color: '#fff', padding: '13px', fontSize: '15px', cursor: 'pointer' }}
+        style={{ width: '100%', border: 'none', borderRadius: '12px', background: 'var(--t-accent)', color: 'var(--t-on)', padding: '13px', fontSize: '15px', cursor: 'pointer' }}
       >
         {t('common.save')}
       </button>

@@ -30,10 +30,10 @@ function usePurchaseTotals() {
 const inputStyle = {
   padding: '8px 12px',
   borderRadius: '10px',
-  border: '1px solid #ECECEC',
-  background: '#fff',
+  border: '1px solid var(--t-line)',
+  background: 'var(--t-surface)',
   fontSize: '13px',
-  color: '#2A2A2C',
+  color: 'var(--t-fg)',
 }
 
 export function DesktopStoricoScreen() {
@@ -67,9 +67,9 @@ export function DesktopStoricoScreen() {
     s.finishedAt === null ? null : outOfPocketCents(totalOf(s), s.buoniSpent, s.buoniValueCents)
 
   const columns: Column<Session>[] = [
-    { key: 'date', label: t('desktop.history.colDate'), render: (s) => <span style={{ color: '#6B6B70' }}>{formatDate(s.startedAt)}</span>, sortValue: (s) => s.startedAt },
+    { key: 'date', label: t('desktop.history.colDate'), render: (s) => <span style={{ color: 'var(--t-text2b)' }}>{formatDate(s.startedAt)}</span>, sortValue: (s) => s.startedAt },
     { key: 'supermarket', label: t('desktop.history.colSupermarket'), render: (s) => <span style={{ fontWeight: 500 }}>{smName.get(s.supermarketId) ?? '?'}</span>, sortValue: (s) => smName.get(s.supermarketId) ?? '' },
-    { key: 'list', label: t('desktop.history.colList'), render: (s) => <span style={{ color: '#9B9B9F' }}>{s.listId !== undefined ? (listName.get(s.listId) ?? '') : ''}</span>, sortValue: (s) => (s.listId !== undefined ? listName.get(s.listId) : null) },
+    { key: 'list', label: t('desktop.history.colList'), render: (s) => <span style={{ color: 'var(--t-muted)' }}>{s.listId !== undefined ? (listName.get(s.listId) ?? '') : ''}</span>, sortValue: (s) => (s.listId !== undefined ? listName.get(s.listId) : null) },
     { key: 'buoni', label: t('desktop.history.colBuoni'), render: (s) => s.buoniSpent, sortValue: (s) => s.buoniSpent },
     { key: 'pocket', label: t('desktop.history.colOutOfPocket'), render: (s) => { const v = outOfPocketOf(s); return v === null ? '—' : `€ ${formatCents(v)}` }, sortValue: outOfPocketOf },
     { key: 'total', label: t('desktop.history.colTotal'), align: 'right', render: (s) => (s.finishedAt === null ? t('desktop.history.inProgress') : `€ ${formatCents(totalOf(s))}`), sortValue: (s) => (s.finishedAt === null ? null : totalOf(s)) },
@@ -93,11 +93,11 @@ export function DesktopStoricoScreen() {
             </option>
           ))}
         </select>
-        <label style={{ fontSize: '13px', color: '#9B9B9F', display: 'flex', gap: '6px', alignItems: 'center' }}>
+        <label style={{ fontSize: '13px', color: 'var(--t-muted)', display: 'flex', gap: '6px', alignItems: 'center' }}>
           {t('desktop.history.from')}
           <input type="date" value={from} onChange={(e) => setFrom(e.target.value)} style={inputStyle} />
         </label>
-        <label style={{ fontSize: '13px', color: '#9B9B9F', display: 'flex', gap: '6px', alignItems: 'center' }}>
+        <label style={{ fontSize: '13px', color: 'var(--t-muted)', display: 'flex', gap: '6px', alignItems: 'center' }}>
           {t('desktop.history.to')}
           <input type="date" value={to} onChange={(e) => setTo(e.target.value)} style={inputStyle} />
         </label>
@@ -108,14 +108,14 @@ export function DesktopStoricoScreen() {
               setFrom('')
               setTo('')
             }}
-            style={{ ...inputStyle, cursor: 'pointer', color: '#6B6B70' }}
+            style={{ ...inputStyle, cursor: 'pointer', color: 'var(--t-text2b)' }}
           >
             {t('desktop.history.reset')}
           </button>
         )}
       </div>
 
-      <div style={{ background: '#fff', borderRadius: '16px', padding: '24px' }}>
+      <div style={{ background: 'var(--t-surface)', borderRadius: '16px', padding: '24px' }}>
         <SortableTable
           columns={columns}
           rows={rows}

@@ -9,7 +9,7 @@ import { PageHeader, SectionTitle } from '../components/PageHeader'
 import { StatCard } from '../components/StatCard'
 import { SortableTable, type Column } from '../components/SortableTable'
 
-const card = { background: '#fff', borderRadius: '16px', padding: '24px' } as const
+const card = { background: 'var(--t-surface)', borderRadius: '16px', padding: '24px' } as const
 
 const W = 600
 const H = 140
@@ -65,7 +65,7 @@ export function DesktopItemDetailScreen() {
     <div style={{ padding: 'var(--page-pad-y) var(--page-pad-x)', maxWidth: '1200px' }}>
       <button
         onClick={() => router.history.back()}
-        style={{ background: 'none', border: 'none', padding: 0, marginBottom: '12px', color: '#9B9B9F', fontSize: '13px', cursor: 'pointer' }}
+        style={{ background: 'none', border: 'none', padding: 0, marginBottom: '12px', color: 'var(--t-muted)', fontSize: '13px', cursor: 'pointer' }}
       >
         ← {t('common.back')}
       </button>
@@ -80,7 +80,7 @@ export function DesktopItemDetailScreen() {
       </div>
 
       {history.length === 0 ? (
-        <div style={{ textAlign: 'center', padding: '48px 0', color: '#9B9B9F', fontSize: '14px' }}>{t('item.noPurchases')}</div>
+        <div style={{ textAlign: 'center', padding: '48px 0', color: 'var(--t-muted)', fontSize: '14px' }}>{t('item.noPurchases')}</div>
       ) : (
         <>
           {history.length > 1 && (
@@ -90,13 +90,13 @@ export function DesktopItemDetailScreen() {
                 <polyline
                   points={points.map((p) => `${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ')}
                   fill="none"
-                  stroke="#2A2A2C"
+                  stroke="var(--t-fg)"
                   strokeWidth="2"
                   strokeLinecap="round"
                   strokeLinejoin="round"
                   vectorEffect="non-scaling-stroke"
                 />
-                <circle cx={last.x} cy={last.y} r="4" fill="#2A2A2C" />
+                <circle cx={last.x} cy={last.y} r="4" fill="var(--t-fg)" />
               </svg>
             </div>
           )}
@@ -120,8 +120,8 @@ export function DesktopItemDetailScreen() {
                       <span>{s.supermarketName}</span>
                       <span>€ {formatCents(s.bestPriceCents)}</span>
                     </div>
-                    <div style={{ height: '5px', background: '#F0F0EE', borderRadius: '999px', overflow: 'hidden' }}>
-                      <div style={{ height: '100%', background: '#2A2A2C', width: `${Math.round((s.bestPriceCents / maxPrice) * 100)}%` }} />
+                    <div style={{ height: '5px', background: 'var(--t-surface3)', borderRadius: '999px', overflow: 'hidden' }}>
+                      <div style={{ height: '100%', background: 'var(--t-accent)', width: `${Math.round((s.bestPriceCents / maxPrice) * 100)}%` }} />
                     </div>
                   </div>
                 ))}

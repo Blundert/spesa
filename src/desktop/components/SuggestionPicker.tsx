@@ -33,10 +33,10 @@ export function SuggestionPicker({
 
   return (
     <div style={{ marginBottom: '22px' }}>
-      <div style={{ fontSize: '12px', color: '#9B9B9F', letterSpacing: '0.5px', textTransform: 'uppercase', marginBottom: '8px' }}>
+      <div style={{ fontSize: '12px', color: 'var(--t-muted)', letterSpacing: '0.5px', textTransform: 'uppercase', marginBottom: '8px' }}>
         {title}
       </div>
-      <div style={{ display: 'inline-flex', background: '#F2F2F0', borderRadius: '10px', padding: '3px', gap: '2px', marginBottom: '10px' }}>
+      <div style={{ display: 'inline-flex', background: 'var(--t-bg)', borderRadius: '10px', padding: '3px', gap: '2px', marginBottom: '10px' }}>
         {[false, true].map((isCustom) => {
           const active = custom === isCustom
           return (
@@ -47,8 +47,8 @@ export function SuggestionPicker({
                 padding: '6px 14px',
                 borderRadius: '8px',
                 border: 'none',
-                background: active ? '#fff' : 'transparent',
-                color: active ? '#2A2A2C' : '#9B9B9F',
+                background: active ? 'var(--t-surface)' : 'transparent',
+                color: active ? 'var(--t-fg)' : 'var(--t-muted)',
                 fontSize: '13px',
                 fontWeight: active ? 500 : 400,
                 cursor: 'pointer',
@@ -61,11 +61,11 @@ export function SuggestionPicker({
         })}
       </div>
 
-      {!custom && <div style={{ fontSize: '13px', color: '#9B9B9F' }}>{autoHint}</div>}
+      {!custom && <div style={{ fontSize: '13px', color: 'var(--t-muted)' }}>{autoHint}</div>}
 
       {custom && (
         <>
-          <div style={{ fontSize: '13px', color: '#9B9B9F', marginBottom: '8px' }}>
+          <div style={{ fontSize: '13px', color: 'var(--t-muted)', marginBottom: '8px' }}>
             {value.length === 0 ? t('lists.customEmptyHint') : t('lists.customCount', { count: value.length })}
           </div>
           {value.length > 0 && (
@@ -81,15 +81,15 @@ export function SuggestionPicker({
                     gap: '6px',
                     padding: '5px 10px',
                     borderRadius: '999px',
-                    border: '1px solid #ECECEC',
-                    background: '#fff',
+                    border: '1px solid var(--t-line)',
+                    background: 'var(--t-surface)',
                     fontSize: '13px',
-                    color: '#2A2A2C',
+                    color: 'var(--t-fg)',
                     cursor: 'pointer',
                   }}
                 >
                   {nameById.get(id) ?? '?'}
-                  <span aria-hidden style={{ color: '#9B9B9F' }}>×</span>
+                  <span aria-hidden style={{ color: 'var(--t-muted)' }}>×</span>
                 </button>
               ))}
             </div>
@@ -104,16 +104,16 @@ export function SuggestionPicker({
               padding: '9px 12px',
               marginBottom: '8px',
               borderRadius: '10px',
-              border: '1px solid #ECECEC',
-              background: '#F6F6F4',
+              border: '1px solid var(--t-line)',
+              background: 'var(--t-surface2)',
               fontSize: '14px',
-              color: '#2A2A2C',
+              color: 'var(--t-fg)',
               outline: 'none',
             }}
           />
-          <div style={{ background: '#F6F6F4', borderRadius: '12px', maxHeight: '200px', overflowY: 'auto' }}>
+          <div style={{ background: 'var(--t-surface2)', borderRadius: '12px', maxHeight: '200px', overflowY: 'auto' }}>
             {shown.length === 0 && (
-              <div style={{ padding: '14px', fontSize: '13px', color: '#9B9B9F' }}>{t('lists.pickNone')}</div>
+              <div style={{ padding: '14px', fontSize: '13px', color: 'var(--t-muted)' }}>{t('lists.pickNone')}</div>
             )}
             {shown.map((it, i) => {
               const id = it.id as number
@@ -130,17 +130,17 @@ export function SuggestionPicker({
                     width: '100%',
                     padding: '10px 14px',
                     border: 'none',
-                    borderBottom: i < shown.length - 1 ? '1px solid #E6E6E2' : 'none',
+                    borderBottom: i < shown.length - 1 ? '1px solid var(--t-line3)' : 'none',
                     background: 'transparent',
                     textAlign: 'left',
                     fontSize: '14px',
-                    color: '#2A2A2C',
+                    color: 'var(--t-fg)',
                     cursor: 'pointer',
                   }}
                 >
                   {it.name}
                   {on && (
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2A2A2C" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--t-fg)" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M5 12l4 4 10-10" />
                     </svg>
                   )}
