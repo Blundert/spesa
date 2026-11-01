@@ -56,6 +56,11 @@ export const it = {
     empty: 'La lista è vuota. Aggiungi qualcosa sopra.',
     templateTitle: 'Carica la tua spesa solita',
     templateLoad: 'Carica',
+    clear: 'Svuota',
+    clearConfirmTitle: 'Svuotare la lista?',
+    clearConfirmBody: 'Tutti gli oggetti della lista ({{count}}) verranno rimossi. Catalogo e prezzi non cambiano.',
+    clearConfirm: 'Svuota lista',
+    cleared: 'Lista svuotata',
   },
   spesa: {
     startTitle: 'Inizia la spesa',

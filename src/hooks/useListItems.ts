@@ -6,6 +6,7 @@ import {
   removeFromList,
   updateListItemQuantity,
   removePurchasedFromList,
+  clearList,
 } from '../db/repositories/listItems'
 import { upsertItem } from '../db/repositories/items'
 
@@ -68,6 +69,16 @@ export function useRemovePurchasedFromList() {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: (itemIds: number[]) => removePurchasedFromList(itemIds),
+    onSuccess: () => {
+      void qc.refetchQueries({ queryKey: qk.listItems(), type: 'all' })
+    },
+  })
+}
+
+export function useClearList() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: () => clearList(),
     onSuccess: () => {
       void qc.refetchQueries({ queryKey: qk.listItems(), type: 'all' })
     },

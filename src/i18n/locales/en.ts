@@ -58,6 +58,11 @@ export const en: typeof it = {
     empty: 'The list is empty. Add something above.',
     templateTitle: 'Load your usual shopping',
     templateLoad: 'Load',
+    clear: 'Clear',
+    clearConfirmTitle: 'Clear the list?',
+    clearConfirmBody: 'All items in the list ({{count}}) will be removed. Catalog and prices are not affected.',
+    clearConfirm: 'Clear list',
+    cleared: 'List cleared',
   },
   spesa: {
     startTitle: 'Start shopping',

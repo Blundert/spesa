@@ -3,7 +3,8 @@ import { useTranslation } from 'react-i18next'
 import { Link } from '@tanstack/react-router'
 import { categoryLabel } from '../i18n'
 import { formatCentsPlain } from '../lib/money'
-import { useListItems, useAddNewItemToList, useRemoveFromList, useUpdateListQuantity } from '../hooks/useListItems'
+import { useListItems, useAddNewItemToList, useRemoveFromList, useUpdateListQuantity, useClearList } from '../hooks/useListItems'
+import { toast } from 'sonner'
 import { useCategories, useItems } from '../hooks/useItems'
 import { normalizeName } from '../lib/normalize'
 import { BASE_ITEMS } from '../lib/baseItems'
@@ -20,6 +21,7 @@ export function ListaScreen() {
   const [addInput, setAddInput] = useState('')
   const inputRef = useRef<HTMLInputElement>(null)
   const [pendingListRemove, setPendingListRemove] = useState<number | null>(null)
+  const [showClear, setShowClear] = useState(false)
 
   const { data: listItems = [] } = useListItems()
   const { data: categories = [] } = useCategories()
@@ -28,6 +30,7 @@ export function ListaScreen() {
   const altroId = categories.find((c) => c.name === 'Altro')?.id ?? 0
   const addNewItem = useAddNewItemToList(altroId)
   const removeFromList = useRemoveFromList()
+  const clearList = useClearList()
   const updateListQuantity = useUpdateListQuantity()
 
   // Build category map id → name
@@ -117,6 +120,11 @@ export function ListaScreen() {
       {/* Header — menu button is in AppShell */}
       <div data-tour="lista-screen" className="flex items-center justify-between px-1 pt-2 pb-[18px]">
         <span className="text-[26px] font-normal tracking-[-0.5px] text-[#2A2A2C]">{t('lista.title')}</span>
+        {listItems.length > 0 && (
+          <button onClick={() => setShowClear(true)} className="text-[15px] text-[#9B9B9F] px-1 active:opacity-50">
+            {t('lista.clear')}
+          </button>
+        )}
       </div>
 
       {/* Add input */}
@@ -273,6 +281,29 @@ export function ListaScreen() {
           {t('lista.empty')}
         </div>
       )}
+
+      {/* Conferma svuota lista */}
+      <BottomSheet open={showClear} onClose={() => setShowClear(false)}>
+        <div className="text-[20px] font-normal text-[#D14343] px-0.5 pb-2">{t('lista.clearConfirmTitle')}</div>
+        <div className="text-[14px] text-[#9B9B9F] px-0.5 pb-6">
+          {t('lista.clearConfirmBody', { count: listItems.length })}
+        </div>
+        <button
+          onClick={() => {
+            clearList.mutate(undefined, { onSuccess: () => toast(t('lista.cleared')) })
+            setShowClear(false)
+          }}
+          className="w-full bg-[#D14343] text-white text-[17px] py-[18px] rounded-[20px] mb-3 active:scale-[.98] transition-transform"
+        >
+          {t('lista.clearConfirm')}
+        </button>
+        <button
+          onClick={() => setShowClear(false)}
+          className="w-full bg-[#F2F2F0] text-[#2A2A2C] text-[17px] py-[18px] rounded-[20px] active:scale-[.98] transition-transform"
+        >
+          {t('common.cancel')}
+        </button>
+      </BottomSheet>
 
       {/* Conferma rimuovi dalla lista */}
       <BottomSheet open={pendingListRemove !== null} onClose={() => setPendingListRemove(null)}>

@@ -2,6 +2,10 @@ export type ChangelogEntry = { it: string[]; en: string[] }
 
 // Ordine: più recente in cima. Aggiungere una entry ad ogni nuova versione.
 export const changelog: Record<string, ChangelogEntry> = {
+  '0.32.0': {
+    it: ['Lista: nuovo bottone "Svuota" in alto per togliere tutti gli oggetti in un colpo (con conferma). Catalogo e prezzi restano'],
+    en: ['List: new "Clear" button at the top to remove all items at once (with confirmation). Catalog and prices are kept'],
+  },
   '0.31.1': {
     it: ['La barra di stato in alto resta sempre chiara; quando si apre un menu dal basso, lo sfondo scurito ha gli angoli superiori arrotondati, paralleli a quelli del menu'],
     en: ['The status bar at the top now always stays light; when a bottom sheet opens, the dimmed background has rounded top corners, parallel to the sheet\'s'],

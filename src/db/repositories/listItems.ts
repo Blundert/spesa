@@ -57,3 +57,8 @@ export async function removePurchasedFromList(itemIds: number[]): Promise<void> 
   if (itemIds.length === 0) return
   await db.listItems.where('itemId').anyOf(itemIds).delete()
 }
+
+/** Svuota la lista: rimuove tutte le voci. Item del catalogo, prezzi e acquisti restano. */
+export async function clearList(): Promise<void> {
+  await db.listItems.clear()
+}

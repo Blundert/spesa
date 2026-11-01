@@ -195,3 +195,10 @@ Nota: il service worker è attivo solo in build di produzione (`npm run build` +
 3. Ricarica la pagina → il valore resta €10,00
 4. Home → barra in basso → "Nuova spesa": "Valore buono" parte da €10,00 → avvia la spesa con 1 buono → "Di tasca tua" usa €10,00
 5. Apri una spesa precedente dallo Storico → i suoi buoni mantengono il valore con cui era stata fatta (non diventano €10,00)
+
+### Flusso 23 — Svuota lista
+1. Vai su Lista con la lista vuota → in alto a destra **non** c'è "Svuota"
+2. Aggiungi 3 oggetti (es. Latte, Pane, Uova) → compare "Svuota" accanto al titolo
+3. Tocca "Svuota" → sheet "Svuotare la lista?" con "Tutti gli oggetti della lista (3) verranno rimossi…" → "Annulla" → la lista è intatta
+4. Tocca di nuovo "Svuota" → "Svuota lista" → toast "Lista svuotata", messaggio di lista vuota, "Svuota" sparisce
+5. Vai su Catalogo → Latte, Pane e Uova sono ancora presenti (con i loro prezzi)
