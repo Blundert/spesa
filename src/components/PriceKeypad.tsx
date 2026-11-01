@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Drawer } from 'vaul'
 import { formatCentsPlain } from '../lib/money'
@@ -40,12 +40,17 @@ export function PriceKeypad({
   const [cents, setCents] = useState(initialCents)
   const [quantity, setQuantity] = useState(initialQuantity)
 
-  useEffect(() => {
+  // All'apertura (o se cambiano i valori iniziali mentre è aperto) riparte da quelli:
+  // stato aggiornato durante il render invece che in un effetto.
+  const resetKey = open ? `${initialCents}:${initialQuantity}` : null
+  const [prevResetKey, setPrevResetKey] = useState(resetKey)
+  if (resetKey !== prevResetKey) {
+    setPrevResetKey(resetKey)
     if (open) {
       setCents(initialCents)
       setQuantity(initialQuantity)
     }
-  }, [open, initialCents, initialQuantity])
+  }
 
   const digit = (d: number) => setCents((c) => Math.min(c * 10 + d, 9_999_999))
   const dbl = () => setCents((c) => Math.min(c * 100, 9_999_999))

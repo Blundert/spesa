@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate, useSearch } from '@tanstack/react-router'
 import { useQueryClient } from '@tanstack/react-query'
@@ -134,12 +134,14 @@ export function SpesaScreen() {
     : null
   const supermarketName = activeSupermarket?.name ?? (activeSession ? '?' : '—')
 
-  // Auto-open store picker if active session has no valid supermarket
-  useEffect(() => {
-    if (activeSession && activeSupermarket === null && supermarkets.length > 0) {
-      setShowStorePicker(true)
-    }
-  }, [activeSession, activeSupermarket, supermarkets.length])
+  // Se la spesa in corso non ha un supermercato valido si apre la scelta del negozio
+  // (quando la condizione diventa vera; stato aggiornato durante il render).
+  const needsStore = activeSession !== null && activeSupermarket === null && supermarkets.length > 0
+  const [prevNeedsStore, setPrevNeedsStore] = useState(false)
+  if (needsStore !== prevNeedsStore) {
+    setPrevNeedsStore(needsStore)
+    if (needsStore) setShowStorePicker(true)
+  }
 
   const handleStartSession = async (supermarketId: number) => {
     if (listId === undefined) return
