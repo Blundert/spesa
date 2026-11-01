@@ -262,3 +262,9 @@ Nota: il service worker è attivo solo in build di produzione (`npm run build` +
 7. Tocca un altro prodotto dopo aver scelto `±×÷` → si riapre in calcolatrice; ricarica la pagina → la modalità resta quella
 8. "Fine" → "Quanto hai speso?" in calcolatrice parte dal totale calcolato (es. `42,80`) → `− 10%` → conferma il risultato
 9. Nello Storico, modifica un acquisto e il totale di una spesa: la calcolatrice c'è anche lì, con lo stesso comportamento
+
+### Flusso 30 — Scroll che non si blocca (test su iPhone, app installata in Home)
+1. Apri la Lista (o lo Storico) con abbastanza voci da scorrere. Scorri fino in cima e continua a trascinare verso il basso più volte di fila → la pagina rimbalza ma, appena trascini verso l'alto, scorre subito (senza bisogno di un tap)
+2. Ripeti in fondo alla pagina, trascinando verso l'alto oltre la fine e poi subito verso il basso
+3. Ripeti dentro un pannello lungo (es. menu o riepilogo della pill) e sulle schede delle liste in orizzontale
+4. In nessun caso lo scroll resta "congelato" finché non si tocca lo schermo

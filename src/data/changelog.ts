@@ -2,6 +2,10 @@ export type ChangelogEntry = { it: string[]; en: string[] }
 
 // Ordine: più recente in cima. Aggiungere una entry ad ogni nuova versione.
 export const changelog: Record<string, ChangelogEntry> = {
+  '0.38.1': {
+    it: ['iPhone: lo scroll non dovrebbe più bloccarsi dopo essere arrivati in cima o in fondo a una pagina (prima ripartiva solo con un tap)'],
+    en: ['iPhone: scrolling should no longer get stuck after reaching the top or bottom of a page (before, it only came back after a tap)'],
+  },
   '0.38.0': {
     it: [
       'Tastierino calcolatrice: quando inserisci un prezzo tocca ±×÷ in alto a sinistra per fare i conti con + − × ÷, parentesi e % (es. "4,50 − 30%" = 3,15). Il risultato si aggiorna mentre scrivi, e 123 torna al tastierino di sempre',

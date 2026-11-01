@@ -12,6 +12,19 @@ body {
   height: 100%;
   margin: 0;
   background: #f2f2f0;
+  /* L'app vive in uno shell fisso: il documento non deve mai scorrere. Su iOS (PWA) un
+     trascinamento al bordo di un'area scrollabile passava al documento, che tentava il
+     rimbalzo: gli scroll successivi restavano agganciati lì (tutto "congelato") fino a un tap. */
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+/* Arrivate al bordo, le aree scrollabili rimbalzano da sole invece di passare il gesto a
+   chi sta sotto (stesso motivo di sopra). */
+.overflow-y-auto,
+.overflow-x-auto,
+.overflow-auto {
+  overscroll-behavior: contain;
 }
 
 #root {
