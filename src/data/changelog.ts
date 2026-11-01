@@ -2,6 +2,10 @@ export type ChangelogEntry = { it: string[]; en: string[] }
 
 // Ordine: più recente in cima. Aggiungere una entry ad ogni nuova versione.
 export const changelog: Record<string, ChangelogEntry> = {
+  '0.43.1': {
+    it: ['Impostazioni su desktop: tutte le schede, anche Lingua e Debug, hanno ora la stessa larghezza; prima una scheda rimasta sola in una riga si allargava a tutta la pagina'],
+    en: ['Settings on desktop: all cards, Language and Debug included, now have the same width; before, a card left alone on a row stretched across the whole page'],
+  },
   '0.43.0': {
     it: [
       'Temi: in Impostazioni → Aspetto puoi scegliere fra Chiaro (quello di sempre, invariato), Scuro, Salvia, Oceano, Notte blu e Contrasto alto. Cambiano colori di pagine, grafici e pulsanti, su telefono e su desktop',

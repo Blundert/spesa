@@ -34,7 +34,7 @@ const LANGS: { code: Lang; label: string }[] = [
 
 function Card({ title, hint, children }: { title: string; hint?: string; children: ReactNode }) {
   return (
-    <div style={{ background: 'var(--t-surface)', borderRadius: '16px', padding: '24px', flex: '1 1 340px', minWidth: 0 }}>
+    <div style={{ background: 'var(--t-surface)', borderRadius: '16px', padding: '24px', minWidth: 0 }}>
       <SectionTitle>{title}</SectionTitle>
       {hint && <div style={{ fontSize: '13px', color: 'var(--t-muted)', margin: '-8px 0 16px' }}>{hint}</div>}
       {children}
@@ -272,7 +272,10 @@ export function DesktopImpostazioniScreen() {
   return (
     <div style={{ padding: 'var(--page-pad-y) var(--page-pad-x)', maxWidth: '1200px' }}>
       <PageHeader title={t('settings.title')} subtitle={t('desktop.settings.subtitle')} />
-      <div style={{ display: 'flex', gap: '24px', flexWrap: 'wrap', alignItems: 'flex-start' }}>
+      {/* Schede tutte della stessa larghezza: una scheda sola in fondo non si allarga a tutta la riga. */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))', gap: '24px', alignItems: 'start' }}>
+        <ThemePicker />
+
         <Card title={t('settings.language')}>
           <div style={{ display: 'flex', gap: '8px' }}>
             {LANGS.map((l) => (
@@ -282,8 +285,6 @@ export function DesktopImpostazioniScreen() {
             ))}
           </div>
         </Card>
-
-        <ThemePicker />
 
         <Card title={t('settings.buoni')} hint={t('settings.defaultBuonoValueHint')}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>

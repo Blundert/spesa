@@ -333,3 +333,7 @@ Nota: il service worker è attivo solo in build di produzione (`npm run build` +
 6. Cambia tema da desktop, poi restringi la finestra sotto i 768 px: l'app mobile ha lo stesso tema (e viceversa)
 7. Il colore della barra del browser (Android/Chrome, Safari) segue lo sfondo del tema. Su iPhone con l'app installata in Home la barra di stato resta chiara: limite noto di iOS
 8. Controlla in un tema scuro: Lista, Pasti, Storico (etichette verde/arancione dello scostamento), Statistiche, Catalogo, Supermercati, finestre di conferma, tastierino prezzi, tutorial
+
+### Flusso 38 — Impostazioni desktop: schede della stessa larghezza
+1. Impostazioni su desktop (1280 px) → "Aspetto" occupa tutta la larghezza; sotto, Lingua, Buoni pasto, Inizio settimana, Dati, App, Tutorial, Sincronizzazione e Debug sono tutte larghe uguali, su due colonne. Nessuna scheda si allarga a tutta la riga, nemmeno Lingua e Debug
+2. A circa 1000 px restano due colonne più strette; sotto i 700 px diventano una colonna sola
