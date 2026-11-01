@@ -34,6 +34,19 @@
   </table>
 </div>
 
+<div align="center">
+  <table>
+    <tr>
+      <td align="center"><img src="docs/screenshots/desktop-dashboard.png" width="420" alt="Dashboard desktop"></td>
+      <td align="center"><img src="docs/screenshots/desktop-statistiche.png" width="420" alt="Statistiche desktop"></td>
+    </tr>
+    <tr>
+      <td align="center"><sub>Desktop · Dashboard</sub></td>
+      <td align="center"><sub>Desktop · Statistiche avanzate</sub></td>
+    </tr>
+  </table>
+</div>
+
 ---
 
 ## Il Progetto
@@ -54,6 +67,7 @@ senza account né server. È installabile come app nativa su iOS, Android e desk
 - 🗓️ Pianificatore pasti settimanale
 - 🏪 Supermercati con tessera fedeltà
 - 🔄 Backup opzionale su GitHub (JSON in repo privata)
+- 🖥️ Interfaccia desktop dedicata (da 768 px): menu laterale compattabile, tabelle ordinabili, grafici a colori; il passaggio da/verso mobile è immediato
 - 📱 PWA installabile — iOS · Android · Desktop
 - 🌍 Italiano · English
 

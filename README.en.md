@@ -34,6 +34,19 @@
   </table>
 </div>
 
+<div align="center">
+  <table>
+    <tr>
+      <td align="center"><img src="docs/screenshots/desktop-dashboard.png" width="420" alt="Desktop dashboard"></td>
+      <td align="center"><img src="docs/screenshots/desktop-statistiche.png" width="420" alt="Desktop statistics"></td>
+    </tr>
+    <tr>
+      <td align="center"><sub>Desktop · Dashboard</sub></td>
+      <td align="center"><sub>Desktop · Advanced statistics</sub></td>
+    </tr>
+  </table>
+</div>
+
 ---
 
 ## About
@@ -54,6 +67,7 @@ no server. It installs as a native app on iOS, Android, and desktop.
 - 🗓️ Weekly meal planner
 - 🏪 Supermarkets with loyalty card
 - 🔄 Optional backup to GitHub (JSON in a private repo)
+- 🖥️ Dedicated desktop interface (from 768 px): collapsible side menu, sortable tables, colour charts; switching to/from mobile is instant
 - 📱 Installable PWA — iOS · Android · Desktop
 - 🌍 Italian · English
 
