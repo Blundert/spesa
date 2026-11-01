@@ -217,3 +217,10 @@ Nota: il service worker è attivo solo in build di produzione (`npm run build` +
 3. Spesa senza buoni → "0 buoni" e "di tasca tua" uguale al totale
 4. Buoni che coprono più del totale → "di tasca tua €0,00" (mai negativo)
 5. Apri una spesa, modifica i buoni dal dettaglio → tornando allo Storico la riga è aggiornata
+
+### Flusso 26 — Statistiche: buoni pasto e di tasca tua
+1. Vai su Statistiche → filtro "Tutto" → sotto "Riepilogo" c'è la card "Buoni pasto e di tasca tua"
+2. La barra è divisa in grigio (coperto dai buoni) e scuro (di tasca tua) in proporzione; sotto, le due voci con importo e percentuale (le percentuali sommano a 100%) e "Buoni usati"
+3. Verifica i conti: "Coperto dai buoni" + "Di tasca tua" = "Totale speso" del Riepilogo
+4. Una spesa con più buoni del totale (es. €10,00 con 3 buoni da €8,00) conta €10,00 come coperto e €0 di tasca tua (mai negativo)
+5. Cambia filtro (7 giorni, 30 giorni, Personalizzato) → la card segue il periodo; in un periodo senza spese la card non compare

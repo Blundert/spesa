@@ -140,6 +140,21 @@ export function StatisticheScreen() {
             </div>
           </div>
 
+          {/* Buoni pasto e di tasca tua */}
+          {stats.totalCents > 0 && (
+            <div className="bg-white rounded-[20px] p-[18px] mb-4">
+              <div className="text-[12px] font-normal tracking-[1.2px] text-[#9B9B9F] uppercase mb-3">
+                {t('statistiche.buoniTitle')}
+              </div>
+              <BuoniSplit
+                totalCents={stats.totalCents}
+                buoniCoveredCents={stats.buoniCoveredCents}
+                outOfPocketCents={stats.outOfPocketCents}
+                buoniCount={stats.buoniCount}
+              />
+            </div>
+          )}
+
           {/* Andamento settimanale */}
           <div className="bg-white rounded-[20px] p-[18px] mb-4">
             <div className="text-[12px] font-normal tracking-[1.2px] text-[#9B9B9F] uppercase mb-4">
@@ -245,6 +260,55 @@ function StatCell({ label, value, big }: { label: string; value: string; big?: b
         {value}
       </div>
     </div>
+  )
+}
+
+function BuoniSplit({
+  totalCents,
+  buoniCoveredCents,
+  outOfPocketCents,
+  buoniCount,
+}: {
+  totalCents: number
+  buoniCoveredCents: number
+  outOfPocketCents: number
+  buoniCount: number
+}) {
+  const { t } = useTranslation()
+  // Percentuali sul totale speso; la seconda è il complemento così la somma fa sempre 100.
+  const buoniPct = Math.round((buoniCoveredCents / totalCents) * 100)
+  const oopPct = 100 - buoniPct
+  return (
+    <>
+      <div className="flex h-[10px] rounded-full overflow-hidden bg-[#F2F2F0]">
+        <div className="h-full bg-[#B5B5BA]" style={{ width: `${(buoniCoveredCents / totalCents) * 100}%` }} />
+        <div className="h-full bg-[#2A2A2C]" style={{ width: `${(outOfPocketCents / totalCents) * 100}%` }} />
+      </div>
+      <div className="flex flex-col gap-[10px] mt-[14px] tabular-nums">
+        <div className="flex items-center justify-between text-[15px] text-[#2A2A2C]">
+          <span className="flex items-center gap-2">
+            <span className="w-[10px] h-[10px] rounded-[3px] bg-[#B5B5BA]" />
+            {t('statistiche.buoniCovered')}
+          </span>
+          <span>
+            €{formatCentsPlain(buoniCoveredCents)} <span className="text-[13px] text-[#9B9B9F]">· {buoniPct}%</span>
+          </span>
+        </div>
+        <div className="flex items-center justify-between text-[15px] text-[#2A2A2C]">
+          <span className="flex items-center gap-2">
+            <span className="w-[10px] h-[10px] rounded-[3px] bg-[#2A2A2C]" />
+            {t('statistiche.outOfPocket')}
+          </span>
+          <span>
+            €{formatCentsPlain(outOfPocketCents)} <span className="text-[13px] text-[#9B9B9F]">· {oopPct}%</span>
+          </span>
+        </div>
+        <div className="flex items-center justify-between text-[13px] text-[#9B9B9F]">
+          <span>{t('statistiche.buoniUsed')}</span>
+          <span>{buoniCount}</span>
+        </div>
+      </div>
+    </>
   )
 }
 

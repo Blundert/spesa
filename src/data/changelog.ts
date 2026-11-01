@@ -2,6 +2,10 @@ export type ChangelogEntry = { it: string[]; en: string[] }
 
 // Ordine: più recente in cima. Aggiungere una entry ad ogni nuova versione.
 export const changelog: Record<string, ChangelogEntry> = {
+  '0.35.0': {
+    it: ['Statistiche: nuova sezione "Buoni pasto e di tasca tua" con quanto del totale speso è stato coperto dai buoni e quanto hai pagato tu, in euro e in percentuale, più il numero di buoni usati nel periodo'],
+    en: ['Statistics: new "Meal vouchers and out of pocket" section showing how much of the total was covered by vouchers and how much you paid yourself, in euros and percent, plus the number of vouchers used in the period'],
+  },
   '0.34.0': {
     it: ['Storico: in fondo a ogni spesa vedi i buoni pasto usati (e quanto hanno coperto) e quanto hai pagato di tasca tua'],
     en: ['History: at the bottom of each trip you now see the meal vouchers used (and how much they covered) and how much you paid out of pocket'],

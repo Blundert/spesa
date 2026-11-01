@@ -1,4 +1,5 @@
 import { db } from '../db'
+import { outOfPocketCents } from '../../lib/budgetSelectors'
 
 function sessionWeekKey(startedAt: number, startDay: number): string {
   const date = new Date(startedAt)
@@ -45,6 +46,12 @@ export interface StatsResult {
   weeklyTotals: WeeklyTotal[]
   topItems: TopItem[]
   categoryBreakdown: CategoryBreakdown[]
+  /** Buoni pasto usati nelle sessioni filtrate. */
+  buoniCount: number
+  /** Parte del totale coperta dai buoni (per sessione: totale − di tasca tua). */
+  buoniCoveredCents: number
+  /** Di tasca propria: Σ max(0, totale − buoni × valore). buoniCovered + outOfPocket = totale. */
+  outOfPocketCents: number
 }
 
 export async function getStats(
@@ -84,6 +91,15 @@ export async function getStats(
 
   const totalCents = sessionTotals.reduce((sum, s) => sum + s.totalCents, 0)
   const avgCents = sessionCount > 0 ? Math.round(totalCents / sessionCount) : 0
+
+  // Buoni e di tasca tua: per sessione, così i buoni che superano il totale non vanno in negativo.
+  let buoniCount = 0
+  let outOfPocketTotal = 0
+  for (const { session, totalCents: t } of sessionTotals) {
+    buoniCount += session.buoniSpent
+    outOfPocketTotal += outOfPocketCents(t, session.buoniSpent, session.buoniValueCents)
+  }
+  const buoniCoveredCents = totalCents - outOfPocketTotal
 
   // Supermercato più frequentato
   const supermarketCounts = new Map<number, number>()
@@ -163,5 +179,16 @@ export async function getStats(
     .map(([catId, total]) => ({ name: categoryNameMap.get(catId) ?? 'Altro', totalCents: total }))
     .sort((a, b) => b.totalCents - a.totalCents)
 
-  return { totalCents, sessionCount, avgCents, topSupermarketName, weeklyTotals, topItems, categoryBreakdown }
+  return {
+    totalCents,
+    sessionCount,
+    avgCents,
+    topSupermarketName,
+    weeklyTotals,
+    topItems,
+    categoryBreakdown,
+    buoniCount,
+    buoniCoveredCents,
+    outOfPocketCents: outOfPocketTotal,
+  }
 }

@@ -329,6 +329,10 @@ export const en: typeof it = {
     weeklyTitle: 'Trend',
     topItemsTitle: 'Most purchased',
     categoryTitle: 'By category',
+    buoniTitle: 'Meal vouchers and out of pocket',
+    buoniCovered: 'Covered by vouchers',
+    outOfPocket: 'Out of pocket',
+    buoniUsed: 'Vouchers used',
     range: {
       '7d': '7 days',
       '30d': '30 days',

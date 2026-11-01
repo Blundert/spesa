@@ -386,3 +386,36 @@ describe('getStats — categoryBreakdown', () => {
     expect(result.categoryBreakdown[0].totalCents).toBe(200)
   })
 })
+
+describe('getStats — buoni e di tasca tua', () => {
+  it('senza sessioni è tutto a zero', async () => {
+    const result = await getStats(WEEK, 0, null, null)
+    expect(result.buoniCount).toBe(0)
+    expect(result.buoniCoveredCents).toBe(0)
+    expect(result.outOfPocketCents).toBe(0)
+  })
+
+  it('somma buoni e di tasca tua per sessione; le due parti fanno il totale', async () => {
+    await db.supermarkets.add({ id: 1, name: 'Coop', normalizedName: 'coop' })
+    // 52,30 con 2 buoni da 8,00 → buoni 16,00, di tasca 36,30
+    await db.sessions.add({
+      id: 1, isoWeek: WEEK, supermarketId: 1, startedAt: WEEK_TS, finishedAt: WEEK_TS + 1,
+      confirmedTotalCents: 5230, buoniSpent: 2, buoniValueCents: 800,
+    })
+    // 10,00 con 3 buoni da 8,00 → buoni coprono solo 10,00 (mai negativo), di tasca 0
+    await db.sessions.add({
+      id: 2, isoWeek: WEEK, supermarketId: 1, startedAt: WEEK_TS + 2, finishedAt: WEEK_TS + 3,
+      confirmedTotalCents: 1000, buoniSpent: 3, buoniValueCents: 800,
+    })
+    // non finita: esclusa
+    await db.sessions.add({
+      id: 3, isoWeek: WEEK, supermarketId: 1, startedAt: WEEK_TS + 4, finishedAt: null,
+      confirmedTotalCents: null, buoniSpent: 5, buoniValueCents: 800,
+    })
+    const result = await getStats(WEEK, 0, null, null)
+    expect(result.buoniCount).toBe(5)
+    expect(result.outOfPocketCents).toBe(3630)
+    expect(result.buoniCoveredCents).toBe(1600 + 1000)
+    expect(result.buoniCoveredCents + result.outOfPocketCents).toBe(result.totalCents)
+  })
+})

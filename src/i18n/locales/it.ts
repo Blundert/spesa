@@ -328,6 +328,10 @@ export const it = {
     weeklyTitle: 'Andamento',
     topItemsTitle: 'Più acquistati',
     categoryTitle: 'Per categoria',
+    buoniTitle: 'Buoni pasto e di tasca tua',
+    buoniCovered: 'Coperto dai buoni',
+    outOfPocket: 'Di tasca tua',
+    buoniUsed: 'Buoni usati',
     range: {
       '7d': '7 giorni',
       '30d': '30 giorni',
