@@ -42,12 +42,27 @@ export interface WeekBudget {
 /** Valore di default di un buono pasto, in centesimi (€8,00). */
 export const DEFAULT_BUONO_VALUE_CENTS = 800
 
+/** Nome della lista creata al primo avvio (e con la migrazione della lista unica). */
+export const DEFAULT_LIST_NAME = 'Spesa'
+
+/** Lista della spesa tematica (es. "Settimanale", "Casa"). Una spesa parte da una lista. */
+export interface ShoppingList {
+  id?: number
+  name: string
+  /** Supermercato preimpostato: la spesa di questa lista salta la scelta del negozio. */
+  supermarketId: number | null
+  sortOrder: number
+  /** Timestamp di archiviazione; null se attiva. Le archiviate tengono i loro prodotti. */
+  archivedAt: number | null
+}
+
 /**
- * Voce della lista della spesa. La lista è unica e globale (non più legata a una
- * settimana): si svuota al termine di ogni spesa.
+ * Voce di una lista della spesa. Lo stesso item può stare in più liste, con quantità
+ * indipendenti; a fine spesa escono solo le voci acquistate della lista della spesa.
  */
 export interface ListItem {
   id?: number
+  listId: number
   itemId: number
   quantity: number
   addedAt: number // timestamp ms
@@ -58,6 +73,11 @@ export interface Session {
   id?: number
   isoWeek: string
   supermarketId: number
+  /**
+   * Lista da cui è partita la spesa. Assente solo nei dati importati senza liste; può
+   * puntare a una lista eliminata definitivamente (la spesa resta senza etichetta).
+   */
+  listId?: number
   /** Timestamp inizio sessione, ms. */
   startedAt: number
   /** Timestamp fine sessione (null se in corso). */

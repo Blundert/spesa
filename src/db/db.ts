@@ -10,8 +10,9 @@ import type {
   MealPlan,
   Dish,
   DishIngredient,
+  ShoppingList,
 } from './types'
-import { DEFAULT_BUONO_VALUE_CENTS } from './types'
+import { DEFAULT_BUONO_VALUE_CENTS, DEFAULT_LIST_NAME } from './types'
 
 class SpesaDb extends Dexie {
   categories!: EntityTable<Category, 'id'>
@@ -24,6 +25,7 @@ class SpesaDb extends Dexie {
   mealPlans!: EntityTable<MealPlan, 'id'>
   dishes!: EntityTable<Dish, 'id'>
   dishIngredients!: EntityTable<DishIngredient, 'id'>
+  shoppingLists!: EntityTable<ShoppingList, 'id'>
 
   constructor() {
     super('spesa')
@@ -168,7 +170,26 @@ class SpesaDb extends Dexie {
       dishes: '++id, normalizedName',
       dishIngredients: '++id, dishId, itemId, [dishId+itemId]',
     })
+
+    // v9: più liste della spesa. La lista unica diventa "Spesa": le sue voci e tutte le
+    // spese passate le vengono assegnate (così la sua spesa solita resta la stessa).
+    this.version(9)
+      .stores({
+        shoppingLists: '++id, sortOrder',
+        listItems: '++id, itemId, listId, [listId+itemId]',
+        sessions: '++id, isoWeek, supermarketId, startedAt, listId',
+      })
+      .upgrade(async (tx) => {
+        const listId = (await tx.table('shoppingLists').add(newDefaultList())) as number
+        await tx.table('listItems').toCollection().modify({ listId })
+        await tx.table('sessions').toCollection().modify({ listId })
+      })
   }
+}
+
+/** Lista iniziale: al primo avvio, dopo la migrazione e dopo un reset. */
+export function newDefaultList(): Omit<ShoppingList, 'id'> {
+  return { name: DEFAULT_LIST_NAME, supermarketId: null, sortOrder: 0, archivedAt: null }
 }
 
 export const db = new SpesaDb()
@@ -188,11 +209,12 @@ const SEED_CATEGORIES: Array<Omit<Category, 'id'>> = [
 
 db.on('populate', async () => {
   await db.categories.bulkAdd(SEED_CATEGORIES)
+  await db.shoppingLists.add(newDefaultList())
 })
 
 /**
- * Azzera tutti i dati utente (lista, spese, acquisti, articoli, supermercati, budget, pasti)
- * e ricrea le categorie seed. Le categorie restano perché sono struttura, non dati utente.
+ * Azzera tutti i dati utente (liste, spese, acquisti, articoli, supermercati, budget, pasti)
+ * e ricrea le categorie seed e la lista iniziale vuota.
  */
 export async function wipeAllData(): Promise<void> {
   await db.transaction(
@@ -208,6 +230,7 @@ export async function wipeAllData(): Promise<void> {
       db.mealPlans,
       db.dishes,
       db.dishIngredients,
+      db.shoppingLists,
     ],
     async () => {
       await Promise.all([
@@ -221,8 +244,10 @@ export async function wipeAllData(): Promise<void> {
         db.dishes.clear(),
         db.dishIngredients.clear(),
         db.categories.clear(),
+        db.shoppingLists.clear(),
       ])
       await db.categories.bulkAdd(SEED_CATEGORIES)
+      await db.shoppingLists.add(newDefaultList())
     },
   )
 }

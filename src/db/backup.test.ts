@@ -22,6 +22,7 @@ const validBase: BackupData = {
   mealPlans: [],
   dishes: [],
   dishIngredients: [],
+  shoppingLists: [],
 }
 
 async function clearAll() {
@@ -36,6 +37,7 @@ async function clearAll() {
     db.mealPlans.clear(),
     db.dishes.clear(),
     db.dishIngredients.clear(),
+    db.shoppingLists.clear(),
   ])
 }
 
@@ -46,12 +48,14 @@ async function seed() {
   ])
   await db.supermarkets.bulkAdd([{ id: 1, name: 'Coop', normalizedName: 'coop', loyaltyCard: 'data:image/jpeg;base64,abc' }])
   await db.weekBudgets.bulkAdd([{ id: 1, isoWeek: '2026-W24', buoniAvailable: 10 }])
-  await db.listItems.bulkAdd([{ id: 1, itemId: 1, quantity: 2, addedAt: 1000 }])
+  await db.shoppingLists.bulkAdd([{ id: 1, name: 'Casa', supermarketId: 1, sortOrder: 0, archivedAt: null }])
+  await db.listItems.bulkAdd([{ id: 1, listId: 1, itemId: 1, quantity: 2, addedAt: 1000 }])
   await db.sessions.bulkAdd([
     {
       id: 1,
       isoWeek: '2026-W24',
       supermarketId: 1,
+      listId: 1,
       startedAt: 2000,
       finishedAt: 3000,
       confirmedTotalCents: 500,
@@ -131,6 +135,8 @@ describe('importData', () => {
     expect(after.mealPlans).toEqual(exported.mealPlans)
     expect(after.dishes).toEqual(exported.dishes)
     expect(after.dishIngredients).toEqual(exported.dishIngredients)
+    expect(after.shoppingLists).toEqual(exported.shoppingLists)
+    expect(after.listItems).toEqual(exported.listItems)
     // la relazione purchase→session resta valida
     expect(after.purchases[0].sessionId).toBe(after.sessions[0].id)
     // la relazione dishIngredient→dish resta valida
@@ -170,6 +176,26 @@ describe('importData', () => {
     const data = await exportData()
     expect(data.dishes).toEqual([])
     expect(data.dishIngredients).toEqual([])
+  })
+
+  it('importa backup versione 7 (senza liste): voci e spese vanno nella lista iniziale', async () => {
+    await seed()
+    const exported = await exportData()
+    const v7 = {
+      ...exported,
+      version: 7,
+      shoppingLists: undefined,
+      listItems: exported.listItems.map((li) => ({ ...li, listId: undefined })),
+      sessions: exported.sessions.map((s) => ({ ...s, listId: undefined })),
+    } as unknown as BackupData
+    await clearAll()
+
+    await importData(v7)
+    const lists = await db.shoppingLists.toArray()
+    expect(lists).toHaveLength(1)
+    expect(lists[0]).toMatchObject({ name: 'Spesa', supermarketId: null, archivedAt: null })
+    expect((await db.listItems.toArray())[0].listId).toBe(lists[0].id)
+    expect((await db.sessions.toArray())[0].listId).toBe(lists[0].id)
   })
 
   it('rifiuta una struttura non valida', async () => {

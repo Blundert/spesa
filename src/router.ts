@@ -82,13 +82,15 @@ const spesaRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/spesa',
   component: SpesaScreen,
-  // Buoni e valore scelti nel box d'avvio; passati alla nuova spesa.
-  validateSearch: (search: Record<string, unknown>): { buoni: number; val: number } => {
+  // Buoni, valore e lista scelti nel pannello della pill; passati alla nuova spesa.
+  validateSearch: (search: Record<string, unknown>): { buoni: number; val: number; list?: number } => {
     const buoni = Number(search.buoni)
     const val = Number(search.val)
+    const list = Number(search.list)
     return {
       buoni: Number.isFinite(buoni) && buoni >= 0 ? Math.floor(buoni) : 0,
       val: Number.isFinite(val) && val > 0 ? Math.floor(val) : getDefaultBuonoValueCents(),
+      ...(Number.isInteger(list) && list > 0 ? { list } : {}),
     }
   },
 })

@@ -14,8 +14,14 @@ export const qk = {
 
   weekBudget: (isoWeek: string) => ['weekBudget', isoWeek] as const,
 
-  /** Lista della spesa: unica e globale. */
+  /** Liste della spesa (archiviate comprese). */
+  shoppingLists: () => ['shoppingLists'] as const,
+
+  /** Voci di tutte le liste: prefisso per invalidare/refetchare ogni lista. */
   listItems: () => ['listItems'] as const,
+  listItemsOf: (listId: number) => ['listItems', listId] as const,
+  /** Spesa solita di una lista (sotto il prefisso listItems, si aggiorna con le voci). */
+  usualItems: (listId: number) => ['listItems', listId, 'usual'] as const,
 
   /** Acquisti aggregati di tutte le sessioni di una settimana (per il recap). */
   purchasesForWeek: (isoWeek: string) => ['purchasesForWeek', isoWeek] as const,

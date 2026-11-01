@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { dayShort, dayFull, formatWeekLabel, shiftWeek } from '../lib/date'
 import { useMealPlan, useSetMealSlotDish, useImportMealPlanToList } from '../hooks/useMealPlan'
 import { useDishes, useSaveDish } from '../hooks/useDishes'
+import { useActiveList } from '../hooks/useShoppingLists'
 import { useCategories, useItems, useUpsertItem } from '../hooks/useItems'
 import { useWeekBudget, useSetBuoniAvailable } from '../hooks/useShopping'
 import { normalizeName } from '../lib/normalize'
@@ -46,6 +47,7 @@ export function PastiScreen() {
   const setBuoni = useSetBuoniAvailable(week)
   const setMealSlotDish = useSetMealSlotDish(week)
   const importToList = useImportMealPlanToList(week)
+  const activeListId = useActiveList().list?.id
   const saveDish = useSaveDish()
   const upsertItem = useUpsertItem()
   const buoniAvailable = budget?.buoniAvailable ?? 0
@@ -63,7 +65,8 @@ export function PastiScreen() {
   }
 
   const handleImportAndGenerate = () => {
-    importToList.mutate(undefined, { onSuccess: () => void navigate({ to: '/' }) })
+    if (activeListId === undefined) return
+    importToList.mutate(activeListId, { onSuccess: () => void navigate({ to: '/' }) })
   }
 
   const openSlot = (day: MealPlanDay, mealType: MealType) => {

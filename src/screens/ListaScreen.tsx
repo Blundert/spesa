@@ -10,6 +10,7 @@ import { normalizeName } from '../lib/normalize'
 import { BASE_ITEMS } from '../lib/baseItems'
 import { BottomSheet } from '../components/BottomSheet'
 import { SectionTitle } from '../components/SectionTitle'
+import { useActiveList } from '../hooks/useShoppingLists'
 
 interface Suggestion {
   name: string
@@ -24,7 +25,9 @@ export function ListaScreen() {
   const [pendingListRemove, setPendingListRemove] = useState<number | null>(null)
   const [showClear, setShowClear] = useState(false)
 
-  const { data: listItems = [] } = useListItems()
+  const { list } = useActiveList()
+  const listId = list?.id
+  const { data: listItems = [] } = useListItems(listId)
   const { data: categories = [] } = useCategories()
   const { data: items = [] } = useItems()
 
@@ -109,9 +112,9 @@ export function ListaScreen() {
 
   const handleAdd = (name?: string, categoryId?: number) => {
     const finalName = (name ?? addInput).trim()
-    if (!finalName) return
+    if (!finalName || listId === undefined) return
     const match = categoryId === undefined ? pool.get(normalizeName(finalName)) : undefined
-    addNewItem.mutate({ name: finalName, categoryId: categoryId ?? match?.categoryId })
+    addNewItem.mutate({ listId, name: finalName, categoryId: categoryId ?? match?.categoryId })
     setAddInput('')
     inputRef.current?.focus()
   }
@@ -200,7 +203,8 @@ export function ListaScreen() {
           </div>
           <button
             onClick={() => {
-              templateSuggestions.forEach((s) => addNewItem.mutate({ name: s.name, categoryId: s.categoryId }))
+              if (listId === undefined) return
+              templateSuggestions.forEach((s) => addNewItem.mutate({ listId, name: s.name, categoryId: s.categoryId }))
             }}
             className="flex-none bg-[#2A2A2C] text-white text-[14px] px-4 py-[9px] rounded-full active:opacity-70"
           >
@@ -291,7 +295,7 @@ export function ListaScreen() {
         </div>
         <button
           onClick={() => {
-            clearList.mutate(undefined, { onSuccess: () => toast(t('lista.cleared')) })
+            if (listId !== undefined) clearList.mutate(listId, { onSuccess: () => toast(t('lista.cleared')) })
             setShowClear(false)
           }}
           className="w-full bg-[#D14343] text-white text-[17px] py-[18px] rounded-[20px] mb-3 active:scale-[.98] transition-transform"

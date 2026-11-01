@@ -18,10 +18,12 @@ export async function createSession(
   supermarketId: number,
   buoniSpent: number,
   buoniValueCents: number,
+  listId: number,
 ): Promise<number> {
   const id = await db.sessions.add({
     isoWeek,
     supermarketId,
+    listId,
     startedAt: Date.now(),
     finishedAt: null,
     confirmedTotalCents: null,

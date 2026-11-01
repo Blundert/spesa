@@ -7,8 +7,8 @@ export interface ListItemWithItem extends ListItem {
   suggestedPriceCents: number | null
 }
 
-export async function getListItems(): Promise<ListItemWithItem[]> {
-  const listItems = await db.listItems.toArray()
+export async function getListItems(listId: number): Promise<ListItemWithItem[]> {
+  const listItems = await db.listItems.where('listId').equals(listId).toArray()
 
   return Promise.all(
     listItems.map(async (li) => {
@@ -24,16 +24,16 @@ export async function getListItems(): Promise<ListItemWithItem[]> {
 }
 
 /**
- * Aggiunge un item alla lista globale.
- * Se già presente, incrementa la quantità invece di duplicare.
+ * Aggiunge un item a una lista.
+ * Se già presente in quella lista, incrementa la quantità invece di duplicare.
  */
-export async function addToList(itemId: number): Promise<void> {
-  const existing = await db.listItems.where('itemId').equals(itemId).first()
+export async function addToList(listId: number, itemId: number): Promise<void> {
+  const existing = await db.listItems.where('[listId+itemId]').equals([listId, itemId]).first()
 
   if (existing?.id !== undefined) {
     await db.listItems.update(existing.id, { quantity: existing.quantity + 1 })
   } else {
-    await db.listItems.add({ itemId, quantity: 1, addedAt: Date.now() })
+    await db.listItems.add({ listId, itemId, quantity: 1, addedAt: Date.now() })
   }
 }
 
@@ -50,15 +50,20 @@ export async function updateListItemQuantity(id: number, quantity: number): Prom
 }
 
 /**
- * Rimuove dalla lista solo le voci corrispondenti agli item acquistati
- * (usato a fine spesa). Le voci non acquistate restano in lista.
+ * Rimuove da una lista solo le voci corrispondenti agli item acquistati
+ * (usato a fine spesa). Le voci non acquistate e le altre liste restano invariate.
  */
-export async function removePurchasedFromList(itemIds: number[]): Promise<void> {
+export async function removePurchasedFromList(listId: number, itemIds: number[]): Promise<void> {
   if (itemIds.length === 0) return
-  await db.listItems.where('itemId').anyOf(itemIds).delete()
+  const ids = new Set(itemIds)
+  await db.listItems
+    .where('listId')
+    .equals(listId)
+    .filter((li) => ids.has(li.itemId))
+    .delete()
 }
 
-/** Svuota la lista: rimuove tutte le voci. Item del catalogo, prezzi e acquisti restano. */
-export async function clearList(): Promise<void> {
-  await db.listItems.clear()
+/** Svuota una lista: rimuove tutte le sue voci. Item del catalogo, prezzi e acquisti restano. */
+export async function clearList(listId: number): Promise<void> {
+  await db.listItems.where('listId').equals(listId).delete()
 }

@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate, useSearch } from '@tanstack/react-router'
 import { useQueryClient } from '@tanstack/react-query'
@@ -27,6 +27,7 @@ import {
   useAddNewItemToList,
 } from '../hooks/useListItems'
 import { useSupermarkets, useCategories, useItems } from '../hooks/useItems'
+import { useActiveList } from '../hooks/useShoppingLists'
 import { normalizeName } from '../lib/normalize'
 import { BASE_ITEMS } from '../lib/baseItems'
 import { PriceKeypad } from '../components/PriceKeypad'
@@ -43,7 +44,7 @@ const isoWeek = currentWeek()
 export function SpesaScreen() {
   const { t } = useTranslation()
   const navigate = useNavigate()
-  const { buoni, val } = useSearch({ from: '/spesa' })
+  const { buoni, val, list: searchListId } = useSearch({ from: '/spesa' })
   const [activeSessionId, setActiveSessionId] = useState<number | null>(null)
   const [priceTarget, setPriceTarget] = useState<{
     itemId: number
@@ -65,7 +66,7 @@ export function SpesaScreen() {
 
   const { data: sessions = [] } = useSessionsByWeek(isoWeek)
   const { data: supermarkets = [] } = useSupermarkets()
-  const { data: listItems = [] } = useListItems()
+  const { list: activeList } = useActiveList()
   const { data: categories = [] } = useCategories()
   const { data: items = [] } = useItems()
   const catMap = Object.fromEntries(categories.map((c) => [c.id ?? 0, categoryLabel(t, c.name)]))
@@ -107,6 +108,10 @@ export function SpesaScreen() {
 
   const { data: purchases = [] } = usePurchasesBySession(activeSession?.id ?? 0)
 
+  // Lista della spesa: quella della sessione; per una spesa nuova quella scelta nel pannello.
+  const listId = activeSession ? activeSession.listId : (searchListId ?? activeList?.id)
+  const { data: listItems = [] } = useListItems(listId)
+
   const createSession = useCreateSession(isoWeek)
   const finishSession = useFinishSession(isoWeek)
   const addPurchase = useAddPurchase(isoWeek)
@@ -135,18 +140,17 @@ export function SpesaScreen() {
     }
   }, [activeSession, activeSupermarket, supermarkets.length])
 
-  const handleStartSession = useCallback(
-    async (supermarketId: number) => {
-      const id = await createSession.mutateAsync({
-        supermarketId,
-        buoniSpent: buoni,
-        buoniValueCents: val,
-      })
-      setActiveSessionId(id)
-      setShowStorePicker(false)
-    },
-    [createSession, buoni, val],
-  )
+  const handleStartSession = async (supermarketId: number) => {
+    if (listId === undefined) return
+    const id = await createSession.mutateAsync({
+      supermarketId,
+      buoniSpent: buoni,
+      buoniValueCents: val,
+      listId,
+    })
+    setActiveSessionId(id)
+    setShowStorePicker(false)
+  }
 
   // La riga buoni è visibile solo con una sessione attiva (creata alla scelta del supermercato).
   const handleSaveBuoni = (buoniSpent: number, buoniValueCents: number) => {
@@ -178,102 +182,90 @@ export function SpesaScreen() {
   // Fuori lista senza prezzo: finisce tra le voci "da prendere"; il prezzo si inserisce
   // dopo, toccando la voce come una qualsiasi voce della lista.
   const handleAddOffListWithoutPrice = async (target: { name: string; categoryId?: number }) => {
+    if (listId === undefined) return
     const categoryId = await resolveOffListCategory(target)
-    await addNewItemToList.mutateAsync({ name: target.name, categoryId })
+    await addNewItemToList.mutateAsync({ listId, name: target.name, categoryId })
     toast(t('spesa.addedWithoutPrice', { name: target.name }), {
       description: t('spesa.addedWithoutPriceHint'),
     })
     setNewItemName('')
   }
 
-  const handleConfirmPrice = useCallback(
-    async (cents: number, quantity: number) => {
-      if (!activeSession?.id) return
-      if (priceTarget) {
-        if (priceTarget.purchaseId !== undefined) {
-          // Modifica della voce esistente (no clone)
-          await updatePurchase.mutateAsync({ id: priceTarget.purchaseId, priceCents: cents, quantity })
-        } else {
-          await addPurchase.mutateAsync({
-            sessionId: activeSession.id,
-            itemId: priceTarget.itemId,
-            priceCents: cents,
-            quantity,
-          })
-          const oop = Math.max(0, summary.spentCents + cents * quantity - liveBuoni * liveVal)
-          toast(t('spesa.itemAdded', { name: priceTarget.name }), {
-            description: t('spesa.outOfPocketAmount', { amount: formatCentsPlain(oop) }),
-          })
-        }
-        setPriceTarget(null)
-      } else if (newItemTarget) {
-        const { upsertItem } = await import('../db/repositories/items')
-        const categoryId = await resolveOffListCategory(newItemTarget)
-        const itemId = await upsertItem(newItemTarget.name, categoryId, cents)
-        await addPurchase.mutateAsync({ sessionId: activeSession.id, itemId, priceCents: cents, quantity })
-        toast(t('spesa.itemAdded', { name: newItemTarget.name }), {
-          description: `€${formatCentsPlain(cents)}`,
+  const handleConfirmPrice = async (cents: number, quantity: number) => {
+    if (!activeSession?.id) return
+    if (priceTarget) {
+      if (priceTarget.purchaseId !== undefined) {
+        // Modifica della voce esistente (no clone)
+        await updatePurchase.mutateAsync({ id: priceTarget.purchaseId, priceCents: cents, quantity })
+      } else {
+        await addPurchase.mutateAsync({
+          sessionId: activeSession.id,
+          itemId: priceTarget.itemId,
+          priceCents: cents,
+          quantity,
         })
-        setNewItemTarget(null)
-        setNewItemName('')
+        const oop = Math.max(0, summary.spentCents + cents * quantity - liveBuoni * liveVal)
+        toast(t('spesa.itemAdded', { name: priceTarget.name }), {
+          description: t('spesa.outOfPocketAmount', { amount: formatCentsPlain(oop) }),
+        })
       }
-    },
-    [activeSession, priceTarget, newItemTarget, addPurchase, updatePurchase, summary.spentCents, liveBuoni, liveVal, t],
-  )
+      setPriceTarget(null)
+    } else if (newItemTarget) {
+      const { upsertItem } = await import('../db/repositories/items')
+      const categoryId = await resolveOffListCategory(newItemTarget)
+      const itemId = await upsertItem(newItemTarget.name, categoryId, cents)
+      await addPurchase.mutateAsync({ sessionId: activeSession.id, itemId, priceCents: cents, quantity })
+      toast(t('spesa.itemAdded', { name: newItemTarget.name }), {
+        description: `€${formatCentsPlain(cents)}`,
+      })
+      setNewItemTarget(null)
+      setNewItemName('')
+    }
+  }
 
-  const handleChangeStore = useCallback(
-    async (supermarketId: number) => {
-      if (!activeSession?.id) {
-        await handleStartSession(supermarketId)
-        return
-      }
-      await db.sessions.update(activeSession.id, { supermarketId })
-      void qc.invalidateQueries({ queryKey: qk.sessions(isoWeek) })
-      setShowStorePicker(false)
-    },
-    [activeSession, handleStartSession, qc],
-  )
+  const handleChangeStore = async (supermarketId: number) => {
+    if (!activeSession?.id) {
+      await handleStartSession(supermarketId)
+      return
+    }
+    await db.sessions.update(activeSession.id, { supermarketId })
+    void qc.invalidateQueries({ queryKey: qk.sessions(isoWeek) })
+    setShowStorePicker(false)
+  }
 
-  const handleFinish = useCallback(() => {
+  const handleFinish = () => {
     if (!activeSession?.id) return
     setShowFinishConfirm(true)
-  }, [activeSession])
+  }
 
-  const handleConfirmFinish = useCallback(
-    async (cents: number) => {
-      if (!activeSession?.id) return
-      await finishSession.mutateAsync({ sessionId: activeSession.id, confirmedTotalCents: cents })
-      await removePurchasedFromList.mutateAsync(purchases.map((p) => p.itemId))
-      toast(t('spesa.saved'), {
-        description: `${supermarketName} · €${formatCentsPlain(cents)}`,
-      })
-      void navigate({ to: '/storico' })
-    },
-    [activeSession, finishSession, removePurchasedFromList, purchases, navigate, supermarketName, t],
-  )
+  const handleConfirmFinish = async (cents: number) => {
+    if (!activeSession?.id) return
+    await finishSession.mutateAsync({ sessionId: activeSession.id, confirmedTotalCents: cents })
+    if (listId !== undefined) {
+      await removePurchasedFromList.mutateAsync({ listId, itemIds: purchases.map((p) => p.itemId) })
+    }
+    toast(t('spesa.saved'), {
+      description: `${supermarketName} · €${formatCentsPlain(cents)}`,
+    })
+    void navigate({ to: '/storico' })
+  }
 
   // Depenna: annulla l'acquisto e rimette la voce tra "da prendere". Se era fuori lista
   // (non presente in lista) la aggiunge alla lista, così ricompare come una voce normale.
-  const uncheckCart = useCallback(
-    async (purchaseId: number, itemId: number) => {
-      await removePurchase.mutateAsync(purchaseId)
-      if (!listItems.some((l) => l.itemId === itemId)) {
-        await addToList.mutateAsync({ itemId })
-      }
-    },
-    [removePurchase, addToList, listItems],
-  )
+  const uncheckCart = async (purchaseId: number, itemId: number) => {
+    await removePurchase.mutateAsync(purchaseId)
+    if (listId !== undefined && !listItems.some((l) => l.itemId === itemId)) {
+      await addToList.mutateAsync({ listId, itemId })
+    }
+  }
 
   // Elimina del tutto una voce dal carrello: rimuove l'acquisto e, se era in lista,
   // la toglie anche dalla lista.
-  const eliminateCart = useCallback(
-    async (purchaseId: number, itemId: number) => {
-      await removePurchase.mutateAsync(purchaseId)
-      const li = listItems.find((l) => l.itemId === itemId)
-      if (li?.id !== undefined) await removeFromList.mutateAsync(li.id)
-    },
-    [removePurchase, removeFromList, listItems],
-  )
+  const eliminateCart = async (purchaseId: number, itemId: number) => {
+    await removePurchase.mutateAsync(purchaseId)
+    const li = listItems.find((l) => l.itemId === itemId)
+    if (li?.id !== undefined) await removeFromList.mutateAsync(li.id)
+  }
 
   // Divide lista in da prendere / nel carrello
   const purchasedItemIds = new Set(purchases.map((p) => p.itemId))

@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import { qk } from '../db/queryKeys'
 import { getWeekBudget, setBuoniAvailable } from '../db/repositories/weekBudget'
-import { getSessionsByWeek, createSession, finishSession, deleteWeek, updateSession as updateSessionRepo } from '../db/repositories/sessions'
+import { getSessionsByWeek, getSessionById, createSession, finishSession, deleteWeek, updateSession as updateSessionRepo } from '../db/repositories/sessions'
 import {
   getPurchasesBySession,
   addPurchase,
@@ -59,11 +59,13 @@ export function useCreateSession(isoWeek: string) {
       supermarketId,
       buoniSpent,
       buoniValueCents,
+      listId,
     }: {
       supermarketId: number
       buoniSpent: number
       buoniValueCents: number
-    }) => createSession(isoWeek, supermarketId, buoniSpent, buoniValueCents),
+      listId: number
+    }) => createSession(isoWeek, supermarketId, buoniSpent, buoniValueCents, listId),
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: qk.sessions(isoWeek) })
       void qc.invalidateQueries({ queryKey: qk.allSessions() })
@@ -261,8 +263,10 @@ export function useFinishPastSession(sessionId: number, isoWeek: string) {
   return useMutation({
     mutationFn: async (confirmedTotalCents: number) => {
       await finishSession(sessionId, confirmedTotalCents)
-      const purchases = await getPurchasesBySession(sessionId)
-      await removePurchasedFromList(purchases.map((p) => p.itemId))
+      const [session, purchases] = await Promise.all([getSessionById(sessionId), getPurchasesBySession(sessionId)])
+      if (session?.listId !== undefined) {
+        await removePurchasedFromList(session.listId, purchases.map((p) => p.itemId))
+      }
     },
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: qk.session(sessionId) })

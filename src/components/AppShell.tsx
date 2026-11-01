@@ -6,6 +6,7 @@ import { formatCentsPlain } from '../lib/money'
 import { weekSpendSummary } from '../lib/budgetSelectors'
 import { useWeekBudget, useSessionsByWeek } from '../hooks/useShopping'
 import { useAutoSync } from '../hooks/useAutoSync'
+import { useActiveList } from '../hooks/useShoppingLists'
 import { getDebugViewport, onDebugViewportChange } from '../lib/debugFlag'
 import { getDefaultBuonoValueCents } from '../lib/buoniSettings'
 import { isPrimaryPath, rememberPrimary } from '../lib/primarySection'
@@ -56,6 +57,7 @@ export function AppShell() {
   const { data: budget } = useWeekBudget(isoWeek)
   const { data: sessions = [] } = useSessionsByWeek(isoWeek)
   const { data: purchases = [] } = usePurchasesForWeek()
+  const { list } = useActiveList()
 
   const summary = weekSpendSummary(sessions, purchases, budget?.buoniAvailable ?? 0)
 
@@ -78,7 +80,8 @@ export function AppShell() {
     setSheetOpen(false)
     const buoni = newBuoni
     const val = newVal
-    setTimeout(() => void navigate({ to: '/spesa', search: { buoni, val } }), 300)
+    const listId = list?.id
+    setTimeout(() => void navigate({ to: '/spesa', search: { buoni, val, list: listId } }), 300)
   }
 
   return (

@@ -10,17 +10,19 @@ import {
 } from '../db/repositories/listItems'
 import { upsertItem } from '../db/repositories/items'
 
-export function useListItems() {
+/** Voci di una lista; senza lista (liste non ancora caricate) resta vuota. */
+export function useListItems(listId: number | undefined) {
   return useQuery({
-    queryKey: qk.listItems(),
-    queryFn: () => getListItems(),
+    queryKey: qk.listItemsOf(listId ?? 0),
+    queryFn: () => getListItems(listId ?? 0),
+    enabled: listId !== undefined,
   })
 }
 
 export function useAddToList() {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: ({ itemId }: { itemId: number }) => addToList(itemId),
+    mutationFn: ({ listId, itemId }: { listId: number; itemId: number }) => addToList(listId, itemId),
     onSuccess: () => {
       void qc.refetchQueries({ queryKey: qk.listItems(), type: 'all' })
     },
@@ -31,10 +33,10 @@ export function useAddToList() {
 export function useAddNewItemToList(defaultCategoryId: number) {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: async ({ name, categoryId }: { name: string; categoryId?: number }) => {
+    mutationFn: async ({ listId, name, categoryId }: { listId: number; name: string; categoryId?: number }) => {
       const catId = categoryId ?? defaultCategoryId
       const itemId = await upsertItem(name, catId)
-      await addToList(itemId)
+      await addToList(listId, itemId)
       return itemId
     },
     onSuccess: () => {
@@ -68,7 +70,8 @@ export function useUpdateListQuantity() {
 export function useRemovePurchasedFromList() {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: (itemIds: number[]) => removePurchasedFromList(itemIds),
+    mutationFn: ({ listId, itemIds }: { listId: number; itemIds: number[] }) =>
+      removePurchasedFromList(listId, itemIds),
     onSuccess: () => {
       void qc.refetchQueries({ queryKey: qk.listItems(), type: 'all' })
     },
@@ -78,7 +81,7 @@ export function useRemovePurchasedFromList() {
 export function useClearList() {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: () => clearList(),
+    mutationFn: (listId: number) => clearList(listId),
     onSuccess: () => {
       void qc.refetchQueries({ queryKey: qk.listItems(), type: 'all' })
     },

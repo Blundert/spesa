@@ -59,17 +59,17 @@ export function useClearMealPlan(isoWeek: string) {
 }
 
 /**
- * Importa nella lista della spesa gli ingredienti selezionati nei pasti pianificati
+ * Importa in una lista della spesa gli ingredienti selezionati nei pasti pianificati
  * della settimana. I duplicati si sommano (vedi `addToList`).
  */
 export function useImportMealPlanToList(isoWeek: string) {
   const qc = useQueryClient()
   const { t } = useTranslation()
   return useMutation({
-    mutationFn: async () => {
+    mutationFn: async (listId: number) => {
       const itemIds = await getSelectedItemIdsForWeek(isoWeek)
       for (const itemId of itemIds) {
-        await addToList(itemId)
+        await addToList(listId, itemId)
       }
       return itemIds.length
     },
