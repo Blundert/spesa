@@ -2,6 +2,10 @@ export type ChangelogEntry = { it: string[]; en: string[] }
 
 // Ordine: più recente in cima. Aggiungere una entry ad ogni nuova versione.
 export const changelog: Record<string, ChangelogEntry> = {
+  '0.30.0': {
+    it: ['Impostazioni → Buoni pasto: scegli il valore predefinito di un buono, proposto ogni volta che inizi una nuova spesa (prima era sempre €8,00)'],
+    en: ['Settings → Meal vouchers: choose the default value of a voucher, suggested every time you start a new shopping trip (it used to be always €8.00)'],
+  },
   '0.29.6': {
     it: ['Pasti: il bottone "Salva" non compare più (disabilitato) mentre scrivi il nome del piatto, ma solo dopo aver scelto un piatto o toccato "Crea piatto"'],
     en: ['Meals: the "Save" button no longer shows (disabled) while you type the dish name; it appears only after picking a dish or tapping "Create dish"'],

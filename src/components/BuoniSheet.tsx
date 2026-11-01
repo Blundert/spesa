@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { formatCentsPlain } from '../lib/money'
+import { MIN_BUONO_VALUE_CENTS } from '../lib/buoniSettings'
 import { BottomSheet } from './BottomSheet'
 
 /** Card con gli stepper "numero buoni" e "valore buono" (condivisa da Nuova spesa e Modifica buoni). */
@@ -34,18 +35,25 @@ export function BuoniSteppers({
       </div>
       <div className="flex items-center justify-between py-[14px]">
         <span className="text-base text-[#2A2A2C]">{t('spesa.buonoValue')}</span>
-        <div className="flex items-center gap-4">
-          <StepperBtn onClick={() => onValue(Math.max(50, valueCents - 50))} label="-">
-            <MinusIcon />
-          </StepperBtn>
-          <span className="text-[18px] font-normal text-[#2A2A2C] min-w-[54px] text-center tabular-nums">
-            €{formatCentsPlain(valueCents)}
-          </span>
-          <StepperBtn onClick={() => onValue(valueCents + 50)} label="+">
-            <PlusIcon />
-          </StepperBtn>
-        </div>
+        <BuonoValueStepper valueCents={valueCents} onValue={onValue} />
       </div>
+    </div>
+  )
+}
+
+/** Stepper −/+ del valore di un buono: passi da €0,50, minimo €0,50. */
+export function BuonoValueStepper({ valueCents, onValue }: { valueCents: number; onValue: (v: number) => void }) {
+  return (
+    <div className="flex items-center gap-4">
+      <StepperBtn onClick={() => onValue(Math.max(MIN_BUONO_VALUE_CENTS, valueCents - 50))} label="-">
+        <MinusIcon />
+      </StepperBtn>
+      <span className="text-[18px] font-normal text-[#2A2A2C] min-w-[54px] text-center tabular-nums">
+        €{formatCentsPlain(valueCents)}
+      </span>
+      <StepperBtn onClick={() => onValue(valueCents + 50)} label="+">
+        <PlusIcon />
+      </StepperBtn>
     </div>
   )
 }

@@ -6,6 +6,8 @@ import { toast } from 'sonner'
 import type { PWAInstallElement } from '@khmyznikov/pwa-install'
 import { LANG_KEY, type Lang } from '../i18n'
 import { getWeekStartDay, setWeekStartDay } from '../lib/weekSettings'
+import { getDefaultBuonoValueCents, setDefaultBuonoValueCents } from '../lib/buoniSettings'
+import { BuonoValueStepper } from '../components/BuoniSheet'
 import { dayShort } from '../lib/date'
 import { wipeAllData } from '../db/db'
 import { exportData, importData, isBackupData, type BackupData } from '../db/backup'
@@ -41,6 +43,7 @@ export function ImpostazioniScreen() {
   const [showPull, setShowPull] = useState(false)
   const [debug, setDebug] = useState<boolean>(() => getDebugViewport())
   const [weekStart, setWeekStart] = useState<number>(() => getWeekStartDay())
+  const [buonoValue, setBuonoValue] = useState<number>(() => getDefaultBuonoValueCents())
   const current: Lang = i18n.language.startsWith('en') ? 'en' : 'it'
 
   const setLang = (lng: Lang) => {
@@ -53,6 +56,11 @@ export function ImpostazioniScreen() {
     setWeekStart(day)
     void qc.invalidateQueries()
     toast(t('settings.weekStartDaySaved'))
+  }
+
+  const handleBuonoValue = (cents: number) => {
+    setDefaultBuonoValueCents(cents)
+    setBuonoValue(getDefaultBuonoValueCents())
   }
 
   const handleReplayTutorial = () => {
@@ -237,6 +245,16 @@ export function ImpostazioniScreen() {
             </button>
           ))}
         </div>
+
+        {/* Buoni pasto: valore predefinito per le nuove spese */}
+        <div className="text-[12px] font-normal tracking-[1.2px] text-[#9B9B9F] uppercase px-1.5 pb-[13px]">
+          {t('settings.buoni')}
+        </div>
+        <div className="bg-white rounded-[20px] px-5 py-[13px] flex items-center justify-between mb-2">
+          <span className="text-base text-[#2A2A2C]">{t('settings.defaultBuonoValue')}</span>
+          <BuonoValueStepper valueCents={buonoValue} onValue={handleBuonoValue} />
+        </div>
+        <div className="text-[13px] text-[#9B9B9F] px-1.5 mb-7">{t('settings.defaultBuonoValueHint')}</div>
 
         {/* Inizio settimana */}
         <div className="text-[12px] font-normal tracking-[1.2px] text-[#9B9B9F] uppercase px-1.5 pb-[13px]">

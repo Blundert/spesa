@@ -7,7 +7,7 @@ import { weekSpendSummary } from '../lib/budgetSelectors'
 import { useWeekBudget, useSessionsByWeek } from '../hooks/useShopping'
 import { useAutoSync } from '../hooks/useAutoSync'
 import { getDebugViewport, onDebugViewportChange } from '../lib/debugFlag'
-import { DEFAULT_BUONO_VALUE_CENTS } from '../db/types'
+import { getDefaultBuonoValueCents } from '../lib/buoniSettings'
 import { qk } from '../db/queryKeys'
 import { useQuery } from '@tanstack/react-query'
 import { db } from '../db/db'
@@ -35,7 +35,7 @@ export function AppShell() {
   const [menuOpen, setMenuOpen] = useState(false)
   const [sheetOpen, setSheetOpen] = useState(false)
   const [newBuoni, setNewBuoni] = useState(0)
-  const [newVal, setNewVal] = useState(DEFAULT_BUONO_VALUE_CENTS)
+  const [newVal, setNewVal] = useState(getDefaultBuonoValueCents)
   const [showDebug, setShowDebug] = useState(getDebugViewport())
   const router = useRouter()
   const navigate = useNavigate()
@@ -53,7 +53,7 @@ export function AppShell() {
   // Init della config nuova spesa nel click di apertura (no effetto → no lint).
   const openNewShopping = () => {
     setNewBuoni(summary.buoniRemaining)
-    setNewVal(DEFAULT_BUONO_VALUE_CENTS)
+    setNewVal(getDefaultBuonoValueCents())
     setSheetOpen(true)
   }
   const startShopping = () => {

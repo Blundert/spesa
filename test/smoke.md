@@ -185,3 +185,10 @@ Nota: su iOS 26+ il colore della barra è ricavato da iOS campionando la cima de
 1. Pasti → slot vuoto → scrivi un nome piatto e conferma → tocca "Aggiungi un ingrediente…" → la pagina **non** fa zoom (lo sheet resta a tutta larghezza, bordi arrotondati visibili)
 2. Ripeti su Piatti → modifica piatto → campo ingrediente, e su Statistiche → "Personalizzato" → campi data
 3. Chiudi la tastiera e prova lo zoom con due dita → deve ancora funzionare (accessibilità)
+
+### Flusso 22 — Valore predefinito dei buoni pasto
+1. Impostazioni → sezione "Buoni pasto" → "Valore predefinito" mostra €8,00 (al primo avvio)
+2. Tocca "+" quattro volte → €10,00; tocca "−" fino in fondo → si ferma a €0,50; riporta a €10,00
+3. Ricarica la pagina → il valore resta €10,00
+4. Home → barra in basso → "Nuova spesa": "Valore buono" parte da €10,00 → avvia la spesa con 1 buono → "Di tasca tua" usa €10,00
+5. Apri una spesa precedente dallo Storico → i suoi buoni mantengono il valore con cui era stata fatta (non diventano €10,00)

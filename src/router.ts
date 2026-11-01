@@ -1,6 +1,6 @@
 import { createRouter, createRootRoute, createRoute, Outlet } from '@tanstack/react-router'
 import { currentWeek } from './lib/date'
-import { DEFAULT_BUONO_VALUE_CENTS } from './db/types'
+import { getDefaultBuonoValueCents } from './lib/buoniSettings'
 import { AppShell } from './components/AppShell'
 import { HomeScreen } from './screens/HomeScreen'
 import { SpesaScreen } from './screens/SpesaScreen'
@@ -86,7 +86,7 @@ const spesaRoute = createRoute({
     const val = Number(search.val)
     return {
       buoni: Number.isFinite(buoni) && buoni >= 0 ? Math.floor(buoni) : 0,
-      val: Number.isFinite(val) && val > 0 ? Math.floor(val) : DEFAULT_BUONO_VALUE_CENTS,
+      val: Number.isFinite(val) && val > 0 ? Math.floor(val) : getDefaultBuonoValueCents(),
     }
   },
 })
