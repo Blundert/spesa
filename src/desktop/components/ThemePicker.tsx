@@ -11,7 +11,7 @@ export function ThemePicker() {
   const inUse = resolveTheme(pref, systemDark)
 
   return (
-    <div style={{ background: 'var(--t-surface)', borderRadius: '16px', padding: '24px', columnSpan: 'all', minWidth: 0, marginBottom: '24px', containerType: 'inline-size' }}>
+    <div style={{ background: 'var(--t-surface)', borderRadius: '16px', padding: '24px', minWidth: 0, marginBottom: '24px', containerType: 'inline-size' }}>
       <SectionTitle>{t('theme.title')}</SectionTitle>
       <div
         role="radiogroup"

@@ -334,7 +334,7 @@ Nota: il service worker è attivo solo in build di produzione (`npm run build` +
 7. Il colore della barra del browser (Android/Chrome, Safari) segue lo sfondo del tema. Su iPhone con l'app installata in Home la barra di stato resta chiara: limite noto di iOS
 8. Controlla in un tema scuro: Lista, Pasti, Storico (etichette verde/arancione dello scostamento), Statistiche, Catalogo, Supermercati, finestre di conferma, tastierino prezzi, tutorial
 
-### Flusso 38 — Impostazioni desktop: schede della stessa larghezza
-1. Impostazioni su desktop (1280 px) → "Aspetto" occupa tutta la larghezza; sotto, Lingua, Buoni pasto, Inizio settimana, Dati, App, Tutorial, Sincronizzazione e Debug sono tutte larghe uguali, su due colonne a muratura: ogni scheda sta sotto la precedente senza spazi vuoti in mezzo (a fine pagina una colonna può finire un po' più in alto dell'altra). Nessuna scheda si allarga a tutta la riga, nemmeno Lingua e Debug
-2. Su schermi molto larghi (1600–2560 px) restano due colonne, non tre: con tre la scheda alta della Sincronizzazione lasciava un grosso buco. A circa 1000 px due colonne più strette; sotto i 700 px una colonna sola
+### Flusso 38 — Impostazioni desktop: disposizione delle schede
+1. Impostazioni su desktop (1280 px) → "Aspetto" a tutta larghezza in alto; sotto due colonne di larghezza uguale e altezza simile (a sinistra Buoni pasto, Inizio settimana, App; a destra Lingua, Dati, Tutorial, Debug); in fondo "Sincronizzazione (GitHub)" a tutta larghezza. Nessun buco grande, nessuna scheda che si allarga da sola, nemmeno Lingua e Debug
+2. Lo stesso su schermi molto larghi (1600–2560 px): sempre due colonne. Sotto circa 700 px di contenuto (finestra stretta) diventa una colonna sola
 3. I sei campioni dei temi stanno su una sola riga quando c'è spazio, altrimenti 3 + 3; mai un campione da solo su una riga

@@ -34,7 +34,7 @@ const LANGS: { code: Lang; label: string }[] = [
 
 function Card({ title, hint, children }: { title: string; hint?: string; children: ReactNode }) {
   return (
-    <div style={{ background: 'var(--t-surface)', borderRadius: '16px', padding: '24px', minWidth: 0, breakInside: 'avoid', marginBottom: '24px' }}>
+    <div style={{ background: 'var(--t-surface)', borderRadius: '16px', padding: '24px', minWidth: 0 }}>
       <SectionTitle>{title}</SectionTitle>
       {hint && <div style={{ fontSize: '13px', color: 'var(--t-muted)', margin: '-8px 0 16px' }}>{hint}</div>}
       {children}
@@ -272,84 +272,98 @@ export function DesktopImpostazioniScreen() {
   return (
     <div style={{ padding: 'var(--page-pad-y) var(--page-pad-x)', maxWidth: '1200px' }}>
       <PageHeader title={t('settings.title')} subtitle={t('desktop.settings.subtitle')} />
-      {/* Colonne in stile "muratura": schede della stessa larghezza, ognuna sotto la precedente, al massimo due colonne (con tre, la scheda alta della sincronizzazione lascia un buco). */}
-      <div style={{ columnWidth: '340px', columnCount: 2, columnGap: '24px' }}>
+      {/* Aspetto a tutta larghezza; sotto due colonne di altezza simile (a mano: con le colonne CSS la scheda alta
+          della sincronizzazione sbilanciava tutto); Sincronizzazione, la più alta, a tutta larghezza in fondo. */}
+      <div style={{ containerType: 'inline-size' }}>
         <ThemePicker />
-
-        <Card title={t('settings.language')}>
-          <div style={{ display: 'flex', gap: '8px' }}>
-            {LANGS.map((l) => (
-              <button key={l.code} onClick={() => setLang(l.code)} style={pill(current === l.code)}>
-                {l.label}
+        <div className="settings-cols">
+          <div className="settings-col">
+          <Card title={t('settings.buoni')} hint={t('settings.defaultBuonoValueHint')}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <span style={{ fontSize: '14px', color: 'var(--t-fg)' }}>{t('settings.defaultBuonoValue')}</span>
+              <BuonoValueStepper valueCents={buonoValue} onValue={handleBuonoValue} />
+            </div>
+          </Card>
+          <Card title={t('settings.weekStartDay')} hint={t('desktop.settings.weekStartHint')}>
+            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+              {Array.from({ length: 7 }, (_, i) => (
+                <button key={i} onClick={() => handleWeekStart(i)} style={pill(weekStart === i)}>
+                  {dayShort(i)}
+                </button>
+              ))}
+            </div>
+          </Card>
+          <Card title={t('settings.app')}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+              <span style={{ fontSize: '14px', color: 'var(--t-fg)' }}>{t('settings.version')}</span>
+              <button
+                onClick={() => void navigate({ to: '/changelog' })}
+                style={{ all: 'unset', cursor: 'pointer', fontSize: '14px', color: 'var(--t-muted)', fontVariantNumeric: 'tabular-nums' }}
+              >
+                {__APP_VERSION__} ›
               </button>
-            ))}
-          </div>
-        </Card>
-
-        <Card title={t('settings.buoni')} hint={t('settings.defaultBuonoValueHint')}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <span style={{ fontSize: '14px', color: 'var(--t-fg)' }}>{t('settings.defaultBuonoValue')}</span>
-            <BuonoValueStepper valueCents={buonoValue} onValue={handleBuonoValue} />
-          </div>
-        </Card>
-
-        <Card title={t('settings.weekStartDay')} hint={t('desktop.settings.weekStartHint')}>
-          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-            {Array.from({ length: 7 }, (_, i) => (
-              <button key={i} onClick={() => handleWeekStart(i)} style={pill(weekStart === i)}>
-                {dayShort(i)}
+            </div>
+            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+              <button onClick={() => void handleUpdate()} style={action}>
+                {t('settings.refresh')}
               </button>
-            ))}
+              <button onClick={handleInstall} style={action}>
+                {t('install.title')}
+              </button>
+            </div>
+          </Card>
           </div>
-        </Card>
-
-        <Card title={t('settings.data')} hint={t('desktop.settings.backupHint')}>
-          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-            <button onClick={() => void handleExport()} style={action}>
-              {t('settings.exportData')}
+          <div className="settings-col">
+          <Card title={t('settings.language')}>
+            <div style={{ display: 'flex', gap: '8px' }}>
+              {LANGS.map((l) => (
+                <button key={l.code} onClick={() => setLang(l.code)} style={pill(current === l.code)}>
+                  {l.label}
+                </button>
+              ))}
+            </div>
+          </Card>
+          <Card title={t('settings.data')} hint={t('desktop.settings.backupHint')}>
+            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+              <button onClick={() => void handleExport()} style={action}>
+                {t('settings.exportData')}
+              </button>
+              <button onClick={() => fileInputRef.current?.click()} style={action}>
+                {t('settings.importData')}
+              </button>
+              <button onClick={() => setShowWipe(true)} style={danger}>
+                {t('settings.deleteAll')}
+              </button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="application/json,.json"
+                onChange={(e) => void handleFileSelected(e)}
+                style={{ display: 'none' }}
+              />
+            </div>
+          </Card>
+          <Card title={t('tutorial.section')}>
+            <button onClick={handleReplayTutorial} style={action}>
+              {t('tutorial.replay')}
             </button>
-            <button onClick={() => fileInputRef.current?.click()} style={action}>
-              {t('settings.importData')}
-            </button>
-            <button onClick={() => setShowWipe(true)} style={danger}>
-              {t('settings.deleteAll')}
-            </button>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="application/json,.json"
-              onChange={(e) => void handleFileSelected(e)}
-              style={{ display: 'none' }}
-            />
+          </Card>
+          <Card title={t('settings.debug')}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <span style={{ fontSize: '14px', color: 'var(--t-fg)' }}>{t('settings.debugViewport')}</span>
+              <Toggle
+                on={debug}
+                label={t('settings.debugViewport')}
+                onClick={() => {
+                  const next = !debug
+                  setDebug(next)
+                  setDebugViewport(next)
+                }}
+              />
+            </div>
+          </Card>
           </div>
-        </Card>
-
-        <Card title={t('settings.app')}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
-            <span style={{ fontSize: '14px', color: 'var(--t-fg)' }}>{t('settings.version')}</span>
-            <button
-              onClick={() => void navigate({ to: '/changelog' })}
-              style={{ all: 'unset', cursor: 'pointer', fontSize: '14px', color: 'var(--t-muted)', fontVariantNumeric: 'tabular-nums' }}
-            >
-              {__APP_VERSION__} ›
-            </button>
-          </div>
-          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-            <button onClick={() => void handleUpdate()} style={action}>
-              {t('settings.refresh')}
-            </button>
-            <button onClick={handleInstall} style={action}>
-              {t('install.title')}
-            </button>
-          </div>
-        </Card>
-
-        <Card title={t('tutorial.section')}>
-          <button onClick={handleReplayTutorial} style={action}>
-            {t('tutorial.replay')}
-          </button>
-        </Card>
-
+        </div>
         <Card title={t('settings.sync')} hint={t('settings.syncHint')}>
           <div style={{ background: 'var(--t-surface2)', borderRadius: '12px', padding: '14px 16px', marginBottom: '16px' }}>
             <div style={{ fontSize: '12px', color: 'var(--t-muted)', textTransform: 'uppercase', letterSpacing: '0.4px', marginBottom: '8px' }}>
@@ -407,21 +421,6 @@ export function DesktopImpostazioniScreen() {
             <button onClick={() => setShowPull(true)} disabled={syncing} style={{ ...action, opacity: syncing ? 0.5 : 1 }}>
               {t('settings.syncPull')}
             </button>
-          </div>
-        </Card>
-
-        <Card title={t('settings.debug')}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <span style={{ fontSize: '14px', color: 'var(--t-fg)' }}>{t('settings.debugViewport')}</span>
-            <Toggle
-              on={debug}
-              label={t('settings.debugViewport')}
-              onClick={() => {
-                const next = !debug
-                setDebug(next)
-                setDebugViewport(next)
-              }}
-            />
           </div>
         </Card>
       </div>

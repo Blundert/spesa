@@ -2,6 +2,10 @@ export type ChangelogEntry = { it: string[]; en: string[] }
 
 // Ordine: più recente in cima. Aggiungere una entry ad ogni nuova versione.
 export const changelog: Record<string, ChangelogEntry> = {
+  '0.43.3': {
+    it: ['Impostazioni su desktop: le schede sono distribuite in due colonne di altezza simile (prima a sinistra ce n\'erano molte più che a destra); la Sincronizzazione GitHub, la più alta, occupa tutta la larghezza in fondo'],
+    en: ['Settings on desktop: cards are spread across two columns of similar height (before, the left had many more than the right); GitHub sync, the tallest, spans the full width at the bottom'],
+  },
   '0.43.2': {
     it: ['Impostazioni su desktop: le schede si dispongono a colonne senza spazi vuoti (due colonne al massimo, anche su schermi molto larghi) e i campioni dei temi stanno tutti su una riga, oppure 3 + 3'],
     en: ['Settings on desktop: cards now flow into columns with no gaps (two columns at most, even on very wide screens) and the theme swatches fit on one row, or 3 + 3'],
