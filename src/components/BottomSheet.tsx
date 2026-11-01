@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
 import { Drawer } from 'vaul'
-import { STATUS_BAR_SHEET, useStatusBarTint } from '../lib/statusBarTint'
 
 interface BottomSheetProps {
   open: boolean
@@ -11,7 +10,9 @@ interface BottomSheetProps {
   hasInput?: boolean
 }
 
-const EXPANDED_HEIGHT = 'calc(100dvh - env(safe-area-inset-top) - 20px)'
+// 12px = stacco dalla barra di stato, uguale a quanto il velo sporge ai lati (vedi Drawer.Overlay):
+// le curve di velo (42px) e sheet (30px) restano concentriche.
+const EXPANDED_HEIGHT = 'calc(100dvh - env(safe-area-inset-top) - 12px)'
 const DEFAULT_MAX_HEIGHT = '85dvh'
 /** Durata dell'animazione di apertura di Vaul (style.css: 0.5s). */
 const OPEN_ANIMATION_MS = 500
@@ -26,7 +27,6 @@ export function BottomSheet({
   const [keyboardHeight, setKeyboardHeight] = useState(0)
   const [viewportHeight, setViewportHeight] = useState(0)
   const scrollRef = useRef<HTMLDivElement>(null)
-  useStatusBarTint(open, STATUS_BAR_SHEET)
 
   // Focus sul campo marcato `data-autofocus` solo a sheet arrivato in posizione.
   // Con `autoFocus` il campo riceve il focus mentre lo sheet è ancora sotto il bordo
@@ -76,7 +76,14 @@ export function BottomSheet({
     // all'apertura della tastiera, in conflitto con la logica qui sopra.
     <Drawer.Root open={open} onOpenChange={(v) => !v && onClose()} dismissible repositionInputs={false}>
       <Drawer.Portal>
-        <Drawer.Overlay className="fixed inset-0 bg-black/32 z-[80]" />
+        {/* La barra di stato resta sempre chiara: il velo scuro sotto di essa è una scheda con
+            angoli superiori da 42px (30 dello sheet + 12 di stacco), allargata di 12px per lato
+            così le curve di velo e sheet sono concentriche e ai lati non resta grigio.
+            Il contenitore resta largo quanto lo schermo (overflow-hidden) per non creare scroll
+            orizzontale su iOS. */}
+        <Drawer.Overlay className="fixed inset-0 z-[80] overflow-hidden">
+          <div className="absolute inset-y-0 -inset-x-3 bg-black/32 rounded-t-[42px]" />
+        </Drawer.Overlay>
         <Drawer.Content
           style={contentStyle}
           className="fixed bottom-0 z-[90] bg-white rounded-t-[30px] pt-[10px] shadow-[0_-12px_44px_rgba(0,0,0,.16)] outline-none w-full max-w-[430px] left-1/2 -translate-x-1/2 flex flex-col"

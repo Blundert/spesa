@@ -177,13 +177,12 @@ Nota: il service worker è attivo solo in build di produzione (`npm run build` +
 8. Torna alla Home: "Di tasca tua" e "N buoni spesi · M rimanenti" riflettono i nuovi buoni della sessione
 9. Ripeti il punto 7 su una sessione "Non completata" dello Storico
 
-### Flusso 20 — Colore barra di stato coerente con l'app (test su iPhone, app installata in Home)
-Nota: su iOS 26+ il colore della barra è ricavato da iOS campionando la cima della pagina; l'app mette una striscia fissa in cima del colore finale (vedi `src/lib/statusBarTint.ts`). `theme-color` deve restare `#2A2A2C`.
+### Flusso 20 — Barra di stato chiara e velo con angoli arrotondati (test su iPhone, app installata in Home)
 1. Apri l'app dalla Home: la barra di stato (ora, batteria) è chiara come lo sfondo dell'app
-2. Apri un qualsiasi bottom sheet (es. Pasti → slot vuoto, menu ☰, conferma eliminazione) → la barra si scurisce insieme al velo grigio
-3. Chiudi il sheet (swipe giù, tap sul velo o azione) → la barra torna chiara. Ripeti più volte: mai barra scura a sheet chiuso, mai barra chiara a sheet aperto
-4. In Spesa tocca un prezzo → tastierino prezzi: la barra si scurisce; chiudi → torna chiara
-5. In Spesa con tessera fedeltà → apri la tessera: barra quasi nera come il velo; chiudi → torna chiara
+2. Apri un qualsiasi bottom sheet (es. Pasti → slot vuoto, menu ☰, conferma eliminazione) → la barra **resta chiara**; il velo grigio sotto di essa ha gli angoli superiori sinistro e destro arrotondati (si vede il chiaro negli angoli). Negli sheet a tutto schermo con campo di testo la fascia di velo sopra lo sheet è sottile (12px) e le due curve sono parallele (concentriche); ai lati dello sheet non c'è grigio. La pagina non scorre in orizzontale
+3. Chiudi il sheet → nessun residuo grigio, barra sempre chiara. Ripeti più volte
+4. In Spesa tocca un prezzo → tastierino prezzi: stesso velo con angoli arrotondati
+5. In Spesa con tessera fedeltà → apri la tessera: velo quasi nero, anch'esso con angoli superiori arrotondati
 
 ### Flusso 21 — Nessuno zoom al tocco dei campi di testo (test su iPhone)
 1. Pasti → slot vuoto → scrivi un nome piatto e conferma → tocca "Aggiungi un ingrediente…" → la pagina **non** fa zoom (lo sheet resta a tutta larghezza, bordi arrotondati visibili)

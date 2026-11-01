@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Drawer } from 'vaul'
 import { formatCentsPlain } from '../lib/money'
-import { STATUS_BAR_SHEET, useStatusBarTint } from '../lib/statusBarTint'
 
 interface PriceKeypadProps {
   open: boolean
@@ -38,7 +37,6 @@ export function PriceKeypad({
 }: PriceKeypadProps) {
   const { t } = useTranslation()
   const confirmText = confirmLabel ?? t('common.confirm')
-  useStatusBarTint(open, STATUS_BAR_SHEET)
   const [cents, setCents] = useState(initialCents)
   const [quantity, setQuantity] = useState(initialQuantity)
 
@@ -71,7 +69,10 @@ export function PriceKeypad({
   return (
     <Drawer.Root open={open} onOpenChange={(v) => !v && onClose()} dismissible>
       <Drawer.Portal>
-        <Drawer.Overlay className="fixed inset-0 bg-black/32 z-[80]" />
+        {/* Velo con angoli concentrici agli sheet: vedi BottomSheet. */}
+        <Drawer.Overlay className="fixed inset-0 z-[80] overflow-hidden">
+          <div className="absolute inset-y-0 -inset-x-3 bg-black/32 rounded-t-[42px]" />
+        </Drawer.Overlay>
         <Drawer.Content className="fixed bottom-0 z-[90] w-full max-w-[430px] left-1/2 -translate-x-1/2 bg-white rounded-t-[30px] px-[22px] pb-[calc(22px+env(safe-area-inset-bottom))] pt-[10px] shadow-[0_-12px_44px_rgba(0,0,0,.16)] outline-none">
           <Drawer.Handle className="w-[38px] h-[5px] rounded-full bg-[#D8D8D6] mx-auto mb-4" />
 

@@ -2,6 +2,10 @@ export type ChangelogEntry = { it: string[]; en: string[] }
 
 // Ordine: più recente in cima. Aggiungere una entry ad ogni nuova versione.
 export const changelog: Record<string, ChangelogEntry> = {
+  '0.31.1': {
+    it: ['La barra di stato in alto resta sempre chiara; quando si apre un menu dal basso, lo sfondo scurito ha gli angoli superiori arrotondati, paralleli a quelli del menu'],
+    en: ['The status bar at the top now always stays light; when a bottom sheet opens, the dimmed background has rounded top corners, parallel to the sheet\'s'],
+  },
   '0.31.0': {
     it: ['Spesa → "Aggiungi fuori lista": nel tastierino c\'è ora "Aggiungi senza prezzo". L\'oggetto finisce tra quelli da prendere e il prezzo lo inserisci dopo, toccandolo'],
     en: ['Shopping → "Add off-list item": the keypad now has "Add without price". The item goes to the ones to pick up and you enter the price later by tapping it'],

@@ -28,7 +28,6 @@ import {
 } from '../hooks/useListItems'
 import { useSupermarkets, useCategories, useItems } from '../hooks/useItems'
 import { normalizeName } from '../lib/normalize'
-import { STATUS_BAR_DARK, useStatusBarTint } from '../lib/statusBarTint'
 import { BASE_ITEMS } from '../lib/baseItems'
 import { PriceKeypad } from '../components/PriceKeypad'
 import { BottomSheet } from '../components/BottomSheet'
@@ -128,7 +127,6 @@ export function SpesaScreen() {
     ? (supermarkets.find((s) => s.id === activeSession.supermarketId) ?? null)
     : null
   const supermarketName = activeSupermarket?.name ?? (activeSession ? '?' : '—')
-  useStatusBarTint(showCard && !!activeSupermarket?.loyaltyCard, STATUS_BAR_DARK)
 
   // Auto-open store picker if active session has no valid supermarket
   useEffect(() => {
@@ -647,13 +645,15 @@ export function SpesaScreen() {
       {/* Overlay tessera fedeltà */}
       {showCard && activeSupermarket?.loyaltyCard && (
         <div
-          className="fixed inset-0 z-[60] bg-black/80 flex items-center justify-center p-6"
+          className="fixed inset-0 z-[60] overflow-hidden flex items-center justify-center p-6"
           onClick={() => setShowCard(false)}
         >
+          {/* Velo con angoli come quello degli sheet (vedi BottomSheet). */}
+          <div className="absolute inset-y-0 -inset-x-3 bg-black/80 rounded-t-[42px]" />
           <img
             src={activeSupermarket.loyaltyCard}
             alt={t('supermercati.cardOf', { name: activeSupermarket.name })}
-            className="max-w-full max-h-full rounded-[16px] object-contain shadow-2xl"
+            className="relative max-w-full max-h-full rounded-[16px] object-contain shadow-2xl"
           />
         </div>
       )}
