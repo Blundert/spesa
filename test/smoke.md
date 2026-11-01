@@ -307,3 +307,9 @@ Nota: il service worker è attivo solo in build di produzione (`npm run build` +
 6. Menu laterale: in fondo il pulsante ‹ / › compatta e riespande (solo icone con tooltip, "Inizia la spesa" diventa un'icona carrello, le voci "Gestisci" sono separate da una linea). Ricarica: la scelta resta
 7. Senza una scelta manuale il menu è compatto sotto i 1100 px e esteso sopra; con la scelta manuale vale quella a qualsiasi larghezza
 8. A 768 px e 800 px ogni pagina è utilizzabile: spaziature ridotte, tabelle che scorrono di lato, griglia dei pasti tutta visibile (Sab → Ven)
+
+### Flusso 35 — Statistiche mobile non resta sul caricamento
+1. Menu → Statistiche con l'intervallo "30 giorni" (quello predefinito) e dei dati → la pagina mostra subito Riepilogo, Buoni pasto e Andamento; non resta mai ferma sulla scritta "Conferma" al centro
+2. Tocca "7 giorni", "3 mesi", "6 mesi", "Tutto", poi di nuovo "30 giorni" → ogni volta i numeri si aggiornano (i totali crescono passando da 7 giorni a 6 mesi) senza restare sul caricamento
+3. Lascia la pagina aperta e riaprila dopo la mezzanotte: l'intervallo "N giorni" parte dalla mezzanotte di N giorni fa (cambia solo al cambio di giorno)
+4. Su desktop (finestra larga) apri Statistiche, restringi sotto i 768 px: la pagina mobile Statistiche si apre e mostra i dati

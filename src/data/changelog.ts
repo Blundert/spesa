@@ -2,6 +2,10 @@ export type ChangelogEntry = { it: string[]; en: string[] }
 
 // Ordine: più recente in cima. Aggiungere una entry ad ogni nuova versione.
 export const changelog: Record<string, ChangelogEntry> = {
+  '0.41.1': {
+    it: ['Statistiche: con "7 giorni", "30 giorni", "3 mesi" o "6 mesi" la pagina restava bloccata sul caricamento. Ora si apre sempre e mostra i dati'],
+    en: ['Statistics: with "7 days", "30 days", "3 months" or "6 months" the page got stuck on loading. It now always opens and shows the data'],
+  },
   '0.41.0': {
     it: [
       'Desktop e mobile si scambiano al volo: ridimensionando la finestra l\'app passa da un\'interfaccia all\'altra senza ricaricare, restando sulla stessa pagina e con gli stessi dati',

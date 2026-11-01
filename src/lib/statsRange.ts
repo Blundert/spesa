@@ -72,6 +72,11 @@ export function rangeToTimestamps(
       toTs: new Date(`${custom.to}T23:59:59.999`).getTime(),
     }
   }
-  const days = RANGE_DAYS[range]
-  return { fromTs: Date.now() - days * 24 * 60 * 60 * 1000, toTs: null }
+  // Dalla mezzanotte locale di N giorni fa, non da "adesso − N giorni": il valore finisce nella
+  // chiave della query e se cambiasse a ogni render la query ripartirebbe di continuo
+  // (la pagina restava sul caricamento per sempre).
+  const from = new Date()
+  from.setHours(0, 0, 0, 0)
+  from.setDate(from.getDate() - RANGE_DAYS[range])
+  return { fromTs: from.getTime(), toTs: null }
 }
