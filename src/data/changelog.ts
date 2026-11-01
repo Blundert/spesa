@@ -2,6 +2,10 @@ export type ChangelogEntry = { it: string[]; en: string[] }
 
 // Ordine: più recente in cima. Aggiungere una entry ad ogni nuova versione.
 export const changelog: Record<string, ChangelogEntry> = {
+  '0.29.1': {
+    it: ['Fix: su iOS i menu dal basso con campo di testo (es. nome piatto nei Pasti) restano fermi quando si apre la tastiera, senza più diventare una schermata bianca'],
+    en: ['Fix: on iOS, bottom sheets with a text field (e.g. dish name in Meals) stay put when the keyboard opens, no longer turning into a blank white screen'],
+  },
   '0.29.0': {
     it: ['Buoni pasto modificabili: tocca "N buoni" durante la spesa o nel dettaglio di una spesa dello Storico per cambiare numero e valore dei buoni usati'],
     en: ['Editable meal vouchers: tap "N vouchers" while shopping or in a past session\'s detail to change how many vouchers you used and their value'],

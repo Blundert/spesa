@@ -10,7 +10,7 @@ interface BottomSheetProps {
   hasInput?: boolean
 }
 
-const EXPANDED_MAX_HEIGHT = 'calc(100dvh - env(safe-area-inset-top) - 20px)'
+const EXPANDED_HEIGHT = 'calc(100dvh - env(safe-area-inset-top) - 20px)'
 const DEFAULT_MAX_HEIGHT = '85dvh'
 
 export function BottomSheet({
@@ -20,9 +20,8 @@ export function BottomSheet({
   showHandle = true,
   hasInput = false,
 }: BottomSheetProps) {
-  const baseMaxHeight = hasInput ? EXPANDED_MAX_HEIGHT : DEFAULT_MAX_HEIGHT
-  const [offsetBottom, setOffsetBottom] = useState(0)
-  const [maxHeight, setMaxHeight] = useState(baseMaxHeight)
+  const [keyboardHeight, setKeyboardHeight] = useState(0)
+  const [viewportHeight, setViewportHeight] = useState(0)
 
   useEffect(() => {
     if (!open) return
@@ -30,37 +29,48 @@ export function BottomSheet({
     const update = () => {
       const vv = window.visualViewport
       if (!vv) return
-      const keyboardHeight = Math.max(0, window.innerHeight - vv.height - vv.offsetTop)
-      if (keyboardHeight > 50) {
-        setOffsetBottom(keyboardHeight)
-        setMaxHeight(`${vv.height - 16}px`)
-      } else {
-        setOffsetBottom(0)
-        setMaxHeight(baseMaxHeight)
-      }
+      const kb = Math.max(0, window.innerHeight - vv.height - vv.offsetTop)
+      setKeyboardHeight(kb > 50 ? kb : 0)
+      setViewportHeight(vv.height)
     }
 
     update()
     window.visualViewport?.addEventListener('resize', update)
     return () => {
       window.visualViewport?.removeEventListener('resize', update)
-      setOffsetBottom(0)
-      setMaxHeight(baseMaxHeight)
+      setKeyboardHeight(0)
     }
-  }, [open, baseMaxHeight])
+  }, [open])
+
+  // Con input: lo sheet resta fermo a tutta altezza anche con la tastiera aperta
+  // (la tastiera copre solo la parte bassa) e il contenuto riceve un padding pari
+  // alla tastiera, così tutto resta raggiungibile scrollando. Muovere/ridimensionare
+  // lo sheet mentre iOS apre la tastiera lo manda fuori schermo (vista bianca).
+  // Senza input: lo sheet sale sopra un'eventuale tastiera.
+  const contentStyle = hasInput
+    ? { height: EXPANDED_HEIGHT }
+    : keyboardHeight > 0
+      ? { bottom: keyboardHeight, maxHeight: `${viewportHeight - 16}px` }
+      : { maxHeight: DEFAULT_MAX_HEIGHT }
+  const scrollStyle = hasInput && keyboardHeight > 0 ? { paddingBottom: keyboardHeight + 22 } : undefined
 
   return (
-    <Drawer.Root open={open} onOpenChange={(v) => !v && onClose()} dismissible>
+    // repositionInputs={false}: Vaul altrimenti riscrive height/bottom dello sheet
+    // all'apertura della tastiera, in conflitto con la logica qui sopra.
+    <Drawer.Root open={open} onOpenChange={(v) => !v && onClose()} dismissible repositionInputs={false}>
       <Drawer.Portal>
         <Drawer.Overlay className="fixed inset-0 bg-black/32 z-[80]" />
         <Drawer.Content
-          style={hasInput ? { bottom: offsetBottom, height: maxHeight } : { bottom: offsetBottom, maxHeight }}
-          className="fixed z-[90] bg-white rounded-t-[30px] pt-[10px] shadow-[0_-12px_44px_rgba(0,0,0,.16)] outline-none w-full max-w-[430px] left-1/2 -translate-x-1/2 flex flex-col"
+          style={contentStyle}
+          className="fixed bottom-0 z-[90] bg-white rounded-t-[30px] pt-[10px] shadow-[0_-12px_44px_rgba(0,0,0,.16)] outline-none w-full max-w-[430px] left-1/2 -translate-x-1/2 flex flex-col"
         >
           {showHandle && (
             <Drawer.Handle className="w-[38px] h-[5px] rounded-full bg-[#D8D8D6] mx-auto mb-4 shrink-0" />
           )}
-          <div className="overflow-y-auto px-[22px] pb-[calc(22px+env(safe-area-inset-bottom))] flex-1">
+          <div
+            style={scrollStyle}
+            className="overflow-y-auto overscroll-contain px-[22px] pb-[calc(22px+env(safe-area-inset-bottom))] flex-1"
+          >
             {children}
           </div>
         </Drawer.Content>

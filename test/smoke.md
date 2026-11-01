@@ -152,15 +152,15 @@ Nota: il service worker è attivo solo in build di produzione (`npm run build` +
 5. Torna su Spesa, tocca di nuovo "Aggiungi fuori lista", digita un nome che non corrisponde a nulla → verifica che non compaia alcun suggerimento, solo il bottone "Continua" → conferma un prezzo
 6. Vai su Catalogo → verifica che questo secondo articolo sia comparso sotto "Altro"
 
-### Flusso 18 — Bottom sheet quasi a schermo intero per i form con input (test su dispositivo iOS reale)
+### Flusso 18 — Bottom sheet con input e tastiera (test su dispositivo iOS reale)
 1. Su un iPhone reale (non simulabile in desktop), apri uno dei bottom sheet con un campo di testo: Catalogo → "Aggiungi categoria" (o "Rinomina categoria/articolo"), Supermercati → "Nuovo supermercato", Spesa → "Aggiungi fuori lista", Piatti → "Aggiungi piatto", Pasti → tocca uno slot vuoto, Statistiche → chip "Personalizzato"
-2. Verifica che il sheet si apra già quasi a schermo intero (non all'altezza parziale usata dagli altri sheet, es. le conferme di eliminazione)
-3. Tocca il campo di testo e verifica che la tastiera compaia senza glitch visibili (salti, flash, contenuto tagliato) e che il campo toccato resti visibile sopra la tastiera
-4. Scrolla il contenuto del sheet mentre la tastiera è aperta → verifica che la parte sopra la tastiera scrolli correttamente e che il bottone di conferma in fondo sia raggiungibile
-5. Chiudi la tastiera (tap fuori dal campo) → verifica che il sheet torni all'altezza quasi piena senza glitch
-6. In Sessione/Spesa → tocca "Cambia negozio" (o l'equivalente store picker): verifica che il sheet resti all'altezza normale (lista di negozi, no input) finché non tocchi "Aggiungi supermercato" → in quel momento il sheet deve espandersi quasi a schermo intero e mostrare il campo di testo senza glitch
-7. Verifica che il drag-to-dismiss (swipe verso il basso sull'handle) funzioni ancora normalmente su questi sheet espansi
-8. Ripeti su un piatto/pasto con lista ingredienti lunga (molti ingredienti) per verificare che lo scroll del contenuto sopra la tastiera funzioni anche con più elementi
+2. Verifica che il sheet si apra quasi a schermo intero (non all'altezza parziale usata dagli altri sheet, es. le conferme di eliminazione)
+3. Tocca il campo di testo → la tastiera compare e il sheet **resta fermo**: titolo, campo e bottone restano visibili in alto, la tastiera copre solo la parte bassa (vuota) del sheet. Mai una schermata bianca senza contenuto
+4. Su un piatto/pasto con lista ingredienti lunga: con la tastiera aperta scrolla il contenuto del sheet → tutto, fino al bottone in fondo, si può portare sopra la tastiera
+5. Chiudi la tastiera (✓ della barra iOS o tap fuori dal campo) → il sheet resta quasi a schermo intero, senza salti
+6. In Sessione/Spesa → store picker: il sheet ha l'altezza normale finché non tocchi "Aggiungi supermercato" → si espande quasi a schermo intero e la tastiera si comporta come al punto 3
+7. Verifica che il drag-to-dismiss (swipe verso il basso sull'handle) funzioni ancora normalmente
+8. Chiudi il sheet con la tastiera aperta → la pagina sottostante (es. Pianifica i pasti) torna intatta, senza aree bianche o scroll spostato
 
 ### Flusso 19 — Modifica buoni pasto di una spesa (durante e dopo)
 1. Avvia una nuova spesa con 2 buoni da €8,00 (barra in basso → stepper → "Inizia la spesa") e scegli un supermercato
