@@ -21,6 +21,7 @@ export default defineConfig({
         'src/lib/imageUtils.ts',
         'src/db/repositories/categories.ts',
         'src/db/repositories/stats.ts',
+        'src/db/repositories/statsExtended.ts',
         'src/db/repositories/listItems.ts',
         'src/db/repositories/shoppingLists.ts',
       ],

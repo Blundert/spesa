@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import type { DesktopRange } from '../../hooks/useDesktopStats'
 
 interface RangeSelectorProps {
@@ -5,15 +6,16 @@ interface RangeSelectorProps {
   onChange: (range: DesktopRange) => void
 }
 
-const OPTIONS: { label: string; value: DesktopRange }[] = [
-  { label: '4 sett.', value: 4 },
-  { label: '12 sett.', value: 12 },
-  { label: '6 mesi', value: 26 },
-  { label: '1 anno', value: 52 },
-  { label: 'Tutto', value: null },
+const OPTIONS: { labelKey: string; value: DesktopRange }[] = [
+  { labelKey: 'desktop.range.w4', value: 4 },
+  { labelKey: 'desktop.range.w12', value: 12 },
+  { labelKey: 'desktop.range.m6', value: 26 },
+  { labelKey: 'desktop.range.y1', value: 52 },
+  { labelKey: 'desktop.range.all', value: null },
 ]
 
 export function RangeSelector({ value, onChange }: RangeSelectorProps) {
+  const { t } = useTranslation()
   return (
     <div
       style={{
@@ -43,7 +45,7 @@ export function RangeSelector({ value, onChange }: RangeSelectorProps) {
               boxShadow: isActive ? '0 1px 3px rgba(0,0,0,0.08)' : 'none',
             }}
           >
-            {opt.label}
+            {t(opt.labelKey)}
           </button>
         )
       })}

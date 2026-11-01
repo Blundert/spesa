@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import {
   ResponsiveContainer,
   LineChart,
@@ -12,9 +13,9 @@ import {
   PieChart,
   Pie,
   Cell,
-  Legend,
 } from 'recharts'
 import { StatCard } from '../components/StatCard'
+import { PageHeader, SectionTitle } from '../components/PageHeader'
 import { RangeSelector } from '../components/RangeSelector'
 import { useDesktopStats, type DesktopRange } from '../../hooks/useDesktopStats'
 import { formatCents } from '../../lib/money'
@@ -24,23 +25,6 @@ const CATEGORY_COLORS = [
   '#2A2A2C', '#6B6B70', '#9B9B9F', '#B5B5BA', '#D1D1D6', '#AEAEB2',
   '#48484A', '#636366', '#8E8E93', '#C7C7CC',
 ]
-
-function SectionTitle({ children }: { children: React.ReactNode }) {
-  return (
-    <h2
-      style={{
-        fontSize: '13px',
-        fontWeight: 500,
-        color: '#9B9B9F',
-        letterSpacing: '0.5px',
-        textTransform: 'uppercase',
-        margin: '0 0 16px',
-      }}
-    >
-      {children}
-    </h2>
-  )
-}
 
 interface CustomTooltipProps {
   active?: boolean
@@ -75,6 +59,7 @@ function EuroTooltip({ active, payload, label }: CustomTooltipProps) {
 }
 
 export function DashboardScreen() {
+  const { t } = useTranslation()
   const [range, setRange] = useState<DesktopRange>(12)
   const { stats, supermarketStats, budgetEfficiency } = useDesktopStats(range)
 
@@ -111,48 +96,41 @@ export function DashboardScreen() {
 
   return (
     <div style={{ padding: '32px 36px', maxWidth: '1200px' }}>
-      {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '28px' }}>
-        <div>
-          <h1 style={{ fontSize: '22px', fontWeight: 600, color: '#2A2A2C', margin: 0, letterSpacing: '-0.3px' }}>
-            Dashboard
-          </h1>
-          <div style={{ fontSize: '13px', color: '#9B9B9F', marginTop: '2px' }}>
-            Riepilogo spese
-          </div>
-        </div>
-        <RangeSelector value={range} onChange={setRange} />
-      </div>
+      <PageHeader
+        title={t('desktop.dashboard.title')}
+        subtitle={t('desktop.dashboard.subtitle')}
+        right={<RangeSelector value={range} onChange={setRange} />}
+      />
 
       {isEmpty ? (
         <div style={{ textAlign: 'center', padding: '80px 0', color: '#9B9B9F', fontSize: '15px' }}>
-          Nessuna sessione completata nel periodo selezionato.
+          {t('desktop.dashboard.empty')}
         </div>
       ) : (
         <>
           {/* KPI cards */}
           <div style={{ display: 'flex', gap: '16px', marginBottom: '32px', flexWrap: 'wrap' }}>
             <StatCard
-              label="Totale speso"
+              label={t('statistiche.totalSpent')}
               value={`€ ${formatCents(s.totalCents)}`}
             />
             <StatCard
-              label="Sessioni"
+              label={t('statistiche.sessions')}
               value={String(s.sessionCount)}
             />
             <StatCard
-              label="Media per sessione"
+              label={t('statistiche.avgPerSession')}
               value={`€ ${formatCents(s.avgCents)}`}
             />
             <StatCard
-              label="Supermercato preferito"
+              label={t('statistiche.favoriteSupermarket')}
               value={s.topSupermarketName ?? '—'}
             />
           </div>
 
           {/* Spending trend */}
           <div style={{ background: '#fff', borderRadius: '16px', padding: '24px', marginBottom: '24px' }}>
-            <SectionTitle>Andamento spesa settimanale</SectionTitle>
+            <SectionTitle>{t('desktop.dashboard.trendTitle')}</SectionTitle>
             <ResponsiveContainer width="100%" height={240}>
               <LineChart data={lineData} margin={{ top: 4, right: 8, left: 0, bottom: 0 }}>
                 <CartesianGrid stroke="#F2F2F0" strokeDasharray="0" vertical={false} />
@@ -174,7 +152,7 @@ export function DashboardScreen() {
                 <Line
                   type="monotone"
                   dataKey="totalCents"
-                  name="Totale"
+                  name={t('desktop.dashboard.total')}
                   stroke="#2A2A2C"
                   strokeWidth={2}
                   dot={false}
@@ -183,7 +161,7 @@ export function DashboardScreen() {
                 <Line
                   type="monotone"
                   dataKey="outOfPocketCents"
-                  name="Di tasca"
+                  name={t('desktop.dashboard.outOfPocket')}
                   stroke="#9B9B9F"
                   strokeWidth={1.5}
                   strokeDasharray="4 3"
@@ -206,9 +184,9 @@ export function DashboardScreen() {
                 minWidth: 0,
               }}
             >
-              <SectionTitle>Categorie</SectionTitle>
+              <SectionTitle>{t('desktop.dashboard.categories')}</SectionTitle>
               {pieData.length > 0 ? (
-                <div style={{ display: 'flex', gap: '24px', alignItems: 'center' }}>
+                <div style={{ display: 'flex', gap: '24px', alignItems: 'flex-start' }}>
                   <PieChart width={160} height={160}>
                     <Pie
                       data={pieData}
@@ -224,7 +202,7 @@ export function DashboardScreen() {
                       ))}
                     </Pie>
                   </PieChart>
-                  <div style={{ flex: 1 }}>
+                  <div style={{ flex: 1, minWidth: 0, maxHeight: '160px', overflowY: 'auto' }}>
                     {pieData.map((entry, i) => {
                       const pct = s.totalCents > 0 ? Math.round((entry.value / s.totalCents) * 100) : 0
                       return (
@@ -258,7 +236,7 @@ export function DashboardScreen() {
                   </div>
                 </div>
               ) : (
-                <div style={{ color: '#9B9B9F', fontSize: '13px' }}>Nessun dato</div>
+                <div style={{ color: '#9B9B9F', fontSize: '13px' }}>{t('desktop.noData')}</div>
               )}
             </div>
 
@@ -272,7 +250,7 @@ export function DashboardScreen() {
                 minWidth: 0,
               }}
             >
-              <SectionTitle>Supermercati</SectionTitle>
+              <SectionTitle>{t('desktop.dashboard.supermarkets')}</SectionTitle>
               {smBarData.length > 0 ? (
                 <ResponsiveContainer width="100%" height={160}>
                   <BarChart
@@ -296,7 +274,7 @@ export function DashboardScreen() {
                       width={90}
                     />
                     <Tooltip
-                      formatter={(v: number) => [`€ ${formatCents(v)}`, 'Totale']}
+                      formatter={(v) => [`€ ${formatCents(Number(v))}`, t('desktop.dashboard.total')]}
                       contentStyle={{
                         background: '#2A2A2C',
                         border: 'none',
@@ -309,7 +287,7 @@ export function DashboardScreen() {
                   </BarChart>
                 </ResponsiveContainer>
               ) : (
-                <div style={{ color: '#9B9B9F', fontSize: '13px' }}>Nessun dato</div>
+                <div style={{ color: '#9B9B9F', fontSize: '13px' }}>{t('desktop.noData')}</div>
               )}
             </div>
           </div>

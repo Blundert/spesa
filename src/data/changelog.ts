@@ -2,6 +2,20 @@ export type ChangelogEntry = { it: string[]; en: string[] }
 
 // Ordine: più recente in cima. Aggiungere una entry ad ogni nuova versione.
 export const changelog: Record<string, ChangelogEntry> = {
+  '0.39.0': {
+    it: [
+      'Versione desktop: aprendo l\'app su uno schermo largo (da 768 px) trovi un\'interfaccia dedicata con menu laterale fisso. Su telefono non cambia nulla',
+      'Dashboard con totale speso, sessioni, spesa media, andamento settimanale, categorie e supermercati, su 4 settimane, 12 settimane, 6 mesi, 1 anno o tutto lo storico',
+      'Statistiche avanzate: spese per giorno della settimana, copertura dei buoni pasto, evoluzione delle categorie e dettaglio per supermercato',
+      'Catalogo, Storico (con filtri per supermercato e date) e Impostazioni (lingua, valore del buono, inizio settimana, backup) anche su desktop',
+    ],
+    en: [
+      'Desktop version: opening the app on a wide screen (768 px and up) gives you a dedicated interface with a fixed side menu. Nothing changes on phones',
+      'Dashboard with total spent, trips, average spend, weekly trend, categories and supermarkets, over 4 weeks, 12 weeks, 6 months, 1 year or all history',
+      'Advanced statistics: trips by day of the week, meal voucher coverage, category evolution and per-supermarket details',
+      'Catalogue, History (with supermarket and date filters) and Settings (language, voucher value, week start, backup) on desktop too',
+    ],
+  },
   '0.38.2': {
     it: ['Ordine alfabetico ovunque: categorie e prodotti dentro ogni categoria in Lista, in corsia durante la spesa e nel Catalogo'],
     en: ['Alphabetical order everywhere: categories and the items inside each one in the List, in the aisle while shopping and in the Catalogue'],

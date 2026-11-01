@@ -31,6 +31,9 @@ export function StatCard({ label, value, sub, trend }: StatCardProps) {
           color: '#2A2A2C',
           letterSpacing: '-0.5px',
           lineHeight: 1.1,
+          whiteSpace: 'nowrap',
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
         }}
       >
         {value}

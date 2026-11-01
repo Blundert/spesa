@@ -1,15 +1,16 @@
 import { useRouter, useRouterState } from '@tanstack/react-router'
+import { useTranslation } from 'react-i18next'
 
 type NavItem = {
   path: string
-  label: string
+  labelKey: string
   icon: React.ReactNode
 }
 
 const NAV_ITEMS: NavItem[] = [
   {
     path: '/',
-    label: 'Dashboard',
+    labelKey: 'desktop.nav.dashboard',
     icon: (
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" />
@@ -19,7 +20,7 @@ const NAV_ITEMS: NavItem[] = [
   },
   {
     path: '/stats',
-    label: 'Statistiche',
+    labelKey: 'desktop.nav.stats',
     icon: (
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <line x1="18" y1="20" x2="18" y2="10" /><line x1="12" y1="20" x2="12" y2="4" />
@@ -29,7 +30,7 @@ const NAV_ITEMS: NavItem[] = [
   },
   {
     path: '/catalogo',
-    label: 'Catalogo',
+    labelKey: 'desktop.nav.catalog',
     icon: (
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z" /><line x1="3" y1="6" x2="21" y2="6" />
@@ -39,7 +40,7 @@ const NAV_ITEMS: NavItem[] = [
   },
   {
     path: '/storico',
-    label: 'Storico',
+    labelKey: 'desktop.nav.history',
     icon: (
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" />
@@ -48,7 +49,7 @@ const NAV_ITEMS: NavItem[] = [
   },
   {
     path: '/impostazioni',
-    label: 'Impostazioni',
+    labelKey: 'desktop.nav.settings',
     icon: (
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <circle cx="12" cy="12" r="3" />
@@ -59,6 +60,7 @@ const NAV_ITEMS: NavItem[] = [
 ]
 
 export function Sidebar() {
+  const { t } = useTranslation()
   const router = useRouter()
   const location = useRouterState({ select: (s) => s.location })
   const currentPath = location.pathname
@@ -72,18 +74,16 @@ export function Sidebar() {
         borderRight: '1px solid #ECECEC',
         display: 'flex',
         flexDirection: 'column',
-        height: '100vh',
-        position: 'sticky',
-        top: 0,
+        height: '100%',
       }}
     >
       {/* Logo / app name */}
       <div style={{ padding: '28px 24px 24px', borderBottom: '1px solid #ECECEC' }}>
         <div style={{ fontSize: '18px', fontWeight: 600, color: '#2A2A2C', letterSpacing: '-0.3px' }}>
-          Spesa
+          {t('desktop.appName')}
         </div>
         <div style={{ fontSize: '12px', color: '#9B9B9F', marginTop: '2px' }}>
-          Dashboard
+          {t('desktop.nav.dashboard')}
         </div>
       </div>
 
@@ -115,7 +115,7 @@ export function Sidebar() {
               }}
             >
               {item.icon}
-              {item.label}
+              {t(item.labelKey)}
             </button>
           )
         })}

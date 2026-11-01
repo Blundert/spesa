@@ -274,3 +274,12 @@ Nota: il service worker è attivo solo in build di produzione (`npm run build` +
 2. Lista → le categorie sono in ordine alfabetico e, dentro ognuna, i prodotti pure (Banane prima di Zucchine), indipendentemente dall'ordine di inserimento; maiuscole e accenti non contano
 3. Avvia una spesa → in corsia le categorie e i prodotti "da prendere" sono nello stesso ordine alfabetico (prima seguivano l'ordine di creazione delle categorie). Il carrello resta in ordine di acquisto
 4. Menu → Catalogo → dentro ogni categoria i prodotti sono in ordine alfabetico
+
+### Flusso 32 — Versione desktop (viewport ≥ 768 px)
+1. Apri l'app con la finestra larga almeno 768 px → menu laterale fisso a sinistra (Dashboard, Statistiche, Catalogo, Storico, Impostazioni), nessuna bottom bar. Con la finestra stretta (< 768 px, poi ricarica) torna l'app mobile identica a prima
+2. Dashboard → a tutta larghezza accanto al menu, scroll interno nell'area contenuto; 4 card (Totale speso, Sessioni, Spesa media, Supermercato preferito), grafico "Andamento spesa settimanale" con due linee (totale e di tasca), torta categorie e barre supermercati. Cambia l'intervallo (4 sett. / 12 sett. / 6 mesi / 1 anno / Tutto) → i numeri e i grafici si aggiornano. Senza spese concluse nel periodo → messaggio "Nessuna sessione completata…"
+3. Statistiche → spese per giorno della settimana (lun…dom), copertura buoni (buoni + di tasca impilati), evoluzione categorie (le 6 principali più "Altre", legenda sotto il grafico) e tabella dettaglio supermercati con data ultima visita nel formato dell'app
+4. Catalogo → colonna categorie con conteggi (clic su una categoria filtra, "Tutte" li mostra tutti), elenco articoli in ordine alfabetico con categoria e ultimo prezzo, ricerca per nome; con filtro senza risultati → "Nessun articolo trovato."
+5. Storico → tabella delle spese (data, supermercato, lista, buoni, di tasca, totale); filtro per supermercato e intervallo date (inclusi gli estremi); "Azzera filtri" li toglie; una spesa in corso mostra "In corso" al posto del totale
+6. Impostazioni → cambia lingua (tutto il desktop passa subito in inglese/italiano), valore predefinito del buono con − / +, giorno di inizio settimana (toast "Impostazione salvata", i grafici si ricalcolano), "Esporta dati" scarica il JSON, "Importa dati" con un file valido chiede conferma e poi toast "Dati importati"; con un file non valido → "File non valido"
+7. I valori impostati qui (lingua, buono, inizio settimana) sono gli stessi dell'app mobile: ricarica a viewport stretto e verifica che siano rimasti

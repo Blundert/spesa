@@ -21,17 +21,17 @@ export function useDesktopStats(range: DesktopRange) {
 
   const stats = useQuery({
     queryKey: [...qk.stats(), weekStartDay, fromTs, 'desktop'],
-    queryFn: () => getStats(weekKey, weekStartDay, fromTs),
+    queryFn: () => getStats(weekKey, weekStartDay, fromTs, null),
   })
 
   const supermarketStats = useQuery({
-    queryKey: ['desktopSupermarketStats', weekStartDay, fromTs],
-    queryFn: () => getSupermarketStats(weekStartDay, fromTs),
+    queryKey: ['desktopSupermarketStats', fromTs],
+    queryFn: () => getSupermarketStats(fromTs),
   })
 
   const dayPattern = useQuery({
-    queryKey: ['desktopDayPattern', weekStartDay, fromTs],
-    queryFn: () => getDayOfWeekPattern(weekStartDay, fromTs),
+    queryKey: ['desktopDayPattern', fromTs],
+    queryFn: () => getDayOfWeekPattern(fromTs),
   })
 
   const categoryEvolution = useQuery({

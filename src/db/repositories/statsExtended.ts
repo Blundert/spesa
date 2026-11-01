@@ -1,4 +1,5 @@
 import { db } from '../db'
+import type { Purchase, Session } from '../types'
 
 // ---------------------------------------------------------------------------
 // Helpers (duplicated from stats.ts to avoid i18n dependency in Node tests)
@@ -24,6 +25,27 @@ function shiftWeekKey(weekKey: string, delta: number): string {
   const mo = String(date.getUTCMonth() + 1).padStart(2, '0')
   const dy = String(date.getUTCDate()).padStart(2, '0')
   return `${yr}-${mo}-${dy}`
+}
+
+/** Sessioni concluse, opzionalmente da `fromTs` in poi. */
+function finishedSince(sessions: Session[], fromTs: number | null): Session[] {
+  return sessions.filter(
+    (s) => s.finishedAt !== null && (fromTs === null || s.startedAt >= fromTs),
+  )
+}
+
+/** Totale calcolato dagli acquisti, per sessione. */
+function purchaseTotals(purchases: Purchase[]): Map<number, number> {
+  const totals = new Map<number, number>()
+  for (const p of purchases) {
+    totals.set(p.sessionId, (totals.get(p.sessionId) ?? 0) + p.priceCents * p.quantity)
+  }
+  return totals
+}
+
+/** Totale della sessione: importo confermato se presente, altrimenti somma degli acquisti. */
+function sessionTotal(s: Session, totals: Map<number, number>): number {
+  return s.confirmedTotalCents ?? totals.get(s.id!) ?? 0
 }
 
 // ---------------------------------------------------------------------------
@@ -80,7 +102,6 @@ export function rangeToFromTs(currentWeekKey: string, rangeWeeks: number | null)
 // ---------------------------------------------------------------------------
 
 export async function getSupermarketStats(
-  weekStartDay: number,
   fromTs: number | null,
 ): Promise<SupermarketStat[]> {
   const [sessions, supermarkets] = await Promise.all([
@@ -88,16 +109,9 @@ export async function getSupermarketStats(
     db.supermarkets.toArray(),
   ])
 
-  const finished = sessions.filter(
-    (s) => s.finishedAt !== null && (fromTs === null || s.startedAt >= fromTs),
-  )
+  const finished = finishedSince(sessions, fromTs)
 
-  const [allPurchases] = await Promise.all([db.purchases.toArray()])
-  const purchasesBySession = new Map<number, typeof allPurchases>()
-  for (const p of allPurchases) {
-    if (!purchasesBySession.has(p.sessionId)) purchasesBySession.set(p.sessionId, [])
-    purchasesBySession.get(p.sessionId)!.push(p)
-  }
+  const totals = purchaseTotals(await db.purchases.toArray())
 
   const smMap = new Map<
     number,
@@ -105,13 +119,7 @@ export async function getSupermarketStats(
   >()
 
   for (const s of finished) {
-    const totalCents =
-      s.confirmedTotalCents !== null
-        ? s.confirmedTotalCents
-        : (purchasesBySession.get(s.id!) ?? []).reduce(
-            (sum, p) => sum + p.priceCents * p.quantity,
-            0,
-          )
+    const totalCents = sessionTotal(s, totals)
     const cur = smMap.get(s.supermarketId) ?? { sessionCount: 0, totalCents: 0, lastVisitTs: 0 }
     smMap.set(s.supermarketId, {
       sessionCount: cur.sessionCount + 1,
@@ -141,13 +149,10 @@ export async function getSupermarketStats(
 // ---------------------------------------------------------------------------
 
 export async function getDayOfWeekPattern(
-  weekStartDay: number,
   fromTs: number | null,
 ): Promise<DayPattern[]> {
   const sessions = await db.sessions.toArray()
-  const finished = sessions.filter(
-    (s) => s.finishedAt !== null && (fromTs === null || s.startedAt >= fromTs),
-  )
+  const finished = finishedSince(sessions, fromTs)
 
   const counts = new Array<number>(7).fill(0)
   for (const s of finished) {
@@ -176,10 +181,8 @@ export async function getCategoryEvolution(
     db.categories.toArray(),
   ])
 
-  const finished = sessions.filter(
-    (s) => s.finishedAt !== null && (fromTs === null || s.startedAt >= fromTs),
-  )
-  const finishedIds = new Set(finished.map((s) => s.id!))
+  const finished = finishedSince(sessions, fromTs)
+  const sessionStart = new Map(finished.map((s) => [s.id!, s.startedAt]))
 
   const itemCatMap = new Map<number, number>()
   for (const it of items) itemCatMap.set(it.id!, it.categoryId)
@@ -190,10 +193,8 @@ export async function getCategoryEvolution(
   const weekCatMap = new Map<string, Map<string, number>>()
 
   for (const p of purchases) {
-    if (!finishedIds.has(p.sessionId)) continue
-    const session = finished.find((s) => s.id === p.sessionId)
-    if (!session) continue
-    const wk = sessionWeekKey(session.startedAt, weekStartDay)
+    if (!sessionStart.has(p.sessionId)) continue
+    const wk = sessionWeekKey(sessionStart.get(p.sessionId)!, weekStartDay)
     const catName = catNameMap.get(itemCatMap.get(p.itemId) ?? 0) ?? 'Altro'
     if (!weekCatMap.has(wk)) weekCatMap.set(wk, new Map())
     const cm = weekCatMap.get(wk)!
@@ -227,28 +228,15 @@ export async function getBudgetEfficiency(
   fromTs: number | null,
 ): Promise<WeeklyBudgetRow[]> {
   const sessions = await db.sessions.toArray()
-  const finished = sessions.filter(
-    (s) => s.finishedAt !== null && (fromTs === null || s.startedAt >= fromTs),
-  )
+  const finished = finishedSince(sessions, fromTs)
 
-  const [allPurchases] = await Promise.all([db.purchases.toArray()])
-  const purchasesBySession = new Map<number, typeof allPurchases>()
-  for (const p of allPurchases) {
-    if (!purchasesBySession.has(p.sessionId)) purchasesBySession.set(p.sessionId, [])
-    purchasesBySession.get(p.sessionId)!.push(p)
-  }
+  const totals = purchaseTotals(await db.purchases.toArray())
 
   // weekKey → { totalCents, buoniCoveredCents }
   const weekMap = new Map<string, { totalCents: number; buoniCoveredCents: number }>()
 
   for (const s of finished) {
-    const totalCents =
-      s.confirmedTotalCents !== null
-        ? s.confirmedTotalCents
-        : (purchasesBySession.get(s.id!) ?? []).reduce(
-            (sum, p) => sum + p.priceCents * p.quantity,
-            0,
-          )
+    const totalCents = sessionTotal(s, totals)
     const buoniCoveredCents = s.buoniSpent * s.buoniValueCents
     const wk = sessionWeekKey(s.startedAt, weekStartDay)
     const cur = weekMap.get(wk) ?? { totalCents: 0, buoniCoveredCents: 0 }

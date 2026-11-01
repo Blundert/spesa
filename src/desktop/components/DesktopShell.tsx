@@ -6,7 +6,8 @@ export function DesktopShell() {
     <div
       style={{
         display: 'flex',
-        minHeight: '100vh',
+        width: '100%',
+        height: '100%',
         background: '#F2F2F0',
         fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Hanken Grotesk', sans-serif",
       }}
@@ -17,6 +18,7 @@ export function DesktopShell() {
           flex: 1,
           overflowY: 'auto',
           minWidth: 0,
+          height: '100%',
         }}
       >
         <Outlet />
