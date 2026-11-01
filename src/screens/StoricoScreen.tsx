@@ -6,6 +6,7 @@ import { receiptDeviationPercent, outOfPocketCents } from '../lib/budgetSelector
 import { formatShortDate, formatWeekLabel } from '../lib/date'
 import { useAllSessions, useDeleteWeek } from '../hooks/useShopping'
 import { useSupermarkets } from '../hooks/useItems'
+import { useShoppingLists } from '../hooks/useShoppingLists'
 import { useQuery } from '@tanstack/react-query'
 import { db } from '../db/db'
 import { BottomSheet } from '../components/BottomSheet'
@@ -44,6 +45,9 @@ export function StoricoScreen() {
   const [deleteWeekState, setDeleteWeekState] = useState<string | null>(null)
 
   const supermarketMap = Object.fromEntries(supermarkets.map((s) => [s.id ?? 0, s.name]))
+  // Nome della lista da cui è partita ogni spesa (assente se la lista è stata eliminata).
+  const { data: lists = [] } = useShoppingLists()
+  const listMap: Record<number, string> = Object.fromEntries(lists.map((l) => [l.id ?? 0, l.name]))
   const weekGroups = groupByWeek(sessions)
 
   const handleConfirmDelete = () => {
@@ -88,6 +92,7 @@ export function StoricoScreen() {
               key={s.id}
               sessionId={s.id!}
               storeName={supermarketMap[s.supermarketId] ?? '?'}
+              listName={s.listId !== undefined ? listMap[s.listId] : undefined}
               date={s.startedAt}
               confirmedTotalCents={s.confirmedTotalCents}
               finishedAt={s.finishedAt}
@@ -125,6 +130,7 @@ export function StoricoScreen() {
 function SessionCard({
   sessionId,
   storeName,
+  listName,
   date,
   confirmedTotalCents,
   finishedAt,
@@ -133,6 +139,7 @@ function SessionCard({
 }: {
   sessionId: number
   storeName: string
+  listName: string | undefined
   date: number
   confirmedTotalCents: number | null
   finishedAt: number | null
@@ -165,6 +172,9 @@ function SessionCard({
     >
       <div className="flex items-center gap-[14px]">
         <div className="flex-1">
+          {listName && (
+            <div className="text-[11px] tracking-[1px] uppercase text-[#9B9B9F] mb-0.5">{listName}</div>
+          )}
           <div className="flex items-center gap-2">
             <span className="text-base font-normal text-[#2A2A2C]">{storeName}</span>
             {!isCompleted && (

@@ -254,6 +254,11 @@ export const en: typeof it = {
         description:
           'This is your list. Tap “Meals” to plan the week: the ingredients end up here.',
       },
+      lists: {
+        title: 'Your lists',
+        description:
+          'Split your shopping by theme: tap + to create a list, tap the active one again to rename it or give it a supermarket.',
+      },
       step2: {
         title: 'Your week',
         description:
@@ -262,12 +267,12 @@ export const en: typeof it = {
       step3: {
         title: 'Start shopping',
         description:
-          'At the supermarket: choose how many vouchers you will use (it starts from the remaining ones) and tap “Start shopping”.',
+          'At the supermarket: choose the list and how many vouchers you will use (it starts from the remaining ones) and tap “Start shopping”.',
       },
       step4: {
         title: 'Menu',
         description:
-          'History, statistics, catalog, dishes and supermarkets. You can replay this tutorial from Settings.',
+          'History, statistics, lists, catalog, dishes and supermarkets. You can replay this tutorial from Settings.',
       },
     },
   },

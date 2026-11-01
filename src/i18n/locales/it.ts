@@ -252,6 +252,11 @@ export const it = {
         description:
           "Qui c'è la tua lista. Tocca «Pasti» per pianificare la settimana: gli ingredienti finiscono qui.",
       },
+      lists: {
+        title: 'Le tue liste',
+        description:
+          'Separa la spesa per tema: tocca + per creare una lista, ritocca quella attiva per rinominarla o darle un supermercato.',
+      },
       step2: {
         title: 'La tua settimana',
         description:
@@ -260,12 +265,12 @@ export const it = {
       step3: {
         title: 'Iniziare la spesa',
         description:
-          'Quando sei al supermercato: scegli quanti buoni usi (parte da quelli rimanenti) e premi «Inizia la spesa».',
+          'Quando sei al supermercato: scegli la lista e quanti buoni usi (parte da quelli rimanenti) e premi «Inizia la spesa».',
       },
       step4: {
         title: 'Menu',
         description:
-          'Storico, statistiche, catalogo, piatti e supermercati. Puoi rivedere questo tutorial dalle Impostazioni.',
+          'Storico, statistiche, liste, catalogo, piatti e supermercati. Puoi rivedere questo tutorial dalle Impostazioni.',
       },
     },
   },

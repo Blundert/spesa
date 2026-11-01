@@ -4,6 +4,7 @@ import { formatWeekLabel, formatShortDate } from '../lib/date'
 import { formatCentsPlain } from '../lib/money'
 import type { WeekSpendSummary } from '../lib/budgetSelectors'
 import { useSupermarkets } from '../hooks/useItems'
+import { useShoppingLists } from '../hooks/useShoppingLists'
 import type { Purchase, Session } from '../db/types'
 
 const MAX_WEEK_SPESE = 3
@@ -25,6 +26,8 @@ export function WeekSummary({
 }) {
   const { t } = useTranslation()
   const { data: supermarkets = [] } = useSupermarkets()
+  const { data: lists = [] } = useShoppingLists()
+  const listMap: Record<number, string> = Object.fromEntries(lists.map((l) => [l.id ?? 0, l.name]))
 
   // Importo confermato, con fallback sulla somma degli oggetti.
   const computedBySession = new Map<number, number>()
@@ -38,6 +41,7 @@ export function WeekSummary({
     .map((s) => ({
       id: s.id as number,
       store: supermarketMap[s.supermarketId] ?? '?',
+      list: s.listId !== undefined ? listMap[s.listId] : undefined,
       date: s.startedAt,
       amountCents: s.confirmedTotalCents ?? computedBySession.get(s.id as number) ?? 0,
     }))
@@ -81,7 +85,10 @@ export function WeekSummary({
             >
               <div>
                 <div className="text-[15px] text-[#2A2A2C]">{sp.store}</div>
-                <div className="text-[12px] text-[#9B9B9F]">{formatShortDate(sp.date)}</div>
+                <div className="text-[12px] text-[#9B9B9F]">
+                  {sp.list ? `${sp.list} · ` : ''}
+                  {formatShortDate(sp.date)}
+                </div>
               </div>
               <span className="text-[17px] text-[#2A2A2C] tabular-nums">€{formatCentsPlain(sp.amountCents)}</span>
             </Link>

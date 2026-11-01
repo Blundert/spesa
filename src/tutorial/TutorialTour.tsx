@@ -13,13 +13,19 @@ interface TourStep {
   pillSheet?: boolean
 }
 
-// Tutti i passi sono sulla Lista, la home: titoli, pill, pannello aperto, menu.
+// Tutti i passi sono sulla Lista, la home: titoli, schede delle liste, pill, pannello aperto, menu.
 const STEPS: TourStep[] = [
   {
     dataAttr: 'section-title',
     tooltipPosition: 'below',
     titleKey: 'tutorial.tour.step1.title',
     descKey: 'tutorial.tour.step1.description',
+  },
+  {
+    dataAttr: 'list-tabs',
+    tooltipPosition: 'below',
+    titleKey: 'tutorial.tour.lists.title',
+    descKey: 'tutorial.tour.lists.description',
   },
   {
     dataAttr: 'session-pill',
