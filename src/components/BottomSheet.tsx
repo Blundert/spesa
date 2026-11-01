@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Drawer } from 'vaul'
+import { STATUS_BAR_SHEET, useStatusBarTint } from '../lib/statusBarTint'
 
 interface BottomSheetProps {
   open: boolean
@@ -25,6 +26,7 @@ export function BottomSheet({
   const [keyboardHeight, setKeyboardHeight] = useState(0)
   const [viewportHeight, setViewportHeight] = useState(0)
   const scrollRef = useRef<HTMLDivElement>(null)
+  useStatusBarTint(open, STATUS_BAR_SHEET)
 
   // Focus sul campo marcato `data-autofocus` solo a sheet arrivato in posizione.
   // Con `autoFocus` il campo riceve il focus mentre lo sheet è ancora sotto il bordo

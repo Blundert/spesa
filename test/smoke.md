@@ -172,3 +172,10 @@ Nota: il service worker è attivo solo in build di produzione (`npm run build` +
 7. Tocca "Fine" e conferma la spesa → apri la sessione dallo Storico → sotto il totale c'è la riga "N buoni · €Y" (visibile anche con 0 buoni) → tocca → sheet con i valori della sessione → modifica → "Salva" → toast "Modifiche salvate", riga aggiornata
 8. Torna alla Home: "Di tasca tua" e "N buoni spesi · M rimanenti" riflettono i nuovi buoni della sessione
 9. Ripeti il punto 7 su una sessione "Non completata" dello Storico
+
+### Flusso 20 — Colore barra di stato coerente con l'app (test su iPhone, app installata in Home)
+1. Apri l'app dalla Home: la barra di stato (ora, batteria) è chiara come lo sfondo dell'app
+2. Apri un qualsiasi bottom sheet (es. Pasti → slot vuoto, menu ☰, conferma eliminazione) → la barra si scurisce insieme al velo grigio
+3. Chiudi il sheet (swipe giù, tap sul velo o azione) → la barra torna chiara. Ripeti più volte: mai barra scura a sheet chiuso, mai barra chiara a sheet aperto
+4. In Spesa tocca un prezzo → tastierino prezzi: la barra si scurisce; chiudi → torna chiara
+5. In Spesa con tessera fedeltà → apri la tessera: barra quasi nera come il velo; chiudi → torna chiara

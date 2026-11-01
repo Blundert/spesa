@@ -2,6 +2,10 @@ export type ChangelogEntry = { it: string[]; en: string[] }
 
 // Ordine: più recente in cima. Aggiungere una entry ad ogni nuova versione.
 export const changelog: Record<string, ChangelogEntry> = {
+  '0.29.3': {
+    it: ["Fix: il colore della barra di stato in alto (ora, batteria) segue sempre l'app: si scurisce quando si apre un menu dal basso e torna chiaro quando lo chiudi"],
+    en: ['Fix: the status bar color at the top (time, battery) now always matches the app: it darkens when a bottom sheet opens and turns light again when you close it'],
+  },
   '0.29.2': {
     it: ['Fix: su iOS, aprendo un menu dal basso con campo di testo (es. Pasti → slot vuoto), la vista non diventa più bianca: il campo si attiva solo quando il menu ha finito di aprirsi. Se la tastiera non compare da sola, tocca il campo'],
     en: ['Fix: on iOS, opening a bottom sheet with a text field (e.g. Meals → empty slot) no longer turns the view white: the field is focused only once the sheet has finished opening. If the keyboard does not appear on its own, tap the field'],

@@ -24,7 +24,7 @@ export default defineConfig({
         name: 'App Spesa',
         short_name: 'Spesa',
         description: 'Gestione spesa con buoni pasto',
-        theme_color: '#2A2A2C',
+        theme_color: '#F2F2F0',
         background_color: '#F2F2F0',
         display: 'standalone',
         orientation: 'portrait',

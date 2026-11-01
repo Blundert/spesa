@@ -27,6 +27,7 @@ import {
 } from '../hooks/useListItems'
 import { useSupermarkets, useCategories, useItems } from '../hooks/useItems'
 import { normalizeName } from '../lib/normalize'
+import { STATUS_BAR_DARK, useStatusBarTint } from '../lib/statusBarTint'
 import { BASE_ITEMS } from '../lib/baseItems'
 import { PriceKeypad } from '../components/PriceKeypad'
 import { BottomSheet } from '../components/BottomSheet'
@@ -125,6 +126,7 @@ export function SpesaScreen() {
     ? (supermarkets.find((s) => s.id === activeSession.supermarketId) ?? null)
     : null
   const supermarketName = activeSupermarket?.name ?? (activeSession ? '?' : '—')
+  useStatusBarTint(showCard && !!activeSupermarket?.loyaltyCard, STATUS_BAR_DARK)
 
   // Auto-open store picker if active session has no valid supermarket
   useEffect(() => {

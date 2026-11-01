@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Drawer } from 'vaul'
 import { formatCentsPlain } from '../lib/money'
+import { STATUS_BAR_SHEET, useStatusBarTint } from '../lib/statusBarTint'
 
 interface PriceKeypadProps {
   open: boolean
@@ -37,6 +38,7 @@ export function PriceKeypad({
 }: PriceKeypadProps) {
   const { t } = useTranslation()
   const confirmText = confirmLabel ?? t('common.confirm')
+  useStatusBarTint(open, STATUS_BAR_SHEET)
   const [cents, setCents] = useState(initialCents)
   const [quantity, setQuantity] = useState(initialQuantity)
 
