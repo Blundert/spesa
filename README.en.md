@@ -20,16 +20,16 @@
 <div align="center">
   <table>
     <tr>
-      <td align="center"><img src="docs/screenshots/home.png" width="180" alt="Home"></td>
       <td align="center"><img src="docs/screenshots/lista.png" width="180" alt="List"></td>
+      <td align="center"><img src="docs/screenshots/pasti.png" width="180" alt="Meals"></td>
+      <td align="center"><img src="docs/screenshots/riepilogo.png" width="180" alt="Week summary"></td>
       <td align="center"><img src="docs/screenshots/statistiche.png" width="180" alt="Statistics"></td>
-      <td align="center"><img src="docs/screenshots/nuova-spesa.png" width="180" alt="New shopping trip"></td>
     </tr>
     <tr>
-      <td align="center"><sub>Home</sub></td>
       <td align="center"><sub>List</sub></td>
+      <td align="center"><sub>Meals</sub></td>
+      <td align="center"><sub>Week summary</sub></td>
       <td align="center"><sub>Statistics</sub></td>
-      <td align="center"><sub>New shopping trip</sub></td>
     </tr>
   </table>
 </div>

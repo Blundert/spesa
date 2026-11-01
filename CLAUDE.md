@@ -23,8 +23,15 @@ Palette colori dal mockup:
 Font: system font stack (`-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Hanken Grotesk', ...`)
 Pesi: 300 per i numeri grandi, 400 per il testo normale.
 
-Navigazione: side nav con push (effetto Vaul), nessun bottom tab bar —
-invece una floating bottom bar fissa che apre un bottom sheet di riepilogo settimana.
+Navigazione (dalla v0.36.0, decisa con l'utente — prevale sul mockup):
+- Home = Lista. Le due sezioni principali, Lista e Pasti, si alternano toccando i titoli
+  grandi in alto (`SectionTitle`: attivo scuro, l'altro grigio). Nessun bottom tab bar.
+- Floating bottom bar fissa: la pill apre un bottom sheet con il riepilogo della settimana
+  e "Nuova spesa"; il cerchio apre il menu a gruppi ("Le tue spese", "Gestisci", Impostazioni).
+- Le pagine del menu hanno la freccia ‹ che torna all'ultima sezione principale e si
+  sostituiscono a vicenda; i dettagli tornano alla pagina precedente (`BackButton`).
+- La barra in basso è visibile ovunque tranne nella spesa in corso (`/spesa`, fuori dalla shell).
+- Transizioni: dissolvenza allo stesso livello, scorrimento laterale tra livelli (`navTransition`).
 
 ## Stack
 
