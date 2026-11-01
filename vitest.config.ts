@@ -17,6 +17,7 @@ export default defineConfig({
         'src/lib/primarySection.ts',
         'src/lib/navTransition.ts',
         'src/lib/activeList.ts',
+        'src/lib/calc.ts',
         'src/lib/imageUtils.ts',
         'src/db/repositories/categories.ts',
         'src/db/repositories/stats.ts',
