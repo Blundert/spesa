@@ -139,7 +139,7 @@ export function DesktopSessioneScreen() {
   const buoniValue = session?.buoniValueCents ?? 0
 
   return (
-    <div style={{ padding: '32px 36px', maxWidth: '1200px' }}>
+    <div style={{ padding: 'var(--page-pad-y) var(--page-pad-x)', maxWidth: '1200px' }}>
       <button
         onClick={() => void navigate({ to: '/storico' })}
         style={{ background: 'none', border: 'none', padding: 0, marginBottom: '12px', color: '#9B9B9F', fontSize: '13px', cursor: 'pointer' }}

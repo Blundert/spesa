@@ -158,7 +158,7 @@ export function DesktopListaScreen() {
   const estimate = listItems.reduce((n, li) => n + (li.suggestedPriceCents ?? 0) * li.quantity, 0)
 
   return (
-    <div style={{ padding: '32px 36px', maxWidth: '1200px' }}>
+    <div style={{ padding: 'var(--page-pad-y) var(--page-pad-x)', maxWidth: '1200px' }}>
       <PageHeader
         title={t('lista.title')}
         subtitle={list ? [list.name, list.supermarketId !== null ? supermarketNames[list.supermarketId] : undefined].filter(Boolean).join(' · ') : undefined}

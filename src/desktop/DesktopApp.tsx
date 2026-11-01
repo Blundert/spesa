@@ -1,8 +1,17 @@
+import { useState } from 'react'
 import { RouterProvider } from '@tanstack/react-router'
 import { Toaster } from 'sonner'
 import { desktopRouter } from './router'
 
 export function DesktopApp() {
+  // Il router desktop può essere rimasto fermo su un URL vecchio mentre era smontato:
+  // lo riallineo alla posizione attuale prima di montarlo.
+  useState(() => {
+    const { pathname, search, hash } = window.location
+    desktopRouter.history.replace(pathname + search + hash)
+    return true
+  })
+
   return (
     <>
       <RouterProvider router={desktopRouter} />

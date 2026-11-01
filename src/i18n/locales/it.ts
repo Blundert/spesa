@@ -425,6 +425,10 @@ export const it = {
     deleted: 'Piatto eliminato',
   },
   desktop: {
+    sidebar: {
+      collapse: 'Comprimi menu',
+      expand: 'Espandi menu',
+    },
     appName: 'Spesa',
     nav: {
       lista: 'Lista',

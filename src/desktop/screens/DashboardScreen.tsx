@@ -92,7 +92,7 @@ export function DashboardScreen() {
   const isEmpty = !s || s.sessionCount === 0
 
   return (
-    <div style={{ padding: '32px 36px', maxWidth: '1200px' }}>
+    <div style={{ padding: 'var(--page-pad-y) var(--page-pad-x)', maxWidth: '1200px' }}>
       <PageHeader
         title={t('desktop.dashboard.title')}
         subtitle={t('desktop.dashboard.subtitle')}

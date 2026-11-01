@@ -106,3 +106,30 @@ body {
     animation: none;
   }
 }
+
+/* Cambio di interfaccia desktop ↔ mobile (ridimensionando la finestra): dissolvenza leggera. */
+@keyframes view-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+html[data-swapping] #root > div {
+  animation: view-fade 200ms ease-out both;
+}
+
+/* Spaziatura delle pagine desktop: si stringe sulle larghezze vicine al mobile. */
+.desktop-root {
+  --page-pad-y: 32px;
+  --page-pad-x: 36px;
+}
+
+@media (max-width: 1023px) {
+  .desktop-root {
+    --page-pad-y: 20px;
+    --page-pad-x: 20px;
+  }
+}

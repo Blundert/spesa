@@ -2,6 +2,20 @@ export type ChangelogEntry = { it: string[]; en: string[] }
 
 // Ordine: più recente in cima. Aggiungere una entry ad ogni nuova versione.
 export const changelog: Record<string, ChangelogEntry> = {
+  '0.41.0': {
+    it: [
+      'Desktop e mobile si scambiano al volo: ridimensionando la finestra l\'app passa da un\'interfaccia all\'altra senza ricaricare, restando sulla stessa pagina e con gli stessi dati',
+      'Il menu laterale del desktop si può compattare (solo icone) con il pulsante in fondo; sotto i 1100 px si compatta da solo, e la scelta fatta a mano viene ricordata',
+      'Layout più adatto alle larghezze vicine al telefono (da 768 px): spaziature ridotte, tabelle che scorrono di lato, griglia dei pasti che resta tutta visibile',
+      'Un telefono in orizzontale resta sull\'interfaccia mobile',
+    ],
+    en: [
+      'Desktop and mobile switch on the fly: resizing the window moves the app from one interface to the other without reloading, staying on the same page with the same data',
+      'The desktop side menu can be collapsed (icons only) with the button at the bottom; below 1100 px it collapses by itself, and a manual choice is remembered',
+      'Layout better suited to widths close to a phone (from 768 px): tighter spacing, tables that scroll sideways, a meals grid that stays fully visible',
+      'A phone held sideways stays on the mobile interface',
+    ],
+  },
   '0.40.0': {
     it: [
       'Versione desktop completa: tutte le pagine dell\'app sono ora disponibili anche su schermo largo (Lista, Pasti, Spesa in corso, Storico e dettaglio spesa, Liste, Catalogo, Piatti, Supermercati, Novità e Impostazioni complete di sincronizzazione GitHub), con il pulsante "Inizia la spesa" nel menu laterale',

@@ -220,7 +220,7 @@ export function DesktopPastiScreen() {
   ]
 
   return (
-    <div style={{ padding: '32px 36px', maxWidth: '1200px' }}>
+    <div style={{ padding: 'var(--page-pad-y) var(--page-pad-x)', maxWidth: '1200px' }}>
       <PageHeader
         title={t('nav.meals')}
         subtitle={t('desktop.pasti.subtitle')}
@@ -269,13 +269,13 @@ export function DesktopPastiScreen() {
         </div>
       </div>
 
-      <div style={{ background: '#fff', borderRadius: '16px', padding: '24px', overflowX: 'auto' }}>
+      <div style={{ background: '#fff', borderRadius: '16px', padding: '20px', overflowX: 'auto' }}>
         <p style={{ fontSize: '13px', color: '#9B9B9F', margin: '0 0 16px' }}>{t('desktop.pasti.intro')}</p>
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: '80px repeat(7, minmax(110px, 1fr))',
-            gap: '8px',
+            gridTemplateColumns: '56px repeat(7, minmax(72px, 1fr))',
+            gap: '6px',
             alignItems: 'stretch',
           }}
         >
@@ -487,15 +487,16 @@ function MealRow({
             onClick={() => onOpen(day)}
             style={{
               minHeight: '72px',
-              padding: '12px',
+              padding: '10px 8px',
               borderRadius: '12px',
               border: value ? '1px solid #ECECEC' : '1px dashed #D8D8D6',
               background: value ? '#F6F6F4' : 'transparent',
               color: value ? '#2A2A2C' : '#B5B5BA',
-              fontSize: '14px',
+              fontSize: 'clamp(11px, 1.3vw, 14px)',
               textAlign: 'left',
               cursor: 'pointer',
-              wordBreak: 'break-word',
+              overflowWrap: 'break-word',
+              hyphens: 'auto',
             }}
           >
             {value || '+'}

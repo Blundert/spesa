@@ -5,7 +5,7 @@
     Manage your weekly grocery shopping with meal vouchers — local-first, no account needed.
   </p>
 
-  ![Version](https://img.shields.io/badge/version-0.40.0-2A2A2C?style=flat-square)
+  ![Version](https://img.shields.io/badge/version-0.41.0-2A2A2C?style=flat-square)
   ![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white)
   ![Vite](https://img.shields.io/badge/Vite-646CFF?style=flat-square&logo=vite&logoColor=white)
   ![Tailwind CSS](https://img.shields.io/badge/Tailwind-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white)

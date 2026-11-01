@@ -147,7 +147,7 @@ export function DesktopListeScreen() {
   ]
 
   return (
-    <div style={{ padding: '32px 36px', maxWidth: '1200px' }}>
+    <div style={{ padding: 'var(--page-pad-y) var(--page-pad-x)', maxWidth: '1200px' }}>
       <PageHeader
         title={t('lists.title')}
         subtitle={t('desktop.liste.subtitle')}

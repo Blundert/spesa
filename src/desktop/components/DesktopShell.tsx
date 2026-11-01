@@ -4,6 +4,7 @@ import { Sidebar } from './Sidebar'
 export function DesktopShell() {
   return (
     <div
+      className="desktop-root"
       style={{
         display: 'flex',
         width: '100%',

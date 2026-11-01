@@ -109,7 +109,7 @@ export function DesktopPiattiScreen() {
   ]
 
   return (
-    <div style={{ padding: '32px 36px', maxWidth: '1200px' }}>
+    <div style={{ padding: 'var(--page-pad-y) var(--page-pad-x)', maxWidth: '1200px' }}>
       <PageHeader
         title={t('piatti.title')}
         subtitle={t('desktop.piatti.subtitle', { count: dishes.length })}

@@ -8,7 +8,7 @@ export function DesktopChangelogScreen() {
   const versions = Object.keys(changelog)
 
   return (
-    <div style={{ padding: '32px 36px', maxWidth: '1200px' }}>
+    <div style={{ padding: 'var(--page-pad-y) var(--page-pad-x)', maxWidth: '1200px' }}>
       <PageHeader title={t('settings.changelog')} subtitle={t('desktop.changelog.subtitle')} />
       <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', maxWidth: '760px' }}>
         {versions.map((version) => {

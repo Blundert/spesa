@@ -1,6 +1,27 @@
+import { useState, useSyncExternalStore } from 'react'
 import { useRouter, useRouterState } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 import { NewShoppingButton } from './NewShoppingModal'
+import { parseSidebarPref, resolveSidebarCompact, type SidebarPref } from '../../lib/viewMode'
+
+const SIDEBAR_KEY = 'desktop-sidebar'
+
+function readPref(): SidebarPref {
+  try {
+    return parseSidebarPref(localStorage.getItem(SIDEBAR_KEY))
+  } catch {
+    return null
+  }
+}
+
+function subscribeWidth(cb: () => void) {
+  window.addEventListener('resize', cb)
+  return () => window.removeEventListener('resize', cb)
+}
+
+function useViewportWidth(): number {
+  return useSyncExternalStore(subscribeWidth, () => window.innerWidth)
+}
 
 function Icon({ children }: { children: React.ReactNode }) {
   return (
@@ -133,36 +154,56 @@ export function Sidebar() {
   const router = useRouter()
   const location = useRouterState({ select: (s) => s.location })
   const currentPath = location.pathname
+  const [pref, setPref] = useState<SidebarPref>(readPref)
+  const width = useViewportWidth()
+  const compact = resolveSidebarCompact(pref, width)
+
+  const toggle = () => {
+    const next: SidebarPref = compact ? 'expanded' : 'compact'
+    setPref(next)
+    try {
+      localStorage.setItem(SIDEBAR_KEY, next)
+    } catch {
+      // storage non disponibile: la scelta vale solo per questa sessione
+    }
+  }
 
   return (
     <aside
       style={{
-        width: '220px',
+        width: compact ? '68px' : '220px',
         flexShrink: 0,
         background: '#fff',
         borderRight: '1px solid #ECECEC',
         display: 'flex',
         flexDirection: 'column',
         height: '100%',
+        transition: 'width 0.2s ease',
+        overflow: 'hidden',
       }}
     >
       {/* Logo / app name */}
-      <div style={{ padding: '28px 24px 24px', borderBottom: '1px solid #ECECEC' }}>
+      <div style={{ padding: compact ? '28px 0 24px' : '28px 24px 24px', borderBottom: '1px solid #ECECEC', textAlign: compact ? 'center' : 'left' }}>
         <div style={{ fontSize: '18px', fontWeight: 600, color: '#2A2A2C', letterSpacing: '-0.3px' }}>
-          {t('desktop.appName')}
+          {compact ? t('desktop.appName').charAt(0) : t('desktop.appName')}
         </div>
-        <div style={{ fontSize: '12px', color: '#9B9B9F', marginTop: '2px' }}>
-          {t('desktop.nav.dashboard')}
-        </div>
+        {!compact && (
+          <div style={{ fontSize: '12px', color: '#9B9B9F', marginTop: '2px' }}>
+            {t('desktop.nav.dashboard')}
+          </div>
+        )}
       </div>
 
-      <NewShoppingButton />
+      <NewShoppingButton compact={compact} />
 
       {/* Nav items */}
-      <nav style={{ flex: 1, padding: '12px 12px', overflowY: 'auto' }}>
+      <nav style={{ flex: 1, padding: compact ? '12px 10px' : '12px 12px', overflowY: 'auto', overflowX: 'hidden' }}>
         {NAV_GROUPS.map((group, g) => (
           <div key={g} style={{ marginBottom: '12px' }}>
-            {group.titleKey && (
+            {group.titleKey && compact && (
+              <div style={{ height: '1px', background: '#ECECEC', margin: '8px 6px 12px' }} />
+            )}
+            {group.titleKey && !compact && (
               <div
                 style={{
                   fontSize: '11px',
@@ -182,12 +223,15 @@ export function Sidebar() {
                 <button
                   key={item.path}
                   onClick={() => router.navigate({ to: item.path as never })}
+                  title={compact ? t(item.labelKey) : undefined}
+                  aria-label={t(item.labelKey)}
                   style={{
                     display: 'flex',
                     alignItems: 'center',
+                    justifyContent: compact ? 'center' : 'flex-start',
                     gap: '10px',
                     width: '100%',
-                    padding: '10px 12px',
+                    padding: compact ? '10px 0' : '10px 12px',
                     borderRadius: '10px',
                     border: 'none',
                     background: isActive ? '#F2F2F0' : 'transparent',
@@ -201,13 +245,39 @@ export function Sidebar() {
                   }}
                 >
                   {item.icon}
-                  {t(item.labelKey)}
+                  {!compact && t(item.labelKey)}
                 </button>
               )
             })}
           </div>
         ))}
       </nav>
+
+      <div style={{ padding: compact ? '10px' : '10px 12px', borderTop: '1px solid #ECECEC' }}>
+        <button
+          onClick={toggle}
+          title={compact ? t('desktop.sidebar.expand') : t('desktop.sidebar.collapse')}
+          aria-label={compact ? t('desktop.sidebar.expand') : t('desktop.sidebar.collapse')}
+          aria-expanded={!compact}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: compact ? 'center' : 'flex-start',
+            gap: '10px',
+            width: '100%',
+            padding: compact ? '10px 0' : '10px 12px',
+            borderRadius: '10px',
+            border: 'none',
+            background: 'transparent',
+            color: '#9B9B9F',
+            fontSize: '14px',
+            cursor: 'pointer',
+          }}
+        >
+          <Icon>{compact ? <path d="M9 6l6 6-6 6" /> : <path d="M15 6l-6 6 6 6" />}</Icon>
+          {!compact && t('desktop.sidebar.collapse')}
+        </button>
+      </div>
     </aside>
   )
 }

@@ -47,7 +47,7 @@ export function DesktopCatalogoScreen() {
   })
 
   return (
-    <div style={{ padding: '32px 36px', maxWidth: '1200px' }}>
+    <div style={{ padding: 'var(--page-pad-y) var(--page-pad-x)', maxWidth: '1200px' }}>
       <PageHeader title={t('catalogo.title')} subtitle={t('desktop.catalog.subtitle')} />
       <div style={{ display: 'flex', gap: '24px', alignItems: 'flex-start', flexWrap: 'wrap' }}>
         <div style={{ background: '#fff', borderRadius: '16px', padding: '24px', flex: '0 0 280px' }}>

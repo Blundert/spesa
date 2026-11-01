@@ -297,3 +297,13 @@ Nota: il service worker è attivo solo in build di produzione (`npm run build` +
 10. Supermercati → aggiungi/elimina, tessera fedeltà (carica/sostituisci/rimuovi), ultima visita con anno. Piatti → aggiungi/modifica/elimina con ingredienti. Liste → riordino con frecce, archiviate da ripristinare/eliminare
 11. Impostazioni → tutte quelle del mobile: versione (→ Novità), aggiorna/installa app, lingua, buoni, inizio settimana, tutorial, esporta/importa, azzera tutti i dati (con conferma), sincronizzazione GitHub (guida token, campi, sync automatico, sincronizza ora, scarica da remoto), debug viewport
 12. Con la finestra < 768 px (e ricarica) l'app mobile è identica a prima
+
+### Flusso 34 — Desktop ↔ mobile al volo e menu compatto
+1. Da desktop (es. 1280 px) apri Statistiche (`/stats`), poi restringi la finestra sotto i 768 px senza ricaricare → compare l'app mobile sulla stessa pagina (`/statistiche`), niente schermo vuoto lungo, nessun errore in console. Riallarga → torna il desktop su `/stats`
+2. Ripeti da una pagina qualsiasi (Storico, Pasti, Catalogo, Impostazioni): si resta sulla stessa pagina. Da desktop `/lista` ↔ mobile `/` (Lista); la Dashboard desktop (`/`) su mobile mostra la Lista
+3. Apri direttamente `/stats` con la finestra stretta → atterri su `/statistiche`; apri `/` con la finestra larga → è la Dashboard (non la Lista)
+4. I dati e lo stato (es. spesa in corso, liste) sono gli stessi nelle due interfacce
+5. Telefono in orizzontale (es. 900×420, altezza sotto i 500 px) → resta l'interfaccia mobile
+6. Menu laterale: in fondo il pulsante ‹ / › compatta e riespande (solo icone con tooltip, "Inizia la spesa" diventa un'icona carrello, le voci "Gestisci" sono separate da una linea). Ricarica: la scelta resta
+7. Senza una scelta manuale il menu è compatto sotto i 1100 px e esteso sopra; con la scelta manuale vale quella a qualsiasi larghezza
+8. A 768 px e 800 px ogni pagina è utilizzabile: spaziature ridotte, tabelle che scorrono di lato, griglia dei pasti tutta visibile (Sab → Ven)

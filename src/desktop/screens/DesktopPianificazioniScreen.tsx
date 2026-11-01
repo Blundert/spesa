@@ -79,7 +79,7 @@ export function DesktopPianificazioniScreen() {
   ]
 
   return (
-    <div style={{ padding: '32px 36px', maxWidth: '1200px' }}>
+    <div style={{ padding: 'var(--page-pad-y) var(--page-pad-x)', maxWidth: '1200px' }}>
       <PageHeader title={t('pianificazioni.title')} subtitle={t('desktop.pianificazioni.subtitle', { count: weeks.length })} />
       <div style={{ background: '#fff', borderRadius: '16px', padding: '24px' }}>
         <SortableTable

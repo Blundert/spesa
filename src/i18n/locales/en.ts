@@ -427,6 +427,10 @@ export const en: typeof it = {
     deleted: 'Dish deleted',
   },
   desktop: {
+    sidebar: {
+      collapse: 'Collapse menu',
+      expand: 'Expand menu',
+    },
     appName: 'Spesa',
     nav: {
       lista: 'List',

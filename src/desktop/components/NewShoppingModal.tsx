@@ -31,7 +31,7 @@ function usePurchasesForWeek() {
 }
 
 /** Pulsante "Inizia la spesa" + riepilogo settimana per la sidebar; apre il dialogo di nuova spesa. */
-export function NewShoppingButton() {
+export function NewShoppingButton({ compact = false }: { compact?: boolean }) {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const [open, setOpen] = useState(false)
@@ -76,33 +76,47 @@ export function NewShoppingButton() {
   const muted = { fontSize: '12px', color: '#9B9B9F' } as const
 
   return (
-    <div style={{ padding: '16px 12px 4px' }}>
+    <div style={{ padding: compact ? '16px 10px 4px' : '16px 12px 4px' }}>
       <button
         onClick={openModal}
+        title={compact ? t('nav.startShopping') : undefined}
+        aria-label={t('nav.startShopping')}
         style={{
           width: '100%',
           border: 'none',
           borderRadius: '12px',
           background: '#2A2A2C',
           color: '#fff',
-          padding: '12px 14px',
+          padding: compact ? '12px 0' : '12px 14px',
           fontSize: '14px',
           fontWeight: 500,
           cursor: 'pointer',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
         }}
       >
-        {t('nav.startShopping')}
+        {compact ? (
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="9" cy="21" r="1" /><circle cx="20" cy="21" r="1" />
+            <path d="M1 1h4l2.7 13.4a2 2 0 002 1.6h9.7a2 2 0 002-1.6L23 6H6" />
+          </svg>
+        ) : (
+          t('nav.startShopping')
+        )}
       </button>
-      <div style={{ padding: '12px 4px 0' }}>
-        <div style={{ display: 'flex', alignItems: 'baseline', color: '#2A2A2C' }}>
-          <span style={{ fontSize: '14px', color: '#B5B5BA', marginRight: '2px' }}>€</span>
-          <span style={{ fontSize: '22px', fontVariantNumeric: 'tabular-nums' }}>{formatCentsPlain(summary.outOfPocketCents)}</span>
+      {!compact && (
+        <div style={{ padding: '12px 4px 0' }}>
+          <div style={{ display: 'flex', alignItems: 'baseline', color: '#2A2A2C' }}>
+            <span style={{ fontSize: '14px', color: '#B5B5BA', marginRight: '2px' }}>€</span>
+            <span style={{ fontSize: '22px', fontVariantNumeric: 'tabular-nums' }}>{formatCentsPlain(summary.outOfPocketCents)}</span>
+          </div>
+          <div style={muted}>{t('home.outOfPocket')}</div>
+          <div style={{ ...muted, marginTop: '6px', fontVariantNumeric: 'tabular-nums' }}>
+            € {formatCents(summary.totalSpentCents)} {t('common.spentWord')} · {summary.buoniSpentCount} {t('common.buoni')}
+          </div>
         </div>
-        <div style={muted}>{t('home.outOfPocket')}</div>
-        <div style={{ ...muted, marginTop: '6px', fontVariantNumeric: 'tabular-nums' }}>
-          € {formatCents(summary.totalSpentCents)} {t('common.spentWord')} · {summary.buoniSpentCount} {t('common.buoni')}
-        </div>
-      </div>
+      )}
 
       <Modal open={open} onClose={() => setOpen(false)} width={440}>
         <div style={{ ...muted, letterSpacing: '0.5px', textTransform: 'uppercase', marginBottom: '10px' }}>

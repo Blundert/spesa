@@ -455,7 +455,7 @@ export function DesktopSpesaScreen() {
 
   if (!activeSession) {
     return (
-      <div style={{ padding: '32px 36px', maxWidth: '1200px' }}>
+      <div style={{ padding: 'var(--page-pad-y) var(--page-pad-x)', maxWidth: '1200px' }}>
         <PageHeader title={t('spesa.startTitle')} />
         <div style={{ ...card, textAlign: 'center', padding: '56px 24px' }}>
           <p style={{ fontSize: '15px', color: '#9B9B9F', margin: '0 0 24px' }}>{t('spesa.choosePrompt')}</p>
@@ -474,7 +474,7 @@ export function DesktopSpesaScreen() {
   }
 
   return (
-    <div style={{ padding: '32px 36px', maxWidth: '1200px' }}>
+    <div style={{ padding: 'var(--page-pad-y) var(--page-pad-x)', maxWidth: '1200px' }}>
       <PageHeader
         title={supermarketName}
         subtitle={sessionList?.name}

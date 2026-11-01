@@ -269,7 +269,7 @@ export function DesktopImpostazioniScreen() {
   ] as const
 
   return (
-    <div style={{ padding: '32px 36px', maxWidth: '1200px' }}>
+    <div style={{ padding: 'var(--page-pad-y) var(--page-pad-x)', maxWidth: '1200px' }}>
       <PageHeader title={t('settings.title')} subtitle={t('desktop.settings.subtitle')} />
       <div style={{ display: 'flex', gap: '24px', flexWrap: 'wrap', alignItems: 'flex-start' }}>
         <Card title={t('settings.language')}>
