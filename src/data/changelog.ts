@@ -2,6 +2,16 @@ export type ChangelogEntry = { it: string[]; en: string[] }
 
 // Ordine: più recente in cima. Aggiungere una entry ad ogni nuova versione.
 export const changelog: Record<string, ChangelogEntry> = {
+  '0.38.0': {
+    it: [
+      'Tastierino calcolatrice: quando inserisci un prezzo tocca ±×÷ in alto a sinistra per fare i conti con + − × ÷, parentesi e % (es. "4,50 − 30%" = 3,15). Il risultato si aggiorna mentre scrivi, e 123 torna al tastierino di sempre',
+      'L\'app ricorda la modalità che hai usato l\'ultima volta; la calcolatrice c\'è ovunque si inserisce un importo (carrello, fine spesa, Storico)',
+    ],
+    en: [
+      'Calculator keypad: when entering a price, tap ±×÷ at the top left to do the maths with + − × ÷, brackets and % (e.g. "4.50 − 30%" = 3.15). The result updates as you type, and 123 brings back the usual keypad',
+      'The app remembers the mode you used last; the calculator is available wherever you enter an amount (cart, end of shopping, History)',
+    ],
+  },
   '0.37.0': {
     it: [
       'Più liste della spesa: sotto il titolo "Lista" trovi una scheda per ogni lista (la tua lista attuale si chiama "Spesa"). Tocca + per crearne una, ritocca quella attiva (con ⌄) per rinominarla, darle un supermercato o archiviarla',

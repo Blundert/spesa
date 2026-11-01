@@ -251,3 +251,14 @@ Nota: il service worker è attivo solo in build di produzione (`npm run build` +
 10. Ritocca "Casa" → "Archivia lista" → toast, la scheda sparisce. Con una sola lista attiva "Archivia lista" non c'è
 11. Menu → Gestisci → "Liste": frecce ↑↓ per riordinare (l'ordine delle schede segue); in "Archiviate" Casa con "Ripristina" (torna tra le schede con i suoi prodotti) ed "Elimina" → conferma "Elimina definitivamente" → sparisce, la spesa di Casa resta nello Storico senza etichetta
 12. Impostazioni → esporta un backup e reimportalo → liste, schede e voci tornano uguali
+
+### Flusso 29 — Tastierino calcolatrice
+1. Avvia una spesa e tocca un prodotto da prendere → nel tastierino, in alto a sinistra, l'interruttore `123 | ±×÷` con `123` attivo; il tastierino di sempre funziona come prima
+2. Digita `1 2 0` (€1,20) → tocca `±×÷` → la calcolatrice (5 colonne: cifre, `( ) × ÷ + − % C`, `,` e `⌫`) parte con `1,20` nella riga sopra il risultato
+3. Digita `− 3 0 %` → la riga mostra `1,20 − 30%` e il risultato grande è €0,84, il bottone dice "Aggiungi al carrello €0,84"
+4. Digita `×` → espressione incompleta: il risultato resta €0,84 in grigio e il bottone è disattivato. Digita `(` → diventa `× (`; digita `2` → il risultato torna nero (la parentesi aperta si chiude da sola)
+5. Prova le regole: due operazioni di fila → la seconda sostituisce la prima; `)` senza parentesi aperte non fa nulla; `,` due volte nello stesso numero → una sola; più di due decimali → ignorati; `C` svuota (€0,00); `5 ÷ 0` → bottone disattivato
+6. Tocca `123` → torna il tastierino semplice con il risultato (arrotondato al centesimo). Conferma → nel carrello col prezzo calcolato e la quantità scelta con lo stepper (il risultato è il prezzo unitario)
+7. Tocca un altro prodotto dopo aver scelto `±×÷` → si riapre in calcolatrice; ricarica la pagina → la modalità resta quella
+8. "Fine" → "Quanto hai speso?" in calcolatrice parte dal totale calcolato (es. `42,80`) → `− 10%` → conferma il risultato
+9. Nello Storico, modifica un acquisto e il totale di una spesa: la calcolatrice c'è anche lì, con lo stesso comportamento

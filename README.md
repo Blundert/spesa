@@ -5,7 +5,7 @@
     Gestisci la spesa settimanale con i buoni pasto — tutto in locale, senza account.
   </p>
 
-  ![Version](https://img.shields.io/badge/version-0.37.0-2A2A2C?style=flat-square)
+  ![Version](https://img.shields.io/badge/version-0.38.0-2A2A2C?style=flat-square)
   ![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white)
   ![Vite](https://img.shields.io/badge/Vite-646CFF?style=flat-square&logo=vite&logoColor=white)
   ![Tailwind CSS](https://img.shields.io/badge/Tailwind-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white)
@@ -49,6 +49,7 @@ senza account né server. È installabile come app nativa su iOS, Android e desk
 - 💶 Budget buoni pasto settimanale
 - 📊 Statistiche: andamento settimanale, top articoli, ripartizione per categoria
 - 📈 Indicatore variazione prezzo rispetto all'ultima volta
+- 🧮 Tastierino prezzi con modalità calcolatrice (+ − × ÷, parentesi, %)
 - ✨ Carica la tua "spesa solita" in un tap
 - 🗓️ Pianificatore pasti settimanale
 - 🏪 Supermercati con tessera fedeltà
