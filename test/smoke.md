@@ -179,3 +179,8 @@ Nota: il service worker è attivo solo in build di produzione (`npm run build` +
 3. Chiudi il sheet (swipe giù, tap sul velo o azione) → la barra torna chiara. Ripeti più volte: mai barra scura a sheet chiuso, mai barra chiara a sheet aperto
 4. In Spesa tocca un prezzo → tastierino prezzi: la barra si scurisce; chiudi → torna chiara
 5. In Spesa con tessera fedeltà → apri la tessera: barra quasi nera come il velo; chiudi → torna chiara
+
+### Flusso 21 — Nessuno zoom al tocco dei campi di testo (test su iPhone)
+1. Pasti → slot vuoto → scrivi un nome piatto e conferma → tocca "Aggiungi un ingrediente…" → la pagina **non** fa zoom (lo sheet resta a tutta larghezza, bordi arrotondati visibili)
+2. Ripeti su Piatti → modifica piatto → campo ingrediente, e su Statistiche → "Personalizzato" → campi data
+3. Chiudi la tastiera e prova lo zoom con due dita → deve ancora funzionare (accessibilità)
