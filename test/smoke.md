@@ -155,7 +155,7 @@ Nota: il service worker è attivo solo in build di produzione (`npm run build` +
 ### Flusso 18 — Bottom sheet con input e tastiera (test su dispositivo iOS reale)
 1. Su un iPhone reale (non simulabile in desktop), apri uno dei bottom sheet con un campo di testo: Catalogo → "Aggiungi categoria" (o "Rinomina categoria/articolo"), Supermercati → "Nuovo supermercato", Spesa → "Aggiungi fuori lista", Piatti → "Aggiungi piatto", Pasti → tocca uno slot vuoto, Statistiche → chip "Personalizzato"
 2. Verifica che il sheet si apra quasi a schermo intero (non all'altezza parziale usata dagli altri sheet, es. le conferme di eliminazione)
-3. Tocca il campo di testo → la tastiera compare e il sheet **resta fermo**: titolo, campo e bottone restano visibili in alto, la tastiera copre solo la parte bassa (vuota) del sheet. Mai una schermata bianca senza contenuto
+3. Senza toccare nulla, verifica che il campo riceva il focus solo **dopo** che il sheet ha finito di salire (mai durante l'animazione). Se la tastiera non compare da sola, tocca il campo → la tastiera compare e il sheet **resta fermo**: titolo, campo e bottone restano visibili in alto, la tastiera copre solo la parte bassa (vuota) del sheet. Mai una schermata bianca senza contenuto
 4. Su un piatto/pasto con lista ingredienti lunga: con la tastiera aperta scrolla il contenuto del sheet → tutto, fino al bottone in fondo, si può portare sopra la tastiera
 5. Chiudi la tastiera (✓ della barra iOS o tap fuori dal campo) → il sheet resta quasi a schermo intero, senza salti
 6. In Sessione/Spesa → store picker: il sheet ha l'altezza normale finché non tocchi "Aggiungi supermercato" → si espande quasi a schermo intero e la tastiera si comporta come al punto 3

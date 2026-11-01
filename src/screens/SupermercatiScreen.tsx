@@ -161,7 +161,7 @@ export function SupermercatiScreen() {
           value={newName}
           onChange={(e) => setNewName(e.target.value)}
           placeholder={t('supermercati.namePlaceholder')}
-          autoFocus
+          data-autofocus
           onKeyDown={(e) => e.key === 'Enter' && void handleAdd()}
           className="w-full border-0 border-b border-[#ECECEC] outline-none bg-transparent px-0.5 py-3 text-[18px] text-[#2A2A2C] mb-3"
         />

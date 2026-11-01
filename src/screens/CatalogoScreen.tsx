@@ -339,7 +339,7 @@ export function CatalogoScreen() {
           value={newCatName}
           onChange={(e) => setNewCatName(e.target.value)}
           placeholder={t('catalogo.namePlaceholder')}
-          autoFocus
+          data-autofocus
           onKeyDown={(e) => e.key === 'Enter' && handleAddCategory()}
           className="w-full border-0 border-b border-[#ECECEC] outline-none bg-transparent px-0.5 py-3 text-[18px] text-[#2A2A2C] mb-3"
         />
@@ -360,7 +360,7 @@ export function CatalogoScreen() {
           value={renameCatName}
           onChange={(e) => setRenameCatName(e.target.value)}
           placeholder={t('catalogo.namePlaceholder')}
-          autoFocus
+          data-autofocus
           onKeyDown={(e) => e.key === 'Enter' && handleRenameCategory()}
           className="w-full border-0 border-b border-[#ECECEC] outline-none bg-transparent px-0.5 py-3 text-[18px] text-[#2A2A2C] mb-3"
         />
@@ -403,7 +403,7 @@ export function CatalogoScreen() {
           value={renameItemName}
           onChange={(e) => setRenameItemName(e.target.value)}
           placeholder={t('catalogo.itemNamePlaceholder')}
-          autoFocus
+          data-autofocus
           onKeyDown={(e) => e.key === 'Enter' && handleRenameItem()}
           className="w-full border-0 border-b border-[#ECECEC] outline-none bg-transparent px-0.5 py-3 text-[18px] text-[#2A2A2C] mb-4"
         />

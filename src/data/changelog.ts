@@ -2,6 +2,10 @@ export type ChangelogEntry = { it: string[]; en: string[] }
 
 // Ordine: più recente in cima. Aggiungere una entry ad ogni nuova versione.
 export const changelog: Record<string, ChangelogEntry> = {
+  '0.29.2': {
+    it: ['Fix: su iOS, aprendo un menu dal basso con campo di testo (es. Pasti → slot vuoto), la vista non diventa più bianca: il campo si attiva solo quando il menu ha finito di aprirsi. Se la tastiera non compare da sola, tocca il campo'],
+    en: ['Fix: on iOS, opening a bottom sheet with a text field (e.g. Meals → empty slot) no longer turns the view white: the field is focused only once the sheet has finished opening. If the keyboard does not appear on its own, tap the field'],
+  },
   '0.29.1': {
     it: ['Fix: su iOS i menu dal basso con campo di testo (es. nome piatto nei Pasti) restano fermi quando si apre la tastiera, senza più diventare una schermata bianca'],
     en: ['Fix: on iOS, bottom sheets with a text field (e.g. dish name in Meals) stay put when the keyboard opens, no longer turning into a blank white screen'],

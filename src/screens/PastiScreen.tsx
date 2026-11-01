@@ -393,7 +393,7 @@ export function PastiScreen() {
                   value={slotState.nameInput}
                   onChange={(e) => setSlotState((prev) => (prev ? { ...prev, nameInput: e.target.value } : prev))}
                   placeholder={t('piatti.namePlaceholder')}
-                  autoFocus
+                  data-autofocus
                   disabled={slotState.isNewDish}
                   className="w-full border-0 border-b border-[#ECECEC] outline-none bg-transparent px-0.5 py-3 text-[18px] text-[#2A2A2C] mb-2 disabled:opacity-60"
                 />

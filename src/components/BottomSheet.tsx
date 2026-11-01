@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Drawer } from 'vaul'
 
 interface BottomSheetProps {
@@ -12,6 +12,8 @@ interface BottomSheetProps {
 
 const EXPANDED_HEIGHT = 'calc(100dvh - env(safe-area-inset-top) - 20px)'
 const DEFAULT_MAX_HEIGHT = '85dvh'
+/** Durata dell'animazione di apertura di Vaul (style.css: 0.5s). */
+const OPEN_ANIMATION_MS = 500
 
 export function BottomSheet({
   open,
@@ -22,6 +24,19 @@ export function BottomSheet({
 }: BottomSheetProps) {
   const [keyboardHeight, setKeyboardHeight] = useState(0)
   const [viewportHeight, setViewportHeight] = useState(0)
+  const scrollRef = useRef<HTMLDivElement>(null)
+
+  // Focus sul campo marcato `data-autofocus` solo a sheet arrivato in posizione.
+  // Con `autoFocus` il campo riceve il focus mentre lo sheet è ancora sotto il bordo
+  // dello schermo (inizio animazione): iOS apre la tastiera, sposta la vista per
+  // mostrare il campo e, a fine animazione, la vista resta spostata (schermata bianca).
+  useEffect(() => {
+    if (!open) return
+    const timer = window.setTimeout(() => {
+      scrollRef.current?.querySelector<HTMLElement>('[data-autofocus]')?.focus({ preventScroll: true })
+    }, OPEN_ANIMATION_MS)
+    return () => window.clearTimeout(timer)
+  }, [open])
 
   useEffect(() => {
     if (!open) return
@@ -68,6 +83,7 @@ export function BottomSheet({
             <Drawer.Handle className="w-[38px] h-[5px] rounded-full bg-[#D8D8D6] mx-auto mb-4 shrink-0" />
           )}
           <div
+            ref={scrollRef}
             style={scrollStyle}
             className="overflow-y-auto overscroll-contain px-[22px] pb-[calc(22px+env(safe-area-inset-bottom))] flex-1"
           >

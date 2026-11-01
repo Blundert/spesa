@@ -180,7 +180,7 @@ export function PiattiScreen() {
           onChange={(e) => setEditorState((prev) => (prev ? { ...prev, name: e.target.value } : prev))}
           onKeyDown={(e) => e.key === 'Enter' && handleSaveDish()}
           placeholder={t('piatti.namePlaceholder')}
-          autoFocus
+          data-autofocus
           className="w-full border-0 border-b border-[#ECECEC] outline-none bg-transparent px-0.5 py-3 text-[18px] text-[#2A2A2C] mb-4"
         />
 
