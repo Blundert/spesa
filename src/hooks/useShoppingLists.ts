@@ -1,7 +1,13 @@
 import { useSyncExternalStore } from 'react'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { qk } from '../db/queryKeys'
-import { getShoppingLists, getUsualItems } from '../db/repositories/shoppingLists'
+import {
+  archiveShoppingList,
+  createShoppingList,
+  getShoppingLists,
+  getUsualItems,
+  updateShoppingList,
+} from '../db/repositories/shoppingLists'
 import { getActiveListId, onActiveListChange, pickList } from '../lib/activeList'
 
 export function useShoppingLists() {
@@ -24,5 +30,31 @@ export function useUsualItems(listId: number | undefined) {
     queryKey: qk.usualItems(listId ?? 0),
     queryFn: () => getUsualItems(listId ?? 0),
     enabled: listId !== undefined,
+  })
+}
+
+export function useCreateList() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: ({ name, supermarketId }: { name: string; supermarketId: number | null }) =>
+      createShoppingList(name, supermarketId),
+    onSuccess: () => void qc.invalidateQueries({ queryKey: qk.shoppingLists() }),
+  })
+}
+
+export function useUpdateList() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: ({ id, ...patch }: { id: number; name?: string; supermarketId?: number | null }) =>
+      updateShoppingList(id, patch),
+    onSuccess: () => void qc.invalidateQueries({ queryKey: qk.shoppingLists() }),
+  })
+}
+
+export function useArchiveList() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (id: number) => archiveShoppingList(id),
+    onSuccess: () => void qc.invalidateQueries({ queryKey: qk.shoppingLists() }),
   })
 }

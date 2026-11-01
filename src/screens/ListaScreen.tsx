@@ -3,14 +3,17 @@ import { useTranslation } from 'react-i18next'
 import { Link } from '@tanstack/react-router'
 import { categoryLabel } from '../i18n'
 import { formatCentsPlain } from '../lib/money'
-import { useListItems, useAddNewItemToList, useRemoveFromList, useUpdateListQuantity, useClearList } from '../hooks/useListItems'
+import { useListItems, useAddNewItemToList, useAddToList, useRemoveFromList, useUpdateListQuantity, useClearList } from '../hooks/useListItems'
 import { toast } from 'sonner'
-import { useCategories, useItems } from '../hooks/useItems'
+import { useCategories, useItems, useSupermarkets } from '../hooks/useItems'
 import { normalizeName } from '../lib/normalize'
 import { BASE_ITEMS } from '../lib/baseItems'
 import { BottomSheet } from '../components/BottomSheet'
 import { SectionTitle } from '../components/SectionTitle'
-import { useActiveList } from '../hooks/useShoppingLists'
+import { useActiveList, useUsualItems } from '../hooks/useShoppingLists'
+import { ListTabs } from '../components/ListTabs'
+import { ListEditSheet } from '../components/ListEditSheet'
+import { activeLists, setActiveListId } from '../lib/activeList'
 
 interface Suggestion {
   name: string
@@ -25,14 +28,22 @@ export function ListaScreen() {
   const [pendingListRemove, setPendingListRemove] = useState<number | null>(null)
   const [showClear, setShowClear] = useState(false)
 
-  const { list } = useActiveList()
+  // Pannello lista: 'new' crea, 'edit' modifica la lista aperta.
+  const [listSheet, setListSheet] = useState<'new' | 'edit' | null>(null)
+
+  const { lists, list } = useActiveList()
+  const tabs = activeLists(lists)
   const listId = list?.id
   const { data: listItems = [] } = useListItems(listId)
+  const { data: usualItems = [] } = useUsualItems(listId)
+  const { data: supermarkets = [] } = useSupermarkets()
+  const supermarketNames = Object.fromEntries(supermarkets.map((s) => [s.id ?? 0, s.name]))
   const { data: categories = [] } = useCategories()
   const { data: items = [] } = useItems()
 
   const altroId = categories.find((c) => c.name === 'Altro')?.id ?? 0
   const addNewItem = useAddNewItemToList(altroId)
+  const addToList = useAddToList()
   const removeFromList = useRemoveFromList()
   const clearList = useClearList()
   const updateListQuantity = useUpdateListQuantity()
@@ -73,13 +84,16 @@ export function ListaScreen() {
   const inListNorm = new Set(listItems.map((li) => normalizeName(li.itemName)))
   const query = normalizeName(addInput)
 
-  // Template automatico: top-8 articoli per purchaseCount, non già in lista
+  // Spesa solita della lista: i suoi 8 prodotti più comprati, non già in lista.
+  // Una lista senza spese alle spalle non la propone.
+  const inListIds = new Set(listItems.map((li) => li.itemId))
+  const itemById = new Map(items.map((it) => [it.id ?? 0, it]))
   const templateSuggestions =
     listItems.length < 3
-      ? Array.from(pool.values())
-          .filter((p) => p.purchaseCount > 0 && !inListNorm.has(normalizeName(p.name)))
-          .sort((a, b) => b.purchaseCount - a.purchaseCount)
+      ? usualItems
+          .filter((u) => !inListIds.has(u.itemId) && itemById.has(u.itemId))
           .slice(0, 8)
+          .map((u) => ({ itemId: u.itemId, name: itemById.get(u.itemId)?.name ?? '' }))
       : []
 
   // Match per l'autocomplete (input non vuoto): prima chi inizia col testo, poi alfabetico.
@@ -130,6 +144,15 @@ export function ListaScreen() {
           </button>
         )}
       </div>
+
+      <ListTabs
+        lists={tabs}
+        activeId={listId}
+        supermarketNames={supermarketNames}
+        onSelect={setActiveListId}
+        onEdit={() => setListSheet('edit')}
+        onCreate={() => setListSheet('new')}
+      />
 
       {/* Add input */}
       <div className="flex items-center gap-2.5 bg-white rounded-2xl px-[18px] py-4 mb-3">
@@ -204,7 +227,7 @@ export function ListaScreen() {
           <button
             onClick={() => {
               if (listId === undefined) return
-              templateSuggestions.forEach((s) => addNewItem.mutate({ listId, name: s.name, categoryId: s.categoryId }))
+              templateSuggestions.forEach((s) => addToList.mutate({ listId, itemId: s.itemId }))
             }}
             className="flex-none bg-[#2A2A2C] text-white text-[14px] px-4 py-[9px] rounded-full active:opacity-70"
           >
@@ -289,7 +312,7 @@ export function ListaScreen() {
 
       {/* Conferma svuota lista */}
       <BottomSheet open={showClear} onClose={() => setShowClear(false)}>
-        <div className="text-[20px] font-normal text-[#D14343] px-0.5 pb-2">{t('lista.clearConfirmTitle')}</div>
+        <div className="text-[20px] font-normal text-[#D14343] px-0.5 pb-2">{t('lista.clearConfirmTitle', { name: list?.name })}</div>
         <div className="text-[14px] text-[#9B9B9F] px-0.5 pb-6">
           {t('lista.clearConfirmBody', { count: listItems.length })}
         </div>
@@ -309,6 +332,15 @@ export function ListaScreen() {
           {t('common.cancel')}
         </button>
       </BottomSheet>
+
+      {/* Nuova lista / modifica della lista aperta */}
+      <ListEditSheet
+        open={listSheet !== null}
+        onClose={() => setListSheet(null)}
+        list={listSheet === 'edit' ? (list ?? null) : null}
+        canArchive={tabs.length > 1}
+        supermarkets={supermarkets}
+      />
 
       {/* Conferma rimuovi dalla lista */}
       <BottomSheet open={pendingListRemove !== null} onClose={() => setPendingListRemove(null)}>
