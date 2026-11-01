@@ -8,7 +8,7 @@ export function SectionTitle({ active }: { active: 'lista' | 'pasti' }) {
   const base = 'text-[26px] font-normal tracking-[-0.5px]'
   const inactive = `${base} text-[#C5C5C9] active:opacity-50`
   return (
-    <div className="flex items-baseline gap-[18px]">
+    <div data-tour="section-title" className="flex items-baseline gap-[18px]">
       {active === 'lista' ? (
         <span className={`${base} text-[#2A2A2C]`}>{t('lista.title')}</span>
       ) : (

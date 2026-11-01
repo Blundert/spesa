@@ -219,39 +219,40 @@ export const en: typeof it = {
         'Your app for managing weekly shopping with meal vouchers. Simple, fast, always with you.',
     },
     slide2: {
-      title: 'Your week',
+      title: 'Plan your week',
       description:
-        "Track how much you spend each week, how many vouchers you've used, and how much came out of your pocket.",
+        'Pick your meals and how many vouchers you have: the ingredients end up in your list.',
     },
     slide3: {
-      title: 'Shopping list',
+      title: 'Your list',
       description:
-        'Add items to your list, organise them by category, and check them off as you shop.',
+        'Add what you need, at home or on the go. It is the first thing you see when you open the app.',
     },
     slide4: {
-      title: 'Ready to start',
+      title: 'At the supermarket',
       description:
-        'Explore the app freely. You can replay this tutorial at any time from Settings.',
+        'Tap the bar at the bottom, choose your vouchers and see what you pay out of pocket.',
     },
     tour: {
       step1: {
-        title: 'Your weekly budget',
+        title: 'List and Meals',
         description:
-          "See what you've spent and what's left. The big number is what came out of your pocket.",
+          'This is your list. Tap “Meals” to plan the week: the ingredients end up here.',
       },
       step2: {
-        title: 'New shopping session',
+        title: 'Your week',
         description:
-          'Tap this bar to start a new shopping session. Select how many vouchers you will use.',
+          'What you paid out of pocket this week. Tap it for the details and to start shopping.',
       },
       step3: {
-        title: 'Menu',
-        description: 'Navigate between Week, List, History, Supermarkets, and Settings from here.',
+        title: 'Start shopping',
+        description:
+          'At the supermarket: choose how many vouchers you will use (it starts from the remaining ones) and tap “Start shopping”.',
       },
       step4: {
-        title: 'Shopping list',
+        title: 'Menu',
         description:
-          'Add items before you leave and check them off during your shop. Everything saves automatically.',
+          'History, statistics, catalog, dishes and supermarkets. You can replay this tutorial from Settings.',
       },
     },
   },

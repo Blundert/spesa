@@ -119,7 +119,7 @@ export function ListaScreen() {
   return (
     <div className="flex-1 overflow-y-auto px-5 pb-[120px]">
       {/* Header — menu button is in AppShell */}
-      <div data-tour="lista-screen" className="flex items-center justify-between px-1 pt-2 pb-[18px]">
+      <div className="flex items-center justify-between px-1 pt-2 pb-[18px]">
         <SectionTitle active="lista" />
         {listItems.length > 0 && (
           <button onClick={() => setShowClear(true)} className="text-[15px] text-[#9B9B9F] px-1 active:opacity-50">

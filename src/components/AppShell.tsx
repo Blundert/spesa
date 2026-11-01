@@ -16,6 +16,7 @@ import { db } from '../db/db'
 import { BottomSheet } from './BottomSheet'
 import { BuoniSteppers } from './BuoniSheet'
 import { WeekSummary } from './WeekSummary'
+import { onTourPillSheet } from '../tutorial/tutorialStore'
 
 const isoWeek = currentWeek()
 
@@ -64,6 +65,15 @@ export function AppShell() {
     setNewVal(getDefaultBuonoValueCents())
     setSheetOpen(true)
   }
+  // Il tour apre il pannello per mostrare buoni e "Inizia la spesa", poi lo richiude.
+  useEffect(
+    () =>
+      onTourPillSheet((open) => {
+        if (open) openNewShopping()
+        else setSheetOpen(false)
+      }),
+  )
+
   const startShopping = () => {
     setSheetOpen(false)
     const buoni = newBuoni
@@ -175,19 +185,21 @@ function NewShoppingSheet({
   return (
     <BottomSheet open={open} onClose={onClose}>
       {summary}
-      <div className="text-[12px] font-normal tracking-[1.4px] text-[#9B9B9F] uppercase px-0.5 pb-[14px]">
-        {t('spesa.newTitle')}
+      <div data-tour="new-shopping">
+        <div className="text-[12px] font-normal tracking-[1.4px] text-[#9B9B9F] uppercase px-0.5 pb-[14px]">
+          {t('spesa.newTitle')}
+        </div>
+        <BuoniSteppers buoni={buoni} valueCents={valueCents} onBuoni={onBuoni} onValue={onValue} />
+        <button
+          onClick={onStart}
+          className="w-full bg-[#2A2A2C] text-white text-[17px] font-normal py-[17px] rounded-[18px] flex items-center justify-center gap-2 active:scale-[.98] transition-transform"
+        >
+          {t('nav.startShopping')}
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M5 12h14M13 6l6 6-6 6" />
+          </svg>
+        </button>
       </div>
-      <BuoniSteppers buoni={buoni} valueCents={valueCents} onBuoni={onBuoni} onValue={onValue} />
-      <button
-        onClick={onStart}
-        className="w-full bg-[#2A2A2C] text-white text-[17px] font-normal py-[17px] rounded-[18px] flex items-center justify-center gap-2 active:scale-[.98] transition-transform"
-      >
-        {t('nav.startShopping')}
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M5 12h14M13 6l6 6-6 6" />
-        </svg>
-      </button>
     </BottomSheet>
   )
 }

@@ -217,40 +217,40 @@ export const it = {
         'La tua app per gestire la spesa settimanale con i buoni pasto. Semplice, veloce, sempre con te.',
     },
     slide2: {
-      title: 'La tua settimana',
+      title: 'Pianifica la settimana',
       description:
-        'Tieni traccia di quanto spendi ogni settimana, quanti buoni hai usato e quanto hai pagato di tasca tua.',
+        'Scegli i pasti e quanti buoni hai a disposizione: gli ingredienti finiscono nella lista.',
     },
     slide3: {
-      title: 'Lista della spesa',
+      title: 'La tua lista',
       description:
-        'Aggiungi articoli alla lista, organizzali per categoria e spuntali mentre fai la spesa.',
+        "Aggiungi quello che ti serve, a casa o al volo. La trovi appena apri l'app.",
     },
     slide4: {
-      title: 'Pronto per iniziare',
+      title: 'Al supermercato',
       description:
-        "Esplora l'app liberamente. Puoi rivedere questo tutorial in qualsiasi momento dalle Impostazioni.",
+        'Tocca la barra in basso, scegli i buoni e vedi quanto paghi di tasca tua.',
     },
     tour: {
       step1: {
-        title: 'Il tuo budget settimanale',
+        title: 'Lista e Pasti',
         description:
-          'Qui vedi quanto hai speso e quanto ti rimane. Il numero grande è quello che hai pagato di tasca tua.',
+          "Qui c'è la tua lista. Tocca «Pasti» per pianificare la settimana: gli ingredienti finiscono qui.",
       },
       step2: {
-        title: 'Nuova sessione di spesa',
+        title: 'La tua settimana',
         description:
-          'Tocca questa barra per iniziare una nuova sessione al supermercato. Seleziona i buoni che userai.',
+          'Quanto hai pagato di tasca tua questa settimana. Toccala per i dettagli e per iniziare una spesa.',
       },
       step3: {
-        title: 'Menu',
+        title: 'Iniziare la spesa',
         description:
-          'Da qui navighi tra Settimana, Lista, Storico, Supermercati e Impostazioni.',
+          'Quando sei al supermercato: scegli quanti buoni usi (parte da quelli rimanenti) e premi «Inizia la spesa».',
       },
       step4: {
-        title: 'Lista della spesa',
+        title: 'Menu',
         description:
-          'Aggiungi articoli prima di uscire e spuntali durante la spesa. Si salva tutto in automatico.',
+          'Storico, statistiche, catalogo, piatti e supermercati. Puoi rivedere questo tutorial dalle Impostazioni.',
       },
     },
   },

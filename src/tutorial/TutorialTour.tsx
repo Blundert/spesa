@@ -1,35 +1,42 @@
-import { useState, useEffect, useCallback, useRef } from 'react'
+import { useState, useEffect, useRef, type CSSProperties } from 'react'
+import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { router } from '../router'
-import { markTourDone } from './tutorialStore'
+import { markTourDone, setTourPillSheet } from './tutorialStore'
 
 interface TourStep {
   dataAttr: string
-  route: string | null
   tooltipPosition: 'above' | 'below'
   titleKey: string
   descKey: string
+  // Il passo si svolge con il pannello della pill aperto.
+  pillSheet?: boolean
 }
 
+// Tutti i passi sono sulla Lista, la home: titoli, pill, pannello aperto, menu.
 const STEPS: TourStep[] = [
   {
+    dataAttr: 'section-title',
+    tooltipPosition: 'below',
+    titleKey: 'tutorial.tour.step1.title',
+    descKey: 'tutorial.tour.step1.description',
+  },
+  {
     dataAttr: 'session-pill',
-    route: null,
     tooltipPosition: 'above',
     titleKey: 'tutorial.tour.step2.title',
     descKey: 'tutorial.tour.step2.description',
   },
   {
-    dataAttr: 'menu-button',
-    route: null,
+    dataAttr: 'new-shopping',
     tooltipPosition: 'above',
     titleKey: 'tutorial.tour.step3.title',
     descKey: 'tutorial.tour.step3.description',
+    pillSheet: true,
   },
   {
-    dataAttr: 'lista-screen',
-    route: '/',
-    tooltipPosition: 'below',
+    dataAttr: 'menu-button',
+    tooltipPosition: 'above',
     titleKey: 'tutorial.tour.step4.title',
     descKey: 'tutorial.tour.step4.description',
   },
@@ -37,6 +44,11 @@ const STEPS: TourStep[] = [
 
 const PAD = 14
 const R = 18
+// Attesa prima di misurare: apertura/chiusura del pannello (Vaul) o transizione di pagina.
+const SETTLE_MS = 550
+
+const nextFrames = () =>
+  new Promise<void>((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve())))
 
 interface TutorialTourProps {
   onComplete: () => void
@@ -45,11 +57,11 @@ interface TutorialTourProps {
 export function TutorialTour({ onComplete }: TutorialTourProps) {
   const { t } = useTranslation()
   const [step, setStep] = useState(0)
-  const [rect, setRect] = useState<DOMRect | null>(null)
-  const [visible, setVisible] = useState(false)
+  // Rettangolo misurato per un passo; il tooltip è visibile solo quando corrisponde al passo corrente.
+  const [measured, setMeasured] = useState<{ step: number; rect: DOMRect | null } | null>(null)
   const [vpW, setVpW] = useState(window.innerWidth)
   const [vpH, setVpH] = useState(window.innerHeight)
-  const measuringRef = useRef(false)
+  const prevStepRef = useRef<number | null>(null)
 
   useEffect(() => {
     const onResize = () => {
@@ -60,66 +72,44 @@ export function TutorialTour({ onComplete }: TutorialTourProps) {
     return () => window.removeEventListener('resize', onResize)
   }, [])
 
-  const measureStep = useCallback(async (stepIndex: number) => {
-    if (measuringRef.current) return
-    measuringRef.current = true
-    setVisible(false)
-
-    const s = STEPS[stepIndex]
-
-    if (s.route !== null) {
-      await router.navigate({ to: s.route })
-      // Wait two frames for the new screen to paint
-      await new Promise<void>((resolve) =>
-        requestAnimationFrame(() => requestAnimationFrame(() => resolve())),
-      )
-    }
-
-    const el = document.querySelector<HTMLElement>(`[data-tour="${s.dataAttr}"]`)
-    if (!el) {
-      measuringRef.current = false
-      // Skip step gracefully
-      if (stepIndex < STEPS.length - 1) {
-        setStep(stepIndex + 1)
-      } else {
-        handleComplete()
-      }
-      return
-    }
-
-    setRect(el.getBoundingClientRect())
-    setVisible(true)
-    measuringRef.current = false
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
-
   useEffect(() => {
-    void measureStep(step)
-  }, [step, measureStep])
+    let cancelled = false
+    const s = STEPS[step]
+    const prev = prevStepRef.current
+    prevStepRef.current = step
+    const sheetChanges = s.pillSheet === true || (prev !== null && STEPS[prev].pillSheet === true)
 
-  const handleComplete = useCallback(() => {
+    void (async () => {
+      // Il tour parte sempre dalla Lista; se serve tornarci si aspetta la fine della transizione.
+      const mustNavigate = prev === null && router.state.location.pathname !== '/'
+      if (mustNavigate) await router.navigate({ to: '/' })
+      setTourPillSheet(s.pillSheet === true)
+      if (sheetChanges || mustNavigate) await new Promise((resolve) => setTimeout(resolve, SETTLE_MS))
+      await nextFrames()
+      if (cancelled) return
+      // Se l'elemento manca il tooltip compare al centro, senza riquadro evidenziato.
+      const el = document.querySelector<HTMLElement>(`[data-tour="${s.dataAttr}"]`)
+      setMeasured({ step, rect: el ? el.getBoundingClientRect() : null })
+    })()
+
+    return () => {
+      cancelled = true
+    }
+  }, [step])
+
+  const handleComplete = () => {
+    setTourPillSheet(false)
     markTourDone()
     onComplete()
-  }, [onComplete])
+  }
 
   const handleNext = () => {
-    if (step === STEPS.length - 1) {
-      handleComplete()
-    } else {
-      setStep((s) => s + 1)
-    }
+    if (step === STEPS.length - 1) handleComplete()
+    else setStep(step + 1)
   }
 
-  const handlePrev = async () => {
-    const prevStep = step - 1
-    // If going back from lista to home, navigate back first
-    const current = STEPS[step]
-    const prev = STEPS[prevStep]
-    if (current.route !== null && prev.route === null) {
-      await router.navigate({ to: '/' })
-    }
-    setStep(prevStep)
-  }
-
+  const visible = measured?.step === step
+  const rect = measured?.rect ?? null
   const isLast = step === STEPS.length - 1
   const currentStep = STEPS[step]
 
@@ -141,7 +131,7 @@ export function TutorialTour({ onComplete }: TutorialTourProps) {
       : `M 0 0 H ${vpW} V ${vpH} H 0 Z`
 
   // Tooltip positioning
-  const tooltipStyle: React.CSSProperties = (() => {
+  const tooltipStyle: CSSProperties = (() => {
     if (!rect) return { top: '50%', left: 16, right: 16 }
     if (currentStep.tooltipPosition === 'above') {
       return {
@@ -157,9 +147,10 @@ export function TutorialTour({ onComplete }: TutorialTourProps) {
     }
   })()
 
-  return (
+  // Portale sul body: dentro la shell (position: fixed) resterebbe sotto ai pannelli Vaul.
+  return createPortal(
     <>
-      {/* Dark overlay with spotlight cutout */}
+      {/* Dark overlay with spotlight cutout: sta sopra anche al pannello e ne blocca i tocchi */}
       <svg
         width={vpW}
         height={vpH}
@@ -180,11 +171,12 @@ export function TutorialTour({ onComplete }: TutorialTourProps) {
         />
       </svg>
 
-      {/* Tooltip card */}
+      {/* Tooltip card (pointer-events espliciti: col pannello aperto il body li disattiva) */}
       <div
         style={{
           position: 'fixed',
           zIndex: 151,
+          pointerEvents: 'auto',
           opacity: visible ? 1 : 0,
           transition: 'opacity 250ms ease',
           ...tooltipStyle,
@@ -215,7 +207,7 @@ export function TutorialTour({ onComplete }: TutorialTourProps) {
           <div className="flex gap-2">
             {step > 0 && (
               <button
-                onClick={() => void handlePrev()}
+                onClick={() => setStep(step - 1)}
                 className="flex-none px-4 py-3 rounded-[14px] bg-[#F2F2F0] text-[#2A2A2C] text-[14px] active:scale-[.97] transition-transform"
               >
                 {t('tutorial.prev')}
@@ -230,6 +222,7 @@ export function TutorialTour({ onComplete }: TutorialTourProps) {
           </div>
         </div>
       </div>
-    </>
+    </>,
+    document.body,
   )
 }
