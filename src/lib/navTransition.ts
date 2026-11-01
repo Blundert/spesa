@@ -3,7 +3,15 @@ import { isPrimaryPath } from './primarySection'
 export type NavTransition = 'fade' | 'push' | 'pop'
 
 // Pagine aperte dal menu: un livello sopra le sezioni principali.
-const MENU_PATHS = new Set(['/storico', '/statistiche', '/catalogo', '/piatti', '/supermercati', '/impostazioni'])
+const MENU_PATHS = new Set([
+  '/storico',
+  '/statistiche',
+  '/liste',
+  '/catalogo',
+  '/piatti',
+  '/supermercati',
+  '/impostazioni',
+])
 
 // 0 = Lista/Pasti, 1 = pagine del menu, 2 = dettagli.
 export function navLevel(pathname: string): number {

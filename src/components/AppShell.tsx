@@ -257,6 +257,7 @@ function MenuSheet({
     {
       title: t('nav.groupManage'),
       items: [
+        { to: '/liste', label: t('nav.lists') },
         { to: '/catalogo', label: t('nav.catalog') },
         { to: '/piatti', label: t('nav.dishes') },
         { to: '/supermercati', label: t('nav.supermarkets') },

@@ -22,6 +22,8 @@ export const qk = {
   listItemsOf: (listId: number) => ['listItems', listId] as const,
   /** Spesa solita di una lista (sotto il prefisso listItems, si aggiorna con le voci). */
   usualItems: (listId: number) => ['listItems', listId, 'usual'] as const,
+  /** Numero di voci per lista (pagina Liste). */
+  listItemCounts: () => ['listItems', 'counts'] as const,
 
   /** Acquisti aggregati di tutte le sessioni di una settimana (per il recap). */
   purchasesForWeek: (isoWeek: string) => ['purchasesForWeek', isoWeek] as const,

@@ -5,6 +5,7 @@ import {
   archiveShoppingList,
   createShoppingList,
   deleteShoppingList,
+  getListItemCounts,
   getShoppingLists,
   getUsualItems,
   reorderShoppingLists,
@@ -127,5 +128,16 @@ describe('getUsualItems', () => {
 
   it('senza spese restituisce vuoto', async () => {
     expect(await getUsualItems(1)).toEqual([])
+  })
+})
+
+describe('getListItemCounts', () => {
+  it('conta le voci di ogni lista', async () => {
+    await db.listItems.bulkAdd([
+      { listId: 1, itemId: 1, quantity: 3, addedAt: 0 },
+      { listId: 1, itemId: 2, quantity: 1, addedAt: 0 },
+      { listId: 2, itemId: 1, quantity: 1, addedAt: 0 },
+    ])
+    expect(await getListItemCounts()).toEqual({ 1: 2, 2: 1 })
   })
 })

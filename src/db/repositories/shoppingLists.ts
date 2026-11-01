@@ -73,3 +73,10 @@ export async function getUsualItems(listId: number): Promise<Array<{ itemId: num
     (a, b) => b.count - a.count || a.itemId - b.itemId,
   )
 }
+
+/** Numero di voci per lista (per la pagina Liste). */
+export async function getListItemCounts(): Promise<Record<number, number>> {
+  const counts: Record<number, number> = {}
+  for (const li of await db.listItems.toArray()) counts[li.listId] = (counts[li.listId] ?? 0) + 1
+  return counts
+}

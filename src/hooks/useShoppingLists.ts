@@ -4,8 +4,12 @@ import { qk } from '../db/queryKeys'
 import {
   archiveShoppingList,
   createShoppingList,
+  deleteShoppingList,
+  getListItemCounts,
   getShoppingLists,
   getUsualItems,
+  reorderShoppingLists,
+  restoreShoppingList,
   updateShoppingList,
 } from '../db/repositories/shoppingLists'
 import { getActiveListId, onActiveListChange, pickList } from '../lib/activeList'
@@ -55,6 +59,40 @@ export function useArchiveList() {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: (id: number) => archiveShoppingList(id),
+    onSuccess: () => void qc.invalidateQueries({ queryKey: qk.shoppingLists() }),
+  })
+}
+
+export function useListItemCounts() {
+  return useQuery({
+    queryKey: qk.listItemCounts(),
+    queryFn: () => getListItemCounts(),
+  })
+}
+
+export function useRestoreList() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (id: number) => restoreShoppingList(id),
+    onSuccess: () => void qc.invalidateQueries({ queryKey: qk.shoppingLists() }),
+  })
+}
+
+export function useDeleteList() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (id: number) => deleteShoppingList(id),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: qk.shoppingLists() })
+      void qc.refetchQueries({ queryKey: qk.listItems(), type: 'all' })
+    },
+  })
+}
+
+export function useReorderLists() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (ids: number[]) => reorderShoppingLists(ids),
     onSuccess: () => void qc.invalidateQueries({ queryKey: qk.shoppingLists() }),
   })
 }

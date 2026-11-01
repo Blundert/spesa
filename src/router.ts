@@ -5,6 +5,7 @@ import { AppShell } from './components/AppShell'
 import { SpesaScreen } from './screens/SpesaScreen'
 import { ListaScreen } from './screens/ListaScreen'
 import { StoricoScreen } from './screens/StoricoScreen'
+import { ListeScreen } from './screens/ListeScreen'
 import { SupermercatiScreen } from './screens/SupermercatiScreen'
 import { ImpostazioniScreen } from './screens/ImpostazioniScreen'
 import { PastiScreen } from './screens/PastiScreen'
@@ -45,6 +46,12 @@ const storicoRoute = createRoute({
   getParentRoute: () => shellRoute,
   path: '/storico',
   component: StoricoScreen,
+})
+
+const listeRoute = createRoute({
+  getParentRoute: () => shellRoute,
+  path: '/liste',
+  component: ListeScreen,
 })
 
 const supermercatiRoute = createRoute({
@@ -135,6 +142,7 @@ const routeTree = rootRoute.addChildren([
     pastiRoute,
     storicoRoute,
     supermercatiRoute,
+    listeRoute,
     cataloRoute,
     piattiRoute,
     statisticheRoute,
