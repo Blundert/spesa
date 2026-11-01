@@ -9,6 +9,7 @@ import { useWeekBudget, useSetBuoniAvailable } from '../hooks/useShopping'
 import { normalizeName } from '../lib/normalize'
 import { BASE_ITEMS } from '../lib/baseItems'
 import { BottomSheet } from '../components/BottomSheet'
+import { SectionTitle } from '../components/SectionTitle'
 import type { MealPlanDay } from '../db/repositories/mealPlan'
 import type { MealType } from '../db/types'
 
@@ -36,7 +37,7 @@ interface SlotState {
 export function PastiScreen() {
   const { t } = useTranslation()
   const navigate = useNavigate()
-  const { week } = useSearch({ from: '/pasti' })
+  const { week } = useSearch({ from: '/shell/pasti' })
   const { data: days = [] } = useMealPlan(week)
   const { data: dishes = [] } = useDishes()
   const { data: categories = [] } = useCategories()
@@ -58,11 +59,11 @@ export function PastiScreen() {
     void navigate({ to: '/pasti', search: { week: shiftWeek(week, delta) } })
 
   const handleGenerate = () => {
-    void navigate({ to: '/lista' })
+    void navigate({ to: '/' })
   }
 
   const handleImportAndGenerate = () => {
-    importToList.mutate(undefined, { onSuccess: () => void navigate({ to: '/lista' }) })
+    importToList.mutate(undefined, { onSuccess: () => void navigate({ to: '/' }) })
   }
 
   const openSlot = (day: MealPlanDay, mealType: MealType) => {
@@ -247,20 +248,11 @@ export function PastiScreen() {
   const canSave = slotState !== null && slotState.nameInput.trim() !== '' && (slotState.dishId !== undefined || slotState.isNewDish)
 
   return (
-    <div className="flex flex-col h-full bg-[#F2F2F0]">
-      <div className="flex-none" style={{ height: 'max(16px, env(safe-area-inset-top))' }} />
+    <div className="flex-1 flex flex-col min-h-0">
       <div className="flex-1 overflow-y-auto px-5 pb-[120px]">
-        {/* Header */}
-        <div className="flex items-center gap-2 pt-2 pb-[18px]">
-          <button
-            onClick={() => void navigate({ to: '/' })}
-            className="w-[34px] h-[34px] -ml-1.5 flex items-center justify-center active:opacity-50"
-          >
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2A2A2C" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M15 5l-7 7 7 7" />
-            </svg>
-          </button>
-          <span className="flex-1 text-[26px] font-normal tracking-[-0.5px] text-[#2A2A2C]">{t('pasti.title')}</span>
+        {/* Header — sezione principale accanto alla Lista */}
+        <div className="flex items-center justify-between px-1 pt-2 pb-[18px]">
+          <SectionTitle active="pasti" />
           <Link to="/pasti/storico" className="text-[15px] text-[#9B9B9F] px-1 active:opacity-50">
             {t('nav.history')}
           </Link>

@@ -14,6 +14,7 @@ export const en: typeof it = {
   nav: {
     week: 'Week',
     list: 'List',
+    meals: 'Meals',
     history: 'History',
     supermarkets: 'Supermarkets',
     catalog: 'Catalog',

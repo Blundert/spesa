@@ -166,7 +166,7 @@ export function HomeScreen() {
             <ChevronRight />
           </Link>
           <Link
-            to="/lista"
+            to="/"
             className="flex items-center gap-[14px] px-5 py-[19px] active:bg-[#F6F6F4] transition-colors"
           >
             <div className="w-[38px] h-[38px] rounded-[11px] bg-[#F2F2F0] flex items-center justify-center flex-none">

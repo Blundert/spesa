@@ -12,6 +12,7 @@ export const it = {
   nav: {
     week: 'Settimana',
     list: 'Lista',
+    meals: 'Pasti',
     history: 'Storico',
     supermarkets: 'Supermercati',
     catalog: 'Catalogo',

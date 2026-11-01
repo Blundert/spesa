@@ -14,7 +14,7 @@ interface TourStep {
 const STEPS: TourStep[] = [
   {
     dataAttr: 'week-card',
-    route: '/',
+    route: '/settimana',
     tooltipPosition: 'below',
     titleKey: 'tutorial.tour.step1.title',
     descKey: 'tutorial.tour.step1.description',
@@ -35,7 +35,7 @@ const STEPS: TourStep[] = [
   },
   {
     dataAttr: 'lista-screen',
-    route: '/lista',
+    route: '/',
     tooltipPosition: 'below',
     titleKey: 'tutorial.tour.step4.title',
     descKey: 'tutorial.tour.step4.description',
@@ -122,7 +122,7 @@ export function TutorialTour({ onComplete }: TutorialTourProps) {
     const current = STEPS[step]
     const prev = STEPS[prevStep]
     if (current.route !== null && prev.route === null) {
-      await router.navigate({ to: '/' })
+      await router.navigate({ to: '/settimana' })
     }
     setStep(prevStep)
   }

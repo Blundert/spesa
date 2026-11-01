@@ -1,4 +1,4 @@
-import { createRouter, createRootRoute, createRoute, Outlet } from '@tanstack/react-router'
+import { createRouter, createRootRoute, createRoute, Outlet, redirect } from '@tanstack/react-router'
 import { currentWeek } from './lib/date'
 import { getDefaultBuonoValueCents } from './lib/buoniSettings'
 import { AppShell } from './components/AppShell'
@@ -27,16 +27,25 @@ const shellRoute = createRoute({
   component: AppShell,
 })
 
-const homeRoute = createRoute({
-  getParentRoute: () => shellRoute,
-  path: '/',
-  component: HomeScreen,
-})
-
+// La Lista è la home; /lista resta come alias per i link salvati.
 const listaRoute = createRoute({
   getParentRoute: () => shellRoute,
-  path: '/lista',
+  path: '/',
   component: ListaScreen,
+})
+
+const listaAliasRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/lista',
+  beforeLoad: () => {
+    throw redirect({ to: '/', replace: true })
+  },
+})
+
+const homeRoute = createRoute({
+  getParentRoute: () => shellRoute,
+  path: '/settimana',
+  component: HomeScreen,
 })
 
 const storicoRoute = createRoute({
@@ -91,8 +100,9 @@ const spesaRoute = createRoute({
   },
 })
 
+// Sezione principale accanto alla Lista: sta nella shell anche se è definita qui.
 const pastiRoute = createRoute({
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => shellRoute,
   path: '/pasti',
   component: PastiScreen,
   validateSearch: (search: Record<string, unknown>): { week: string } => ({
@@ -126,8 +136,9 @@ const changelogRoute = createRoute({
 
 const routeTree = rootRoute.addChildren([
   shellRoute.addChildren([
-    homeRoute,
     listaRoute,
+    homeRoute,
+    pastiRoute,
     storicoRoute,
     supermercatiRoute,
     cataloRoute,
@@ -135,8 +146,8 @@ const routeTree = rootRoute.addChildren([
     statisticheRoute,
     impostazioniRoute,
   ]),
+  listaAliasRoute,
   spesaRoute,
-  pastiRoute,
   pianificazioniRoute,
   sessioneRoute,
   itemDetailRoute,

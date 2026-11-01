@@ -181,8 +181,7 @@ function MenuSheet({
 }) {
   const { t } = useTranslation()
   const items: { to: string; label: string }[] = [
-    { to: '/', label: t('nav.week') },
-    { to: '/lista', label: t('nav.list') },
+    { to: '/settimana', label: t('nav.week') },
     { to: '/storico', label: t('nav.history') },
     { to: '/supermercati', label: t('nav.supermarkets') },
     { to: '/catalogo', label: t('nav.catalog') },

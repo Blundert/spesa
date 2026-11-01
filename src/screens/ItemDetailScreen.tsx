@@ -61,7 +61,7 @@ export function ItemDetailScreen() {
         {/* Header */}
         <div className="flex items-center gap-2 pt-2 pb-4">
           <button
-            onClick={() => void navigate({ to: '/lista' })}
+            onClick={() => void navigate({ to: '/' })}
             className="w-[34px] h-[34px] -ml-1.5 flex items-center justify-center active:opacity-50"
           >
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2A2A2C" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

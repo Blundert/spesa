@@ -9,6 +9,7 @@ import { useCategories, useItems } from '../hooks/useItems'
 import { normalizeName } from '../lib/normalize'
 import { BASE_ITEMS } from '../lib/baseItems'
 import { BottomSheet } from '../components/BottomSheet'
+import { SectionTitle } from '../components/SectionTitle'
 
 interface Suggestion {
   name: string
@@ -119,7 +120,7 @@ export function ListaScreen() {
     <div className="flex-1 overflow-y-auto px-5 pb-[120px]">
       {/* Header — menu button is in AppShell */}
       <div data-tour="lista-screen" className="flex items-center justify-between px-1 pt-2 pb-[18px]">
-        <span className="text-[26px] font-normal tracking-[-0.5px] text-[#2A2A2C]">{t('lista.title')}</span>
+        <SectionTitle active="lista" />
         {listItems.length > 0 && (
           <button onClick={() => setShowClear(true)} className="text-[15px] text-[#9B9B9F] px-1 active:opacity-50">
             {t('lista.clear')}
