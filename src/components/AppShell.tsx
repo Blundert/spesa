@@ -1,6 +1,6 @@
 import { useState, useEffect, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Outlet, Link, useRouter, useNavigate } from '@tanstack/react-router'
+import { Outlet, Link, useRouterState, useNavigate } from '@tanstack/react-router'
 import { currentWeek } from '../lib/date'
 import { formatCentsPlain } from '../lib/money'
 import { weekSpendSummary } from '../lib/budgetSelectors'
@@ -9,6 +9,7 @@ import { useAutoSync } from '../hooks/useAutoSync'
 import { getDebugViewport, onDebugViewportChange } from '../lib/debugFlag'
 import { getDefaultBuonoValueCents } from '../lib/buoniSettings'
 import { isPrimaryPath, rememberPrimary } from '../lib/primarySection'
+import { navTransition } from '../lib/navTransition'
 import { qk } from '../db/queryKeys'
 import { useQuery } from '@tanstack/react-query'
 import { db } from '../db/db'
@@ -39,13 +40,16 @@ export function AppShell() {
   const [newBuoni, setNewBuoni] = useState(0)
   const [newVal, setNewVal] = useState(getDefaultBuonoValueCents)
   const [showDebug, setShowDebug] = useState(getDebugViewport())
-  const router = useRouter()
   const navigate = useNavigate()
-  const pathname = router.state.location.pathname
-  const href = router.state.location.href
+  const pathname = useRouterState({ select: (s) => s.location.pathname })
+  const href = useRouterState({ select: (s) => s.location.href })
 
   useAutoSync()
   useEffect(() => rememberPrimary(pathname, href), [pathname, href])
+
+  // Animazione della pagina che entra, calcolata confrontando con il percorso precedente.
+  const [nav, setNav] = useState({ pathname, cls: '' })
+  if (nav.pathname !== pathname) setNav({ pathname, cls: `nav-${navTransition(nav.pathname, pathname)}` })
   useEffect(() => onDebugViewportChange(() => setShowDebug(getDebugViewport())), [])
 
   const { data: budget } = useWeekBudget(isoWeek)
@@ -78,7 +82,9 @@ export function AppShell() {
 
         {/* Screen content — fade in basso stile Claude (mask sull'opacità del contenuto) */}
         <div className="flex-1 flex flex-col overflow-hidden scroll-fade-bottom">
-          <Outlet />
+          <div key={pathname} className={`flex-1 flex flex-col min-h-0 ${nav.cls}`}>
+            <Outlet />
+          </div>
         </div>
 
         {/* Barra fissa: pill riepilogo + cerchio menu, galleggianti.
