@@ -52,6 +52,11 @@ export interface LiveSpendSummary {
   outOfPocketCents: number
 }
 
+/** Di tasca propria per una spesa: max(0, totale − buoni × valore del buono). */
+export function outOfPocketCents(totalCents: number, buoniSpent: number, buoniValueCents: number): number {
+  return Math.max(0, totalCents - buoniSpent * buoniValueCents)
+}
+
 export function liveSpendSummary(
   activePurchases: Purchase[],
   buoniSpent: number,
@@ -60,7 +65,7 @@ export function liveSpendSummary(
   const spentCents = activePurchases.reduce((acc, p) => acc + p.priceCents * p.quantity, 0)
   return {
     spentCents,
-    outOfPocketCents: Math.max(0, spentCents - buoniSpent * buoniValueCents),
+    outOfPocketCents: outOfPocketCents(spentCents, buoniSpent, buoniValueCents),
   }
 }
 

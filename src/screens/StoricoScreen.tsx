@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Link } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 import { formatCentsPlain, formatSignedPercent } from '../lib/money'
-import { receiptDeviationPercent } from '../lib/budgetSelectors'
+import { receiptDeviationPercent, outOfPocketCents } from '../lib/budgetSelectors'
 import { formatShortDate, formatWeekLabel } from '../lib/date'
 import { useAllSessions, useDeleteWeek } from '../hooks/useShopping'
 import { useSupermarkets } from '../hooks/useItems'
@@ -89,6 +89,8 @@ export function StoricoScreen() {
               date={s.startedAt}
               confirmedTotalCents={s.confirmedTotalCents}
               finishedAt={s.finishedAt}
+              buoniSpent={s.buoniSpent}
+              buoniValueCents={s.buoniValueCents}
             />
           ))}
         </div>
@@ -124,12 +126,16 @@ function SessionCard({
   date,
   confirmedTotalCents,
   finishedAt,
+  buoniSpent,
+  buoniValueCents,
 }: {
   sessionId: number
   storeName: string
   date: number
   confirmedTotalCents: number | null
   finishedAt: number | null
+  buoniSpent: number
+  buoniValueCents: number
 }) {
   const { t } = useTranslation()
   const { data: computedCents = 0 } = useSessionTotal(sessionId)
@@ -147,32 +153,49 @@ function SessionCard({
       : deviation > 0
         ? 'bg-[#FBEDE4] text-[#C2612A]'
         : 'bg-[#E6F2EA] text-[#3B8A57]'
+  const buoniCoveredCents = buoniSpent * buoniValueCents
 
   return (
     <Link
       to="/storico/$sessionId"
       params={{ sessionId: String(sessionId) }}
-      className="flex items-center gap-[14px] bg-white rounded-[20px] px-5 py-[18px] mb-[10px] active:bg-[#F6F6F4] block"
+      className="block bg-white rounded-[20px] px-5 py-[18px] mb-[10px] active:bg-[#F6F6F4]"
     >
-      <div className="flex-1">
-        <div className="flex items-center gap-2">
-          <span className="text-base font-normal text-[#2A2A2C]">{storeName}</span>
-          {!isCompleted && (
-            <span className="text-[11px] text-white bg-[#E07B39] rounded-full px-[7px] py-[2px] leading-none">{t('sessione.notCompleted')}</span>
+      <div className="flex items-center gap-[14px]">
+        <div className="flex-1">
+          <div className="flex items-center gap-2">
+            <span className="text-base font-normal text-[#2A2A2C]">{storeName}</span>
+            {!isCompleted && (
+              <span className="text-[11px] text-white bg-[#E07B39] rounded-full px-[7px] py-[2px] leading-none">{t('sessione.notCompleted')}</span>
+            )}
+          </div>
+          <div className="text-[13px] text-[#9B9B9F] mt-0.5">
+            {formatShortDate(date)} · {t('storico.itemsCount', { count: purchases.length })}
+            {deviation !== null && ` · ${t('storico.computed', { amount: formatCentsPlain(computedCents) })}`}
+          </div>
+        </div>
+        <div className="flex flex-col items-end">
+          <span className="text-[22px] font-normal text-[#2A2A2C] tabular-nums">€{formatCentsPlain(totalCents)}</span>
+          {deviation !== null && (
+            <span className={`mt-1 text-[11px] leading-none rounded-full px-[7px] py-[3px] tabular-nums ${deviationClass}`}>
+              {formatSignedPercent(deviation)}
+            </span>
           )}
         </div>
-        <div className="text-[13px] text-[#9B9B9F] mt-0.5">
-          {formatShortDate(date)} · {t('storico.itemsCount', { count: purchases.length })}
-          {deviation !== null && ` · ${t('storico.computed', { amount: formatCentsPlain(computedCents) })}`}
-        </div>
       </div>
-      <div className="flex flex-col items-end">
-        <span className="text-[22px] font-normal text-[#2A2A2C] tabular-nums">€{formatCentsPlain(totalCents)}</span>
-        {deviation !== null && (
-          <span className={`mt-1 text-[11px] leading-none rounded-full px-[7px] py-[3px] tabular-nums ${deviationClass}`}>
-            {formatSignedPercent(deviation)}
+
+      {/* Buoni usati e spesa effettiva (di tasca tua) */}
+      <div className="flex items-baseline justify-between gap-3 border-t border-[#ECECEC] mt-[14px] pt-3 text-[13px] text-[#9B9B9F] tabular-nums">
+        <span className="whitespace-nowrap">
+          {t('storico.buoniCount', { count: buoniSpent })}
+          {buoniSpent > 0 && ` · −€${formatCentsPlain(buoniCoveredCents)}`}
+        </span>
+        <span className="whitespace-nowrap">
+          {t('storico.outOfPocket')}{' '}
+          <span className="text-[15px] text-[#2A2A2C]">
+            €{formatCentsPlain(outOfPocketCents(totalCents, buoniSpent, buoniValueCents))}
           </span>
-        )}
+        </span>
       </div>
     </Link>
   )

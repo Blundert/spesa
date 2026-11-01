@@ -115,6 +115,8 @@ export const en: typeof it = {
     empty: 'No saved sessions.',
     itemsCount: '{{count}} items',
     computed: 'calc. €{{amount}}',
+    buoniCount: '{{count}} vouchers',
+    outOfPocket: 'out of pocket',
     deleteWeekTitle: 'Delete week {{week}}?',
     deleteWeekBody: 'All shopping sessions and meal planning for this week will be deleted.',
     deleteWeekConfirm: 'Delete week',

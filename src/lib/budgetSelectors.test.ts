@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { weekSpendSummary, liveSpendSummary, receiptDeviationPercent } from './budgetSelectors'
+import { weekSpendSummary, liveSpendSummary, receiptDeviationPercent, outOfPocketCents } from './budgetSelectors'
 import type { Session, Purchase } from '../db/types'
 
 function makeSession(overrides: Partial<Session> & { id: number }): Session {
@@ -149,5 +149,17 @@ describe('receiptDeviationPercent', () => {
   })
   it('null se la somma degli oggetti è 0', () => {
     expect(receiptDeviationPercent(1000, 0)).toBeNull()
+  })
+})
+
+describe('outOfPocketCents', () => {
+  it('sottrae i buoni dal totale', () => {
+    expect(outOfPocketCents(5230, 2, 800)).toBe(3630)
+  })
+  it('senza buoni coincide con il totale', () => {
+    expect(outOfPocketCents(3100, 0, 800)).toBe(3100)
+  })
+  it('non scende sotto zero', () => {
+    expect(outOfPocketCents(1000, 3, 800)).toBe(0)
   })
 })

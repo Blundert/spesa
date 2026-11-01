@@ -2,6 +2,10 @@ export type ChangelogEntry = { it: string[]; en: string[] }
 
 // Ordine: più recente in cima. Aggiungere una entry ad ogni nuova versione.
 export const changelog: Record<string, ChangelogEntry> = {
+  '0.34.0': {
+    it: ['Storico: in fondo a ogni spesa vedi i buoni pasto usati (e quanto hanno coperto) e quanto hai pagato di tasca tua'],
+    en: ['History: at the bottom of each trip you now see the meal vouchers used (and how much they covered) and how much you paid out of pocket'],
+  },
   '0.33.0': {
     it: ['Storico: per ogni spesa confermata vedi anche il totale calcolato dagli oggetti ("calc. €…") e lo scarto in percentuale dello scontrino: arancione se hai pagato di più, verde se di meno'],
     en: ['History: each confirmed trip now also shows the total computed from its items ("calc. €…") and how much the receipt differs in percent: orange if you paid more, green if less'],

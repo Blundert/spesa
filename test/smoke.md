@@ -210,3 +210,10 @@ Nota: il service worker è attivo solo in build di produzione (`npm run build` +
 4. Ripeti confermando esattamente il totale proposto → etichetta grigia "0%"
 5. Una spesa "Non completata" (senza totale confermato) o con 0 oggetti → niente "calc." e niente etichetta
 6. Apri una spesa e modificane il totale dal dettaglio → tornando allo Storico calcolato e scarto sono aggiornati
+
+### Flusso 25 — Storico: buoni usati e di tasca tua
+1. Vai su Storico → ogni card ha in fondo, separata da una linea sottile, la riga "N buoni" a sinistra e "di tasca tua €X" a destra
+2. Spesa con buoni (es. 2 da €8,00, scontrino €28,80) → "2 buoni · −€16,00" e "di tasca tua €12,80"
+3. Spesa senza buoni → "0 buoni" e "di tasca tua" uguale al totale
+4. Buoni che coprono più del totale → "di tasca tua €0,00" (mai negativo)
+5. Apri una spesa, modifica i buoni dal dettaglio → tornando allo Storico la riga è aggiornata
