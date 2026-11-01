@@ -2,6 +2,10 @@ export type ChangelogEntry = { it: string[]; en: string[] }
 
 // Ordine: più recente in cima. Aggiungere una entry ad ogni nuova versione.
 export const changelog: Record<string, ChangelogEntry> = {
+  '0.36.1': {
+    it: ['Pasti: il link in alto a destra si chiama ora "Settimane" (prima "Storico", che si confondeva con lo Storico delle spese) e apre "Settimane pianificate"'],
+    en: ['Meals: the top-right link is now called "Weeks" (it was "History", easy to confuse with the shopping history) and opens "Planned weeks"'],
+  },
   '0.36.0': {
     it: [
       'Navigazione ripensata: l\'app si apre sulla Lista e in alto tocchi "Pasti" per passare alla pianificazione della settimana (e "Lista" per tornare)',

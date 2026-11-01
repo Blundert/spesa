@@ -254,7 +254,7 @@ export function PastiScreen() {
         <div className="flex items-center justify-between px-1 pt-2 pb-[18px]">
           <SectionTitle active="pasti" />
           <Link to="/pasti/storico" className="text-[15px] text-[#9B9B9F] px-1 active:opacity-50">
-            {t('nav.history')}
+            {t('pianificazioni.link')}
           </Link>
         </div>
 

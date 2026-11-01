@@ -229,7 +229,7 @@ Nota: il service worker è attivo solo in build di produzione (`npm run build` +
 
 ### Flusso 27 — Navigazione: Lista e Pasti, pill, menu e frecce
 1. Apri l'app → si apre la Lista; in alto "Lista" scuro e "Pasti" grigio. Visita http://localhost:5173/lista → reindirizza a `/`
-2. Tocca "Pasti" → dissolvenza breve, ora "Pasti" è scuro e "Lista" grigio; non c'è freccia indietro e la barra in basso resta visibile. Cambia settimana con le frecce
+2. Tocca "Pasti" → dissolvenza breve, ora "Pasti" è scuro e "Lista" grigio; non c'è freccia indietro e la barra in basso resta visibile. Cambia settimana con le frecce. In alto a destra il link "Settimane" apre "Settimane pianificate" (‹ torna a Pasti)
 3. Tocca la pill → il pannello mostra "Questa settimana · …", la card "Di tasca tua", Speso / Buoni spesi / Rimanenti, le ultime spese (al massimo 3, con "Vedi tutte (N)" se sono di più) e sotto "Nuova spesa" con "Inizia la spesa". Tocca una spesa → si chiude il pannello e si apre il suo dettaglio
 4. Apri il menu → tre gruppi: "Le tue spese" (Storico, Statistiche), "Gestisci" (Catalogo, Piatti, Supermercati), Impostazioni; nessuna voce "Lista" o "Settimana"
 5. Da Pasti apri Storico → la pagina entra da destra, con la freccia ‹ e la barra in basso. Dal menu apri Statistiche → dissolvenza; premi ‹ → torni su Pasti, sulla stessa settimana di prima
