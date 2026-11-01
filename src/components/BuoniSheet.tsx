@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { formatCentsPlain } from '../lib/money'
 import { MIN_BUONO_VALUE_CENTS } from '../lib/buoniSettings'
@@ -10,15 +10,19 @@ export function BuoniSteppers({
   valueCents,
   onBuoni,
   onValue,
+  top,
 }: {
   buoni: number
   valueCents: number
   onBuoni: (n: number) => void
   onValue: (v: number) => void
+  /** Righe extra in cima alla stessa scheda (es. la scelta della lista). */
+  top?: ReactNode
 }) {
   const { t } = useTranslation()
   return (
     <div className="bg-[#F6F6F4] rounded-[18px] px-4 mb-[14px]">
+      {top}
       <div className="flex items-center justify-between py-[14px] border-b border-[#E6E6E2]">
         <span className="text-base text-[#2A2A2C]">{t('spesa.buoni')}</span>
         <div className="flex items-center gap-4">

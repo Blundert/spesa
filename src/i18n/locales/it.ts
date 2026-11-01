@@ -55,6 +55,7 @@ export const it = {
     cleared: 'Lista svuotata',
   },
   lists: {
+    label: 'Lista',
     newTitle: 'Nuova lista',
     editTitle: 'Modifica lista',
     namePlaceholder: 'Nome della lista',

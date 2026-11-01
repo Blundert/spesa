@@ -57,6 +57,7 @@ export const en: typeof it = {
     cleared: 'List cleared',
   },
   lists: {
+    label: 'List',
     newTitle: 'New list',
     editTitle: 'Edit list',
     namePlaceholder: 'List name',

@@ -4,7 +4,8 @@ import { Outlet, Link, useRouterState, useNavigate } from '@tanstack/react-route
 import { currentWeek } from '../lib/date'
 import { formatCentsPlain } from '../lib/money'
 import { weekSpendSummary } from '../lib/budgetSelectors'
-import { useWeekBudget, useSessionsByWeek } from '../hooks/useShopping'
+import { useWeekBudget, useSessionsByWeek, useCreateSession } from '../hooks/useShopping'
+import { useSupermarkets } from '../hooks/useItems'
 import { useAutoSync } from '../hooks/useAutoSync'
 import { useActiveList } from '../hooks/useShoppingLists'
 import { getDebugViewport, onDebugViewportChange } from '../lib/debugFlag'
@@ -17,6 +18,8 @@ import { db } from '../db/db'
 import { BottomSheet } from './BottomSheet'
 import { BuoniSteppers } from './BuoniSheet'
 import { WeekSummary } from './WeekSummary'
+import { ListPickerRow } from './ListPickerRow'
+import { activeLists } from '../lib/activeList'
 import { onTourPillSheet } from '../tutorial/tutorialStore'
 
 const isoWeek = currentWeek()
@@ -41,6 +44,7 @@ export function AppShell() {
   const [sheetOpen, setSheetOpen] = useState(false)
   const [newBuoni, setNewBuoni] = useState(0)
   const [newVal, setNewVal] = useState(getDefaultBuonoValueCents)
+  const [newListId, setNewListId] = useState<number | undefined>(undefined)
   const [showDebug, setShowDebug] = useState(getDebugViewport())
   const navigate = useNavigate()
   const pathname = useRouterState({ select: (s) => s.location.pathname })
@@ -57,7 +61,10 @@ export function AppShell() {
   const { data: budget } = useWeekBudget(isoWeek)
   const { data: sessions = [] } = useSessionsByWeek(isoWeek)
   const { data: purchases = [] } = usePurchasesForWeek()
-  const { list } = useActiveList()
+  const { lists, list } = useActiveList()
+  const { data: supermarkets = [] } = useSupermarkets()
+  const supermarketNames = Object.fromEntries(supermarkets.map((s) => [s.id ?? 0, s.name]))
+  const createSession = useCreateSession(isoWeek)
 
   const summary = weekSpendSummary(sessions, purchases, budget?.buoniAvailable ?? 0)
 
@@ -65,6 +72,7 @@ export function AppShell() {
   const openNewShopping = () => {
     setNewBuoni(summary.buoniRemaining)
     setNewVal(getDefaultBuonoValueCents())
+    setNewListId(list?.id)
     setSheetOpen(true)
   }
   // Il tour apre il pannello per mostrare buoni e "Inizia la spesa", poi lo richiude.
@@ -76,11 +84,22 @@ export function AppShell() {
       }),
   )
 
-  const startShopping = () => {
+  const startShopping = async () => {
     setSheetOpen(false)
     const buoni = newBuoni
     const val = newVal
-    const listId = list?.id
+    const chosen = lists.find((l) => l.id === newListId) ?? list
+    const listId = chosen?.id
+    // Lista con supermercato: la spesa parte subito lì (se non ce n'è già una in corso).
+    const storeId = chosen?.supermarketId
+    if (
+      listId !== undefined &&
+      storeId != null &&
+      supermarkets.some((s) => s.id === storeId) &&
+      !sessions.some((s) => s.finishedAt === null)
+    ) {
+      await createSession.mutateAsync({ supermarketId: storeId, buoniSpent: buoni, buoniValueCents: val, listId })
+    }
     setTimeout(() => void navigate({ to: '/spesa', search: { buoni, val, list: listId } }), 300)
   }
 
@@ -156,7 +175,15 @@ export function AppShell() {
         valueCents={newVal}
         onBuoni={setNewBuoni}
         onValue={setNewVal}
-        onStart={startShopping}
+        onStart={() => void startShopping()}
+        listRow={
+          <ListPickerRow
+            lists={activeLists(lists)}
+            value={newListId}
+            onChange={setNewListId}
+            supermarketNames={supermarketNames}
+          />
+        }
       />
 
       {/* Menu di navigazione (bottom sheet) */}
@@ -174,8 +201,10 @@ function NewShoppingSheet({
   onValue,
   onStart,
   summary,
+  listRow,
 }: {
   summary: ReactNode
+  listRow: ReactNode
   open: boolean
   onClose: () => void
   buoni: number
@@ -192,7 +221,7 @@ function NewShoppingSheet({
         <div className="text-[12px] font-normal tracking-[1.4px] text-[#9B9B9F] uppercase px-0.5 pb-[14px]">
           {t('spesa.newTitle')}
         </div>
-        <BuoniSteppers buoni={buoni} valueCents={valueCents} onBuoni={onBuoni} onValue={onValue} />
+        <BuoniSteppers buoni={buoni} valueCents={valueCents} onBuoni={onBuoni} onValue={onValue} top={listRow} />
         <button
           onClick={onStart}
           className="w-full bg-[#2A2A2C] text-white text-[17px] font-normal py-[17px] rounded-[18px] flex items-center justify-center gap-2 active:scale-[.98] transition-transform"

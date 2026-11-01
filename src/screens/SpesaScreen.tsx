@@ -66,7 +66,7 @@ export function SpesaScreen() {
 
   const { data: sessions = [] } = useSessionsByWeek(isoWeek)
   const { data: supermarkets = [] } = useSupermarkets()
-  const { list: activeList } = useActiveList()
+  const { lists, list: activeList } = useActiveList()
   const { data: categories = [] } = useCategories()
   const { data: items = [] } = useItems()
   const catMap = Object.fromEntries(categories.map((c) => [c.id ?? 0, categoryLabel(t, c.name)]))
@@ -111,6 +111,7 @@ export function SpesaScreen() {
   // Lista della spesa: quella della sessione; per una spesa nuova quella scelta nel pannello.
   const listId = activeSession ? activeSession.listId : (searchListId ?? activeList?.id)
   const { data: listItems = [] } = useListItems(listId)
+  const sessionList = lists.find((l) => l.id === listId)
 
   const createSession = useCreateSession(isoWeek)
   const finishSession = useFinishSession(isoWeek)
@@ -331,10 +332,16 @@ export function SpesaScreen() {
         <button onClick={() => void navigate({ to: '/' })} className="w-[34px] h-[34px] -ml-1.5 flex items-center justify-center active:opacity-50">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2A2A2C" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 5l-7 7 7 7" /></svg>
         </button>
-        <button onClick={() => setShowStorePicker(true)} className="flex items-center gap-1.5 px-[14px] py-[7px] bg-white rounded-full active:bg-[#EDEDEB]">
-          <span className="text-[15px] text-[#2A2A2C]">{supermarketName}</span>
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#9B9B9F" strokeWidth="2.2" strokeLinecap="round"><path d="M6 9l6 6 6-6" /></svg>
-        </button>
+        {/* Lista della spesa sopra al supermercato: si cambia solo il negozio */}
+        <div className="flex flex-col items-center gap-[3px] min-w-0">
+          {sessionList && (
+            <span className="text-[10px] tracking-[1.2px] uppercase text-[#9B9B9F] max-w-[180px] truncate">{sessionList.name}</span>
+          )}
+          <button onClick={() => setShowStorePicker(true)} className="flex items-center gap-1.5 px-[14px] py-[7px] bg-white rounded-full active:bg-[#EDEDEB]">
+            <span className="text-[15px] text-[#2A2A2C]">{supermarketName}</span>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#9B9B9F" strokeWidth="2.2" strokeLinecap="round"><path d="M6 9l6 6 6-6" /></svg>
+          </button>
+        </div>
         <div className="flex items-center gap-2">
           {activeSupermarket?.loyaltyCard && (
             <button
