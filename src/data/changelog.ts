@@ -2,6 +2,10 @@ export type ChangelogEntry = { it: string[]; en: string[] }
 
 // Ordine: più recente in cima. Aggiungere una entry ad ogni nuova versione.
 export const changelog: Record<string, ChangelogEntry> = {
+  '0.29.5': {
+    it: ["Fix: secondo tentativo per la barra di stato in alto su iPhone: deve scurirsi quando si apre un menu dal basso e tornare chiara quando lo chiudi (la 0.29.3 la lasciava sempre chiara)"],
+    en: ['Fix: second attempt at the iPhone status bar color: it should darken when a bottom sheet opens and turn light again when you close it (0.29.3 left it always light)'],
+  },
   '0.29.4': {
     it: ['Fix: su iPhone toccare un campo di testo (es. "Aggiungi un ingrediente") non fa più zoom sulla pagina'],
     en: ['Fix: on iPhone, tapping a text field (e.g. "Add an ingredient") no longer zooms the page'],

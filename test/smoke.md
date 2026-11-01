@@ -174,6 +174,7 @@ Nota: il service worker è attivo solo in build di produzione (`npm run build` +
 9. Ripeti il punto 7 su una sessione "Non completata" dello Storico
 
 ### Flusso 20 — Colore barra di stato coerente con l'app (test su iPhone, app installata in Home)
+Nota: su iOS 26+ il colore della barra è ricavato da iOS campionando la cima della pagina; l'app mette una striscia fissa in cima del colore finale (vedi `src/lib/statusBarTint.ts`). `theme-color` deve restare `#2A2A2C`.
 1. Apri l'app dalla Home: la barra di stato (ora, batteria) è chiara come lo sfondo dell'app
 2. Apri un qualsiasi bottom sheet (es. Pasti → slot vuoto, menu ☰, conferma eliminazione) → la barra si scurisce insieme al velo grigio
 3. Chiudi il sheet (swipe giù, tap sul velo o azione) → la barra torna chiara. Ripeti più volte: mai barra scura a sheet chiuso, mai barra chiara a sheet aperto
