@@ -43,6 +43,25 @@ describe('updateShoppingList', () => {
     await updateShoppingList(id, { supermarketId: 7 })
     expect(await db.shoppingLists.get(id)).toMatchObject({ name: 'Detersivi', supermarketId: 7 })
   })
+
+  it('salva la spesa solita e i chip scelti a mano, e li toglie tornando ad automatico', async () => {
+    const id = await createShoppingList('Casa', null)
+    await updateShoppingList(id, { usualItemIds: [3, 1], quickItemIds: [2] })
+    expect(await db.shoppingLists.get(id)).toMatchObject({ usualItemIds: [3, 1], quickItemIds: [2] })
+
+    await updateShoppingList(id, { usualItemIds: undefined, quickItemIds: undefined })
+    const list = await db.shoppingLists.get(id)
+    expect(list).toBeDefined()
+    expect('usualItemIds' in (list ?? {})).toBe(false)
+    expect('quickItemIds' in (list ?? {})).toBe(false)
+  })
+
+  it('un aggiornamento senza questi campi non li tocca', async () => {
+    const id = await createShoppingList('Casa', null)
+    await updateShoppingList(id, { usualItemIds: [4] })
+    await updateShoppingList(id, { name: 'Casa nuova' })
+    expect(await db.shoppingLists.get(id)).toMatchObject({ name: 'Casa nuova', usualItemIds: [4] })
+  })
 })
 
 describe('archivio', () => {

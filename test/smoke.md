@@ -313,3 +313,13 @@ Nota: il service worker è attivo solo in build di produzione (`npm run build` +
 2. Tocca "7 giorni", "3 mesi", "6 mesi", "Tutto", poi di nuovo "30 giorni" → ogni volta i numeri si aggiornano (i totali crescono passando da 7 giorni a 6 mesi) senza restare sul caricamento
 3. Lascia la pagina aperta e riaprila dopo la mezzanotte: l'intervallo "N giorni" parte dalla mezzanotte di N giorni fa (cambia solo al cambio di giorno)
 4. Su desktop (finestra larga) apri Statistiche, restringi sotto i 768 px: la pagina mobile Statistiche si apre e mostra i dati
+
+### Flusso 36 — Chip e spesa solita personalizzabili per lista (mobile e desktop)
+1. Lista → tocca la scheda attiva (⌄) → "Modifica lista": sotto il supermercato ci sono "Chip più proposti" e "Spesa solita", entrambi su "Automatico" con una riga che spiega da dove arrivano i prodotti. Nella creazione di una lista nuova non ci sono (si personalizzano dopo)
+2. "Chip più proposti" → "Scelti da me": parte con i prodotti proposti adesso già selezionati ("N prodotti scelti"), mostrati come etichette con ×; tocca × per toglierne, cerca nel catalogo e spunta per aggiungerne (i nuovi vanno in fondo). Salva → i chip sotto il campo di aggiunta sono esattamente quelli scelti, nell'ordine scelto, senza limite di numero
+3. Aggiungi alla lista uno dei prodotti scelti → il suo chip sparisce; rimuovilo dalla lista → il chip torna
+4. "Spesa solita" → "Scelti da me": la card "Carica la tua spesa solita" propone i prodotti scelti (solo se la lista ha meno di 3 voci) e "Carica" li aggiunge tutti; quelli già in lista non sono riproposti
+5. "Scelti da me" senza nessun prodotto: non compare niente (né chip né card) e il testo dice "Nessun prodotto scelto: non verrà proposto niente"
+6. Torna ad "Automatico" e Salva → tornano i chip più comprati (6 su mobile, 10 su desktop) e la spesa solita calcolata dalle spese (8)
+7. Con due liste le scelte sono indipendenti; elimina dal catalogo un prodotto scelto → sparisce dai suggerimenti senza errori
+8. Passa da desktop a mobile (e viceversa) ridimensionando la finestra: le stesse scelte compaiono nell'altra interfaccia. Esporta e reimporta un backup: le scelte restano

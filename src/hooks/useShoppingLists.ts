@@ -49,7 +49,16 @@ export function useCreateList() {
 export function useUpdateList() {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: ({ id, ...patch }: { id: number; name?: string; supermarketId?: number | null }) =>
+    mutationFn: ({
+      id,
+      ...patch
+    }: {
+      id: number
+      name?: string
+      supermarketId?: number | null
+      usualItemIds?: number[]
+      quickItemIds?: number[]
+    }) =>
       updateShoppingList(id, patch),
     onSuccess: () => void qc.invalidateQueries({ queryKey: qk.shoppingLists() }),
   })

@@ -2,6 +2,16 @@ export type ChangelogEntry = { it: string[]; en: string[] }
 
 // Ordine: più recente in cima. Aggiungere una entry ad ogni nuova versione.
 export const changelog: Record<string, ChangelogEntry> = {
+  '0.42.0': {
+    it: [
+      'Lista: per ogni lista puoi scegliere a mano i "Chip più proposti" (le scorciatoie sotto il campo di aggiunta) e la "Spesa solita". Dal pannello di modifica della lista passa da "Automatico" (come prima) a "Scelti da me" e spunta i prodotti del catalogo; i prodotti già in lista non vengono riproposti',
+      'Vale sia su telefono sia su desktop e viaggia nei backup',
+    ],
+    en: [
+      'List: for each list you can now hand-pick the "Suggested chips" (the shortcuts under the add field) and the "Usual shopping". In the list edit panel switch from "Automatic" (as before) to "My choice" and tick products from the catalogue; items already in the list are not suggested again',
+      'Works on both phone and desktop and is included in backups',
+    ],
+  },
   '0.41.1': {
     it: ['Statistiche: con "7 giorni", "30 giorni", "3 mesi" o "6 mesi" la pagina restava bloccata sul caricamento. Ora si apre sempre e mostra i dati'],
     en: ['Statistics: with "7 days", "30 days", "3 months" or "6 months" the page got stuck on loading. It now always opens and shows the data'],

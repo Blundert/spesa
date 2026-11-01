@@ -54,6 +54,10 @@ export interface ShoppingList {
   sortOrder: number
   /** Timestamp di archiviazione; null se attiva. Le archiviate tengono i loro prodotti. */
   archivedAt: number | null
+  /** Spesa solita scelta a mano (id degli articoli, in ordine). Assente = automatica. */
+  usualItemIds?: number[]
+  /** Chip rapidi scelti a mano (id degli articoli, in ordine). Assente = automatici. */
+  quickItemIds?: number[]
 }
 
 /**

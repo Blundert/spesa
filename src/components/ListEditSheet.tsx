@@ -2,7 +2,10 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import type { ShoppingList, Supermarket } from '../db/types'
-import { useArchiveList, useCreateList, useUpdateList } from '../hooks/useShoppingLists'
+import { useArchiveList, useCreateList, useUpdateList, useUsualItems } from '../hooks/useShoppingLists'
+import { useItems } from '../hooks/useItems'
+import { SuggestionPicker } from './SuggestionPicker'
+import { AUTO_USUAL_LIMIT } from '../lib/listSuggestions'
 import { setActiveListId } from '../lib/activeList'
 import { BottomSheet } from './BottomSheet'
 
@@ -45,6 +48,10 @@ function ListForm({
   const { t } = useTranslation()
   const [name, setName] = useState(list?.name ?? '')
   const [supermarketId, setSupermarketId] = useState<number | null>(list?.supermarketId ?? null)
+  const [quickIds, setQuickIds] = useState<number[] | undefined>(list?.quickItemIds)
+  const [usualIds, setUsualIds] = useState<number[] | undefined>(list?.usualItemIds)
+  const { data: items = [] } = useItems()
+  const { data: usual = [] } = useUsualItems(list?.id)
   const createList = useCreateList()
   const updateList = useUpdateList()
   const archiveList = useArchiveList()
@@ -53,7 +60,13 @@ function ListForm({
     const trimmed = name.trim()
     if (!trimmed) return
     if (list?.id !== undefined) {
-      await updateList.mutateAsync({ id: list.id, name: trimmed, supermarketId })
+      await updateList.mutateAsync({
+        id: list.id,
+        name: trimmed,
+        supermarketId,
+        quickItemIds: quickIds,
+        usualItemIds: usualIds,
+      })
     } else {
       const id = await createList.mutateAsync({ name: trimmed, supermarketId })
       setActiveListId(id)
@@ -108,6 +121,30 @@ function ListForm({
           </button>
         ))}
       </div>
+
+      {list && (
+        <>
+          <SuggestionPicker
+            title={t('lists.quickTitle')}
+            autoHint={t('lists.quickAutoHint')}
+            value={quickIds}
+            onChange={setQuickIds}
+            items={items}
+            prefill={[...items]
+              .sort((a, b) => (b.purchaseCount ?? 0) - (a.purchaseCount ?? 0))
+              .slice(0, 6)
+              .map((it) => it.id as number)}
+          />
+          <SuggestionPicker
+            title={t('lists.usualTitle')}
+            autoHint={t('lists.usualAutoHint')}
+            value={usualIds}
+            onChange={setUsualIds}
+            items={items}
+            prefill={usual.slice(0, AUTO_USUAL_LIMIT).map((u) => u.itemId)}
+          />
+        </>
+      )}
 
       <button
         onClick={() => void handleSave()}

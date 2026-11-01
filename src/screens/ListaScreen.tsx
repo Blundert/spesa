@@ -7,6 +7,7 @@ import { useListItems, useAddNewItemToList, useAddToList, useRemoveFromList, use
 import { toast } from 'sonner'
 import { useCategories, useItems, useSupermarkets } from '../hooks/useItems'
 import { compareNames, normalizeName } from '../lib/normalize'
+import { pickQuickChips, pickUsualItemIds } from '../lib/listSuggestions'
 import { BASE_ITEMS } from '../lib/baseItems'
 import { BottomSheet } from '../components/BottomSheet'
 import { SectionTitle } from '../components/SectionTitle'
@@ -91,10 +92,12 @@ export function ListaScreen() {
   const itemById = new Map(items.map((it) => [it.id ?? 0, it]))
   const templateSuggestions =
     listItems.length < 3
-      ? usualItems
-          .filter((u) => !inListIds.has(u.itemId) && itemById.has(u.itemId))
-          .slice(0, 8)
-          .map((u) => ({ itemId: u.itemId, name: itemById.get(u.itemId)?.name ?? '' }))
+      ? pickUsualItemIds({
+          custom: list?.usualItemIds,
+          usual: usualItems,
+          inListIds,
+          knownIds: new Set(itemById.keys()),
+        }).map((itemId) => ({ itemId, name: itemById.get(itemId)?.name ?? '' }))
       : []
 
   // Match per l'autocomplete (input non vuoto): prima chi inizia col testo, poi alfabetico.
@@ -115,13 +118,19 @@ export function ListaScreen() {
         .slice(0, 8)
     : []
 
-  // Chip rapide quando l'input è vuoto: i più comprati prima, poi default.
+  // Chip rapide quando l'input è vuoto: quelli scelti per la lista, altrimenti i più comprati.
+  const customQuick: Suggestion[] | undefined = list?.quickItemIds
+    ?.map((id) => itemById.get(id))
+    .filter((it): it is NonNullable<typeof it> => it !== undefined)
+    .map((it) => ({ name: it.name, categoryId: it.categoryId, purchaseCount: it.purchaseCount ?? 0 }))
   const quick: Suggestion[] = addInput
     ? []
-    : Array.from(pool.values())
-        .filter((p) => !inListNorm.has(normalizeName(p.name)))
-        .sort((a, b) => b.purchaseCount - a.purchaseCount)
-        .slice(0, 6)
+    : pickQuickChips({
+        pool: Array.from(pool.values()),
+        custom: customQuick,
+        isInList: (name) => inListNorm.has(normalizeName(name)),
+        autoLimit: 6,
+      })
 
   const exactInPool = pool.has(query)
 
