@@ -5,6 +5,9 @@ import { PageHeader, SectionTitle } from '../components/PageHeader'
 import { Card, Toggle, ModalActions } from '../components/settingsUi'
 import { action, primary, input } from '../components/settingsStyles'
 import { Modal } from '../components/Modal'
+import { CommitGraph } from '../components/CommitGraph'
+import { CommitModal } from '../components/CommitModal'
+import { useCommitGraph } from '../../hooks/useCommitGraph'
 import { SortableTable, type Column } from '../components/SortableTable'
 import { SyncDiffView } from '../../components/sync/SyncDiffView'
 import { SyncGuide } from '../../components/sync/SyncGuide'
@@ -30,6 +33,8 @@ export function DesktopSincronizzazioneScreen() {
     setConfirming(false)
   }
   const restore = useRestore(close)
+  const graph = useCommitGraph()
+  const [commitSha, setCommitSha] = useState<string | null>(null)
 
   const items = buildHistoryItems(remote.data ?? [], local.data ?? [])
 
@@ -163,6 +168,30 @@ export function DesktopSincronizzazioneScreen() {
           )}
         </Card>
       </div>
+
+      <div style={{ marginTop: '24px' }}>
+        <Card title={t('syncGraph.title')} hint={t('syncGraph.hint')}>
+          {!configured && (
+            <div style={{ fontSize: '13px', color: 'var(--t-muted)' }}>{t('syncPage.historyNotConfigured')}</div>
+          )}
+          {configured && graph.query.isPending && (
+            <div style={{ fontSize: '13px', color: 'var(--t-muted)' }}>{t('syncGraph.loading')}</div>
+          )}
+          {graph.query.isError && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <span style={{ fontSize: '13px', color: 'var(--t-danger)' }}>{t('syncGraph.error')}</span>
+              <button onClick={() => void graph.query.refetch()} style={action}>
+                {t('syncPage.retry')}
+              </button>
+            </div>
+          )}
+          {graph.query.isSuccess && graph.rows.length === 0 && (
+            <div style={{ fontSize: '13px', color: 'var(--t-muted)' }}>{t('syncGraph.empty')}</div>
+          )}
+          {graph.rows.length > 0 && <CommitGraph rows={graph.rows} selected={commitSha} onSelect={setCommitSha} />}
+        </Card>
+      </div>
+      <CommitModal row={graph.rows.find((r) => r.commit.sha === commitSha) ?? null} onClose={() => setCommitSha(null)} />
 
       <div style={{ marginTop: '28px' }}>
         <SectionTitle>{t('syncPage.guide')}</SectionTitle>

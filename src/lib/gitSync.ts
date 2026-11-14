@@ -1,5 +1,6 @@
 import { exportData, importData, isBackupData, type BackupData } from '../db/backup'
 import { saveSafetySnapshot } from '../db/repositories/safetySnapshots'
+import type { GraphCommit } from './commitGraph'
 import { backupPath, isInitialData, isValidBranchName, parseBackupPath, type BackupSide } from './syncBackup'
 
 // ─── Config (in localStorage) ────────────────────────────────────────────────
@@ -520,4 +521,45 @@ export async function switchBranch(name: string): Promise<SyncResult> {
   setGitConfig({ ...c, branch: name })
   rememberSynced(contentHash(parsed), target.sha)
   return { backupPath: path }
+}
+
+// ─── Grafo dei commit ────────────────────────────────────────────────────────
+
+export interface CommitGraph {
+  commits: GraphCommit[]
+  /** Branch → commit in punta. */
+  heads: Record<string, string>
+}
+
+const GRAPH_PAGE = 100
+
+/** Gli ultimi commit di ogni branch (tutti, non solo quelli che toccano il file dei dati), con i loro genitori. */
+export async function listCommitGraph(): Promise<CommitGraph> {
+  const c = getGitConfig()
+  if (!isGitConfigured(c)) throw new Error('Sync non configurato')
+  const repo = `${API}/repos/${c.owner}/${c.repo}`
+  const names = await listBranches()
+  const lists = await Promise.all(
+    names.map((name) =>
+      githubJson<Array<{ sha: string; parents: Array<{ sha: string }>; commit: { message: string; author: { date: string } } }>>(
+        c,
+        `${repo}/commits?sha=${encodeURIComponent(name)}&per_page=${GRAPH_PAGE}`,
+        'GET',
+      ),
+    ),
+  )
+  const bySha = new Map<string, GraphCommit>()
+  const heads: Record<string, string> = {}
+  names.forEach((name, i) => {
+    for (const k of lists[i]) {
+      bySha.set(k.sha, {
+        sha: k.sha,
+        date: k.commit.author.date,
+        message: k.commit.message.split('\n')[0],
+        parents: k.parents.map((p) => p.sha),
+      })
+    }
+    if (lists[i].length > 0) heads[name] = lists[i][0].sha
+  })
+  return { commits: [...bySha.values()], heads }
 }

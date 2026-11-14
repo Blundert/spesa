@@ -8,6 +8,7 @@ import {
   createBranch,
   getAutoSync,
   listBranches,
+  listCommitGraph,
   listRemoteHistory,
   loadRemoteBackup,
   loadHistoryBackup,
@@ -599,5 +600,52 @@ describe('branch', () => {
       expect(getGitConfig().branch).toBe('main')
       expect([...gh.branchFiles.get('prova')!.keys()].some((f) => f.startsWith('backups/'))).toBe(true)
     })
+  })
+})
+
+describe('listCommitGraph', () => {
+  it('non configurato', async () => {
+    store.clear()
+    await expect(listCommitGraph()).rejects.toThrow('Sync non configurato')
+  })
+
+  it('un branch: commit con genitori e punta', async () => {
+    await addItem('Mele')
+    await autoSync()
+    await addItem('Pere')
+    await autoSync()
+    const g = await listCommitGraph()
+    expect(g.commits.map((k) => k.sha).sort()).toEqual(['c1', 'c2'])
+    expect(g.commits.find((k) => k.sha === 'c2')?.parents).toEqual(['c1'])
+    expect(g.commits.find((k) => k.sha === 'c1')?.parents).toEqual([])
+    expect(g.heads).toEqual({ main: 'c2' })
+  })
+
+  it('più branch: unisce i commit senza duplicati, tiene solo la prima riga del messaggio, salta i branch vuoti', async () => {
+    gh.branchFiles.set('vuoto', new Map())
+    gh.override = (_m, u) => {
+      if (!/\/commits\?/.test(u)) return undefined
+      const row = (sha: string, parent: string | null, message: string) => ({
+        sha,
+        parents: parent ? [{ sha: parent }] : [],
+        commit: { message, author: { date: '2026-11-01T10:00:00Z' } },
+      })
+      const body = u.includes('sha=main')
+        ? [row('b', 'a', 'Backup\n\ndettagli'), row('a', null, 'Root')]
+        : u.includes('sha=feat')
+          ? [row('f', 'a', 'Prova'), row('a', null, 'Root')]
+          : []
+      return new Response(JSON.stringify(body), { status: 200 })
+    }
+    gh.branchFiles.set('feat', new Map())
+    const g = await listCommitGraph()
+    expect(g.commits.map((k) => k.sha).sort()).toEqual(['a', 'b', 'f'])
+    expect(g.commits.find((k) => k.sha === 'b')?.message).toBe('Backup')
+    expect(g.heads).toEqual({ main: 'b', feat: 'f' })
+  })
+
+  it('errore di rete', async () => {
+    gh.failCommitList = true
+    await expect(listCommitGraph()).rejects.toThrow('GitHub 500')
   })
 })

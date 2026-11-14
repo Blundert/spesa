@@ -2,6 +2,16 @@ export type ChangelogEntry = { it: string[]; en: string[] }
 
 // Ordine: più recente in cima. Aggiungere una entry ad ogni nuova versione.
 export const changelog: Record<string, ChangelogEntry> = {
+  '0.49.0': {
+    it: [
+      'Desktop, pagina Sincronizzazione: nuovo "Grafo dei commit", con tutti i branch e le loro versioni disegnati come in git (corsie colorate, unioni, branch in punta). Toccando un commit vedi cosa ha cambiato, con prima e dopo affiancati, rispetto al commit precedente o ai dati di adesso',
+      'Dal dettaglio di un commit puoi anche ripristinarlo, con le stesse protezioni di sempre (backup prima, un solo nuovo commit). Solo su desktop: sul telefono restano l\'elenco della cronologia e il confronto per tabella',
+    ],
+    en: [
+      'Desktop, Sync page: new "Commit graph", with all branches and their versions drawn as in git (coloured lanes, merges, branch tips). Tap a commit to see what it changed, with before and after side by side, compared with the previous commit or with your data now',
+      'From a commit\'s detail you can also restore it, with the usual protections (backup first, a single new commit). Desktop only: on the phone you keep the history list and the per-table comparison',
+    ],
+  },
   '0.48.0': {
     it: [
       'Branch: nella pagina Sincronizzazione c\'è ora la sezione "Branch" per provare una versione dei dati senza perdere le altre. "Crea da qui" crea un branch dai dati di adesso; "Passa a" sostituisce i dati di questo dispositivo con quelli di un altro branch e da lì il sync lavora su di lui; "Unisci qui" porta il contenuto di un altro branch in quello attivo con la schermata di unione',

@@ -391,3 +391,13 @@ Serve un repo di prova con almeno due branch che contengono `spesa-db.json` (puo
 6. "Unisci qui" su un branch → schermata di unione con "Si porta qui il branch …" e le differenze rispetto al branch attivo; applicando c'è UN commit "Merge …" sul branch attivo
 7. La guida ha la voce "Branch"
 
+### Flusso 44 — Grafo dei commit con diff affiancato (solo desktop)
+Solo interfaccia desktop (≥ 768 px): su mobile non c'è il grafo, la Cronologia (Flusso 41) copre l'elenco e il confronto. Serve un repo con almeno due branch e un'unione (Flusso 43).
+1. Pagina Sincronizzazione su desktop → scheda "Grafo dei commit" sotto Collegamento/Cronologia: una riga per commit, dal più recente, con messaggio, data e a sinistra le corsie colorate; i branch hanno un'etichetta sul commit in punta; un commit di unione ha due linee in uscita e un branch che si apre/chiude ha una corsia in più
+2. I colori delle corsie seguono il tema (provarne uno scuro); senza repo configurato la scheda dice di collegarne uno, con errore compare "Impossibile leggere il grafo" e "Riprova"
+3. Tocca un commit → finestra con messaggio e sigla, "Confronta con" = "Commit precedente" (di partenza) e due colonne "Prima" / "Dopo": a sinistra in rosso ciò che sparisce o cambia, a destra ciò che compare, tabella per tabella; un commit senza modifiche dei dati dice "Nessuna differenza nei dati."
+4. Cambia in "Dati di adesso": le colonne diventano "Dati di adesso" / "Questo commit"; per il primo commit del repo il confronto è con un backup vuoto
+5. "Ripristina questo commit" → testo di conferma → "Ripristina": come nel Flusso 41 (un commit "Restore …" sopra la cronologia, backup prima, toast "Versione ripristinata"); con errori i dati non cambiano
+6. Dopo un ripristino o un'unione il grafo mostra il nuovo commit (si aggiorna riaprendo la pagina o da "Sincronizza ora")
+7. A 768–1000 px la scheda sta nella pagina senza scorrimento orizzontale e il messaggio lungo viene troncato con "…" (verificato a 800, 1000 e 1280 px)
+

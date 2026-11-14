@@ -86,10 +86,14 @@ export class FakeGithub {
     if (/\/commits\?/.test(url)) {
       if (this.failCommitList) return json({ message: 'boom' }, 500)
       const path = decodeURIComponent(/[?&]path=([^&]+)/.exec(url)?.[1] ?? '')
+      const branch = decodeURIComponent(/[?&]sha=([^&]+)/.exec(url)?.[1] ?? 'main')
+      // Il finto repo ha un solo storico (main): gli altri branch non hanno commit propri.
+      if (branch !== 'main') return json([])
       return json(
         this.log
-          .filter((k) => path in k.files)
-          .map((k) => ({ sha: k.sha, commit: { message: k.message, author: { date: k.date } } }))
+          .map((k, i) => ({ k, parents: i > 0 ? [{ sha: this.log[i - 1].sha }] : [] }))
+          .filter(({ k }) => !path || path in k.files)
+          .map(({ k, parents }) => ({ sha: k.sha, parents, commit: { message: k.message, author: { date: k.date } } }))
           .reverse(),
       )
     }
