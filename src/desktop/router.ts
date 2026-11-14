@@ -63,6 +63,8 @@ const unisciRoute = createRoute({
   getParentRoute: () => shellRoute,
   path: '/sincronizzazione/unisci',
   component: DesktopUnisciScreen,
+  validateSearch: (search: Record<string, unknown>): { from?: string } =>
+    typeof search.from === 'string' && search.from !== '' ? { from: search.from } : {},
 })
 
 const impostazioniRoute = createRoute({

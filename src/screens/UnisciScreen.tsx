@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate } from '@tanstack/react-router'
+import { useNavigate, useSearch } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 import { BackButton } from '../components/BackButton'
 import { BottomSheet } from '../components/BottomSheet'
@@ -16,11 +16,12 @@ const QUICK: Array<{ mode: QuickMode; key: string }> = [
 export function UnisciScreen() {
   const { t } = useTranslation()
   const navigate = useNavigate()
+  const { from } = useSearch({ strict: false }) as { from?: string }
   const [confirming, setConfirming] = useState(false)
   const m = useMerge(() => {
     setConfirming(false)
     void navigate({ to: '/sincronizzazione', replace: true })
-  })
+  }, from)
 
   return (
     <>
@@ -41,6 +42,7 @@ export function UnisciScreen() {
         )}
         {m.data.isSuccess && m.plan.length > 0 && (
           <>
+            {from && <p className="text-[14px] text-t-fg px-1.5 pb-1.5">{t('syncBranches.mergeFrom', { name: from })}</p>}
             <p className="text-[13px] text-t-muted px-1.5 pb-3 leading-relaxed">{t('syncMerge.intro')}</p>
             <div className="flex gap-1.5 pb-5">
               {QUICK.map((q) => (

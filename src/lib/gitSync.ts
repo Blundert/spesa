@@ -1,6 +1,6 @@
 import { exportData, importData, isBackupData, type BackupData } from '../db/backup'
 import { saveSafetySnapshot } from '../db/repositories/safetySnapshots'
-import { backupPath, isInitialData, parseBackupPath, type BackupSide } from './syncBackup'
+import { backupPath, isInitialData, isValidBranchName, parseBackupPath, type BackupSide } from './syncBackup'
 
 // ─── Config (in localStorage) ────────────────────────────────────────────────
 
@@ -384,11 +384,14 @@ export async function listRemoteHistory(): Promise<HistoryEntry[]> {
   return entries.sort((a, b) => b.date.localeCompare(a.date))
 }
 
-/** Scarica e valida la versione attuale del file dei dati sul remoto (per il confronto e l'unione). */
-export async function loadRemoteBackup(): Promise<BackupData> {
+/**
+ * Scarica e valida la versione attuale del file dei dati sul remoto (per il confronto e l'unione);
+ * con `branch` la legge da quel branch invece che da quello attivo.
+ */
+export async function loadRemoteBackup(branch?: string): Promise<BackupData> {
   const c = getGitConfig()
   if (!isGitConfigured(c)) throw new Error('Sync non configurato')
-  const file = await getRemoteFile(c)
+  const file = await getRemoteFile(c, c.path, branch ?? c.branch)
   if (file === null) throw new Error('Nessun backup remoto')
   const parsed: unknown = JSON.parse(file.text)
   if (!isBackupData(parsed)) throw new Error('Backup remoto non valido')
@@ -457,5 +460,64 @@ export async function restoreFromBackup(
   }
   await importData(data)
   rememberSynced(contentHash(data), newSha)
+  return { backupPath: path }
+}
+
+// ─── Branch ──────────────────────────────────────────────────────────────────
+
+/** Nomi dei branch del repository. */
+export async function listBranches(): Promise<string[]> {
+  const c = getGitConfig()
+  if (!isGitConfigured(c)) throw new Error('Sync non configurato')
+  const branches = await githubJson<Array<{ name: string }>>(
+    c,
+    `${API}/repos/${c.owner}/${c.repo}/branches?per_page=100`,
+    'GET',
+  )
+  return branches.map((b) => b.name)
+}
+
+/** Crea un branch dal commit attuale del branch attivo (non ci passa). */
+export async function createBranch(name: string): Promise<void> {
+  const c = getGitConfig()
+  if (!isGitConfigured(c)) throw new Error('Sync non configurato')
+  if (!isValidBranchName(name)) throw new Error('Nome del branch non valido')
+  const repo = `${API}/repos/${c.owner}/${c.repo}/git`
+  const head = await githubJson<{ object: { sha: string } }>(c, `${repo}/ref/heads/${encodePath(c.branch)}`, 'GET')
+  try {
+    await githubJson(c, `${repo}/refs`, 'POST', { ref: `refs/heads/${name}`, sha: head.object.sha })
+  } catch (e) {
+    if (e instanceof GithubError && e.status === 422) throw new Error('Esiste già un branch con questo nome', { cause: e })
+    throw e
+  }
+}
+
+/**
+ * Passa a un altro branch: i dati di quel branch sostituiscono il locale e da lì il sync lavora su di lui.
+ * Prima, come per ogni sostituzione, il locale non ancora sincronizzato viene salvato in `backups/` sul branch
+ * che si lascia (bloccante: se fallisce non cambia niente) e se ne tiene una copia di sicurezza sul dispositivo.
+ */
+export async function switchBranch(name: string): Promise<SyncResult> {
+  const c = getGitConfig()
+  if (!isGitConfigured(c)) throw new Error('Sync non configurato')
+  const target = await getRemoteFile(c, c.path, name)
+  if (target === null) throw new Error('Nessun backup su questo branch')
+  const parsed: unknown = JSON.parse(target.text)
+  if (!isBackupData(parsed)) throw new Error('Backup non valido')
+
+  const local = await exportData()
+  let path: string | null = null
+  if (!isInitialData(local)) {
+    const localJson = JSON.stringify(local, null, 2)
+    await saveSafetySnapshot('restore', localJson)
+    if (contentHash(local) !== localStorage.getItem(HASH_KEY)) {
+      const iso = isoStamp()
+      path = backupPath(iso, 'local')
+      await commitFiles(c, [{ path, content: localJson }], `Back up local before switching to ${name} ${iso}`)
+    }
+  }
+  await importData(parsed)
+  setGitConfig({ ...c, branch: name })
+  rememberSynced(contentHash(parsed), target.sha)
   return { backupPath: path }
 }

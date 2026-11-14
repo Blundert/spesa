@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import type { BackupData } from '../db/backup'
 import { SEED_CATEGORIES } from '../db/db'
-import { backupPath, isInitialData, parseBackupPath } from './syncBackup'
+import { backupPath, isInitialData, isValidBranchName, parseBackupPath } from './syncBackup'
 
 function initial(): BackupData {
   return {
@@ -94,5 +94,35 @@ describe('isInitialData', () => {
     const d = initial()
     d.shoppingLists!.push({ id: 2, name: 'Altra', supermarketId: null, sortOrder: 1, archivedAt: null })
     expect(isInitialData(d)).toBe(false)
+  })
+})
+
+describe('isValidBranchName', () => {
+  it.each(['main', 'prova-menu', 'feature/menu', 'v1.2', 'a_b'])('accetta %s', (n) => {
+    expect(isValidBranchName(n)).toBe(true)
+  })
+
+  it.each([
+    '',
+    'x'.repeat(101),
+    '-prova',
+    '/prova',
+    'prova/',
+    'prova.',
+    'prova.lock',
+    'a..b',
+    'a//b',
+    'a@{b',
+    'a b',
+    'a~b',
+    'a^b',
+    'a:b',
+    'a?b',
+    'a*b',
+    'a[b',
+    'a\\b',
+    'a\u0001b',
+  ])('rifiuta %j', (n) => {
+    expect(isValidBranchName(n)).toBe(false)
   })
 })

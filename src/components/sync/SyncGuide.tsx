@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next'
 
-const SECTIONS = ['Config', 'SyncNow', 'Auto', 'Conflict', 'Pull', 'NewDevice', 'History'] as const
+const SECTIONS = ['Config', 'SyncNow', 'Auto', 'Conflict', 'Pull', 'NewDevice', 'History', 'Branches'] as const
 
 /** Guida ai pulsanti e ai flussi di sync: ogni voce è un accordion, chiuso all'inizio. */
 export function SyncGuide() {

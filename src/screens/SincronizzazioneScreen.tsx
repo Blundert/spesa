@@ -5,6 +5,7 @@ import { BackButton } from '../components/BackButton'
 import { BottomSheet } from '../components/BottomSheet'
 import { SyncDiffView } from '../components/sync/SyncDiffView'
 import { SyncGuide } from '../components/sync/SyncGuide'
+import { SyncBranches } from '../components/sync/SyncBranches'
 import { formatDateTime, historyDetail, historyTitle } from '../components/sync/historyText'
 import { useGitSyncSettings } from '../hooks/useGitSyncSettings'
 import { useHistoryPreview, useRemoteHistory, useRestore, useSafetySnapshots } from '../hooks/useSyncHistory'
@@ -134,6 +135,13 @@ export function SincronizzazioneScreen() {
         >
           {t('settings.syncPull')}
         </button>
+
+        {/* Branch */}
+        <div className={SECTION_LABEL}>{t('syncBranches.title')}</div>
+        <p className="text-[13px] text-t-muted px-1.5 pb-[13px] leading-relaxed">{t('syncBranches.hint')}</p>
+        <div className="bg-t-surface rounded-[20px] px-5 py-3 mb-7">
+          <SyncBranches onSwitched={s.refresh} />
+        </div>
 
         {/* Cronologia */}
         <div className={SECTION_LABEL}>{t('syncPage.history')}</div>

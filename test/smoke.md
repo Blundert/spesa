@@ -381,3 +381,13 @@ Serve un repo di prova e due dispositivi con modifiche diverse (es. una settiman
 7. "Applica unione" → conferma → toast "Unione applicata" (con il backup salvato) e si torna a Sincronizzazione. Nel repo UN commit "Merge …" con il file dei dati e i file in `backups/` (locale e remoto); le spese portate hanno id nuovi e gli acquisti restano collegati; le statistiche degli articoli sono coerenti con gli acquisti
 8. Con il token revocato o il branch avanzato nel frattempo: errore e dati locali invariati
 
+### Flusso 43 — Branch (mobile e desktop)
+Serve un repo di prova con almeno due branch che contengono `spesa-db.json` (puoi crearne uno col passo 2 e poi sincronizzare).
+1. Pagina Sincronizzazione → sezione "Branch" (su desktop sotto "Collegamento"): elenca i branch, quello attivo ha "· attivo" e non ha pulsanti; gli altri hanno "Passa a" e "Unisci qui". Senza repo configurato dice di collegarne uno
+2. Scrivi un nome con spazi o caratteri speciali → "Nome non valido" e "Crea da qui" disattivato. Con un nome valido → toast "Branch creato" e compare nell'elenco (parte dal commit attuale del branch attivo); un nome già esistente dà errore e non crea niente
+3. "Passa a" su un altro branch → conferma in riga ("I dati di adesso vengono sostituiti…") → "Passa": toast `Ora lavori su "…"`, i dati sono quelli di quel branch e il campo "Branch" del modulo mostra il nuovo nome. "Annulla" richiude la conferma senza cambiare niente
+4. Con dati locali non ancora sincronizzati: prima del passaggio nel branch che lasci compare un commit "Back up local before switching to …" con il file in `backups/`; il toast indica il backup. Con il token revocato: errore e nessun cambiamento (né dati né branch)
+5. Dopo il passaggio la Cronologia mostra le versioni del nuovo branch e "Sincronizza ora" lavora su di lui; ripassando al branch di prima i dati tornano quelli di prima
+6. "Unisci qui" su un branch → schermata di unione con "Si porta qui il branch …" e le differenze rispetto al branch attivo; applicando c'è UN commit "Merge …" sul branch attivo
+7. La guida ha la voce "Branch"
+

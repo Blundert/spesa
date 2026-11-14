@@ -5,7 +5,9 @@ import { getSafetySnapshots } from '../db/repositories/safetySnapshots'
 import { FakeGithub } from './fakeGithub'
 import {
   autoSync,
+  createBranch,
   getAutoSync,
+  listBranches,
   listRemoteHistory,
   loadRemoteBackup,
   loadHistoryBackup,
@@ -14,6 +16,7 @@ import {
   isGitConfigured,
   setAutoSync,
   setGitConfig,
+  switchBranch,
   syncPull,
 } from './gitSync'
 
@@ -493,5 +496,108 @@ describe('restoreFromBackup', () => {
   it('via locale con dati iniziali: nessuna copia', async () => {
     await restoreFromBackup(await remoteWith('Kiwi'), 'local')
     expect(await getSafetySnapshots()).toEqual([])
+  })
+})
+
+describe('branch', () => {
+  it('senza configurazione tutto rifiuta', async () => {
+    store.clear()
+    await expect(listBranches()).rejects.toThrow('Sync non configurato')
+    await expect(createBranch('prova')).rejects.toThrow('Sync non configurato')
+    await expect(switchBranch('prova')).rejects.toThrow('Sync non configurato')
+  })
+
+  it('elenca i branch', async () => {
+    expect(await listBranches()).toEqual(['main'])
+    gh.branchFiles.set('prova', new Map())
+    expect(await listBranches()).toEqual(['main', 'prova'])
+    gh.override = () => new Response('', { status: 500 })
+    await expect(listBranches()).rejects.toThrow('GitHub 500')
+  })
+
+  it('crea un branch dal commit attuale, rifiuta nomi non validi e doppioni', async () => {
+    await addItem('Mele')
+    await autoSync()
+    await createBranch('prova')
+    expect(gh.branchFiles.get('prova')?.get(PATH)).toContain('Mele')
+    await expect(createBranch('prova')).rejects.toThrow('Esiste già')
+    await expect(createBranch('main')).rejects.toThrow('Esiste già')
+    await expect(createBranch('a b')).rejects.toThrow('non valido')
+    gh.override = (m, u) => (m === 'POST' && u.endsWith('/git/refs') ? new Response('', { status: 403 }) : undefined)
+    await expect(createBranch('altro')).rejects.toThrow('GitHub 403')
+  })
+
+  it('carica il file dei dati di un altro branch', async () => {
+    gh.branchFiles.set('prova', new Map([[PATH, JSON.stringify(await remoteWith('Kiwi'))]]))
+    expect((await loadRemoteBackup('prova')).items.map((i) => i.name)).toEqual(['Kiwi'])
+  })
+
+  describe('switchBranch', () => {
+    const onBranch = async (name: string, item: string) => {
+      gh.branchFiles.set(name, new Map([[PATH, JSON.stringify(await remoteWith(item))]]))
+    }
+
+    it('branch senza file o con file non valido', async () => {
+      gh.branchFiles.set('vuoto', new Map())
+      await expect(switchBranch('vuoto')).rejects.toThrow('Nessun backup su questo branch')
+      gh.branchFiles.set('rotto', new Map([[PATH, '{"foo":1}']]))
+      await expect(switchBranch('rotto')).rejects.toThrow('Backup non valido')
+    })
+
+    it('locale già sincronizzato: copia di sicurezza, nessun commit; poi il sync lavora sul nuovo branch', async () => {
+      await addItem('Mele')
+      await autoSync()
+      await onBranch('prova', 'Kiwi')
+      const before = gh.commits
+      expect(await switchBranch('prova')).toEqual({ backupPath: null })
+      expect(gh.commits).toBe(before)
+      expect(getGitConfig().branch).toBe('prova')
+      expect((await db.items.toArray()).map((i) => i.name)).toEqual(['Kiwi'])
+      expect(await getSafetySnapshots()).toHaveLength(1)
+      expect(await autoSync()).toEqual({ status: 'noop' })
+    })
+
+    it('locale non sincronizzato: prima il backup nel branch che si lascia, poi il passaggio', async () => {
+      await addItem('Mele')
+      await autoSync()
+      await addItem('Pere')
+      await onBranch('prova', 'Kiwi')
+      const res = await switchBranch('prova')
+      expect(res.backupPath).toMatch(/^backups\/.+-local\.json$/)
+      expect(gh.files.get(res.backupPath!)).toContain('Pere') // sul branch lasciato (main)
+      expect(gh.log.at(-1)?.message).toMatch(/^Back up local before switching to prova /)
+      expect(gh.branchFiles.get('prova')?.has(res.backupPath!)).toBe(false)
+      expect((await db.items.toArray()).map((i) => i.name)).toEqual(['Kiwi'])
+    })
+
+    it('locale iniziale: passa senza copie né commit', async () => {
+      await onBranch('prova', 'Kiwi')
+      expect(await switchBranch('prova')).toEqual({ backupPath: null })
+      expect(await getSafetySnapshots()).toEqual([])
+      expect(gh.commits).toBe(0)
+    })
+
+    it('se il backup non riesce il locale e il branch restano com’erano', async () => {
+      await addItem('Mele')
+      await autoSync()
+      await addItem('Pere')
+      await onBranch('prova', 'Kiwi')
+      gh.override = (m, u) => (m === 'POST' && u.endsWith('/git/trees') ? new Response('', { status: 401 }) : undefined)
+      await expect(switchBranch('prova')).rejects.toThrow('GitHub 401')
+      expect(getGitConfig().branch).toBe('main')
+      expect((await db.items.toArray()).map((i) => i.name).sort()).toEqual(['Mele', 'Pere'])
+    })
+
+    it('si può tornare indietro: il backup finisce sul branch in cui si era', async () => {
+      await addItem('Mele')
+      await autoSync()
+      await onBranch('prova', 'Kiwi')
+      await switchBranch('prova')
+      await addItem('Fichi')
+      gh.branchFiles.get('prova')!.set('spesa-db.json', JSON.stringify(await remoteWith('Kiwi')))
+      await switchBranch('main')
+      expect(getGitConfig().branch).toBe('main')
+      expect([...gh.branchFiles.get('prova')!.keys()].some((f) => f.startsWith('backups/'))).toBe(true)
+    })
   })
 })

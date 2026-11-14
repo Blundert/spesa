@@ -2,6 +2,18 @@ export type ChangelogEntry = { it: string[]; en: string[] }
 
 // Ordine: più recente in cima. Aggiungere una entry ad ogni nuova versione.
 export const changelog: Record<string, ChangelogEntry> = {
+  '0.48.0': {
+    it: [
+      'Branch: nella pagina Sincronizzazione c\'è ora la sezione "Branch" per provare una versione dei dati senza perdere le altre. "Crea da qui" crea un branch dai dati di adesso; "Passa a" sostituisce i dati di questo dispositivo con quelli di un altro branch e da lì il sync lavora su di lui; "Unisci qui" porta il contenuto di un altro branch in quello attivo con la schermata di unione',
+      'Prima di passare a un altro branch, i dati non ancora sincronizzati vengono salvati in backups/ sul branch che lasci (se il salvataggio non riesce non cambia niente) e se ne tiene una copia anche sul dispositivo',
+      'La guida di Sincronizzazione ha una nuova voce sui branch',
+    ],
+    en: [
+      'Branches: the Sync page now has a "Branches" section to try a version of your data without losing the others. "Create from here" makes a branch from your current data; "Switch to" replaces this device\'s data with another branch\'s and sync then works on it; "Merge here" brings another branch\'s content into the active one using the merge screen',
+      'Before switching to another branch, data that is not synced yet is saved under backups/ on the branch you leave (if saving fails nothing changes) and a copy is also kept on the device',
+      'The Sync guide has a new entry about branches',
+    ],
+  },
   '0.47.0': {
     it: [
       'Conflitti di sincronizzazione: invece di due soli pulsanti ("Mantieni" / "Usa remoto"), l\'avviso ti porta a una schermata di unione. Le differenze sono raggruppate per settimana e per elemento (articoli, negozi, liste, piatti): di partenza si tiene tutto, quindi non si perde niente, e per ogni gruppo puoi scegliere cosa tenere (per le settimane presenti da entrambe le parti c\'è anche "Unione")',

@@ -11,13 +11,13 @@ import { toastWithBackup } from '../lib/syncRunner'
 export type QuickMode = 'union' | 'local' | 'remote'
 
 /** Stato della schermata di unione: confronto locale/remoto, scelte per gruppo, risultato e applicazione. */
-export function useMerge(onDone: () => void) {
+export function useMerge(onDone: () => void, from?: string) {
   const { t } = useTranslation()
   const qc = useQueryClient()
   const data = useQuery({
-    queryKey: ['merge-data'],
+    queryKey: ['merge-data', from ?? null],
     queryFn: async () => {
-      const [local, remote] = await Promise.all([exportData(), loadRemoteBackup()])
+      const [local, remote] = await Promise.all([exportData(), loadRemoteBackup(from)])
       return { local, remote, plan: planMerge(local, remote) }
     },
     retry: false,

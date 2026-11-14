@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate } from '@tanstack/react-router'
+import { useNavigate, useSearch } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 import { PageHeader, SectionTitle } from '../components/PageHeader'
 import { Card, ModalActions } from '../components/settingsUi'
@@ -18,17 +18,18 @@ const QUICK: Array<{ mode: QuickMode; key: string }> = [
 export function DesktopUnisciScreen() {
   const { t } = useTranslation()
   const navigate = useNavigate()
+  const { from } = useSearch({ strict: false }) as { from?: string }
   const [confirming, setConfirming] = useState(false)
   const m = useMerge(() => {
     setConfirming(false)
     void navigate({ to: '/sincronizzazione', replace: true })
-  })
+  }, from)
 
   return (
     <div style={{ padding: 'var(--page-pad-y) var(--page-pad-x)', maxWidth: '1200px' }}>
       <PageHeader
         title={t('syncMerge.title')}
-        subtitle={t('syncMerge.intro')}
+        subtitle={from ? `${t('syncBranches.mergeFrom', { name: from })} ${t('syncMerge.intro')}` : t('syncMerge.intro')}
         right={
           <button onClick={() => void navigate({ to: '/sincronizzazione' })} style={action}>
             {t('common.back')}

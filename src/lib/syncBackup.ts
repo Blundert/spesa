@@ -48,3 +48,15 @@ export function parseBackupPath(path: string): { iso: string; side: BackupSide }
   if (!m) return null
   return { iso: `${m[1]}T${m[2]}:${m[3]}:${m[4]}.${m[5]}Z`, side: m[6] as BackupSide }
 }
+
+/** Regole di base di git per i nomi dei branch (abbastanza severe da non produrre mai un nome rifiutato). */
+export function isValidBranchName(name: string): boolean {
+  if (name.length === 0 || name.length > 100) return false
+  if (name.startsWith('-') || name.startsWith('/') || name.endsWith('/') || name.endsWith('.') || name.endsWith('.lock')) {
+    return false
+  }
+  if (name.includes('..') || name.includes('//') || name.includes('@{')) return false
+  // spazi e ~ ^ : ? * [ \ non sono ammessi, né i caratteri di controllo
+  if (/[\s~^:?*[\\]/.test(name)) return false
+  return ![...name].some((ch) => ch.charCodeAt(0) < 32 || ch.charCodeAt(0) === 127)
+}

@@ -8,6 +8,7 @@ import { Modal } from '../components/Modal'
 import { SortableTable, type Column } from '../components/SortableTable'
 import { SyncDiffView } from '../../components/sync/SyncDiffView'
 import { SyncGuide } from '../../components/sync/SyncGuide'
+import { SyncBranches } from '../../components/sync/SyncBranches'
 import { formatDateTime, historyDetail, historyTitle } from '../../components/sync/historyText'
 import { useGitSyncSettings } from '../../hooks/useGitSyncSettings'
 import { useHistoryPreview, useRemoteHistory, useRestore, useSafetySnapshots } from '../../hooks/useSyncHistory'
@@ -59,6 +60,7 @@ export function DesktopSincronizzazioneScreen() {
     <div style={{ padding: 'var(--page-pad-y) var(--page-pad-x)', maxWidth: '1200px' }}>
       <PageHeader title={t('syncPage.title')} subtitle={t('settings.syncHint')} />
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: '24px', alignItems: 'start' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', minWidth: 0 }}>
         <Card title={t('syncPage.config')}>
           <div style={{ background: 'var(--t-surface2)', borderRadius: '12px', padding: '14px 16px', marginBottom: '16px' }}>
             <div style={{ fontSize: '12px', color: 'var(--t-muted)', textTransform: 'uppercase', letterSpacing: '0.4px', marginBottom: '8px' }}>
@@ -129,6 +131,10 @@ export function DesktopSincronizzazioneScreen() {
             </button>
           </div>
         </Card>
+        <Card title={t('syncBranches.title')} hint={t('syncBranches.hint')}>
+          <SyncBranches onSwitched={s.refresh} />
+        </Card>
+        </div>
 
         <Card title={t('syncPage.history')} hint={t('syncPage.historyHint')}>
           {!configured && (

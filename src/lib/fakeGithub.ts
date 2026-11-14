@@ -19,6 +19,8 @@ export class FakeGithub {
   emptyContents = false
   private pendingTree: Array<{ path: string; content: string }> = []
   private pendingMessage = ''
+  /** Branch diversi da main: nome → file. */
+  branchFiles = new Map<string, Map<string, string>>()
   /** Commit in ordine cronologico: messaggio, data e file toccati (con il loro contenuto). */
   log: Array<{ sha: string; message: string; date: string; files: Record<string, string> }> = []
   /** Se true, GET /commits risponde 500. */
@@ -69,9 +71,10 @@ export class FakeGithub {
         if (names.length === 0) return json({ message: 'Not Found' }, 404)
         return json(names.map((n) => ({ path: n, sha: FakeGithub.sha(this.files.get(n) ?? '') })))
       }
-      const ref = /[?&]ref=([^&]+)/.exec(url)?.[1] ?? 'main'
-      const at = this.log.find((k) => k.sha === decodeURIComponent(ref))
-      const text = at ? at.files[path] : this.files.get(path)
+      const ref = decodeURIComponent(/[?&]ref=([^&]+)/.exec(url)?.[1] ?? 'main')
+      const at = this.log.find((k) => k.sha === ref)
+      const branch = this.branchFiles.get(ref)
+      const text = at ? at.files[path] : branch ? branch.get(path) : this.files.get(path)
       if (text === undefined) return json({ message: 'Not Found' }, 404)
       if (this.emptyContents) return json({})
       if (this.useDownloadUrl) {
@@ -90,8 +93,18 @@ export class FakeGithub {
           .reverse(),
       )
     }
-    if (/\/git\/ref\/heads\//.test(url)) return json({ object: { sha: `c${this.commits}` } })
-    if (/\/git\/commits\/c\d+$/.test(url)) return json({ tree: { sha: `t${this.commits}` } })
+    if (/\/branches\?/.test(url)) return json([{ name: 'main' }, ...[...this.branchFiles.keys()].map((name) => ({ name }))])
+    if (/\/git\/ref\/heads\//.test(url)) {
+      const name = decodeURIComponent(url.split('/git/ref/heads/')[1])
+      return json({ object: { sha: this.branchFiles.has(name) ? `o-${name}` : `c${this.commits}` } })
+    }
+    if (/\/git\/commits\/(c\d+|o-.+)$/.test(url)) return json({ tree: { sha: `t${this.commits}` } })
+    if (/\/git\/refs$/.test(url) && method === 'POST') {
+      const name = (body as { ref: string }).ref.replace('refs/heads/', '')
+      if (name === 'main' || this.branchFiles.has(name)) return json({ message: 'Reference already exists' }, 422)
+      this.branchFiles.set(name, new Map(this.files))
+      return json({})
+    }
     if (/\/git\/trees$/.test(url)) {
       const b = body as { tree: Array<{ path: string; content: string }> }
       this.pendingTree = b.tree
@@ -106,7 +119,8 @@ export class FakeGithub {
     }
     if (/\/git\/refs\/heads\//.test(url)) {
       if (this.rejectRefUpdate) return json({ message: 'Update is not a fast forward' }, 422)
-      for (const e of this.pendingTree) this.files.set(e.path, e.content)
+      const target = this.branchFiles.get(decodeURIComponent(url.split('/git/refs/heads/')[1])) ?? this.files
+      for (const e of this.pendingTree) target.set(e.path, e.content)
       this.commits++
       this.record(this.pendingMessage, Object.fromEntries(this.pendingTree.map((e) => [e.path, e.content])))
       return json({})

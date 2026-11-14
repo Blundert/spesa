@@ -69,5 +69,8 @@ export function useGitSyncSettings() {
     }
   }
 
-  return { git, setGitField, auto, toggleAuto, syncing, showPull, setShowPull, save, syncNow, pull }
+  /** Rilegge la configurazione salvata (dopo un cambio di branch fatto altrove). */
+  const refresh = () => setGit(getGitConfig())
+
+  return { git, refresh, setGitField, auto, toggleAuto, syncing, showPull, setShowPull, save, syncNow, pull }
 }
