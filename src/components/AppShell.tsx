@@ -261,6 +261,7 @@ function MenuSheet({
         { to: '/catalogo', label: t('nav.catalog') },
         { to: '/piatti', label: t('nav.dishes') },
         { to: '/supermercati', label: t('nav.supermarkets') },
+        { to: '/sincronizzazione', label: t('nav.sync') },
       ],
     },
     { items: [{ to: '/impostazioni', label: t('nav.settings') }] },

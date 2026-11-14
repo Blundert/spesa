@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useNavigate } from '@tanstack/react-router'
+import { Link, useNavigate } from '@tanstack/react-router'
 import { useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import type { PWAInstallElement } from '@khmyznikov/pwa-install'
@@ -11,16 +11,6 @@ import { BuonoValueStepper } from '../components/BuoniSheet'
 import { dayShort } from '../lib/date'
 import { wipeAllData } from '../db/db'
 import { exportData, importData, isBackupData, type BackupData } from '../db/backup'
-import {
-  getGitConfig,
-  setGitConfig,
-  getAutoSync,
-  setAutoSync,
-  isGitConfigured,
-  syncPull,
-  type GitConfig,
-} from '../lib/gitSync'
-import { runSync, toastWithBackup } from '../lib/syncRunner'
 import { saveSafetySnapshot } from '../db/repositories/safetySnapshots'
 import { getDebugViewport, setDebugViewport } from '../lib/debugFlag'
 import { resetTutorial } from '../tutorial/tutorialStore'
@@ -40,10 +30,6 @@ export function ImpostazioniScreen() {
   const [showWipe, setShowWipe] = useState(false)
   const [pendingImport, setPendingImport] = useState<BackupData | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
-  const [git, setGit] = useState<GitConfig>(() => getGitConfig())
-  const [auto, setAuto] = useState<boolean>(() => getAutoSync())
-  const [syncing, setSyncing] = useState(false)
-  const [showPull, setShowPull] = useState(false)
   const [debug, setDebug] = useState<boolean>(() => getDebugViewport())
   const [weekStart, setWeekStart] = useState<number>(() => getWeekStartDay())
   const [buonoValue, setBuonoValue] = useState<number>(() => getDefaultBuonoValueCents())
@@ -134,51 +120,6 @@ export function ImpostazioniScreen() {
     } catch {
       setPendingImport(null)
       toast.error(t('settings.importInvalid'))
-    }
-  }
-
-  const setGitField = (field: keyof GitConfig, value: string) => {
-    setGit((g) => ({ ...g, [field]: value }))
-  }
-
-  const handleGitSave = () => {
-    setGitConfig(git)
-    toast(t('settings.syncSaved'))
-  }
-
-  const handleToggleAuto = () => {
-    const next = !auto
-    setAuto(next)
-    setAutoSync(next)
-  }
-
-  const handlePush = async () => {
-    if (!isGitConfigured(git)) {
-      toast.error(t('settings.syncNotConfigured'))
-      return
-    }
-    setGitConfig(git)
-    setSyncing(true)
-    try {
-      // Sync bidirezionale: push se siamo avanti, pull se indietro, toast se in conflitto.
-      await runSync(qc, { announce: true })
-    } finally {
-      setSyncing(false)
-    }
-  }
-
-  const handlePull = async () => {
-    setShowPull(false)
-    setGitConfig(git)
-    setSyncing(true)
-    try {
-      const res = await syncPull()
-      await qc.invalidateQueries()
-      toastWithBackup(t('settings.syncPulled'), res)
-    } catch (e) {
-      toast.error(`${t('settings.syncError')}: ${e instanceof Error ? e.message : ''}`)
-    } finally {
-      setSyncing(false)
     }
   }
 
@@ -328,99 +269,16 @@ export function ImpostazioniScreen() {
           {t('settings.deleteAll')}
         </button>
 
-        {/* Sincronizzazione GitHub */}
-        <div className="text-[12px] font-normal tracking-[1.2px] text-t-muted uppercase px-1.5 pb-[13px]">
-          {t('settings.sync')}
-        </div>
-        <p className="text-[13px] text-t-muted px-1.5 pb-[13px] leading-relaxed">
-          {t('settings.syncHint')}
-        </p>
-        <a
-          href="https://github.com/settings/personal-access-tokens/new"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="w-full flex items-center justify-between bg-t-surface rounded-[20px] px-5 py-[17px] mb-3 active:bg-t-surface2 transition-colors text-left"
+        {/* Sincronizzazione: pagina dedicata */}
+        <Link
+          to="/sincronizzazione"
+          className="w-full flex items-center justify-between bg-t-surface rounded-[20px] px-5 py-[17px] mb-7 active:bg-t-surface2 transition-colors text-left"
         >
-          <span className="text-base text-t-fg">{t('settings.syncCreateToken')}</span>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--t-muted)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M14 5h5v5M19 5l-8 8M11 5H6a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-5" />
+          <span className="text-base text-t-fg">{t('syncPage.link')}</span>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--t-chev)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M9 6l6 6-6 6" />
           </svg>
-        </a>
-        <div className="bg-t-surface2 rounded-[20px] px-5 py-4 mb-3">
-          <div className="text-[12px] font-normal tracking-[0.4px] text-t-muted uppercase pb-2.5">
-            {t('settings.syncStepsTitle')}
-          </div>
-          <ol className="space-y-2">
-            {[
-              t('settings.syncStep1'),
-              t('settings.syncStep2'),
-              t('settings.syncStep3'),
-              t('settings.syncStep4'),
-            ].map((step, i) => (
-              <li key={i} className="flex gap-2.5 text-[13px] text-t-text2 leading-relaxed">
-                <span className="flex-none w-[18px] h-[18px] mt-px rounded-full bg-t-line8 text-[11px] flex items-center justify-center tabular-nums">
-                  {i + 1}
-                </span>
-                <span>{step}</span>
-              </li>
-            ))}
-          </ol>
-        </div>
-        <div className="bg-t-surface rounded-[20px] overflow-hidden mb-3">
-          {([
-            { f: 'token', ph: t('settings.syncToken'), type: 'password' },
-            { f: 'owner', ph: t('settings.syncOwner'), type: 'text' },
-            { f: 'repo', ph: t('settings.syncRepo'), type: 'text' },
-            { f: 'branch', ph: t('settings.syncBranch'), type: 'text' },
-            { f: 'path', ph: t('settings.syncPath'), type: 'text' },
-          ] as const).map((row, i, arr) => (
-            <input
-              key={row.f}
-              type={row.type}
-              value={git[row.f]}
-              onChange={(e) => setGitField(row.f, e.target.value)}
-              placeholder={row.ph}
-              autoCapitalize="off"
-              autoCorrect="off"
-              spellCheck={false}
-              className="w-full px-5 py-[15px] text-base text-t-fg placeholder:text-t-faint bg-transparent outline-none"
-              style={{ borderBottom: i < arr.length - 1 ? '1px solid var(--t-line)' : 'none' }}
-            />
-          ))}
-        </div>
-        <button
-          onClick={handleGitSave}
-          className="w-full bg-t-surface rounded-[20px] px-5 py-[17px] mb-3 text-left text-base text-t-fg active:bg-t-surface2 transition-colors"
-        >
-          {t('settings.syncSave')}
-        </button>
-        <button
-          onClick={handleToggleAuto}
-          className="w-full flex items-center justify-between bg-t-surface rounded-[20px] px-5 py-[17px] mb-3 active:bg-t-surface2 transition-colors text-left"
-        >
-          <span className="text-base text-t-fg">{t('settings.syncAuto')}</span>
-          <span
-            className={`relative w-[46px] h-[28px] rounded-full transition-colors flex-none ${auto ? 'bg-t-accent' : 'bg-t-line2'}`}
-          >
-            <span
-              className={`absolute top-[3px] w-[22px] h-[22px] rounded-full bg-t-surface transition-all ${auto ? 'left-[21px]' : 'left-[3px]'}`}
-            />
-          </span>
-        </button>
-        <button
-          onClick={() => void handlePush()}
-          disabled={syncing}
-          className="w-full bg-t-accent text-t-on rounded-[20px] px-5 py-[17px] mb-2.5 text-base active:scale-[.99] transition-transform disabled:opacity-50"
-        >
-          {t('settings.syncNow')}
-        </button>
-        <button
-          onClick={() => setShowPull(true)}
-          disabled={syncing}
-          className="w-full bg-t-surface rounded-[20px] px-5 py-[17px] text-base text-t-fg active:bg-t-surface2 transition-colors disabled:opacity-50"
-        >
-          {t('settings.syncPull')}
-        </button>
+        </Link>
 
         {/* Debug (sviluppo) */}
         <div className="text-[12px] font-normal tracking-[1.2px] text-t-muted uppercase px-1.5 pt-7 pb-[13px]">
@@ -497,27 +355,6 @@ export function ImpostazioniScreen() {
         </button>
       </BottomSheet>
 
-      {/* Drawer di conferma pull (sovrascrive i dati locali) */}
-      <BottomSheet open={showPull} onClose={() => setShowPull(false)}>
-        <div className="text-[20px] font-normal text-t-fg px-0.5 pb-2">
-          {t('settings.syncPullConfirmTitle')}
-        </div>
-        <p className="text-sm text-t-text2 px-0.5 pb-4 leading-relaxed">
-          {t('settings.syncPullConfirmBody')}
-        </p>
-        <button
-          onClick={() => void handlePull()}
-          className="w-full bg-t-accent text-t-on text-[17px] py-[18px] rounded-[20px] mb-2 active:scale-[.98] transition-transform"
-        >
-          {t('settings.syncPullConfirm')}
-        </button>
-        <button
-          onClick={() => setShowPull(false)}
-          className="w-full bg-t-line5 text-t-fg text-[17px] py-[18px] rounded-[20px] active:scale-[.98] transition-transform"
-        >
-          {t('common.cancel')}
-        </button>
-      </BottomSheet>
     </>
   )
 }

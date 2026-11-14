@@ -136,6 +136,15 @@ const NAV_GROUPS: NavGroup[] = [
   {
     items: [
       {
+        path: '/sincronizzazione',
+        labelKey: 'desktop.nav.sync',
+        icon: (
+          <Icon>
+            <path d="M21 12a9 9 0 01-15.5 6.2M3 12a9 9 0 0115.5-6.2" /><path d="M18.5 2v4h-4M5.5 22v-4h4" />
+          </Icon>
+        ),
+      },
+      {
         path: '/impostazioni',
         labelKey: 'desktop.nav.settings',
         icon: (

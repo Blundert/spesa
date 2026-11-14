@@ -33,6 +33,8 @@ export default defineConfig({
         'src/db/repositories/safetySnapshots.ts',
         'src/lib/syncBackup.ts',
         'src/lib/backupDiff.ts',
+        'src/lib/diffSummary.ts',
+        'src/lib/historyItems.ts',
         'src/lib/gitSync.ts',
         'src/lib/syncRunner.ts',
       ],

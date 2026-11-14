@@ -7,6 +7,7 @@ describe('navLevel', () => {
     expect(navLevel('/pasti')).toBe(0)
     expect(navLevel('/storico')).toBe(1)
     expect(navLevel('/impostazioni')).toBe(1)
+    expect(navLevel('/sincronizzazione')).toBe(1)
     expect(navLevel('/storico/6')).toBe(2)
     expect(navLevel('/changelog')).toBe(2)
   })

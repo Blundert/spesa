@@ -2,6 +2,20 @@ export type ChangelogEntry = { it: string[]; en: string[] }
 
 // Ordine: più recente in cima. Aggiungere una entry ad ogni nuova versione.
 export const changelog: Record<string, ChangelogEntry> = {
+  '0.46.0': {
+    it: [
+      'Nuova pagina "Sincronizzazione" (menu → Gestisci, e nella barra laterale su desktop): ci sono ora il collegamento a GitHub, "Sincronizza ora", "Scarica da remoto" e il sync automatico, che prima stavano in Impostazioni (dove resta un link)',
+      'Cronologia: elenca le versioni sincronizzate nel repository, i backup salvati in backups/ e le copie di sicurezza di questo dispositivo. Toccandone una vedi cosa cambierebbe rispetto ai dati di adesso (cosa si aggiungerebbe, sparirebbe o cambierebbe, con l\'elenco delle spese) e puoi ripristinarla',
+      'Il ripristino non riscrive la cronologia: aggiunge una nuova versione nel repository e, prima, salva una copia di quello che sostituisce. Se il salvataggio non riesce, i tuoi dati restano com\'erano',
+      'Guida: una sezione con accordion, chiusi all\'inizio, che spiega cosa fa ogni pulsante e ogni flusso di sincronizzazione',
+    ],
+    en: [
+      'New "Sync" page (menu → Manage, and in the sidebar on desktop): it now holds the GitHub connection, "Sync now", "Pull from remote" and auto sync, which used to live in Settings (where a link remains)',
+      'History: lists the synced versions in the repository, the backups saved in backups/ and the safety copies on this device. Tap one to see what would change compared with your data now (what would be added, disappear or change, with the list of trips) and restore it',
+      'Restoring does not rewrite the history: it adds a new version to the repository and first saves a copy of what it replaces. If saving fails, your data stays as it was',
+      'Guide: a section with accordions, closed at first, explaining what each button and each sync flow does',
+    ],
+  },
   '0.45.0': {
     it: ['Sincronizzazione su desktop: se attivi "Sync automatico" in Impostazioni, anche la versione desktop sincronizza da sola (all\'apertura, ogni 3 minuti e quando la finestra va in background), come già faceva il telefono. Prima sul desktop partiva solo dai pulsanti, e le modifiche fatte lì restavano indietro rispetto al telefono fino al conflitto successivo'],
     en: ['Sync on desktop: if you turn on "Auto sync" in Settings, the desktop version now syncs by itself too (on open, every 3 minutes and when the window goes to the background), as the phone already did. Before, on desktop it only ran from the buttons, so changes made there fell behind the phone until the next conflict'],

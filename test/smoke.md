@@ -295,7 +295,7 @@ Nota: il service worker è attivo solo in build di produzione (`npm run build` +
 8. Pasti → griglia settimanale giorni × pranzo/cena; clic su una cella: scegli o crea il piatto, spunta gli ingredienti, Salva/Rimuovi; "Importa piatti e vai alla lista" (con più liste chiede in quale); "Settimane" apre le pianificazioni
 9. "Inizia la spesa" → pannello con riepilogo, lista, buoni e valore → "Inizia la spesa" apre la spesa in corso (se la lista non ha supermercato chiede di sceglierlo). Clic su un prodotto → importo (accetta calcoli come `3,50-10%`) e quantità → "Aggiungi al carrello"; "Fine spesa" → importo calcolato precompilato → "Conferma spesa" porta allo Storico
 10. Supermercati → aggiungi/elimina, tessera fedeltà (carica/sostituisci/rimuovi), ultima visita con anno. Piatti → aggiungi/modifica/elimina con ingredienti. Liste → riordino con frecce, archiviate da ripristinare/eliminare
-11. Impostazioni → tutte quelle del mobile: versione (→ Novità), aggiorna/installa app, lingua, buoni, inizio settimana, tutorial, esporta/importa, azzera tutti i dati (con conferma), sincronizzazione GitHub (guida token, campi, sync automatico, sincronizza ora, scarica da remoto), debug viewport
+11. Impostazioni → tutte quelle del mobile: versione (→ Novità), aggiorna/installa app, lingua, buoni, inizio settimana, tutorial, esporta/importa, azzera tutti i dati (con conferma), un link "Sincronizzazione e cronologia" (la sync GitHub sta nella sua pagina, vedi Flusso 41), debug viewport
 12. Con la finestra < 768 px (e ricarica) l'app mobile è identica a prima
 
 ### Flusso 34 — Desktop ↔ mobile al volo e menu compatto
@@ -357,4 +357,16 @@ Serve un repo GitHub di prova con token (Impostazioni → Sincronizzazione) e du
 3. Modifica qualcosa e passa a un'altra scheda del browser (o chiudi la scheda) → il push parte in background, senza toast
 4. Con il sync automatico spento il desktop non sincronizza da solo (solo "Sincronizza ora")
 5. Stesso comportamento di prima sul mobile (<768 px): nessuna regressione
+
+### Flusso 41 — Pagina Sincronizzazione, cronologia e ripristino (mobile e desktop)
+Serve un repo GitHub di prova con almeno due commit di `spesa-db.json` (e, per i backup, un conflitto risolto come nel Flusso 39).
+1. Mobile: menu (cerchio in basso) → Gestisci → "Sincronizzazione"; la pagina ha "Collegamento" (guida token, campi, Salva, Sync automatico, Sincronizza ora, Scarica da remoto), "Cronologia" e "Guida". Impostazioni → "Sincronizzazione e cronologia" porta alla stessa pagina e non ha più i campi di sync
+2. Desktop (≥ 768 px): voce "Sincronizzazione" nella barra laterale (sopra Impostazioni); collegamento a sinistra, cronologia a destra in tabella ordinabile per data, guida sotto. Impostazioni ha solo la scheda "Sincronizzazione (GitHub)" con il pulsante che apre la pagina; le altre schede restano bilanciate in due colonne
+3. Senza repo configurato la cronologia dice "Collega un repository…"; con token sbagliato compare "Impossibile leggere la cronologia" e "Riprova"
+4. Con il repo: la cronologia elenca "Versione sincronizzata" (commit del file dei dati), "Backup dei dati di questo dispositivo" / "Backup del repository" (file in backups/) e "Copia di sicurezza sul dispositivo" (con il motivo), dalla più recente
+5. Tocca una voce → riepilogo "Rispetto ai dati di adesso": una riga per tabella (Si aggiungerebbero / Sparirebbero / Cambierebbero) e l'elenco delle spese con negozio e data; se è identica ai dati di adesso lo dice. Le statistiche degli articoli non contano come differenze
+6. "Ripristina questa versione" → testo di conferma → "Ripristina": toast "Versione ripristinata" (con il backup salvato, se serviva) e i dati cambiano; nel repo c'è UN commit "Restore …" sopra la cronologia (nessun force-push) e, se il locale o il remoto non erano sincronizzati, il relativo file in backups/. Riaprendo la stessa voce è "Identica ai dati di adesso"
+7. Ripristino con token revocato: errore e dati locali invariati. Una copia di sicurezza locale si ripristina senza rete e senza commit
+8. "Guida": sette accordion, tutti chiusi all'apertura della pagina; ognuno si apre e si chiude da solo
+9. Navigazione: la pagina si apre con scorrimento laterale dal menu e ‹ torna alla sezione principale; tra pagine del menu è dissolvenza. Cambiando tema (es. Scuro) e passando fra mobile e desktop resta leggibile
 

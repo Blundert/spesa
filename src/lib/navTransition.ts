@@ -11,6 +11,7 @@ const MENU_PATHS = new Set([
   '/piatti',
   '/supermercati',
   '/impostazioni',
+  '/sincronizzazione',
 ])
 
 // 0 = Lista/Pasti, 1 = pagine del menu, 2 = dettagli.

@@ -7,6 +7,7 @@ import { AdvancedStatsScreen } from './screens/AdvancedStatsScreen'
 import { DesktopCatalogoScreen } from './screens/DesktopCatalogoScreen'
 import { DesktopStoricoScreen } from './screens/DesktopStoricoScreen'
 import { DesktopImpostazioniScreen } from './screens/DesktopImpostazioniScreen'
+import { DesktopSincronizzazioneScreen } from './screens/DesktopSincronizzazioneScreen'
 
 import { DesktopListaScreen } from './screens/DesktopListaScreen'
 import { DesktopListeScreen } from './screens/DesktopListeScreen'
@@ -49,6 +50,12 @@ const storicoRoute = createRoute({
   getParentRoute: () => shellRoute,
   path: '/storico',
   component: DesktopStoricoScreen,
+})
+
+const sincronizzazioneRoute = createRoute({
+  getParentRoute: () => shellRoute,
+  path: '/sincronizzazione',
+  component: DesktopSincronizzazioneScreen,
 })
 
 const impostazioniRoute = createRoute({
@@ -138,6 +145,7 @@ const routeTree = rootRoute.addChildren([
     cataloRoute,
     storicoRoute,
     impostazioniRoute,
+    sincronizzazioneRoute,
     listaRoute,
     listeRoute,
     pastiRoute,

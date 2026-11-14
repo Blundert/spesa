@@ -1,10 +1,12 @@
-import { useRef, useState, type ReactNode } from 'react'
+import { useRef, useState } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 import { useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import type { PWAInstallElement } from '@khmyznikov/pwa-install'
-import { PageHeader, SectionTitle } from '../components/PageHeader'
+import { PageHeader } from '../components/PageHeader'
+import { Card, Toggle, ModalActions } from '../components/settingsUi'
+import { action, primary, danger } from '../components/settingsStyles'
 import { ThemePicker } from '../components/ThemePicker'
 import { LANG_KEY, type Lang } from '../../i18n'
 import { getWeekStartDay, setWeekStartDay } from '../../lib/weekSettings'
@@ -13,16 +15,6 @@ import { BuonoValueStepper } from '../../components/BuoniSheet'
 import { dayShort } from '../../lib/date'
 import { wipeAllData } from '../../db/db'
 import { exportData, importData, isBackupData, type BackupData } from '../../db/backup'
-import {
-  getGitConfig,
-  setGitConfig,
-  getAutoSync,
-  setAutoSync,
-  isGitConfigured,
-  syncPull,
-  type GitConfig,
-} from '../../lib/gitSync'
-import { runSync, toastWithBackup } from '../../lib/syncRunner'
 import { saveSafetySnapshot } from '../../db/repositories/safetySnapshots'
 import { getDebugViewport, setDebugViewport } from '../../lib/debugFlag'
 import { resetTutorial } from '../../tutorial/tutorialStore'
@@ -32,16 +24,6 @@ const LANGS: { code: Lang; label: string }[] = [
   { code: 'it', label: 'Italiano' },
   { code: 'en', label: 'English' },
 ]
-
-function Card({ title, hint, children }: { title: string; hint?: string; children: ReactNode }) {
-  return (
-    <div style={{ background: 'var(--t-surface)', borderRadius: '16px', padding: '24px', minWidth: 0 }}>
-      <SectionTitle>{title}</SectionTitle>
-      {hint && <div style={{ fontSize: '13px', color: 'var(--t-muted)', margin: '-8px 0 16px' }}>{hint}</div>}
-      {children}
-    </div>
-  )
-}
 
 const pill = (active: boolean) => ({
   padding: '8px 16px',
@@ -53,70 +35,6 @@ const pill = (active: boolean) => ({
   cursor: 'pointer',
 })
 
-const action = {
-  padding: '10px 18px',
-  borderRadius: '10px',
-  border: '1px solid var(--t-line2)',
-  background: 'var(--t-surface)',
-  color: 'var(--t-fg)',
-  fontSize: '14px',
-  cursor: 'pointer',
-}
-
-const primary = { ...action, background: 'var(--t-accent)', color: 'var(--t-on)', border: '1px solid var(--t-fg)' }
-const danger = { ...action, color: 'var(--t-danger)', border: '1px solid var(--t-danger)' }
-
-const input = {
-  width: '100%',
-  boxSizing: 'border-box' as const,
-  padding: '10px 12px',
-  borderRadius: '10px',
-  border: '1px solid var(--t-line2)',
-  background: 'var(--t-surface)',
-  fontSize: '14px',
-  color: 'var(--t-fg)',
-  outline: 'none',
-}
-
-function Toggle({ on, onClick, label }: { on: boolean; onClick: () => void; label: string }) {
-  return (
-    <button
-      role="switch"
-      aria-checked={on}
-      aria-label={label}
-      onClick={onClick}
-      style={{
-        all: 'unset',
-        cursor: 'pointer',
-        position: 'relative',
-        width: '46px',
-        height: '28px',
-        borderRadius: '999px',
-        background: on ? 'var(--t-accent)' : 'var(--t-line2)',
-        flex: 'none',
-        transition: 'background .15s',
-      }}
-    >
-      <span
-        style={{
-          position: 'absolute',
-          top: '3px',
-          left: on ? '21px' : '3px',
-          width: '22px',
-          height: '22px',
-          borderRadius: '50%',
-          background: 'var(--t-surface)',
-          transition: 'left .15s',
-        }}
-      />
-    </button>
-  )
-}
-
-function ModalActions({ children }: { children: ReactNode }) {
-  return <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px', marginTop: '20px' }}>{children}</div>
-}
-
 export function DesktopImpostazioniScreen() {
   const { t, i18n } = useTranslation()
   const qc = useQueryClient()
@@ -126,10 +44,6 @@ export function DesktopImpostazioniScreen() {
   const navigate = useNavigate()
   const [showWipe, setShowWipe] = useState(false)
   const [pendingImport, setPendingImport] = useState<BackupData | null>(null)
-  const [git, setGit] = useState<GitConfig>(() => getGitConfig())
-  const [auto, setAuto] = useState<boolean>(() => getAutoSync())
-  const [syncing, setSyncing] = useState(false)
-  const [showPull, setShowPull] = useState(false)
   const [debug, setDebug] = useState<boolean>(() => getDebugViewport())
   const current: Lang = i18n.language.startsWith('en') ? 'en' : 'it'
 
@@ -218,58 +132,6 @@ export function DesktopImpostazioniScreen() {
     }
     window.location.reload()
   }
-
-  const setGitField = (field: keyof GitConfig, value: string) => {
-    setGit((g) => ({ ...g, [field]: value }))
-  }
-
-  const handleGitSave = () => {
-    setGitConfig(git)
-    toast(t('settings.syncSaved'))
-  }
-
-  const handleToggleAuto = () => {
-    const next = !auto
-    setAuto(next)
-    setAutoSync(next)
-  }
-
-  const handlePush = async () => {
-    if (!isGitConfigured(git)) {
-      toast.error(t('settings.syncNotConfigured'))
-      return
-    }
-    setGitConfig(git)
-    setSyncing(true)
-    try {
-      await runSync(qc, { announce: true })
-    } finally {
-      setSyncing(false)
-    }
-  }
-
-  const handlePull = async () => {
-    setShowPull(false)
-    setGitConfig(git)
-    setSyncing(true)
-    try {
-      const res = await syncPull()
-      await qc.invalidateQueries()
-      toastWithBackup(t('settings.syncPulled'), res)
-    } catch (e) {
-      toast.error(`${t('settings.syncError')}: ${e instanceof Error ? e.message : ''}`)
-    } finally {
-      setSyncing(false)
-    }
-  }
-
-  const gitFields = [
-    { f: 'token', label: t('settings.syncToken'), type: 'password' },
-    { f: 'owner', label: t('settings.syncOwner'), type: 'text' },
-    { f: 'repo', label: t('settings.syncRepo'), type: 'text' },
-    { f: 'branch', label: t('settings.syncBranch'), type: 'text' },
-    { f: 'path', label: t('settings.syncPath'), type: 'text' },
-  ] as const
 
   return (
     <div style={{ padding: 'var(--page-pad-y) var(--page-pad-x)', maxWidth: '1200px' }}>
@@ -367,63 +229,9 @@ export function DesktopImpostazioniScreen() {
           </div>
         </div>
         <Card title={t('settings.sync')} hint={t('settings.syncHint')}>
-          <div style={{ background: 'var(--t-surface2)', borderRadius: '12px', padding: '14px 16px', marginBottom: '16px' }}>
-            <div style={{ fontSize: '12px', color: 'var(--t-muted)', textTransform: 'uppercase', letterSpacing: '0.4px', marginBottom: '8px' }}>
-              {t('settings.syncStepsTitle')}
-            </div>
-            <ol style={{ margin: 0, paddingLeft: '18px', fontSize: '13px', color: 'var(--t-text2)', lineHeight: 1.6 }}>
-              {[
-                t('settings.syncStep1'),
-                t('settings.syncStep2'),
-                t('settings.syncStep3'),
-                t('settings.syncStep4'),
-              ].map((step, i) => (
-                <li key={i}>{step}</li>
-              ))}
-            </ol>
-            <a
-              href="https://github.com/settings/personal-access-tokens/new"
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{ display: 'inline-block', marginTop: '10px', fontSize: '13px', color: 'var(--t-fg)' }}
-            >
-              {t('settings.syncCreateToken')} ↗
-            </a>
-          </div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '16px' }}>
-            {gitFields.map((row) => (
-              <label
-                key={row.f}
-                style={{ display: 'flex', flexDirection: 'column', gap: '4px', fontSize: '12px', color: 'var(--t-muted)', gridColumn: row.f === 'token' || row.f === 'path' ? '1 / -1' : undefined }}
-              >
-                {row.label}
-                <input
-                  type={row.type}
-                  value={git[row.f]}
-                  onChange={(e) => setGitField(row.f, e.target.value)}
-                  autoCapitalize="off"
-                  autoCorrect="off"
-                  spellCheck={false}
-                  style={input}
-                />
-              </label>
-            ))}
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
-            <span style={{ fontSize: '14px', color: 'var(--t-fg)' }}>{t('settings.syncAuto')}</span>
-            <Toggle on={auto} onClick={handleToggleAuto} label={t('settings.syncAuto')} />
-          </div>
-          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-            <button onClick={handleGitSave} style={action}>
-              {t('settings.syncSave')}
-            </button>
-            <button onClick={() => void handlePush()} disabled={syncing} style={{ ...primary, opacity: syncing ? 0.5 : 1 }}>
-              {t('settings.syncNow')}
-            </button>
-            <button onClick={() => setShowPull(true)} disabled={syncing} style={{ ...action, opacity: syncing ? 0.5 : 1 }}>
-              {t('settings.syncPull')}
-            </button>
-          </div>
+          <button onClick={() => void navigate({ to: '/sincronizzazione' })} style={action}>
+            {t('syncPage.link')} ›
+          </button>
         </Card>
       </div>
 
@@ -451,17 +259,6 @@ export function DesktopImpostazioniScreen() {
         </ModalActions>
       </Modal>
 
-      <Modal open={showPull} onClose={() => setShowPull(false)} title={t('settings.syncPullConfirmTitle')}>
-        <p style={{ fontSize: '14px', color: 'var(--t-text2)', lineHeight: 1.5, margin: 0 }}>{t('settings.syncPullConfirmBody')}</p>
-        <ModalActions>
-          <button onClick={() => setShowPull(false)} style={action}>
-            {t('common.cancel')}
-          </button>
-          <button onClick={() => void handlePull()} style={primary}>
-            {t('settings.syncPullConfirm')}
-          </button>
-        </ModalActions>
-      </Modal>
     </div>
   )
 }
