@@ -338,3 +338,16 @@ Nota: il service worker è attivo solo in build di produzione (`npm run build` +
 1. Impostazioni su desktop (1280 px) → "Aspetto" a tutta larghezza in alto; sotto due colonne di larghezza uguale e altezza simile (a sinistra Buoni pasto, Inizio settimana, App; a destra Lingua, Dati, Tutorial, Debug); in fondo "Sincronizzazione (GitHub)" a tutta larghezza. Nessun buco grande, nessuna scheda che si allarga da sola, nemmeno Lingua e Debug
 2. Lo stesso su schermi molto larghi (1600–2560 px): sempre due colonne. Sotto circa 700 px di contenuto (finestra stretta) diventa una colonna sola
 3. I sei campioni dei temi stanno su una sola riga quando c'è spazio, altrimenti 3 + 3; mai un campione da solo su una riga
+
+### Flusso 39 — Sync: backup della scelta scartata (mobile e desktop)
+Serve un repo GitHub di prova con token (Impostazioni → Sincronizzazione) e due dispositivi, o due profili del browser.
+1. Dispositivo A: "Sincronizza ora" → nel repo compare `spesa-db.json`. Dispositivo B (profilo nuovo, solo dati iniziali): "Sincronizza ora" → scarica direttamente il remoto, senza toast di conflitto
+2. Modifica qualcosa su A e su B (due articoli diversi), poi sincronizza da B → compare il toast "Dati diversi qui e sul remoto" con "Usa remoto" / "Mantieni", senza scrivere nulla nel repo
+3. "Mantieni" → toast "Sincronizzato" con la riga "Copia dei dati scartati salvata in backups/…-remote.json". Nel repo c'è UN solo commit nuovo ("Keep local, back up remote …") che contiene `spesa-db.json` aggiornato e il file in `backups/` col vecchio remoto
+4. Rifai il conflitto e scegli "Usa remoto" → toast "Dati scaricati" con "…backups/…-local.json". Nel repo un commit "Back up local before using remote …" che aggiunge solo il file di backup (`spesa-db.json` invariato); l'app ora ha i dati del remoto
+5. "Usa remoto" con il token revocato (o offline): errore nel toast e i dati locali NON cambiano
+6. "Scarica da remoto" in Impostazioni (con locale modificato dall'ultimo sync) → stesso backup `…-local.json`; con locale invariato dall'ultimo sync non crea nessun commit
+7. Se il remoto cambia mentre si salva il backup compare "Il remoto è cambiato durante il salvataggio: riprova" e non si scrive nulla
+8. Importa un file di backup da Impostazioni → i dati vengono sostituiti; in DevTools → Application → IndexedDB → spesa → safetySnapshots c'è la copia di prima (massimo 10)
+9. Stessi passaggi 2–6 da desktop (≥ 768 px): il toast e i messaggi sono identici
+

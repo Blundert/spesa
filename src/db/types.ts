@@ -143,3 +143,16 @@ export interface DishIngredient {
   dishId: number
   itemId: number
 }
+
+/**
+ * Copia di sicurezza dei dati locali, presa prima di un'operazione che li sostituisce
+ * (sync, import, ripristino). `json` è un BackupData serializzato. Non fa parte del backup.
+ */
+export interface SafetySnapshot {
+  id?: number
+  createdAt: number
+  reason: SafetySnapshotReason
+  json: string
+}
+
+export type SafetySnapshotReason = 'pull' | 'import-file' | 'restore'

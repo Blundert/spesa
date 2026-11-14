@@ -22,7 +22,8 @@ import {
   syncPull,
   type GitConfig,
 } from '../../lib/gitSync'
-import { runSync } from '../../lib/syncRunner'
+import { runSync, toastWithBackup } from '../../lib/syncRunner'
+import { saveSafetySnapshot } from '../../db/repositories/safetySnapshots'
 import { getDebugViewport, setDebugViewport } from '../../lib/debugFlag'
 import { resetTutorial } from '../../tutorial/tutorialStore'
 import { Modal } from '../components/Modal'
@@ -180,6 +181,7 @@ export function DesktopImpostazioniScreen() {
   const handleImportConfirm = async () => {
     if (!pendingImport) return
     try {
+      await saveSafetySnapshot('import-file', JSON.stringify(await exportData()))
       await importData(pendingImport)
       await qc.invalidateQueries()
       setPendingImport(null)
@@ -251,9 +253,9 @@ export function DesktopImpostazioniScreen() {
     setGitConfig(git)
     setSyncing(true)
     try {
-      await syncPull()
+      const res = await syncPull()
       await qc.invalidateQueries()
-      toast(t('settings.syncPulled'))
+      toastWithBackup(t('settings.syncPulled'), res)
     } catch (e) {
       toast.error(`${t('settings.syncError')}: ${e instanceof Error ? e.message : ''}`)
     } finally {

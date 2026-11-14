@@ -2,6 +2,18 @@ export type ChangelogEntry = { it: string[]; en: string[] }
 
 // Ordine: più recente in cima. Aggiungere una entry ad ogni nuova versione.
 export const changelog: Record<string, ChangelogEntry> = {
+  '0.44.0': {
+    it: [
+      'Sincronizzazione: quando scegli "Mantieni" o "Usa remoto" dopo un conflitto, l\'app salva nel repository GitHub, nella cartella backups/, una copia di quello che scarti, prima di sovrascriverlo. "Mantieni" fa un solo commit (dati nuovi + copia del remoto); "Usa remoto" salva prima la copia del tuo locale e solo se riesce scarica il remoto (se il salvataggio fallisce, i tuoi dati restano intatti)',
+      'Anche "Scarica da remoto" in Impostazioni passa dalla stessa protezione. Prima di sostituire i dati con un sync o con un import da file, l\'app tiene anche una copia di sicurezza sul dispositivo (le ultime 10)',
+      'Un dispositivo nuovo, con solo i dati iniziali, scarica direttamente il remoto invece di chiederti cosa tenere',
+    ],
+    en: [
+      'Sync: when you pick "Keep this device" or "Use remote" after a conflict, the app saves a copy of what you discard in the GitHub repository, in the backups/ folder, before overwriting it. "Keep" makes a single commit (new data + copy of the remote); "Use remote" first saves a copy of your local data and only downloads the remote if that succeeds (if saving fails, your data stays untouched)',
+      '"Pull from remote" in Settings goes through the same protection. Before replacing your data with a sync or a file import, the app also keeps a safety copy on the device (the last 10)',
+      'A new device, holding only the initial data, downloads the remote directly instead of asking what to keep',
+    ],
+  },
   '0.43.3': {
     it: ['Impostazioni su desktop: le schede sono distribuite in due colonne di altezza simile (prima a sinistra ce n\'erano molte più che a destra); la Sincronizzazione GitHub, la più alta, occupa tutta la larghezza in fondo'],
     en: ['Settings on desktop: cards are spread across two columns of similar height (before, the left had many more than the right); GitHub sync, the tallest, spans the full width at the bottom'],

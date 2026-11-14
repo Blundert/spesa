@@ -333,6 +333,7 @@ export const it = {
     syncPull: 'Scarica da remoto',
     syncDone: 'Sincronizzato',
     syncPulled: 'Dati scaricati',
+    syncBackupSaved: 'Copia dei dati scartati salvata in {{path}}',
     syncUpToDate: 'Già aggiornato',
     syncConflict: 'Dati diversi qui e sul remoto. Cosa vuoi tenere?',
     syncConflictKeepLocal: 'Mantieni',

@@ -1,9 +1,16 @@
 import { toast } from 'sonner'
 import i18n from 'i18next'
 import type { QueryClient } from '@tanstack/react-query'
-import { autoSync, syncPull, syncPushForce } from './gitSync'
+import { autoSync, syncPull, syncPushForce, type SyncResult } from './gitSync'
 
 let inFlight = false
+
+/** Toast di esito; se è stato salvato un backup del lato scartato ne indica il file. */
+export function toastWithBackup(message: string, res: SyncResult): void {
+  const t = i18n.t.bind(i18n)
+  if (res.backupPath) toast(message, { description: t('settings.syncBackupSaved', { path: res.backupPath }) })
+  else toast(message)
+}
 
 /** Mostra un toast persistente per risolvere un conflitto: tieni locale ↔ scarica remoto. */
 function showConflictToast(qc: QueryClient): void {
@@ -15,8 +22,10 @@ function showConflictToast(qc: QueryClient): void {
       label: t('settings.syncConflictPull'),
       onClick: () => {
         void syncPull()
-          .then(() => qc.invalidateQueries())
-          .then(() => toast(t('settings.syncPulled')))
+          .then(async (res) => {
+            await qc.invalidateQueries()
+            toastWithBackup(t('settings.syncPulled'), res)
+          })
           .catch((e: unknown) =>
             toast.error(`${t('settings.syncError')}: ${e instanceof Error ? e.message : ''}`),
           )
@@ -26,7 +35,7 @@ function showConflictToast(qc: QueryClient): void {
       label: t('settings.syncConflictKeepLocal'),
       onClick: () => {
         void syncPushForce()
-          .then(() => toast(t('settings.syncDone')))
+          .then((res) => toastWithBackup(t('settings.syncDone'), res))
           .catch((e: unknown) =>
             toast.error(`${t('settings.syncError')}: ${e instanceof Error ? e.message : ''}`),
           )

@@ -335,6 +335,7 @@ export const en: typeof it = {
     syncPull: 'Pull from remote',
     syncDone: 'Synced',
     syncPulled: 'Data pulled',
+    syncBackupSaved: 'Copy of the discarded data saved in {{path}}',
     syncUpToDate: 'Already up to date',
     syncConflict: 'Local and remote both changed. Which do you keep?',
     syncConflictKeepLocal: 'Keep this device',

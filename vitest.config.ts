@@ -30,6 +30,10 @@ export default defineConfig({
         'src/db/repositories/statsExtended.ts',
         'src/db/repositories/listItems.ts',
         'src/db/repositories/shoppingLists.ts',
+        'src/db/repositories/safetySnapshots.ts',
+        'src/lib/syncBackup.ts',
+        'src/lib/gitSync.ts',
+        'src/lib/syncRunner.ts',
       ],
       all: true,
       thresholds: {

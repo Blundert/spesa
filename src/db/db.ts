@@ -11,6 +11,7 @@ import type {
   Dish,
   DishIngredient,
   ShoppingList,
+  SafetySnapshot,
 } from './types'
 import { DEFAULT_BUONO_VALUE_CENTS, DEFAULT_LIST_NAME } from './types'
 
@@ -26,6 +27,7 @@ class SpesaDb extends Dexie {
   dishes!: EntityTable<Dish, 'id'>
   dishIngredients!: EntityTable<DishIngredient, 'id'>
   shoppingLists!: EntityTable<ShoppingList, 'id'>
+  safetySnapshots!: EntityTable<SafetySnapshot, 'id'>
 
   constructor() {
     super('spesa')
@@ -184,6 +186,11 @@ class SpesaDb extends Dexie {
         await tx.table('listItems').toCollection().modify({ listId })
         await tx.table('sessions').toCollection().modify({ listId })
       })
+
+    // v10: copie di sicurezza dei dati locali prima di sostituirli (ultime N, vedi safetySnapshots.ts).
+    this.version(10).stores({
+      safetySnapshots: '++id, createdAt',
+    })
   }
 }
 
@@ -198,7 +205,7 @@ export const db = new SpesaDb()
 // Seed categories on first open
 // ---------------------------------------------------------------------------
 
-const SEED_CATEGORIES: Array<Omit<Category, 'id'>> = [
+export const SEED_CATEGORIES: Array<Omit<Category, 'id'>> = [
   { name: 'Frutta e verdura', sortOrder: 0 },
   { name: 'Frigo', sortOrder: 1 },
   { name: 'Dispensa', sortOrder: 2 },
