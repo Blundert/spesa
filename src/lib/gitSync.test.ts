@@ -6,6 +6,9 @@ import { FakeGithub } from './fakeGithub'
 import {
   autoSync,
   getAutoSync,
+  listRemoteHistory,
+  loadHistoryBackup,
+  restoreFromBackup,
   getGitConfig,
   isGitConfigured,
   setAutoSync,
@@ -336,5 +339,159 @@ describe('syncPull ("Usa remoto")', () => {
     await expect(syncPull()).rejects.toThrow('GitHub 401')
 
     expect((await db.items.toArray()).map((i) => i.name).sort()).toEqual(['Mele', 'Pere'])
+  })
+})
+
+describe('cronologia', () => {
+  it('non configurata', async () => {
+    store.clear()
+    await expect(listRemoteHistory()).rejects.toThrow('Sync non configurato')
+    await expect(loadHistoryBackup({ kind: 'commit', sha: 'x', date: '', message: '' })).rejects.toThrow(
+      'Sync non configurato',
+    )
+  })
+
+  it('senza nessun commit né backup è vuota', async () => {
+    expect(await listRemoteHistory()).toEqual([])
+  })
+
+  it('unisce commit dei dati e file di backup, dal più recente', async () => {
+    await addItem('Mele')
+    await autoSync() // commit 1
+    await addItem('Pere')
+    gh.files.set(PATH, JSON.stringify(await remoteWith('Kiwi')))
+    gh.files.set('backups/non-nostro.json', 'x')
+    await syncPushForce() // commit 2: dati + backups/…-remote.json
+    const h = await listRemoteHistory()
+    const commits = h.filter((e) => e.kind === 'commit')
+    const backups = h.filter((e) => e.kind === 'backup')
+    expect(commits).toHaveLength(2)
+    expect(backups).toHaveLength(1)
+    expect(backups[0]).toMatchObject({ side: 'remote', path: expect.stringMatching(/^backups\/.+-remote\.json$/) })
+    const dates = h.map((e) => e.date)
+    expect([...dates].sort().reverse()).toEqual(dates)
+  })
+
+  it('errori di rete', async () => {
+    gh.failCommitList = true
+    await expect(listRemoteHistory()).rejects.toThrow('GitHub 500')
+    gh.failCommitList = false
+    gh.failBackupList = true
+    await expect(listRemoteHistory()).rejects.toThrow('GitHub 500')
+  })
+
+  it('scarica la versione di un commit e il contenuto di un backup', async () => {
+    await addItem('Mele')
+    await autoSync()
+    const first = (await listRemoteHistory())[0]
+    await addItem('Pere')
+    await autoSync()
+    const old = await loadHistoryBackup(first)
+    expect(old.items.map((i) => i.name)).toEqual(['Mele'])
+
+    gh.files.set(PATH, JSON.stringify(await remoteWith('Kiwi')))
+    await syncPushForce()
+    const backup = (await listRemoteHistory()).find((e) => e.kind === 'backup')!
+    expect((await loadHistoryBackup(backup)).items.map((i) => i.name)).toEqual(['Kiwi'])
+  })
+
+  it('file non trovato o non valido', async () => {
+    await expect(loadHistoryBackup({ kind: 'backup', path: 'backups/x.json', date: '', side: 'local', sha: '' })).rejects.toThrow(
+      'File non trovato',
+    )
+    gh.files.set('backups/x.json', '{"foo":1}')
+    await expect(loadHistoryBackup({ kind: 'backup', path: 'backups/x.json', date: '', side: 'local', sha: '' })).rejects.toThrow(
+      'Backup non valido',
+    )
+  })
+})
+
+describe('restoreFromBackup', () => {
+  it('non configurato (via repo)', async () => {
+    store.clear()
+    await expect(restoreFromBackup(await remoteWith('Kiwi'), 'repo')).rejects.toThrow('Sync non configurato')
+  })
+
+  it('senza file remoto: crea il file con i dati ripristinati', async () => {
+    await addItem('Pere')
+    const res = await restoreFromBackup(await remoteWith('Kiwi'), 'repo')
+    expect(res).toEqual({ backupPath: null })
+    expect(gh.files.get(PATH)).toContain('Kiwi')
+    expect((await db.items.toArray()).map((i) => i.name)).toEqual(['Kiwi'])
+    expect(await getSafetySnapshots()).toHaveLength(1)
+  })
+
+  it('con il locale non ancora sincronizzato: un commit con dati ripristinati e backup del locale', async () => {
+    await addItem('Mele')
+    await autoSync()
+    await addItem('Pere')
+    const before = gh.commits
+    const res = await restoreFromBackup(await remoteWith('Kiwi'), 'repo')
+    expect(gh.commits).toBe(before + 1)
+    expect(res.backupPath).toMatch(/-local\.json$/)
+    expect(gh.files.get(res.backupPath!)).toContain('Pere')
+    expect(gh.files.get(PATH)).toContain('Kiwi')
+    expect(gh.log.at(-1)?.message).toMatch(/^Restore /)
+    expect((await db.items.toArray()).map((i) => i.name)).toEqual(['Kiwi'])
+    expect(await autoSync()).toEqual({ status: 'noop' })
+  })
+
+  it('con locale già sincronizzato: solo il file dei dati', async () => {
+    await addItem('Mele')
+    await autoSync()
+    const res = await restoreFromBackup(await remoteWith('Kiwi'), 'repo')
+    expect(res).toEqual({ backupPath: null })
+    expect(Object.keys(gh.log.at(-1)!.files)).toEqual([PATH])
+  })
+
+  it('con remoto avanzato e non scaricato: salva anche il backup del remoto', async () => {
+    await addItem('Mele')
+    await autoSync()
+    gh.files.set(PATH, JSON.stringify(await remoteWith('Altro')))
+    const res = await restoreFromBackup(await remoteWith('Kiwi'), 'repo')
+    expect(res.backupPath).toMatch(/-remote\.json$/)
+    expect(gh.files.get(res.backupPath!)).toContain('Altro')
+  })
+
+  it('con locale e remoto da salvare: due backup nello stesso commit, ritorna quello locale', async () => {
+    await addItem('Mele')
+    await autoSync()
+    await addItem('Pere')
+    gh.files.set(PATH, JSON.stringify(await remoteWith('Altro')))
+    const before = gh.commits
+    const res = await restoreFromBackup(await remoteWith('Kiwi'), 'repo')
+    expect(gh.commits).toBe(before + 1)
+    expect(res.backupPath).toMatch(/-local\.json$/)
+    expect(Object.keys(gh.log.at(-1)!.files).filter((f) => f.startsWith('backups/'))).toHaveLength(2)
+  })
+
+  it('con il locale ancora iniziale: niente copia né backup locale, ma il remoto non scaricato sì', async () => {
+    gh.files.set(PATH, JSON.stringify(await remoteWith('Altro')))
+    const res = await restoreFromBackup(await remoteWith('Kiwi'), 'repo')
+    expect(res.backupPath).toMatch(/-remote\.json$/)
+    expect(await getSafetySnapshots()).toEqual([])
+  })
+
+  it('se il commit non riesce il locale non cambia', async () => {
+    await addItem('Mele')
+    await autoSync()
+    await addItem('Pere')
+    gh.override = (m, u) => (m === 'POST' && u.endsWith('/git/trees') ? new Response('', { status: 401 }) : undefined)
+    await expect(restoreFromBackup(await remoteWith('Kiwi'), 'repo')).rejects.toThrow('GitHub 401')
+    expect((await db.items.toArray()).map((i) => i.name).sort()).toEqual(['Mele', 'Pere'])
+  })
+
+  it('via locale: copia di sicurezza e import, senza rete', async () => {
+    await addItem('Pere')
+    const res = await restoreFromBackup(await remoteWith('Kiwi'), 'local')
+    expect(res).toEqual({ backupPath: null })
+    expect(gh.calls).toEqual([])
+    expect((await db.items.toArray()).map((i) => i.name)).toEqual(['Kiwi'])
+    expect(await getSafetySnapshots()).toHaveLength(1)
+  })
+
+  it('via locale con dati iniziali: nessuna copia', async () => {
+    await restoreFromBackup(await remoteWith('Kiwi'), 'local')
+    expect(await getSafetySnapshots()).toEqual([])
   })
 })

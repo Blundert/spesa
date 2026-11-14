@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import type { BackupData } from '../db/backup'
 import { SEED_CATEGORIES } from '../db/db'
-import { backupPath, isInitialData } from './syncBackup'
+import { backupPath, isInitialData, parseBackupPath } from './syncBackup'
 
 function initial(): BackupData {
   return {
@@ -25,6 +25,19 @@ describe('backupPath', () => {
   it('toglie ":" e "." dal timestamp', () => {
     expect(backupPath('2026-11-14T18:52:11.440Z', 'remote')).toBe('backups/2026-11-14T18-52-11-440Z-remote.json')
     expect(backupPath('2026-11-14T18:52:11.440Z', 'local')).toBe('backups/2026-11-14T18-52-11-440Z-local.json')
+  })
+})
+
+describe('parseBackupPath', () => {
+  it('è l’inverso di backupPath', () => {
+    const iso = '2026-11-14T18:52:11.440Z'
+    expect(parseBackupPath(backupPath(iso, 'remote'))).toEqual({ iso, side: 'remote' })
+    expect(parseBackupPath(backupPath(iso, 'local'))).toEqual({ iso, side: 'local' })
+  })
+
+  it('ignora i file che non sono backup', () => {
+    expect(parseBackupPath('backups/note.json')).toBeNull()
+    expect(parseBackupPath('spesa-db.json')).toBeNull()
   })
 })
 

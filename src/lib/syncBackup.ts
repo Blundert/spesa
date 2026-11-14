@@ -39,3 +39,12 @@ export function isInitialData(data: BackupData): boolean {
       lists[0].archivedAt === null)
   )
 }
+
+const BACKUP_NAME = /^backups\/(\d{4}-\d{2}-\d{2})T(\d{2})-(\d{2})-(\d{2})-(\d{3})Z-(local|remote)\.json$/
+
+/** Inverso di `backupPath`: data (ISO) e lato di un file di backup, o null se non è uno dei nostri. */
+export function parseBackupPath(path: string): { iso: string; side: BackupSide } | null {
+  const m = BACKUP_NAME.exec(path)
+  if (!m) return null
+  return { iso: `${m[1]}T${m[2]}:${m[3]}:${m[4]}.${m[5]}Z`, side: m[6] as BackupSide }
+}

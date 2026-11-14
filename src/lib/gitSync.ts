@@ -1,6 +1,6 @@
 import { exportData, importData, isBackupData, type BackupData } from '../db/backup'
 import { saveSafetySnapshot } from '../db/repositories/safetySnapshots'
-import { backupPath, isInitialData } from './syncBackup'
+import { backupPath, isInitialData, parseBackupPath, type BackupSide } from './syncBackup'
 
 // ─── Config (in localStorage) ────────────────────────────────────────────────
 
@@ -106,9 +106,13 @@ interface RemoteFile {
   text: string
 }
 
-/** GET del file remoto: ritorna sha + contenuto, o null se non esiste (404). */
-async function getRemoteFile(c: GitConfig): Promise<RemoteFile | null> {
-  const res = await fetch(`${contentsUrl(c)}?ref=${encodeURIComponent(c.branch)}`, {
+/** GET di un file del repo (di default il file dei dati sul branch): sha + contenuto, o null se non esiste (404). */
+async function getRemoteFile(
+  c: GitConfig,
+  path: string = c.path,
+  ref: string = c.branch,
+): Promise<RemoteFile | null> {
+  const res = await fetch(`${contentsUrl({ ...c, path })}?ref=${encodeURIComponent(ref)}`, {
     headers: authHeaders(c.token),
   })
   if (res.status === 404) return null
@@ -360,5 +364,112 @@ export async function syncPull(): Promise<SyncResult> {
   }
   await importData(parsed)
   rememberSynced(contentHash(parsed), remote.sha)
+  return { backupPath: path }
+}
+
+// ─── Cronologia e ripristino ─────────────────────────────────────────────────
+
+export type HistoryEntry =
+  | { kind: 'commit'; sha: string; date: string; message: string }
+  | { kind: 'backup'; path: string; date: string; side: BackupSide; sha: string }
+
+const HISTORY_PAGE = 50
+
+/**
+ * Cronologia remota: i commit che hanno toccato il file dei dati + i file in `backups/`.
+ * Dal più recente al più vecchio.
+ */
+export async function listRemoteHistory(): Promise<HistoryEntry[]> {
+  const c = getGitConfig()
+  if (!isGitConfigured(c)) throw new Error('Sync non configurato')
+  const repo = `${API}/repos/${c.owner}/${c.repo}`
+  const commits = await githubJson<
+    Array<{ sha: string; commit: { message: string; author: { date: string } } }>
+  >(
+    c,
+    `${repo}/commits?sha=${encodeURIComponent(c.branch)}&path=${encodeURIComponent(c.path)}&per_page=${HISTORY_PAGE}`,
+    'GET',
+  )
+  const entries: HistoryEntry[] = commits.map((k) => ({
+    kind: 'commit',
+    sha: k.sha,
+    date: k.commit.author.date,
+    message: k.commit.message,
+  }))
+
+  // Senza cartella backups/ GitHub risponde 404: nessun backup, non è un errore.
+  const res = await fetch(`${repo}/contents/backups?ref=${encodeURIComponent(c.branch)}`, {
+    headers: authHeaders(c.token),
+  })
+  if (res.ok) {
+    const files = (await res.json()) as Array<{ path: string; sha: string }>
+    for (const f of files) {
+      const parsed = parseBackupPath(f.path)
+      if (parsed) entries.push({ kind: 'backup', path: f.path, date: parsed.iso, side: parsed.side, sha: f.sha })
+    }
+  } else if (res.status !== 404) {
+    throw new GithubError(res.status, (await res.text()).slice(0, 160))
+  }
+  return entries.sort((a, b) => b.date.localeCompare(a.date))
+}
+
+/** Scarica e valida il backup che sta dietro una voce della cronologia. */
+export async function loadHistoryBackup(entry: HistoryEntry): Promise<BackupData> {
+  const c = getGitConfig()
+  if (!isGitConfigured(c)) throw new Error('Sync non configurato')
+  const file =
+    entry.kind === 'commit'
+      ? await getRemoteFile(c, c.path, entry.sha)
+      : await getRemoteFile(c, entry.path)
+  if (file === null) throw new Error('File non trovato nel repository')
+  const parsed: unknown = JSON.parse(file.text)
+  if (!isBackupData(parsed)) throw new Error('Backup non valido')
+  return parsed
+}
+
+/**
+ * Ripristina `data` come stato attuale. Con `via: 'repo'` crea UN commit nuovo sopra la cronologia
+ * (mai riscritta) con i dati ripristinati e, se serve, i backup di ciò che si sostituisce (locale non
+ * ancora sincronizzato, remoto non ancora scaricato). Bloccante: se il commit fallisce il locale
+ * resta com'è. Con `via: 'local'` (copie di sicurezza, senza sync) sostituisce solo il locale.
+ */
+export async function restoreFromBackup(data: BackupData, via: 'repo' | 'local'): Promise<SyncResult> {
+  const local = await exportData()
+  const localJson = JSON.stringify(local, null, 2)
+  const hasLocalData = !isInitialData(local)
+
+  if (via === 'local') {
+    if (hasLocalData) await saveSafetySnapshot('restore', localJson)
+    await importData(data)
+    return { backupPath: null }
+  }
+
+  const c = getGitConfig()
+  if (!isGitConfigured(c)) throw new Error('Sync non configurato')
+  const json = JSON.stringify(data, null, 2)
+  const remote = await getRemoteFile(c)
+  const iso = isoStamp()
+  const message = `Restore ${iso}`
+  let path: string | null = null
+  let newSha: string
+  if (hasLocalData) await saveSafetySnapshot('restore', localJson)
+
+  if (remote === null) {
+    newSha = await putFile(c, json, message, null)
+  } else {
+    const files: GitFile[] = [{ path: c.path, content: json }]
+    if (hasLocalData && contentHash(local) !== localStorage.getItem(HASH_KEY)) {
+      path = backupPath(iso, 'local')
+      files.push({ path, content: localJson })
+    }
+    if (remote.sha !== localStorage.getItem(SHA_KEY)) {
+      const remotePath = backupPath(iso, 'remote')
+      path ??= remotePath
+      files.push({ path: remotePath, content: remote.text })
+    }
+    newSha = (await commitFiles(c, files, message))[c.path]
+  }
+  await importData(data)
+  rememberSynced(contentHash(data), newSha)
   return { backupPath: path }
 }
