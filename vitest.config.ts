@@ -32,6 +32,7 @@ export default defineConfig({
         'src/db/repositories/shoppingLists.ts',
         'src/db/repositories/safetySnapshots.ts',
         'src/lib/syncBackup.ts',
+        'src/lib/backupDiff.ts',
         'src/lib/gitSync.ts',
         'src/lib/syncRunner.ts',
       ],
