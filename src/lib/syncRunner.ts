@@ -1,7 +1,8 @@
 import { toast } from 'sonner'
 import i18n from 'i18next'
 import type { QueryClient } from '@tanstack/react-query'
-import { autoSync, syncPull, syncPushForce, type SyncResult } from './gitSync'
+import { autoSync, type SyncResult } from './gitSync'
+import { openMerge } from './mergeNav'
 
 let inFlight = false
 
@@ -12,35 +13,13 @@ export function toastWithBackup(message: string, res: SyncResult): void {
   else toast(message)
 }
 
-/** Mostra un toast persistente per risolvere un conflitto: tieni locale ↔ scarica remoto. */
-function showConflictToast(qc: QueryClient): void {
+/** Toast persistente per il conflitto: porta alla schermata di unione, dove si sceglie cosa tenere. */
+function showConflictToast(): void {
   const t = i18n.t.bind(i18n)
   toast.warning(t('settings.syncConflict'), {
     id: 'sync-conflict', // evita duplicati
     duration: Infinity,
-    action: {
-      label: t('settings.syncConflictPull'),
-      onClick: () => {
-        void syncPull()
-          .then(async (res) => {
-            await qc.invalidateQueries()
-            toastWithBackup(t('settings.syncPulled'), res)
-          })
-          .catch((e: unknown) =>
-            toast.error(`${t('settings.syncError')}: ${e instanceof Error ? e.message : ''}`),
-          )
-      },
-    },
-    cancel: {
-      label: t('settings.syncConflictKeepLocal'),
-      onClick: () => {
-        void syncPushForce()
-          .then((res) => toastWithBackup(t('settings.syncDone'), res))
-          .catch((e: unknown) =>
-            toast.error(`${t('settings.syncError')}: ${e instanceof Error ? e.message : ''}`),
-          )
-      },
-    },
+    action: { label: t('syncMerge.review'), onClick: openMerge },
   })
 }
 
@@ -64,7 +43,7 @@ export async function runSync(qc: QueryClient, opts?: { announce?: boolean }): P
         if (announce) toast(t('settings.syncDone'))
         break
       case 'conflict':
-        showConflictToast(qc)
+        showConflictToast()
         break
       case 'noop':
         if (announce) toast(t('settings.syncUpToDate'))

@@ -8,6 +8,7 @@ import { DesktopCatalogoScreen } from './screens/DesktopCatalogoScreen'
 import { DesktopStoricoScreen } from './screens/DesktopStoricoScreen'
 import { DesktopImpostazioniScreen } from './screens/DesktopImpostazioniScreen'
 import { DesktopSincronizzazioneScreen } from './screens/DesktopSincronizzazioneScreen'
+import { DesktopUnisciScreen } from './screens/DesktopUnisciScreen'
 
 import { DesktopListaScreen } from './screens/DesktopListaScreen'
 import { DesktopListeScreen } from './screens/DesktopListeScreen'
@@ -56,6 +57,12 @@ const sincronizzazioneRoute = createRoute({
   getParentRoute: () => shellRoute,
   path: '/sincronizzazione',
   component: DesktopSincronizzazioneScreen,
+})
+
+const unisciRoute = createRoute({
+  getParentRoute: () => shellRoute,
+  path: '/sincronizzazione/unisci',
+  component: DesktopUnisciScreen,
 })
 
 const impostazioniRoute = createRoute({
@@ -146,6 +153,7 @@ const routeTree = rootRoute.addChildren([
     storicoRoute,
     impostazioniRoute,
     sincronizzazioneRoute,
+    unisciRoute,
     listaRoute,
     listeRoute,
     pastiRoute,

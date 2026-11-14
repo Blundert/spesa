@@ -6,8 +6,10 @@ vi.mock('sonner', () => ({ toast: toastFn }))
 vi.mock('i18next', () => ({
   default: { t: (key: string, o?: { path?: string }) => (o?.path ? `${key}:${o.path}` : key) },
 }))
-const sync = { autoSync: vi.fn(), syncPull: vi.fn(), syncPushForce: vi.fn() }
+const sync = { autoSync: vi.fn() }
 vi.mock('./gitSync', () => sync)
+const nav = { openMerge: vi.fn() }
+vi.mock('./mergeNav', () => nav)
 
 const { runSync, toastWithBackup } = await import('./syncRunner')
 
@@ -16,14 +18,6 @@ const qc = { invalidateQueries: vi.fn(async () => {}) } as unknown as QueryClien
 beforeEach(() => {
   vi.clearAllMocks()
 })
-
-type ConflictOpts = { action: { onClick: () => void }; cancel: { onClick: () => void } }
-async function conflictOpts(): Promise<ConflictOpts> {
-  sync.autoSync.mockResolvedValue({ status: 'conflict' })
-  await runSync(qc)
-  return toastFn.warning.mock.calls[0][1] as ConflictOpts
-}
-const flush = () => new Promise((r) => setTimeout(r, 0))
 
 describe('toastWithBackup', () => {
   it('con backup indica il file', () => {
@@ -87,48 +81,15 @@ describe('runSync', () => {
 })
 
 describe('conflitto', () => {
-  it('"Usa remoto": scarica, aggiorna e mostra il backup salvato', async () => {
-    const o = await conflictOpts()
-    sync.syncPull.mockResolvedValue({ backupPath: 'backups/l.json' })
-    o.action.onClick()
-    await flush()
-    expect(qc.invalidateQueries).toHaveBeenCalled()
-    expect(toastFn).toHaveBeenCalledWith('settings.syncPulled', {
-      description: 'settings.syncBackupSaved:backups/l.json',
-    })
-  })
-
-  it('"Usa remoto": un errore (anche di backup) viene mostrato', async () => {
-    const o = await conflictOpts()
-    sync.syncPull.mockRejectedValue(new Error('GitHub 401'))
-    o.action.onClick()
-    await flush()
-    expect(toastFn.error).toHaveBeenCalledWith('settings.syncError: GitHub 401')
-    sync.syncPull.mockRejectedValue('x')
-    o.action.onClick()
-    await flush()
-    expect(toastFn.error).toHaveBeenLastCalledWith('settings.syncError: ')
-  })
-
-  it('"Mantieni": un commit e toast con il backup del remoto', async () => {
-    const o = await conflictOpts()
-    sync.syncPushForce.mockResolvedValue({ backupPath: 'backups/r.json' })
-    o.cancel.onClick()
-    await flush()
-    expect(toastFn).toHaveBeenCalledWith('settings.syncDone', {
-      description: 'settings.syncBackupSaved:backups/r.json',
-    })
-  })
-
-  it('"Mantieni": errore mostrato', async () => {
-    const o = await conflictOpts()
-    sync.syncPushForce.mockRejectedValue(new Error('Il remoto è cambiato'))
-    o.cancel.onClick()
-    await flush()
-    expect(toastFn.error).toHaveBeenCalledWith('settings.syncError: Il remoto è cambiato')
-    sync.syncPushForce.mockRejectedValue('x')
-    o.cancel.onClick()
-    await flush()
-    expect(toastFn.error).toHaveBeenLastCalledWith('settings.syncError: ')
+  it('toast persistente con un solo pulsante che apre la schermata di unione', async () => {
+    sync.autoSync.mockResolvedValue({ status: 'conflict' })
+    await runSync(qc)
+    expect(toastFn.warning).toHaveBeenCalledOnce()
+    const [text, opts] = toastFn.warning.mock.calls[0] as [string, { id: string; duration: number; action: { label: string; onClick: () => void } }]
+    expect(text).toBe('settings.syncConflict')
+    expect(opts).toMatchObject({ id: 'sync-conflict', duration: Infinity })
+    expect(opts.action.label).toBe('syncMerge.review')
+    opts.action.onClick()
+    expect(nav.openMerge).toHaveBeenCalledOnce()
   })
 })

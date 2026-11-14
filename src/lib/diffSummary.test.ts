@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest'
 import { TABLE_NAMES, type BackupDiff } from './backupDiff'
 import { summarizeDiff } from './diffSummary'
 
-const row = (key: string) => ({ key, label: key, fields: {} })
+const row = (key: string) => ({ id: 1, key, label: key, fields: {} })
 
 function emptyDiff(): BackupDiff {
   return Object.fromEntries(TABLE_NAMES.map((t) => [t, { added: [], removed: [], modified: [] }])) as unknown as BackupDiff

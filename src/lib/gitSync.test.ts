@@ -7,6 +7,7 @@ import {
   autoSync,
   getAutoSync,
   listRemoteHistory,
+  loadRemoteBackup,
   loadHistoryBackup,
   restoreFromBackup,
   getGitConfig,
@@ -14,7 +15,6 @@ import {
   setAutoSync,
   setGitConfig,
   syncPull,
-  syncPushForce,
 } from './gitSync'
 
 const CONFIG = { token: 't', owner: 'me', repo: 'spesa', branch: 'main', path: 'spesa-db.json' }
@@ -225,61 +225,61 @@ describe('lettura del file remoto', () => {
   })
 })
 
-describe('syncPushForce ("Mantieni")', () => {
-  it('non configurato', async () => {
-    store.clear()
-    await expect(syncPushForce()).rejects.toThrow('Sync non configurato')
-  })
-
-  it('senza remoto crea il file, senza backup', async () => {
-    await addItem('Mele')
-    expect(await syncPushForce()).toEqual({ backupPath: null })
-    expect(gh.files.get(PATH)).toContain('Mele')
-  })
-
-  it('un solo commit con dati nuovi e backup del remoto scartato', async () => {
-    await addItem('Mele')
-    await autoSync()
-    const remoteJson = JSON.stringify(await remoteWith('Kiwi'))
-    gh.files.set(PATH, remoteJson)
-    await addItem('Pere')
-    const before = gh.commits
-
-    const res = await syncPushForce()
-
-    expect(gh.commits).toBe(before + 1)
-    expect(res.backupPath).toMatch(/^backups\/.+-remote\.json$/)
-    expect(gh.files.get(res.backupPath!)).toBe(remoteJson)
-    expect(gh.files.get(PATH)).toContain('Pere')
-    // lo stato è ricordato: ora è tutto allineato
-    expect(await autoSync()).toEqual({ status: 'noop' })
-  })
-
-  it('se il branch è avanzato nel frattempo non scrive niente e lo dice', async () => {
+describe('scrittura atomica (commit unico)', () => {
+  const diverged = async () => {
     await addItem('Mele')
     await autoSync()
     await addItem('Pere')
     gh.files.set(PATH, JSON.stringify(await remoteWith('Kiwi')))
+  }
+
+  it('un solo commit con i dati e i backup di locale e remoto', async () => {
+    await diverged()
+    const before = gh.commits
+    await restoreFromBackup(await remoteWith('Unito'), 'repo', 'Merge')
+    expect(gh.commits).toBe(before + 1)
+    expect(gh.log.at(-1)?.message).toMatch(/^Merge /)
+    expect(Object.keys(gh.log.at(-1)!.files).filter((f) => f.startsWith('backups/')).sort()).toHaveLength(2)
+    expect(gh.files.get(PATH)).toContain('Unito')
+    expect(await autoSync()).toEqual({ status: 'noop' })
+  })
+
+  it('se il branch è avanzato nel frattempo non scrive niente e lo dice', async () => {
+    await diverged()
     gh.rejectRefUpdate = true
     const before = gh.commits
-    await expect(syncPushForce()).rejects.toThrow('Il remoto è cambiato durante il salvataggio')
+    await expect(restoreFromBackup(await remoteWith('Unito'), 'repo')).rejects.toThrow(
+      'Il remoto è cambiato durante il salvataggio',
+    )
     expect(gh.commits).toBe(before)
+    expect((await db.items.toArray()).map((i) => i.name).sort()).toEqual(['Mele', 'Pere'])
   })
 
   it('rilancia gli altri errori', async () => {
-    await addItem('Mele')
-    await autoSync()
+    await diverged()
     gh.override = (m, u) => (m === 'POST' && u.endsWith('/git/trees') ? new Response('no', { status: 403 }) : undefined)
-    await expect(syncPushForce()).rejects.toThrow('GitHub 403: no')
+    await expect(restoreFromBackup(await remoteWith('Unito'), 'repo')).rejects.toThrow('GitHub 403: no')
     gh.override = (m) => (m === 'PATCH' ? new TypeError('offline') : undefined)
-    await expect(syncPushForce()).rejects.toThrow('offline')
+    await expect(restoreFromBackup(await remoteWith('Unito'), 'repo')).rejects.toThrow('offline')
   })
 
   it('risposta senza i file dell’albero', async () => {
-    await addItem('Mele')
-    await autoSync()
+    await diverged()
     gh.omitTreeEntries = true
-    await expect(syncPushForce()).rejects.toThrow('risposta incompleta')
+    await expect(restoreFromBackup(await remoteWith('Unito'), 'repo')).rejects.toThrow('risposta incompleta')
+  })
+})
+
+describe('loadRemoteBackup', () => {
+  it('non configurato / senza file / non valido / valido', async () => {
+    store.clear()
+    await expect(loadRemoteBackup()).rejects.toThrow('Sync non configurato')
+    setGitConfig(CONFIG)
+    await expect(loadRemoteBackup()).rejects.toThrow('Nessun backup remoto')
+    gh.files.set(PATH, '{"foo":1}')
+    await expect(loadRemoteBackup()).rejects.toThrow('Backup remoto non valido')
+    gh.files.set(PATH, JSON.stringify(await remoteWith('Kiwi')))
+    expect((await loadRemoteBackup()).items.map((i) => i.name)).toEqual(['Kiwi'])
   })
 })
 
@@ -361,13 +361,13 @@ describe('cronologia', () => {
     await addItem('Pere')
     gh.files.set(PATH, JSON.stringify(await remoteWith('Kiwi')))
     gh.files.set('backups/non-nostro.json', 'x')
-    await syncPushForce() // commit 2: dati + backups/…-remote.json
+    await restoreFromBackup(await remoteWith('Unito'), 'repo') // commit 2: dati + backups/
     const h = await listRemoteHistory()
     const commits = h.filter((e) => e.kind === 'commit')
     const backups = h.filter((e) => e.kind === 'backup')
     expect(commits).toHaveLength(2)
-    expect(backups).toHaveLength(1)
-    expect(backups[0]).toMatchObject({ side: 'remote', path: expect.stringMatching(/^backups\/.+-remote\.json$/) })
+    expect(backups).toHaveLength(2)
+    expect(backups.map((b) => (b.kind === 'backup' ? b.side : '')).sort()).toEqual(['local', 'remote'])
     const dates = h.map((e) => e.date)
     expect([...dates].sort().reverse()).toEqual(dates)
   })
@@ -390,8 +390,8 @@ describe('cronologia', () => {
     expect(old.items.map((i) => i.name)).toEqual(['Mele'])
 
     gh.files.set(PATH, JSON.stringify(await remoteWith('Kiwi')))
-    await syncPushForce()
-    const backup = (await listRemoteHistory()).find((e) => e.kind === 'backup')!
+    await restoreFromBackup(await remoteWith('Unito'), 'repo')
+    const backup = (await listRemoteHistory()).find((e) => e.kind === 'backup' && e.side === 'remote')!
     expect((await loadHistoryBackup(backup)).items.map((i) => i.name)).toEqual(['Kiwi'])
   })
 

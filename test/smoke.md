@@ -342,10 +342,10 @@ Nota: il service worker è attivo solo in build di produzione (`npm run build` +
 ### Flusso 39 — Sync: backup della scelta scartata (mobile e desktop)
 Serve un repo GitHub di prova con token (Impostazioni → Sincronizzazione) e due dispositivi, o due profili del browser.
 1. Dispositivo A: "Sincronizza ora" → nel repo compare `spesa-db.json`. Dispositivo B (profilo nuovo, solo dati iniziali): "Sincronizza ora" → scarica direttamente il remoto, senza toast di conflitto
-2. Modifica qualcosa su A e su B (due articoli diversi), poi sincronizza da B → compare il toast "Dati diversi qui e sul remoto" con "Usa remoto" / "Mantieni", senza scrivere nulla nel repo
-3. "Mantieni" → toast "Sincronizzato" con la riga "Copia dei dati scartati salvata in backups/…-remote.json". Nel repo c'è UN solo commit nuovo ("Keep local, back up remote …") che contiene `spesa-db.json` aggiornato e il file in `backups/` col vecchio remoto
-4. Rifai il conflitto e scegli "Usa remoto" → toast "Dati scaricati" con "…backups/…-local.json". Nel repo un commit "Back up local before using remote …" che aggiunge solo il file di backup (`spesa-db.json` invariato); l'app ora ha i dati del remoto
-5. "Usa remoto" con il token revocato (o offline): errore nel toast e i dati locali NON cambiano
+2. Modifica qualcosa su A e su B (due articoli diversi), poi sincronizza da B → compare il toast "Dati diversi qui e sul remoto" con il solo pulsante "Rivedi e unisci" (vedi Flusso 42), senza scrivere nulla nel repo
+3. Dalla schermata di unione scegli "Tutto locale" e applica → UN solo commit ("Merge …") con `spesa-db.json` aggiornato e in `backups/` le copie di locale e remoto scartati; toast "Unione applicata"
+4. Rifai il conflitto e scegli "Tutto remoto" → stesso commit unico, con i dati del remoto; l'app ora ha i dati del remoto
+5. "Scarica da remoto" o "Applica unione" con il token revocato (o offline): errore nel toast e i dati locali NON cambiano
 6. "Scarica da remoto" in Impostazioni (con locale modificato dall'ultimo sync) → stesso backup `…-local.json`; con locale invariato dall'ultimo sync non crea nessun commit
 7. Se il remoto cambia mentre si salva il backup compare "Il remoto è cambiato durante il salvataggio: riprova" e non si scrive nulla
 8. Importa un file di backup da Impostazioni → i dati vengono sostituiti; in DevTools → Application → IndexedDB → spesa → safetySnapshots c'è la copia di prima (massimo 10)
@@ -369,4 +369,15 @@ Serve un repo GitHub di prova con almeno due commit di `spesa-db.json` (e, per i
 7. Ripristino con token revocato: errore e dati locali invariati. Una copia di sicurezza locale si ripristina senza rete e senza commit
 8. "Guida": sette accordion, tutti chiusi all'apertura della pagina; ognuno si apre e si chiude da solo
 9. Navigazione: la pagina si apre con scorrimento laterale dal menu e ‹ torna alla sezione principale; tra pagine del menu è dissolvenza. Cambiando tema (es. Scuro) e passando fra mobile e desktop resta leggibile
+
+### Flusso 42 — Unione dei dati con anteprima (mobile e desktop)
+Serve un repo di prova e due dispositivi con modifiche diverse (es. una settimana solo su uno, un articolo nuovo sull'altro).
+1. In caso di conflitto il toast ha un solo pulsante "Rivedi e unisci" e resta finché non lo tocchi; lo stesso schermo si apre anche da Sincronizzazione → "Confronta e unisci" (disattivato senza repo configurato)
+2. Mobile: la schermata ha ‹ che torna a Sincronizzazione, le scorciatoie "Tieni tutto / Tutto locale / Tutto remoto" e i gruppi per tipo (Settimane, Liste, Articoli, Negozi, Categorie, Piatti) con contatore. Desktop: gruppi a sinistra, "Risultato" fisso a destra, pulsante "Indietro"
+3. Ogni gruppo mostra stato ("Solo su questo dispositivo", "Solo nel repository", "Diverso"), cosa contiene da una parte e dall'altra (es. "Spese 3 · Acquisti 32") e i pulsanti di scelta: Tieni/Togli, Non portare/Porta qui; per le settimane presenti da entrambe le parti anche Unione/Locale/Remoto
+4. Di partenza è selezionato "tieni tutto" e il risultato mostra solo cose che si aggiungono (nessuna sparisce). Cambia una scelta (es. "Togli" su una settimana) → il risultato si aggiorna subito: "Sparirebbero" per quella settimana, su questo dispositivo e/o nel repository
+5. Una settimana portata dal remoto con articoli, negozio o piatti che qui non esistono li aggiunge da sola, anche se il loro gruppo è su "Non portare"
+6. Se i due lati coincidono: "I dati … coincidono: non c'è niente da unire." Se la lettura del remoto fallisce: messaggio di errore
+7. "Applica unione" → conferma → toast "Unione applicata" (con il backup salvato) e si torna a Sincronizzazione. Nel repo UN commit "Merge …" con il file dei dati e i file in `backups/` (locale e remoto); le spese portate hanno id nuovi e gli acquisti restano collegati; le statistiche degli articoli sono coerenti con gli acquisti
+8. Con il token revocato o il branch avanzato nel frattempo: errore e dati locali invariati
 

@@ -2,6 +2,18 @@ export type ChangelogEntry = { it: string[]; en: string[] }
 
 // Ordine: più recente in cima. Aggiungere una entry ad ogni nuova versione.
 export const changelog: Record<string, ChangelogEntry> = {
+  '0.47.0': {
+    it: [
+      'Conflitti di sincronizzazione: invece di due soli pulsanti ("Mantieni" / "Usa remoto"), l\'avviso ti porta a una schermata di unione. Le differenze sono raggruppate per settimana e per elemento (articoli, negozi, liste, piatti): di partenza si tiene tutto, quindi non si perde niente, e per ogni gruppo puoi scegliere cosa tenere (per le settimane presenti da entrambe le parti c\'è anche "Unione")',
+      'Scorciatoie "Tieni tutto", "Tutto locale" e "Tutto remoto", e il risultato in anteprima, su questo dispositivo e nel repository, prima di applicare. Applicando, i due lati diventano uguali con un solo commit, dopo aver salvato in backups/ una copia di entrambe le versioni',
+      'L\'unione si apre anche quando vuoi, dal pulsante "Confronta e unisci" nella pagina Sincronizzazione. Le statistiche degli articoli (ultimo prezzo, prezzo medio, quantità) vengono ricalcolate dagli acquisti',
+    ],
+    en: [
+      'Sync conflicts: instead of just two buttons ("Keep" / "Use remote"), the notice takes you to a merge screen. Differences are grouped by week and by element (items, stores, lists, dishes): by default everything is kept, so nothing is lost, and for each group you choose what to keep (for weeks present on both sides there is also "Merge")',
+      'Shortcuts "Keep everything", "All local" and "All remote", and a preview of the result, on this device and in the repository, before applying. Applying makes both sides equal with a single commit, after saving a copy of both versions in backups/',
+      'You can also open the merge whenever you like, from the "Compare and merge" button on the Sync page. Item stats (last price, average price, quantity) are recalculated from the purchases',
+    ],
+  },
   '0.46.0': {
     it: [
       'Nuova pagina "Sincronizzazione" (menu → Gestisci, e nella barra laterale su desktop): ci sono ora il collegamento a GitHub, "Sincronizza ora", "Scarica da remoto" e il sync automatico, che prima stavano in Impostazioni (dove resta un link)',

@@ -7,6 +7,7 @@ import { weekSpendSummary } from '../lib/budgetSelectors'
 import { useWeekBudget, useSessionsByWeek, useCreateSession } from '../hooks/useShopping'
 import { useSupermarkets } from '../hooks/useItems'
 import { useAutoSync } from '../hooks/useAutoSync'
+import { useMergeNavigator } from '../hooks/useMergeNavigator'
 import { useActiveList } from '../hooks/useShoppingLists'
 import { getDebugViewport, onDebugViewportChange } from '../lib/debugFlag'
 import { getDefaultBuonoValueCents } from '../lib/buoniSettings'
@@ -51,6 +52,7 @@ export function AppShell() {
   const href = useRouterState({ select: (s) => s.location.href })
 
   useAutoSync()
+  useMergeNavigator()
   useEffect(() => rememberPrimary(pathname, href), [pathname, href])
 
   // Animazione della pagina che entra, calcolata confrontando con il percorso precedente.

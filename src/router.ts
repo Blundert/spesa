@@ -9,6 +9,7 @@ import { ListeScreen } from './screens/ListeScreen'
 import { SupermercatiScreen } from './screens/SupermercatiScreen'
 import { ImpostazioniScreen } from './screens/ImpostazioniScreen'
 import { SincronizzazioneScreen } from './screens/SincronizzazioneScreen'
+import { UnisciScreen } from './screens/UnisciScreen'
 import { PastiScreen } from './screens/PastiScreen'
 import { PianificazioniScreen } from './screens/PianificazioniScreen'
 import { SessioneScreen } from './screens/SessioneScreen'
@@ -71,6 +72,12 @@ const sincronizzazioneRoute = createRoute({
   getParentRoute: () => shellRoute,
   path: '/sincronizzazione',
   component: SincronizzazioneScreen,
+})
+
+const unisciRoute = createRoute({
+  getParentRoute: () => shellRoute,
+  path: '/sincronizzazione/unisci',
+  component: UnisciScreen,
 })
 
 const cataloRoute = createRoute({
@@ -155,6 +162,7 @@ const routeTree = rootRoute.addChildren([
     statisticheRoute,
     impostazioniRoute,
     sincronizzazioneRoute,
+    unisciRoute,
     pianificazioniRoute,
     sessioneRoute,
     itemDetailRoute,

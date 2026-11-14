@@ -1,10 +1,12 @@
 import { Outlet } from '@tanstack/react-router'
 import { useAutoSync } from '../../hooks/useAutoSync'
+import { useMergeNavigator } from '../../hooks/useMergeNavigator'
 import { Sidebar } from './Sidebar'
 
 export function DesktopShell() {
   // Stesso sync automatico del mobile (apertura, ogni 3 minuti, in background).
   useAutoSync()
+  useMergeNavigator()
   return (
     <div
       className="desktop-root"

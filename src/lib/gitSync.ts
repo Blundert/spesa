@@ -309,35 +309,6 @@ export interface SyncResult {
 }
 
 /**
- * Forza il locale come verità ("Mantieni"): UN commit con il nuovo file di dati e il backup del
- * remoto scartato in `backups/`, così non esiste uno stato con il remoto sovrascritto e senza copia.
- */
-export async function syncPushForce(): Promise<SyncResult> {
-  const c = getGitConfig()
-  if (!isGitConfigured(c)) throw new Error('Sync non configurato')
-  const data = await exportData()
-  const json = JSON.stringify(data, null, 2)
-  const remote = await getRemoteFile(c)
-  if (remote === null) {
-    const newSha = await putFile(c, json, `Backup ${isoStamp()}`, null)
-    rememberSynced(contentHash(data), newSha)
-    return { backupPath: null }
-  }
-  const iso = isoStamp()
-  const path = backupPath(iso, 'remote')
-  const shas = await commitFiles(
-    c,
-    [
-      { path: c.path, content: json },
-      { path, content: remote.text },
-    ],
-    `Keep local, back up remote ${iso}`,
-  )
-  rememberSynced(contentHash(data), shas[c.path])
-  return { backupPath: path }
-}
-
-/**
  * Forza il remoto come verità ("Usa remoto", "Scarica da remoto"): prima il backup del locale
  * scartato nel repo (bloccante: se fallisce il locale non viene toccato), poi l'import.
  * Il backup nel repo si salta se il locale è ancora quello dell'ultimo sync (è già nella cronologia)
@@ -413,6 +384,17 @@ export async function listRemoteHistory(): Promise<HistoryEntry[]> {
   return entries.sort((a, b) => b.date.localeCompare(a.date))
 }
 
+/** Scarica e valida la versione attuale del file dei dati sul remoto (per il confronto e l'unione). */
+export async function loadRemoteBackup(): Promise<BackupData> {
+  const c = getGitConfig()
+  if (!isGitConfigured(c)) throw new Error('Sync non configurato')
+  const file = await getRemoteFile(c)
+  if (file === null) throw new Error('Nessun backup remoto')
+  const parsed: unknown = JSON.parse(file.text)
+  if (!isBackupData(parsed)) throw new Error('Backup remoto non valido')
+  return parsed
+}
+
 /** Scarica e valida il backup che sta dietro una voce della cronologia. */
 export async function loadHistoryBackup(entry: HistoryEntry): Promise<BackupData> {
   const c = getGitConfig()
@@ -433,7 +415,11 @@ export async function loadHistoryBackup(entry: HistoryEntry): Promise<BackupData
  * ancora sincronizzato, remoto non ancora scaricato). Bloccante: se il commit fallisce il locale
  * resta com'è. Con `via: 'local'` (copie di sicurezza, senza sync) sostituisce solo il locale.
  */
-export async function restoreFromBackup(data: BackupData, via: 'repo' | 'local'): Promise<SyncResult> {
+export async function restoreFromBackup(
+  data: BackupData,
+  via: 'repo' | 'local',
+  label = 'Restore',
+): Promise<SyncResult> {
   const local = await exportData()
   const localJson = JSON.stringify(local, null, 2)
   const hasLocalData = !isInitialData(local)
@@ -449,7 +435,7 @@ export async function restoreFromBackup(data: BackupData, via: 'repo' | 'local')
   const json = JSON.stringify(data, null, 2)
   const remote = await getRemoteFile(c)
   const iso = isoStamp()
-  const message = `Restore ${iso}`
+  const message = `${label} ${iso}`
   let path: string | null = null
   let newSha: string
   if (hasLocalData) await saveSafetySnapshot('restore', localJson)

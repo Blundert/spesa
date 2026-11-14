@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useNavigate } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 import { BackButton } from '../components/BackButton'
 import { BottomSheet } from '../components/BottomSheet'
@@ -15,6 +16,7 @@ const SECTION_LABEL = 'text-[12px] font-normal tracking-[1.2px] text-t-muted upp
 export function SincronizzazioneScreen() {
   const { t } = useTranslation()
   const s = useGitSyncSettings()
+  const navigate = useNavigate()
   const configured = isGitConfigured(getGitConfig())
   const remote = useRemoteHistory()
   const local = useSafetySnapshots()
@@ -117,6 +119,13 @@ export function SincronizzazioneScreen() {
           className="w-full bg-t-accent text-t-on rounded-[20px] px-5 py-[17px] mb-2.5 text-base active:scale-[.99] transition-transform disabled:opacity-50"
         >
           {t('settings.syncNow')}
+        </button>
+        <button
+          onClick={() => void navigate({ to: '/sincronizzazione/unisci' })}
+          disabled={s.syncing || !configured}
+          className="w-full bg-t-surface rounded-[20px] px-5 py-[17px] mb-2.5 text-base text-t-fg active:bg-t-surface2 transition-colors disabled:opacity-50"
+        >
+          {t('syncMerge.open')}
         </button>
         <button
           onClick={() => s.setShowPull(true)}

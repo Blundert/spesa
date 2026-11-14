@@ -42,6 +42,8 @@ export const TABLE_NAMES: readonly TableName[] = [
 export type FieldValue = string | number | boolean | null
 
 export interface DiffRow {
+  /** Id del record nel backup di provenienza (locale a quel dispositivo). */
+  id: number
   /** Chiave naturale: identifica il record tra dispositivi. */
   key: string
   /** Nome leggibile (articolo, negozio, settimana…); le date si formattano dai `fields`. */
@@ -111,26 +113,31 @@ export function toRows(data: BackupData): Record<TableName, DiffRow[]> {
 
   const rows: Record<TableName, DiffRow[]> = {
     categories: data.categories.map((c) => ({
+      id: c.id as number,
       key: c.name,
       label: c.name,
       fields: { sortOrder: c.sortOrder },
     })),
     items: data.items.map((i) => ({
+      id: i.id as number,
       key: i.normalizedName,
       label: i.name,
       fields: { name: i.name, category: ref(categoryNames, i.categoryId) },
     })),
     supermarkets: data.supermarkets.map((s) => ({
+      id: s.id as number,
       key: s.normalizedName,
       label: s.name,
       fields: { name: s.name, loyaltyCard: fingerprint(s.loyaltyCard) },
     })),
     weekBudgets: data.weekBudgets.map((w) => ({
+      id: w.id as number,
       key: w.isoWeek,
       label: w.isoWeek,
       fields: { buoniAvailable: w.buoniAvailable },
     })),
     shoppingLists: lists.map((l) => ({
+      id: l.id as number,
       key: l.name,
       label: l.name,
       fields: {
@@ -142,11 +149,13 @@ export function toRows(data: BackupData): Record<TableName, DiffRow[]> {
       },
     })),
     listItems: data.listItems.map((li) => ({
+      id: li.id as number,
       key: `${ref(listNames, li.listId)}|${ref(itemKeys, li.itemId)}`,
       label: ref(itemLabels, li.itemId),
       fields: { list: ref(listNames, li.listId), quantity: li.quantity, addedAt: li.addedAt },
     })),
     sessions: data.sessions.map((s) => ({
+      id: s.id as number,
       key: String(s.startedAt),
       label: ref(supermarketLabels, s.supermarketId),
       fields: {
@@ -160,11 +169,13 @@ export function toRows(data: BackupData): Record<TableName, DiffRow[]> {
       },
     })),
     purchases: data.purchases.map((p) => ({
+      id: p.id as number,
       key: `${ref(sessionKeys, p.sessionId)}|${ref(itemKeys, p.itemId)}`,
       label: ref(itemLabels, p.itemId),
       fields: { session: ref(sessionKeys, p.sessionId), priceCents: p.priceCents, quantity: p.quantity },
     })),
     mealPlans: data.mealPlans.map((m) => ({
+      id: m.id as number,
       key: `${m.isoWeek}|${m.dayIndex}|${m.mealType}`,
       label: m.dish,
       fields: {
@@ -176,11 +187,17 @@ export function toRows(data: BackupData): Record<TableName, DiffRow[]> {
         selectedItems: m.selectedItemIds ? itemList(m.selectedItemIds).sort().join('|') : null,
       },
     })),
-    dishes: dishes.map((d) => ({ key: d.normalizedName, label: d.name, fields: { name: d.name } })),
+    dishes: dishes.map((d) => ({
+      id: d.id as number,
+      key: d.normalizedName,
+      label: d.name,
+      fields: { name: d.name },
+    })),
     dishIngredients: (data.dishIngredients ?? []).map((di) => ({
+      id: di.id as number,
       key: `${ref(dishKeys, di.dishId)}|${ref(itemKeys, di.itemId)}`,
       label: `${ref(dishLabels, di.dishId)} · ${ref(itemLabels, di.itemId)}`,
-      fields: {},
+      fields: { dish: ref(dishKeys, di.dishId) },
     })),
   }
   for (const t of TABLE_NAMES) rows[t] = uniqueKeys(rows[t])
