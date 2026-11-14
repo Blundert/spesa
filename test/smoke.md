@@ -351,3 +351,10 @@ Serve un repo GitHub di prova con token (Impostazioni → Sincronizzazione) e du
 8. Importa un file di backup da Impostazioni → i dati vengono sostituiti; in DevTools → Application → IndexedDB → spesa → safetySnapshots c'è la copia di prima (massimo 10)
 9. Stessi passaggi 2–6 da desktop (≥ 768 px): il toast e i messaggi sono identici
 
+### Flusso 40 — Sync automatico anche su desktop
+1. Impostazioni su desktop (≥ 768 px) → attiva "Sync automatico" con un repo configurato. Ricarica la pagina → parte un sync all'apertura (se il remoto è cambiato compare "Dati scaricati")
+2. Modifica un articolo dal desktop e lascia la pagina aperta oltre 3 minuti → il remoto riceve il commit "Backup …" senza premere nulla
+3. Modifica qualcosa e passa a un'altra scheda del browser (o chiudi la scheda) → il push parte in background, senza toast
+4. Con il sync automatico spento il desktop non sincronizza da solo (solo "Sincronizza ora")
+5. Stesso comportamento di prima sul mobile (<768 px): nessuna regressione
+

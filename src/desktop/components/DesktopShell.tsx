@@ -1,7 +1,10 @@
 import { Outlet } from '@tanstack/react-router'
+import { useAutoSync } from '../../hooks/useAutoSync'
 import { Sidebar } from './Sidebar'
 
 export function DesktopShell() {
+  // Stesso sync automatico del mobile (apertura, ogni 3 minuti, in background).
+  useAutoSync()
   return (
     <div
       className="desktop-root"

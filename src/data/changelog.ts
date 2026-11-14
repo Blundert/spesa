@@ -2,6 +2,10 @@ export type ChangelogEntry = { it: string[]; en: string[] }
 
 // Ordine: più recente in cima. Aggiungere una entry ad ogni nuova versione.
 export const changelog: Record<string, ChangelogEntry> = {
+  '0.45.0': {
+    it: ['Sincronizzazione su desktop: se attivi "Sync automatico" in Impostazioni, anche la versione desktop sincronizza da sola (all\'apertura, ogni 3 minuti e quando la finestra va in background), come già faceva il telefono. Prima sul desktop partiva solo dai pulsanti, e le modifiche fatte lì restavano indietro rispetto al telefono fino al conflitto successivo'],
+    en: ['Sync on desktop: if you turn on "Auto sync" in Settings, the desktop version now syncs by itself too (on open, every 3 minutes and when the window goes to the background), as the phone already did. Before, on desktop it only ran from the buttons, so changes made there fell behind the phone until the next conflict'],
+  },
   '0.44.0': {
     it: [
       'Sincronizzazione: quando scegli "Mantieni" o "Usa remoto" dopo un conflitto, l\'app salva nel repository GitHub, nella cartella backups/, una copia di quello che scarti, prima di sovrascriverlo. "Mantieni" fa un solo commit (dati nuovi + copia del remoto); "Usa remoto" salva prima la copia del tuo locale e solo se riesce scarica il remoto (se il salvataggio fallisce, i tuoi dati restano intatti)',
