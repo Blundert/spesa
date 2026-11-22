@@ -299,6 +299,7 @@ export const en: typeof it = {
     link: 'Sync and history',
     config: 'Connection',
     history: 'History',
+    historyOpen: 'History and restore',
     historyHint: 'Synced versions, backups in the repository and safety copies on this device. Tap an entry to see what would change and restore it.',
     historyNotConfigured: 'Connect a repository to see the remote history.',
     historyEmpty: 'No versions yet.',

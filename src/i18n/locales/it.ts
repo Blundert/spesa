@@ -297,6 +297,7 @@ export const it = {
     link: 'Sincronizzazione e cronologia',
     config: 'Collegamento',
     history: 'Cronologia',
+    historyOpen: 'Cronologia e ripristino',
     historyHint: 'Versioni sincronizzate, backup nel repository e copie di sicurezza di questo dispositivo. Tocca una voce per vedere cosa cambierebbe e ripristinarla.',
     historyNotConfigured: 'Collega un repository per vedere la cronologia remota.',
     historyEmpty: 'Ancora nessuna versione.',

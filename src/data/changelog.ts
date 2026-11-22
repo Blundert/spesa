@@ -2,6 +2,14 @@ export type ChangelogEntry = { it: string[]; en: string[] }
 
 // Ordine: più recente in cima. Aggiungere una entry ad ogni nuova versione.
 export const changelog: Record<string, ChangelogEntry> = {
+  '1.2.0': {
+    it: [
+      'Sincronizzazione più corta: la cronologia delle versioni (con il ripristino e, su desktop, il grafo dei commit) è ora in una pagina a parte, "Cronologia e ripristino", e non devi più scorrere tanto per arrivare alla guida',
+    ],
+    en: [
+      'Shorter Sync page: the version history (with restore and, on desktop, the commit graph) now lives on its own page, "History and restore", so you no longer have to scroll a lot to reach the guide',
+    ],
+  },
   '1.1.4': {
     it: [
       'Liste condivise: risolto "Un altro stava modificando la lista: riprova tra poco" che usciva subito dopo aver condiviso una lista anche senza aver invitato nessuno. Due sincronizzazioni partivano insieme e GitHub rifiutava la seconda; ora ce n\'è una sola alla volta e tra un tentativo e l\'altro c\'è una piccola pausa',

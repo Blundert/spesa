@@ -487,3 +487,11 @@ Serve la sync del backup personale attiva (Sincronizzazione → Sync automatico)
 1. "Condividi" su una lista, senza invitare nessuno: toast "Lista condivisa" (o "finisce di sincronizzarsi tra poco"), mai "Un altro stava modificando la lista" a vuoto; su GitHub c'è un solo commit con `lista.json`
 2. Se un tentativo precedente è fallito lasciando un repository vuoto con lo stesso nome, ripetere la condivisione con quel nome lo riusa (nessun "Esiste già un repository con questo nome"); se il repo ha già una lista dentro, invece, lo dice
 3. Se compare davvero il messaggio sul conflitto, ora spiega cosa fare: toccare la riga sotto le schede per sincronizzare di nuovo
+
+### Flusso 55 — Cronologia su una pagina a parte (mobile e desktop)
+Cambia dove si trovano le cose dei Flussi 41 e 44: la cronologia, il ripristino e (desktop) il grafo dei commit non sono più nella pagina Sincronizzazione.
+1. Sincronizzazione (mobile e desktop): ci sono Collegamento, Branch, una riga/scheda "Cronologia e ripristino" e subito dopo la Guida; niente elenco della cronologia, niente grafo, niente finestra di ripristino lì dentro
+2. Tocca "Cronologia e ripristino": si apre `/sincronizzazione/cronologia` (stesso percorso su mobile e desktop) con l'elenco delle versioni (mobile: lista; desktop: tabella ordinabile) e, solo su desktop, sotto il "Grafo dei commit". La freccia ‹ (mobile) o "← Sincronizzazione" (desktop) torna alla pagina precedente
+3. Su quella pagina funzionano come prima: toccare una versione mostra cosa cambierebbe, "Ripristina" chiede conferma e ripristina (con backup prima); su desktop toccare un commit del grafo apre il confronto affiancato e il ripristino
+4. Senza repository collegato: "Collega un repository per vedere la cronologia remota" (in entrambe le pagine dove serve)
+5. A 390, 800 e 1280 px nessuno scroll orizzontale; Impostazioni → "Sincronizzazione e cronologia" porta ancora alla pagina Sincronizzazione

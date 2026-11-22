@@ -1,16 +1,11 @@
-import { useState } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 import { BackButton } from '../components/BackButton'
 import { BottomSheet } from '../components/BottomSheet'
-import { SyncDiffView } from '../components/sync/SyncDiffView'
 import { GithubConnect } from '../components/sync/GithubConnect'
 import { SyncGuide } from '../components/sync/SyncGuide'
 import { SyncBranches } from '../components/sync/SyncBranches'
-import { formatDateTime, historyDetail, historyTitle } from '../components/sync/historyText'
 import { useGitSyncSettings } from '../hooks/useGitSyncSettings'
-import { useHistoryPreview, useRemoteHistory, useRestore, useSafetySnapshots } from '../hooks/useSyncHistory'
-import { buildHistoryItems, type HistoryItem } from '../lib/historyItems'
 import { getGitConfig, isGitConfigured } from '../lib/gitSync'
 
 const SECTION_LABEL = 'text-[12px] font-normal tracking-[1.2px] text-t-muted uppercase px-1.5 pb-[13px]'
@@ -20,18 +15,6 @@ export function SincronizzazioneScreen() {
   const s = useGitSyncSettings()
   const navigate = useNavigate()
   const configured = isGitConfigured(getGitConfig())
-  const remote = useRemoteHistory()
-  const local = useSafetySnapshots()
-  const [selected, setSelected] = useState<HistoryItem | null>(null)
-  const [confirming, setConfirming] = useState(false)
-  const preview = useHistoryPreview(selected?.selection ?? null)
-  const close = () => {
-    setSelected(null)
-    setConfirming(false)
-  }
-  const restore = useRestore(close)
-
-  const items = buildHistoryItems(remote.data ?? [], local.data ?? [])
 
   return (
     <>
@@ -124,100 +107,21 @@ export function SincronizzazioneScreen() {
           <SyncBranches onSwitched={s.refresh} />
         </div>
 
-        {/* Cronologia */}
-        <div className={SECTION_LABEL}>{t('syncPage.history')}</div>
-        <p className="text-[13px] text-t-muted px-1.5 pb-[13px] leading-relaxed">{t('syncPage.historyHint')}</p>
-        {!configured && <p className="text-[13px] text-t-muted px-1.5 pb-3">{t('syncPage.historyNotConfigured')}</p>}
-        {configured && remote.isPending && (
-          <p className="text-[13px] text-t-muted px-1.5 pb-3">{t('syncPage.historyLoading')}</p>
-        )}
-        {remote.isError && (
-          <div className="flex items-center justify-between gap-3 px-1.5 pb-3">
-            <span className="text-[13px] text-t-danger">{t('syncPage.historyError')}</span>
-            <button onClick={() => void remote.refetch()} className="text-[13px] text-t-fg underline">
-              {t('syncPage.retry')}
-            </button>
-          </div>
-        )}
-        {items.length > 0 && (
-          <div className="bg-t-surface rounded-[20px] overflow-hidden mb-7">
-            {items.map((item, i) => {
-              const detail = historyDetail(t, item)
-              return (
-                <button
-                  key={item.key}
-                  onClick={() => setSelected(item)}
-                  className="w-full text-left px-5 py-[14px] active:bg-t-surface2 transition-colors"
-                  style={{ borderBottom: i < items.length - 1 ? '1px solid var(--t-line)' : 'none' }}
-                >
-                  <div className="text-[15px] text-t-fg">{historyTitle(t, item)}</div>
-                  <div className="text-[12px] text-t-muted tabular-nums">{formatDateTime(item.when)}</div>
-                  {detail && <div className="text-[12px] text-t-muted truncate">{detail}</div>}
-                </button>
-              )
-            })}
-          </div>
-        )}
-        {items.length === 0 && configured && remote.isSuccess && (
-          <p className="text-[13px] text-t-muted px-1.5 pb-7">{t('syncPage.historyEmpty')}</p>
-        )}
+        {/* Cronologia: su una pagina a parte, così Sincronizzazione non è lunghissima */}
+        <button
+          onClick={() => void navigate({ to: '/sincronizzazione/cronologia' })}
+          className="w-full flex items-center justify-between bg-t-surface rounded-[20px] px-5 py-[17px] mb-7 text-left active:bg-t-surface2 transition-colors"
+        >
+          <span className="text-base text-t-fg">{t('syncPage.historyOpen')}</span>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--t-chev)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M9 6l6 6-6 6" />
+          </svg>
+        </button>
 
         {/* Guida */}
         <div className={SECTION_LABEL}>{t('syncPage.guide')}</div>
         <SyncGuide />
       </div>
-
-      {/* Dettaglio di una voce: cosa cambierebbe + ripristino */}
-      <BottomSheet open={selected !== null} onClose={close}>
-        {selected && (
-          <>
-            <div className="text-[20px] font-normal text-t-fg px-0.5">{historyTitle(t, selected)}</div>
-            <div className="text-[13px] text-t-muted px-0.5 pb-3 tabular-nums">{formatDateTime(selected.when)}</div>
-            <div className="text-[12px] tracking-[0.4px] text-t-muted uppercase pb-2">{t('syncPage.compareTitle')}</div>
-            <div className="max-h-[42vh] overflow-y-auto mb-4">
-              {preview.isPending && <p className="text-[13px] text-t-muted">{t('syncPage.previewLoading')}</p>}
-              {preview.isError && <p className="text-[13px] text-t-danger">{t('syncPage.previewError')}</p>}
-              {preview.data && <SyncDiffView diff={preview.data.diff} />}
-            </div>
-            {confirming ? (
-              <>
-                <p className="text-sm text-t-text2 px-0.5 pb-4 leading-relaxed">
-                  {selected.selection.source === 'remote'
-                    ? t('syncPage.restoreConfirmBodyRepo')
-                    : t('syncPage.restoreConfirmBodyLocal')}
-                </p>
-                <button
-                  disabled={!preview.data || restore.isPending}
-                  onClick={() =>
-                    preview.data &&
-                    restore.mutate({
-                      data: preview.data.data,
-                      via: selected.selection.source === 'remote' ? 'repo' : 'local',
-                    })
-                  }
-                  className="w-full bg-t-accent text-t-on text-[17px] py-[18px] rounded-[20px] mb-2 active:scale-[.98] transition-transform disabled:opacity-50"
-                >
-                  {t('syncPage.restoreConfirm')}
-                </button>
-                <button
-                  onClick={() => setConfirming(false)}
-                  className="w-full bg-t-line5 text-t-fg text-[17px] py-[18px] rounded-[20px] active:scale-[.98] transition-transform"
-                >
-                  {t('common.cancel')}
-                </button>
-              </>
-            ) : (
-              <button
-                disabled={!preview.data}
-                onClick={() => setConfirming(true)}
-                className="w-full bg-t-accent text-t-on text-[17px] py-[18px] rounded-[20px] active:scale-[.98] transition-transform disabled:opacity-50"
-              >
-                {t('syncPage.restore')}
-              </button>
-            )}
-          </>
-        )}
-      </BottomSheet>
 
       {/* Conferma "Scarica da remoto" */}
       <BottomSheet open={s.showPull} onClose={() => s.setShowPull(false)}>

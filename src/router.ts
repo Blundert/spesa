@@ -1,4 +1,5 @@
 import { createRouter, createRootRoute, createRoute, Outlet, redirect } from '@tanstack/react-router'
+import { CronologiaScreen } from './screens/CronologiaScreen'
 import { currentWeek } from './lib/date'
 import { getDefaultBuonoValueCents } from './lib/buoniSettings'
 import { AppShell } from './components/AppShell'
@@ -72,6 +73,12 @@ const sincronizzazioneRoute = createRoute({
   getParentRoute: () => shellRoute,
   path: '/sincronizzazione',
   component: SincronizzazioneScreen,
+})
+
+const cronologiaRoute = createRoute({
+  getParentRoute: () => shellRoute,
+  path: '/sincronizzazione/cronologia',
+  component: CronologiaScreen,
 })
 
 const unisciRoute = createRoute({
@@ -164,6 +171,7 @@ const routeTree = rootRoute.addChildren([
     statisticheRoute,
     impostazioniRoute,
     sincronizzazioneRoute,
+    cronologiaRoute,
     unisciRoute,
     pianificazioniRoute,
     sessioneRoute,
