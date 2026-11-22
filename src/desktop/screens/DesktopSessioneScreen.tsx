@@ -1,4 +1,6 @@
 import { useState } from 'react'
+import { displayName } from '../../lib/sharedLists'
+import { useShoppingLists } from '../../hooks/useShoppingLists'
 import { useNavigate, useParams } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
@@ -69,6 +71,10 @@ export function DesktopSessioneScreen() {
   const editPurchase = useEditPastPurchase(sessionId, session?.isoWeek ?? '')
   const finishPast = useFinishPastSession(sessionId, session?.isoWeek ?? '')
   const isCompleted = session?.finishedAt !== null && session?.finishedAt !== undefined
+  // Spesa di un'altra persona (lista condivisa): solo da consultare.
+  const { data: allLists = [] } = useShoppingLists()
+  const foreign = session?.doneBy !== undefined
+  const byName = session?.doneBy !== undefined ? displayName(allLists.find((l) => l.id === session.listId)?.shared, session.doneBy) : ''
 
   const storeName = supermarkets.find((s) => s.id === session?.supermarketId)?.name ?? '?'
   const computedCents = purchases.reduce((acc, p) => acc + p.priceCents * p.quantity, 0)
@@ -150,6 +156,7 @@ export function DesktopSessioneScreen() {
         title={storeName}
         subtitle={isCompleted ? undefined : t('sessione.notCompleted')}
         right={
+          foreign ? undefined : (
           <div style={{ display: 'flex', gap: '8px' }}>
             <button onClick={() => setShowStorePicker(true)} style={{ ...btn, background: 'var(--t-surface)', border: '1px solid var(--t-line)', color: 'var(--t-fg)' }}>
               {t('sessione.editStore')}
@@ -163,8 +170,18 @@ export function DesktopSessioneScreen() {
               {t('sessione.deleteSession')}
             </button>
           </div>
+          )
         }
       />
+
+      {foreign && (
+        <div style={{ background: 'var(--t-surface)', borderRadius: '12px', padding: '12px 16px', marginBottom: '16px', fontSize: '13px', color: 'var(--t-muted)' }}>
+          {t('shared.sessionByOther', { name: byName })}
+          {session?.uncounted && ` · ${t('shared.notCounted')}`}
+        </div>
+      )}
+
+      <div style={foreign ? { pointerEvents: 'none' } : undefined}>
 
       <div style={{ display: 'flex', gap: '16px', marginBottom: '24px' }}>
         <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: '6px' }}>
@@ -215,6 +232,7 @@ export function DesktopSessioneScreen() {
           onRowClick={(r) => setEditingPurchaseId(r.id ?? null)}
           emptyMessage={t('sessione.noPurchases')}
         />
+      </div>
       </div>
 
       <ConfirmModal

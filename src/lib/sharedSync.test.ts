@@ -206,6 +206,30 @@ describe('syncSharedList: sync normali', () => {
   })
 })
 
+describe('syncSharedList: spese concluse', () => {
+  it('pubblica le mie spese concluse e porta qui quelle degli altri', async () => {
+    await setup({ lastSha: undefined, sharedSince: 0 })
+    await db.supermarkets.clear()
+    await db.sessions.clear()
+    await db.purchases.clear()
+    await db.supermarkets.add({ id: 1, name: 'Coop', normalizedName: 'coop' })
+    putRemote(rFile({
+      sessions: [{
+        uid: 's-anna', doneBy: 'anna', supermarketName: 'Coop', startedAt: 5000, finishedAt: 6000, confirmedTotalCents: 300,
+        buoniSpent: 1, buoniValueCents: 800, purchases: [{ name: 'Uova', categoryName: 'Frigo', priceCents: 300, quantity: 1 }],
+      }],
+    }))
+    await syncSharedList(1, NOW) // prima sync: scarica
+    expect((await db.sessions.toArray()).map((s) => [s.doneBy, s.uncounted])).toEqual([['anna', true]])
+
+    await db.sessions.add({ isoWeek: 'w', supermarketId: 1, listId: 1, startedAt: 7000, finishedAt: 8000, confirmedTotalCents: 450, buoniSpent: 0, buoniValueCents: 800 })
+    await syncSharedList(1, NOW + 10)
+    expect(remote().sessions.map((s) => s.doneBy).sort()).toEqual(['anna', 'matteo'])
+    await syncSharedList(1, NOW + 20) // niente di nuovo: nessuna riscrittura, nessuna spesa doppia
+    expect(await db.sessions.count()).toBe(2)
+  })
+})
+
 describe('syncSharedList: sola lettura', () => {
   it('la copia locale diventa quella del repo e non si scrive mai', async () => {
     push = false

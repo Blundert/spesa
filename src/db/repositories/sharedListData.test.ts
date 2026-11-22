@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { db } from '../db'
 import type { SharedLink } from '../types'
 import { parseSharedFile, serializeSharedFile, SHARED_FORMAT, SHARED_VERSION, type SharedListFile } from '../../lib/sharedListFile'
@@ -41,8 +41,13 @@ async function seed(withAltro = true) {
 }
 
 beforeEach(async () => {
-  await Promise.all([db.categories.clear(), db.items.clear(), db.listItems.clear(), db.shoppingLists.clear()])
+  vi.stubGlobal('localStorage', { getItem: () => null, setItem: () => {} })
+  await Promise.all([
+    db.categories.clear(), db.items.clear(), db.listItems.clear(), db.shoppingLists.clear(),
+    db.sessions.clear(), db.purchases.clear(), db.supermarkets.clear(),
+  ])
 })
+afterEach(() => vi.unstubAllGlobals())
 
 describe('exportSharedFile', () => {
   it('esporta nome, voci con uid e autore, e le eliminazioni; il testo passa la validazione', async () => {
@@ -195,6 +200,26 @@ describe('applySharedFile', () => {
     await seed()
     await applySharedFile(1, file({ items: [fi('a', 'Uova', { addedBy: 'constructor' })] }))
     expect((await db.shoppingLists.get(1))?.shared?.members.constructor).toEqual({ label: '', kind: 'stranger' })
+  })
+
+  it('importa le spese del file con il tipo delle persone, e dopo aver applicato le esporta senza ripubblicare quelle altrui', async () => {
+    await seed()
+    await db.supermarkets.add({ id: 1, name: 'Coop', normalizedName: 'coop' })
+    await db.shoppingLists.update(1, {
+      shared: { ...LINK, members: { anna: { label: 'Anna', kind: 'partner' } }, sharedSince: 0 },
+    })
+    const sess = (uid: string, doneBy: string) => ({
+      uid, doneBy, supermarketName: 'Coop', startedAt: 5000, finishedAt: 6000, confirmedTotalCents: 300,
+      buoniSpent: 1, buoniValueCents: 800, purchases: [{ name: 'Latte', categoryName: 'Frigo', priceCents: 150, quantity: 2 }],
+    })
+    await applySharedFile(1, file({ sessions: [sess('s-anna', 'anna'), sess('s-luca', 'luca')] }))
+    const imported = await db.sessions.toArray()
+    expect(imported.map((x) => [x.sharedUid, x.doneBy, x.uncounted])).toEqual([
+      ['s-anna', 'anna', undefined],
+      ['s-luca', 'luca', true], // persona nuova: parte come estraneo
+    ])
+    // le spese di altri non tornano nel file come mie
+    expect((await exportSharedFile(1)).sessions).toEqual([])
   })
 
   it('esportare dopo aver applicato dà lo stesso contenuto', async () => {

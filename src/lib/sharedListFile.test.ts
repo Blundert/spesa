@@ -269,6 +269,15 @@ describe('mergeSharedFiles', () => {
     )
   })
 
+  it('una spesa eliminata (tombstone) non torna, e il tombstone resta', () => {
+    const a = file({ sessions: [session('s1'), session('s2', { finishedAt: 3000 })] })
+    const b = file({ tombstones: { s1: NOW - 100 }, sessions: [session('s1')] })
+    const m = mergeSharedFiles(a, b, NOW)
+    expect(m.sessions.map((x) => x.uid)).toEqual(['s2'])
+    expect(m.tombstones).toEqual({ s1: NOW - 100 })
+    expect(mergeSharedFiles(b, a, NOW)).toEqual(m)
+  })
+
   it('il nome più recente vince; a parità si sceglie sempre lo stesso', () => {
     const a = file({ name: 'Casa', nameUpdatedAt: 5 })
     const b = file({ name: 'Casa nostra', nameUpdatedAt: 9 })

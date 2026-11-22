@@ -52,7 +52,7 @@ beforeEach(async () => {
   api = () => undefined
   gh.override = (m, u) => api(m, u)
   vi.stubGlobal('fetch', gh.fetch)
-  await Promise.all([db.categories.clear(), db.items.clear(), db.listItems.clear(), db.shoppingLists.clear()])
+  await Promise.all([db.categories.clear(), db.items.clear(), db.listItems.clear(), db.shoppingLists.clear(), db.sessions.clear(), db.purchases.clear(), db.supermarkets.clear()])
   await db.categories.bulkAdd([{ id: 1, name: 'Frigo', sortOrder: 0 }, { id: 2, name: 'Altro', sortOrder: 1 }])
   await db.shoppingLists.add({ id: 1, name: 'Casa', supermarketId: null, sortOrder: 0, archivedAt: null })
 })
@@ -114,6 +114,7 @@ describe('shareList', () => {
     expect(r).toEqual({ owner: 'matteo', repo: 'spesa-casa', invite: 'invited' })
     const list = await db.shoppingLists.get(1)
     expect(list?.shared).toMatchObject({ owner: 'matteo', repo: 'spesa-casa', path: 'lista.json', me: 'matteo', canWrite: true })
+    expect(list?.shared?.sharedSince).toBeGreaterThan(0)
     expect(list?.shared?.lastSha).toBeTruthy()
     expect(parseSharedFile(gh.files.get('lista.json') as string)).toMatchObject({ name: 'Casa', uid: list?.shared?.uid })
     expect(parseSharedFile(gh.files.get('lista.json') as string).items.map((i) => i.name)).toEqual(['Latte'])
@@ -209,6 +210,7 @@ describe('joinSharedList', () => {
     const list = await db.shoppingLists.get(id)
     expect(list).toMatchObject({ name: 'Casa di Anna' })
     expect(list?.shared).toMatchObject({ uid: 'lista-9', owner: 'anna', repo: 'spesa', me: 'matteo', canWrite: true })
+    expect(list?.shared?.sharedSince).toBeGreaterThan(0)
     expect(list?.shared?.members.anna).toEqual({ label: '', kind: 'stranger' })
     const rows = await db.listItems.where('listId').equals(id).toArray()
     expect(rows).toHaveLength(1)
@@ -283,5 +285,17 @@ describe('unlinkSharedList / setMember', () => {
     expect(m?.luca).toEqual({ label: 'Luca', kind: 'stranger' })
     await db.shoppingLists.update(1, { shared: undefined })
     await expect(setMember(1, 'anna', { label: 'x' })).rejects.toThrow('non condivisa')
+  })
+
+  it('passare una persona a partner (o a estraneo) cambia se le sue spese contano', async () => {
+    await db.shoppingLists.update(1, { shared: { ...LINK, members: { anna: { label: 'Anna', kind: 'stranger' } } } })
+    await db.sessions.add({
+      isoWeek: 'w', supermarketId: 1, listId: 1, startedAt: 1, finishedAt: 2, confirmedTotalCents: 1,
+      buoniSpent: 1, buoniValueCents: 800, doneBy: 'anna', uncounted: true,
+    })
+    await setMember(1, 'anna', { kind: 'partner' })
+    expect((await db.sessions.toArray())[0].uncounted).toBeUndefined()
+    await setMember(1, 'anna', { kind: 'stranger' })
+    expect((await db.sessions.toArray())[0].uncounted).toBe(true)
   })
 })

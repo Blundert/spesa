@@ -1,4 +1,6 @@
 import { useNavigate, useParams } from '@tanstack/react-router'
+import { displayName } from '../lib/sharedLists'
+import { useShoppingLists } from '../hooks/useShoppingLists'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
@@ -48,6 +50,10 @@ export function SessioneScreen() {
   const finishPast = useFinishPastSession(sessionId, session?.isoWeek ?? '')
   const [showFinishKeypad, setShowFinishKeypad] = useState(false)
   const isCompleted = session?.finishedAt !== null && session?.finishedAt !== undefined
+  // Spesa di un'altra persona (lista condivisa): solo da consultare.
+  const { data: allLists = [] } = useShoppingLists()
+  const foreign = session?.doneBy !== undefined
+  const byName = session?.doneBy !== undefined ? displayName(allLists.find((l) => l.id === session.listId)?.shared, session.doneBy) : ''
 
   const storeName = supermarkets.find((s) => s.id === session?.supermarketId)?.name ?? '?'
   const computedCents = purchases.reduce((acc, p) => acc + p.priceCents * p.quantity, 0)
@@ -144,6 +150,7 @@ export function SessioneScreen() {
           <div className="absolute left-1/2 -translate-x-1/2 flex flex-col items-center gap-0.5">
             <button
               onClick={() => setShowStorePicker(true)}
+              disabled={foreign}
               aria-label={t('sessione.editStore')}
               className="text-[26px] font-normal tracking-[-0.5px] text-t-fg max-w-[200px] truncate active:opacity-50"
             >
@@ -153,6 +160,7 @@ export function SessioneScreen() {
               <span className="text-[11px] text-t-muted leading-none">{t('sessione.notCompleted')}</span>
             )}
           </div>
+          {!foreign && (
           <button
             onClick={() => setShowDeleteConfirm(true)}
             aria-label={t('sessione.deleteSession')}
@@ -162,8 +170,17 @@ export function SessioneScreen() {
               <path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6" />
             </svg>
           </button>
+          )}
         </div>
 
+        {foreign && (
+          <div className="bg-t-surface2 text-t-muted text-[13px] rounded-2xl px-[18px] py-3 mb-[14px]">
+            {t('shared.sessionByOther', { name: byName })}
+            {session?.uncounted && ` · ${t('shared.notCounted')}`}
+          </div>
+        )}
+
+        <div className={foreign ? 'pointer-events-none' : undefined}>
         {/* Summary card */}
         <div className="bg-t-surface rounded-[22px] px-6 pt-6 pb-4 mb-[14px] text-center">
           <div className="relative inline-block mb-2">
@@ -241,6 +258,7 @@ export function SessioneScreen() {
           {purchases.length === 0 && (
             <div className="text-center py-8 text-t-muted text-sm">{t('sessione.noPurchases')}</div>
           )}
+        </div>
         </div>
       </div>
     </div>

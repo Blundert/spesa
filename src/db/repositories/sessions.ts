@@ -1,5 +1,28 @@
 import { db } from '../db'
 import type { Session } from '../types'
+import { emitSharedChange } from '../../lib/sharedChange'
+
+/**
+ * Segna come eliminate le mie spese già pubblicate in una lista condivisa, perché il merge con il repo non le
+ * faccia tornare. Le spese di altri non si eliminano mai (vedi sotto). Da chiamare nella stessa transazione che le
+ * cancella (tabelle `sessions` e `shoppingLists`).
+ */
+async function tombstoneSessions(sessions: Session[], now: number = Date.now()): Promise<void> {
+  const byList = new Map<number, string[]>()
+  for (const s of sessions) {
+    if (s.sharedUid && s.listId !== undefined && s.doneBy === undefined) {
+      byList.set(s.listId, [...(byList.get(s.listId) ?? []), s.sharedUid])
+    }
+  }
+  for (const [listId, uids] of byList) {
+    const list = await db.shoppingLists.get(listId)
+    if (!list?.shared) continue
+    const tombstones = { ...list.shared.tombstones }
+    for (const uid of uids) tombstones[uid] = now
+    await db.shoppingLists.update(listId, { shared: { ...list.shared, tombstones } })
+    emitSharedChange(listId)
+  }
+}
 
 export async function getSessions(): Promise<Session[]> {
   return db.sessions.orderBy('startedAt').reverse().toArray()
@@ -44,11 +67,16 @@ export async function finishSession(id: number, confirmedTotalCents: number): Pr
       await db.items.update(itemId, { purchaseCount: total })
     }
   })
+  // Lista condivisa: la spesa conclusa va nel repo (5 secondi dopo, insieme a eventuali altre modifiche).
+  const listId = (await db.sessions.get(id))?.listId
+  if (listId !== undefined && (await db.shoppingLists.get(listId))?.shared) emitSharedChange(listId)
 }
 
 export async function deleteWeek(isoWeek: string): Promise<void> {
-  await db.transaction('rw', [db.sessions, db.purchases, db.items, db.weekBudgets, db.mealPlans], async () => {
-    const sessions = await db.sessions.where('isoWeek').equals(isoWeek).toArray()
+  await db.transaction('rw', [db.sessions, db.purchases, db.items, db.weekBudgets, db.mealPlans, db.shoppingLists], async () => {
+    // Le spese di altre persone (liste condivise) restano: non sono mie da eliminare e tornerebbero alla prossima sync.
+    const sessions = (await db.sessions.where('isoWeek').equals(isoWeek).toArray()).filter((s) => s.doneBy === undefined)
+    await tombstoneSessions(sessions)
     const sessionIds = sessions.map((s) => s.id!)
     const allPurchases = sessionIds.length > 0
       ? await db.purchases.where('sessionId').anyOf(sessionIds).toArray()
@@ -57,7 +85,7 @@ export async function deleteWeek(isoWeek: string): Promise<void> {
     if (sessionIds.length > 0) {
       await db.purchases.where('sessionId').anyOf(sessionIds).delete()
     }
-    await db.sessions.where('isoWeek').equals(isoWeek).delete()
+    await db.sessions.bulkDelete(sessionIds)
     await db.weekBudgets.where('isoWeek').equals(isoWeek).delete()
     await db.mealPlans.where('isoWeek').equals(isoWeek).delete()
     for (const itemId of itemIds) {
@@ -82,7 +110,11 @@ export async function updateSession(
 }
 
 export async function deleteSession(id: number): Promise<void> {
-  await db.transaction('rw', [db.sessions, db.purchases, db.items], async () => {
+  await db.transaction('rw', [db.sessions, db.purchases, db.items, db.shoppingLists], async () => {
+    const session = await db.sessions.get(id)
+    // Le spese di altre persone (liste condivise) non si eliminano da qui.
+    if (!session || session.doneBy !== undefined) return
+    await tombstoneSessions([session])
     const purchases = await db.purchases.where('sessionId').equals(id).toArray()
     const itemIds = [...new Set(purchases.map((p) => p.itemId))]
     await db.purchases.where('sessionId').equals(id).delete()

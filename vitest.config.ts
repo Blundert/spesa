@@ -50,7 +50,9 @@ export default defineConfig({
         'src/lib/sharedChange.ts',
         'src/lib/sharedSyncScheduler.ts',
         'src/lib/sharedSyncStatus.ts',
+        'src/lib/sharedSessions.ts',
         'src/db/repositories/sharedListData.ts',
+        'src/db/repositories/sharedSessionsData.ts',
       ],
       all: true,
       thresholds: {

@@ -43,7 +43,8 @@ export interface SupermarketStats {
 
 export async function getSupermarketStats(): Promise<SupermarketStats[]> {
   const supermarkets = await db.supermarkets.toArray()
-  const sessions = await db.sessions.toArray()
+  // Le spese di estranei (liste condivise) non contano nei miei totali per negozio.
+  const sessions = (await db.sessions.toArray()).filter((s) => !s.uncounted)
 
   return Promise.all(
     supermarkets.map(async (s) => {

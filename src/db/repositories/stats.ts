@@ -71,6 +71,7 @@ export async function getStats(
   const finishedSessions = sessions.filter(
     (s) =>
       s.finishedAt !== null &&
+      !s.uncounted && // le spese di estranei (liste condivise) non entrano nelle statistiche
       (fromTs === null || s.startedAt >= fromTs) &&
       (toTs === null || s.startedAt <= toTs),
   )

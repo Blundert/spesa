@@ -53,11 +53,12 @@ export function useUnlinkList() {
 }
 
 export function useSetMember() {
-  const refresh = useRefreshLists()
+  const qc = useQueryClient()
   return useMutation({
     mutationFn: ({ listId, login, patch }: { listId: number; login: string; patch: Partial<SharedMember> }) =>
       setMember(listId, login, patch),
-    onSuccess: refresh,
+    // Partner o estraneo cambia cosa conta nel budget e nelle statistiche: si ricarica tutto.
+    onSuccess: () => void qc.invalidateQueries(),
   })
 }
 

@@ -29,8 +29,9 @@ function shiftWeekKey(weekKey: string, delta: number): string {
 
 /** Sessioni concluse, opzionalmente da `fromTs` in poi. */
 function finishedSince(sessions: Session[], fromTs: number | null): Session[] {
+  // Le spese di estranei (liste condivise) non entrano nelle statistiche.
   return sessions.filter(
-    (s) => s.finishedAt !== null && (fromTs === null || s.startedAt >= fromTs),
+    (s) => s.finishedAt !== null && !s.uncounted && (fromTs === null || s.startedAt >= fromTs),
   )
 }
 

@@ -446,3 +446,14 @@ Serve una lista condivisa (Flusso 47) e un secondo dispositivo o account che la 
 7. Token scaduto o accesso perso: la riga diventa rossa con il motivo ("Il token non è più valido…", "Il repository non esiste o non hai accesso…") e il controllo ogni 15 secondi si ferma finché non si riapre la lista o si torna in primo piano
 8. Sola lettura: lo stato si aggiorna come sopra, ma non parte mai nessuna scrittura. Due persone che aggiungono lo stesso articolo (es. "latte") nello stesso momento ne vedono uno solo, con le quantità sommate
 9. A 390, 800 e 1280 px la riga di stato non crea scroll orizzontale
+
+### Flusso 49 — Spese concluse condivise e budget (mobile e desktop)
+Serve una lista condivisa (Flusso 47) con un'altra persona che fa spese (o, per provare, una spesa scritta nel repo come `sessions` di `lista.json`). Usare il build di produzione.
+1. Una mia spesa partita da una lista condivisa, a fine spesa ("Conferma spesa"): dopo circa 5 secondi nel repo c'è la spesa con il tuo login, negozio, importi, buoni e gli acquisti; gli articoli acquistati escono dalla lista per tutti. Le spese fatte PRIMA di condividere la lista non vanno mai nel repo
+2. La spesa fatta da un'altra persona arriva da sola (entro circa 15 secondi) nello Storico, con "fatta da Anna" sotto il negozio (desktop: accanto al negozio, nel nome che hai scelto in "Persone", altrimenti il login). Se per te è un **estraneo** (di partenza) c'è anche "non conta nel tuo budget": **non** entra in "Di tasca tua", speso, buoni spesi/rimanenti (home, pannello, riepilogo settimana), nelle Statistiche (totali, per supermercato, giorno, categorie, budget settimanale) né nei totali per negozio; non compare nelle "ultime spese" della home
+3. In "Persone" passa quella persona a **Partner**: subito la sua spesa conta (di tasca tua, speso, buoni, statistiche) e perde "non conta nel tuo budget"; con i buoni che ha usato scalano da quelli che hai impostato tu. Rimettila su **Estraneo**: torna fuori dai conti
+4. Tocca una spesa di un'altra persona: il dettaglio (mobile e desktop) dice "Spesa di Anna: solo da consultare" (+ "non conta…"), non ci sono eliminazione, cambio del negozio, modifica di totale/buoni/data né degli acquisti. Dallo Storico la settimana si può eliminare: le spese di altri restano; le tue già pubblicate non tornano alla sync dopo
+5. Eliminare una tua spesa già pubblicata (dal suo dettaglio) la toglie anche dal repo (dopo circa 5 secondi) e non ricompare; una spesa mai pubblicata si elimina come sempre
+6. Gli articoli e i negozi comprati dagli altri compaiono nel Catalogo e tra i supermercati (per nome); prezzo medio e ultimo prezzo degli articoli tengono conto anche dei loro acquisti
+7. Su un dispositivo nuovo (stesso account GitHub) la tua spesa pubblicata torna nello storico come tua e conta; le spese di altri tornano con la loro etichetta
+8. Una lista normale non cambia: nessuna etichetta, nessuna pubblicazione, budget e statistiche come prima

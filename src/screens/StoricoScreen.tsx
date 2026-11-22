@@ -11,6 +11,7 @@ import { useQuery } from '@tanstack/react-query'
 import { db } from '../db/db'
 import { BottomSheet } from '../components/BottomSheet'
 import type { Session } from '../db/types'
+import { displayName } from '../lib/sharedLists'
 import { BackButton } from '../components/BackButton'
 
 function useSessionTotal(sessionId: number) {
@@ -98,6 +99,8 @@ export function StoricoScreen() {
               finishedAt={s.finishedAt}
               buoniSpent={s.buoniSpent}
               buoniValueCents={s.buoniValueCents}
+              byName={s.doneBy !== undefined ? displayName(lists.find((l) => l.id === s.listId)?.shared, s.doneBy) : undefined}
+              uncounted={s.uncounted === true}
             />
           ))}
         </div>
@@ -136,6 +139,8 @@ function SessionCard({
   finishedAt,
   buoniSpent,
   buoniValueCents,
+  byName,
+  uncounted,
 }: {
   sessionId: number
   storeName: string
@@ -145,6 +150,9 @@ function SessionCard({
   finishedAt: number | null
   buoniSpent: number
   buoniValueCents: number
+  /** Chi ha fatto la spesa, se non sono io (lista condivisa). */
+  byName?: string
+  uncounted?: boolean
 }) {
   const { t } = useTranslation()
   const { data: computedCents = 0 } = useSessionTotal(sessionId)
@@ -181,6 +189,12 @@ function SessionCard({
               <span className="text-[11px] text-t-on bg-t-warn rounded-full px-[7px] py-[2px] leading-none">{t('sessione.notCompleted')}</span>
             )}
           </div>
+          {byName && (
+            <div className="text-[12px] text-t-muted mt-0.5">
+              {t('shared.madeBy', { name: byName })}
+              {uncounted && ` · ${t('shared.notCounted')}`}
+            </div>
+          )}
           <div className="text-[13px] text-t-muted mt-0.5">
             {formatShortDate(date)} · {t('storico.itemsCount', { count: purchases.length })}
             {deviation !== null && ` · ${t('storico.computed', { amount: formatCentsPlain(computedCents) })}`}

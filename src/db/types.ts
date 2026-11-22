@@ -73,6 +73,11 @@ export interface SharedLink {
   canWrite: boolean
   /** Quando è stato cambiato per l'ultima volta il nome della lista (ms): nel merge vince il più recente. */
   nameUpdatedAt?: number
+  /**
+   * Da quando la lista è condivisa (ms). Nel repo vanno solo le mie spese concluse da questo momento in poi:
+   * lo storico di prima resta mio. Assente = tutte (collegamenti vecchi).
+   */
+  sharedSince?: number
   /** Gli altri utenti, per login GitHub. */
   members: Record<string, SharedMember>
   /** Voci eliminate (uid → quando): servono al merge perché un'eliminazione non ricompaia. */
@@ -145,6 +150,15 @@ export interface Session {
   buoniSpent: number
   /** Valore unitario del buono usato in questa spesa, in centesimi. */
   buoniValueCents: number
+  /** Login GitHub di chi ha fatto la spesa, se non sono io (spesa di una lista condivisa, importata dal repo). */
+  doneBy?: string
+  /** Identificatore della spesa nel repo condiviso (assegnato alla prima pubblicazione). */
+  sharedUid?: string
+  /**
+   * La spesa è di un'altra persona che per me è un "estraneo": si vede nello storico ma non conta nel budget,
+   * nei buoni e nelle statistiche. Assente = conta.
+   */
+  uncounted?: boolean
 }
 
 /** Acquisto singolo all'interno di una sessione. */

@@ -31,6 +31,21 @@ describe('getStats — stato vuoto', () => {
   })
 })
 
+describe('getStats — spese di estranei', () => {
+  it('le spese non conteggiate (liste condivise) non entrano nelle statistiche', async () => {
+    await db.supermarkets.add({ id: 1, name: 'Coop', normalizedName: 'coop' })
+    const base = { isoWeek: WEEK, supermarketId: 1, startedAt: 1000, finishedAt: 2000, buoniSpent: 0, buoniValueCents: 800 }
+    await db.sessions.bulkAdd([
+      { ...base, id: 1, confirmedTotalCents: 1000 },
+      { ...base, id: 2, confirmedTotalCents: 9000, doneBy: 'luca', uncounted: true },
+      { ...base, id: 3, confirmedTotalCents: 500, doneBy: 'anna' }, // partner: conta
+    ])
+    const result = await getStats(WEEK, 0, null, null)
+    expect(result.sessionCount).toBe(2)
+    expect(result.totalCents).toBe(1500)
+  })
+})
+
 describe('getStats — sessioni finite', () => {
   it('ignora le sessioni non finite', async () => {
     await db.supermarkets.add({ id: 1, name: 'Coop', normalizedName: 'coop' })

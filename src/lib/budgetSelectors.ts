@@ -31,7 +31,8 @@ export function weekSpendSummary(
   let buoniSpentCount = 0
   let buoniCoveredCents = 0
   for (const s of sessions) {
-    if (s.finishedAt === null || s.id === undefined) continue
+    // Le spese di estranei (liste condivise) si vedono nello storico ma non contano nel mio budget.
+    if (s.finishedAt === null || s.id === undefined || s.uncounted) continue
     totalSpentCents += s.confirmedTotalCents ?? computedBySession.get(s.id) ?? 0
     buoniSpentCount += s.buoniSpent
     buoniCoveredCents += s.buoniSpent * s.buoniValueCents

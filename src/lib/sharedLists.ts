@@ -2,6 +2,7 @@ import { db } from '../db/db'
 import type { ShoppingList, SharedLink, SharedMember } from '../db/types'
 import { createShoppingList, deleteShoppingList, setSharedLink } from '../db/repositories/shoppingLists'
 import { patchSharedLink } from '../db/repositories/sharedListData'
+import { recountSharedSessions } from '../db/repositories/sharedSessionsData'
 import { getGitConfig, getRemoteFile, type GitConfig } from './gitSync'
 import {
   createPrivateRepo,
@@ -116,6 +117,7 @@ export async function shareList(
     canWrite: true,
     members: {},
     tombstones: {},
+    sharedSince: Date.now(),
   })
   try {
     await syncSharedList(listId)
@@ -190,6 +192,7 @@ export async function joinSharedList(ref: RepoRef): Promise<number> {
       canWrite: meta.canPush,
       members: {},
       tombstones: {},
+      sharedSince: Date.now(),
     })
     await syncSharedList(listId)
   } catch (e) {
@@ -210,4 +213,6 @@ export async function setMember(listId: number, login: string, patch: Partial<Sh
   if (!link) throw new Error('Lista non condivisa')
   const current: SharedMember = link.members[login] ?? { label: '', kind: 'stranger' }
   await patchSharedLink(listId, { members: { ...link.members, [login]: { ...current, ...patch } } })
+  // Partner o estraneo cambia se le sue spese contano nel mio budget.
+  await recountSharedSessions(listId)
 }

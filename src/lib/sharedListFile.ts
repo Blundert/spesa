@@ -82,6 +82,13 @@ const UID_RE = /^[A-Za-z0-9-]{1,64}$/
 const LOGIN_RE = /^[A-Za-z0-9](?:[A-Za-z0-9-]{0,38})$/
 // eslint-disable-next-line no-control-regex -- proprio i caratteri di controllo vanno rifiutati
 const CONTROL_RE = /[\u0000-\u001f\u007f]/
+// eslint-disable-next-line no-control-regex -- come sopra, globale per sostituirli tutti
+const CONTROL_RE_G = /[\u0000-\u001f\u007f]/g
+
+/** Testo adatto al file: senza caratteri di controllo e non più lungo del massimo, così il nostro file passa sempre la validazione. */
+export function cleanText(value: string, max: number): string {
+  return value.replace(CONTROL_RE_G, ' ').trim().slice(0, max).trim() || '?'
+}
 
 function isRecord(v: unknown): v is Record<string, unknown> {
   return typeof v === 'object' && v !== null && !Array.isArray(v)
@@ -233,7 +240,7 @@ function newer<T extends { updatedAt: number }>(a: T, b: T): T {
  * - ogni voce è identificata dal suo uid; se due persone l'hanno cambiata vince la modifica più recente;
  * - un'eliminazione (tombstone) vince su una voce non più recente di lei; una modifica successiva la fa tornare;
  * - voci con lo stesso nome (aggiunte in parallelo da due persone) diventano una sola con le quantità sommate;
- * - le spese concluse si uniscono per uid (non cambiano mai);
+ * - le spese concluse si uniscono per uid (non cambiano mai; una spesa eliminata, cioè con un tombstone, non torna);
  * - le eliminazioni più vecchie di 30 giorni si dimenticano.
  * È simmetrica: `merge(a, b)` e `merge(b, a)` danno lo stesso risultato.
  */
@@ -279,8 +286,10 @@ export function mergeSharedFiles(a: SharedListFile, b: SharedListFile, now: numb
     if (!aliveUids.has(k) && now - t <= TOMBSTONE_TTL_MS) kept[k] = t
   }
 
+  // Una spesa eliminata (tombstone) non torna; per il resto le spese non cambiano mai.
   const sessions = new Map<string, SharedSession>()
   for (const s of [...a.sessions, ...b.sessions]) {
+    if (tombstones[s.uid] !== undefined) continue
     const cur = sessions.get(s.uid)
     sessions.set(s.uid, cur && JSON.stringify(cur) >= JSON.stringify(s) ? cur : s)
   }

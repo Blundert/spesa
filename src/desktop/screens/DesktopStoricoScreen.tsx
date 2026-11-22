@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { displayName } from '../../lib/sharedLists'
 import { useTranslation } from 'react-i18next'
 import { useQuery } from '@tanstack/react-query'
 import { PageHeader } from '../components/PageHeader'
@@ -68,7 +69,18 @@ export function DesktopStoricoScreen() {
 
   const columns: Column<Session>[] = [
     { key: 'date', label: t('desktop.history.colDate'), render: (s) => <span style={{ color: 'var(--t-text2b)' }}>{formatDate(s.startedAt)}</span>, sortValue: (s) => s.startedAt },
-    { key: 'supermarket', label: t('desktop.history.colSupermarket'), render: (s) => <span style={{ fontWeight: 500 }}>{smName.get(s.supermarketId) ?? '?'}</span>, sortValue: (s) => smName.get(s.supermarketId) ?? '' },
+    { key: 'supermarket', label: t('desktop.history.colSupermarket'), render: (s) => (
+      <span style={{ fontWeight: 500 }}>
+        {smName.get(s.supermarketId) ?? '?'}
+        {s.doneBy !== undefined && (
+          <span style={{ fontWeight: 400, color: 'var(--t-muted)', fontSize: '12px' }}>
+            {' · '}
+            {t('shared.madeBy', { name: displayName(lists.find((l) => l.id === s.listId)?.shared, s.doneBy) })}
+            {s.uncounted && ` · ${t('shared.notCounted')}`}
+          </span>
+        )}
+      </span>
+    ), sortValue: (s) => smName.get(s.supermarketId) ?? '' },
     { key: 'list', label: t('desktop.history.colList'), render: (s) => <span style={{ color: 'var(--t-muted)' }}>{s.listId !== undefined ? (listName.get(s.listId) ?? '') : ''}</span>, sortValue: (s) => (s.listId !== undefined ? listName.get(s.listId) : null) },
     { key: 'buoni', label: t('desktop.history.colBuoni'), render: (s) => s.buoniSpent, sortValue: (s) => s.buoniSpent },
     { key: 'pocket', label: t('desktop.history.colOutOfPocket'), render: (s) => { const v = outOfPocketOf(s); return v === null ? '—' : `€ ${formatCents(v)}` }, sortValue: outOfPocketOf },

@@ -17,10 +17,12 @@ export const liveSync = createSharedSyncScheduler({
     setSyncStatus(listId, outcome)
     // Novità degli altri, o permesso cambiato (sola lettura): si ricaricano liste e voci.
     const readOnlyNow = outcome.ok ? !outcome.result.canWrite : outcome.code === 'read-only'
-    if (readOnlyNow || (outcome.ok && outcome.result.changed)) {
+    if (outcome.ok && outcome.result.changed) {
+      // Possono essere arrivate anche spese degli altri: storico, budget e statistiche si ricaricano.
+      void queryClient.invalidateQueries()
+    } else if (readOnlyNow) {
       void queryClient.invalidateQueries({ queryKey: qk.shoppingLists() })
       void queryClient.invalidateQueries({ queryKey: qk.listItems() })
-      void queryClient.invalidateQueries({ queryKey: qk.items() })
     }
   },
 })

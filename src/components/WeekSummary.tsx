@@ -36,7 +36,8 @@ export function WeekSummary({
   }
   const supermarketMap = Object.fromEntries(supermarkets.map((s) => [s.id ?? 0, s.name]))
   const weekSpese = sessions
-    .filter((s) => s.finishedAt !== null && s.id !== undefined)
+    // Come i totali: le spese di estranei (liste condivise) non compaiono qui.
+    .filter((s) => s.finishedAt !== null && s.id !== undefined && !s.uncounted)
     .sort((a, b) => (b.finishedAt ?? 0) - (a.finishedAt ?? 0))
     .map((s) => ({
       id: s.id as number,

@@ -59,6 +59,19 @@ describe('rangeToFromTs', () => {
   })
 })
 
+describe('spese di estranei (liste condivise)', () => {
+  it('non entrano nelle statistiche per supermercato', async () => {
+    await db.sessions.clear()
+    await db.supermarkets.clear()
+    await db.purchases.clear()
+    await db.supermarkets.add({ id: 1, name: 'Coop', normalizedName: 'coop' })
+    await addSession({ startedAt: day(15), confirmedTotalCents: 1000 })
+    await addSession({ startedAt: day(16), confirmedTotalCents: 7000, doneBy: 'luca', uncounted: true })
+    const [coop] = await getSupermarketStats(null)
+    expect(coop).toMatchObject({ sessionCount: 1, totalCents: 1000 })
+  })
+})
+
 describe('getSupermarketStats', () => {
   it('vuoto senza sessioni', async () => {
     expect(await getSupermarketStats(null)).toEqual([])

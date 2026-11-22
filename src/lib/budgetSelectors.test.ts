@@ -43,6 +43,17 @@ describe('weekSpendSummary', () => {
     expect(r.buoniSpentCount).toBe(0)
   })
 
+  it('una spesa di un estraneo (uncounted) non conta in totale, buoni e rimanenti', () => {
+    const sessions = [
+      makeSession({ id: 1, confirmedTotalCents: 1000, buoniSpent: 1 }),
+      makeSession({ id: 2, confirmedTotalCents: 5000, buoniSpent: 3, uncounted: true, doneBy: 'luca' }),
+    ]
+    const r = weekSpendSummary(sessions, [], 5)
+    expect(r.totalSpentCents).toBe(1000)
+    expect(r.buoniSpentCount).toBe(1)
+    expect(r.buoniRemaining).toBe(4)
+  })
+
   it('sessione senza id viene ignorata', () => {
     const session: Session = {
       isoWeek: '2026-W24',
