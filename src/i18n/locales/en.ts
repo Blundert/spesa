@@ -466,6 +466,8 @@ export const en: typeof it = {
     syncPath: 'File path',
     syncSave: 'Save configuration',
     syncSaved: 'Configuration saved',
+    syncForgetToken: 'Forget the token on this device',
+    syncTokenForgotten: 'Token removed from this device',
     syncAuto: 'Auto sync',
     syncNow: 'Sync now',
     syncPull: 'Pull from remote',

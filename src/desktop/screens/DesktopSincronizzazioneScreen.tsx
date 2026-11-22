@@ -121,6 +121,9 @@ export function DesktopSincronizzazioneScreen() {
             <button onClick={s.save} style={action}>
               {t('settings.syncSave')}
             </button>
+            <button onClick={s.forgetToken} disabled={!s.git.token} style={{ ...action, opacity: s.git.token ? 1 : 0.5 }}>
+              {t('settings.syncForgetToken')}
+            </button>
             <button onClick={() => void s.syncNow()} disabled={s.syncing} style={{ ...primary, opacity: s.syncing ? 0.5 : 1 }}>
               {t('settings.syncNow')}
             </button>

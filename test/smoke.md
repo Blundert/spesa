@@ -401,3 +401,13 @@ Solo interfaccia desktop (≥ 768 px): su mobile non c'è il grafo, la Cronologi
 6. Dopo un ripristino o un'unione il grafo mostra il nuovo commit (si aggiorna riaprendo la pagina o da "Sincronizza ora")
 7. A 768–1000 px la scheda sta nella pagina senza scorrimento orizzontale e il messaggio lungo viene troncato con "…" (verificato a 800, 1000 e 1280 px)
 
+
+### Flusso 45 — Sicurezza: CSP e token (mobile e desktop)
+Va provato sul **build di produzione** (`npm run build && npm run preview`): in `npm run dev` la CSP non c'è di proposito (Vite ha bisogno di script inline e websocket).
+1. Apri l'app dal preview e controlla la console: nessun errore "Content Security Policy"; il tema scelto si applica al primo disegno (lo script inline del tema è ammesso dal suo hash) e il service worker si registra
+2. In `dist/index.html` c'è un `<meta http-equiv="Content-Security-Policy">` con `connect-src 'self' https://api.github.com` e `script-src 'self'` più un solo hash; la stessa riga c'è in `dist/404.html` (copia fatta dal deploy)
+3. `dist/` non contiene `spesa-design.html` né `support.js`, e `dist/sw.js` non li nomina; `/spesa-design.html` sul preview mostra l'app, non il mockup (in `npm run dev` il mockup resta raggiungibile)
+4. Sincronizzazione con un token (anche finto): le chiamate a `api.github.com` partono (un token finto dà 401, non un blocco CSP); nessuna richiesta verso altri domini
+5. Mobile (≈390 px): sotto "Salva configurazione" c'è "Dimentica il token su questo dispositivo"; toccandolo il campo Token si svuota, compare il toast "Token rimosso da questo dispositivo", owner/repo/branch/file restano e il pulsante si disattiva; senza token il pulsante è già disattivato
+6. Desktop (1280 px e 800 px): lo stesso pulsante è tra "Salva configurazione" e "Sincronizza ora", fa le stesse cose e non crea scroll orizzontale
+7. Dopo "Dimentica il token" "Sincronizza ora" dice di configurare owner, repo e token; incollando di nuovo il token e salvando tutto torna a funzionare

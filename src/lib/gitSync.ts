@@ -41,6 +41,11 @@ export function setGitConfig(c: GitConfig): void {
   localStorage.setItem(CONFIG_KEY, JSON.stringify(c))
 }
 
+/** Cancella il token salvato su questo dispositivo, lasciando intatti repo, branch e file. */
+export function forgetGitToken(): void {
+  setGitConfig({ ...getGitConfig(), token: '' })
+}
+
 export function isGitConfigured(c: GitConfig): boolean {
   return Boolean(c.token && c.owner && c.repo && c.path)
 }

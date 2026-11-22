@@ -464,6 +464,8 @@ export const it = {
     syncPath: 'Percorso file',
     syncSave: 'Salva configurazione',
     syncSaved: 'Configurazione salvata',
+    syncForgetToken: 'Dimentica il token su questo dispositivo',
+    syncTokenForgotten: 'Token rimosso da questo dispositivo',
     syncAuto: 'Sync automatico',
     syncNow: 'Sincronizza ora',
     syncPull: 'Scarica da remoto',

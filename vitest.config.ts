@@ -40,6 +40,7 @@ export default defineConfig({
         'src/lib/historyItems.ts',
         'src/lib/gitSync.ts',
         'src/lib/syncRunner.ts',
+        'src/lib/csp.ts',
       ],
       all: true,
       thresholds: {

@@ -17,6 +17,7 @@ import {
   isGitConfigured,
   setAutoSync,
   setGitConfig,
+  forgetGitToken,
   switchBranch,
   syncPull,
 } from './gitSync'
@@ -61,6 +62,12 @@ beforeEach(async () => {
 afterEach(() => vi.unstubAllGlobals())
 
 describe('configurazione', () => {
+  it('dimenticare il token lo cancella e tiene il resto', () => {
+    forgetGitToken()
+    expect(getGitConfig()).toEqual({ ...CONFIG, token: '' })
+    expect(isGitConfigured(getGitConfig())).toBe(false)
+  })
+
   it('senza nulla salvato dà i valori predefiniti', () => {
     store.clear()
     expect(getGitConfig()).toEqual({ token: '', owner: '', repo: '', branch: 'main', path: 'spesa-db.json' })

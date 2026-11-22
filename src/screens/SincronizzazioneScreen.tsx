@@ -102,6 +102,13 @@ export function SincronizzazioneScreen() {
           {t('settings.syncSave')}
         </button>
         <button
+          onClick={s.forgetToken}
+          disabled={!s.git.token}
+          className="w-full bg-t-surface rounded-[20px] px-5 py-[17px] mb-3 text-left text-base text-t-fg active:bg-t-surface2 transition-colors disabled:opacity-50"
+        >
+          {t('settings.syncForgetToken')}
+        </button>
+        <button
           onClick={s.toggleAuto}
           className="w-full flex items-center justify-between bg-t-surface rounded-[20px] px-5 py-[17px] mb-3 active:bg-t-surface2 transition-colors text-left"
         >

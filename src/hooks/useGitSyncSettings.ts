@@ -4,6 +4,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import {
   getAutoSync,
+  forgetGitToken,
   getGitConfig,
   isGitConfigured,
   setAutoSync,
@@ -29,6 +30,14 @@ export function useGitSyncSettings() {
   const save = () => {
     setGitConfig(git)
     toast(t('settings.syncSaved'))
+    void qc.invalidateQueries({ queryKey: ['sync-history'] })
+  }
+
+  /** Toglie il token da questo dispositivo (repo e file restano): per un token da revocare o un dispositivo da pulire. */
+  const forgetToken = () => {
+    forgetGitToken()
+    setGit(getGitConfig())
+    toast(t('settings.syncTokenForgotten'))
     void qc.invalidateQueries({ queryKey: ['sync-history'] })
   }
 
@@ -72,5 +81,5 @@ export function useGitSyncSettings() {
   /** Rilegge la configurazione salvata (dopo un cambio di branch fatto altrove). */
   const refresh = () => setGit(getGitConfig())
 
-  return { git, refresh, setGitField, auto, toggleAuto, syncing, showPull, setShowPull, save, syncNow, pull }
+  return { git, refresh, setGitField, auto, toggleAuto, syncing, showPull, setShowPull, save, forgetToken, syncNow, pull }
 }
