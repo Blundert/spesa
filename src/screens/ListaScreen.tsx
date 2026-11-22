@@ -225,7 +225,7 @@ export function ListaScreen() {
 
       {/* Suggerimenti rapidi (input vuoto) */}
       {!readOnly && quick.length > 0 && (
-        <div className="flex gap-2 overflow-x-auto pb-4 -mx-5 px-5">
+        <div className="flex gap-2 overflow-x-auto overflow-y-hidden pb-4 -mx-5 px-5">
           {quick.map((p) => (
             <button
               key={p.name}

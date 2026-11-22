@@ -2,6 +2,14 @@ export type ChangelogEntry = { it: string[]; en: string[] }
 
 // Ordine: più recente in cima. Aggiungere una entry ad ogni nuova versione.
 export const changelog: Record<string, ChangelogEntry> = {
+  '1.2.1': {
+    it: [
+      'Schede delle liste: scorrendo di lato non si muovono più anche in verticale (succedeva soprattutto su iPhone). Stessa correzione per la fila dei suggerimenti rapidi e per le schede su desktop',
+    ],
+    en: [
+      'List tabs: swiping sideways no longer also moves them vertically (mostly on iPhone). Same fix for the quick suggestions row and for the tabs on desktop',
+    ],
+  },
   '1.2.0': {
     it: [
       'Sincronizzazione più corta: la cronologia delle versioni (con il ripristino e, su desktop, il grafo dei commit) è ora in una pagina a parte, "Cronologia e ripristino", e non devi più scorrere tanto per arrivare alla guida',

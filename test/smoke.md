@@ -495,3 +495,8 @@ Cambia dove si trovano le cose dei Flussi 41 e 44: la cronologia, il ripristino 
 3. Su quella pagina funzionano come prima: toccare una versione mostra cosa cambierebbe, "Ripristina" chiede conferma e ripristina (con backup prima); su desktop toccare un commit del grafo apre il confronto affiancato e il ripristino
 4. Senza repository collegato: "Collega un repository per vedere la cronologia remota" (in entrambe le pagine dove serve)
 5. A 390, 800 e 1280 px nessuno scroll orizzontale; Impostazioni → "Sincronizzazione e cronologia" porta ancora alla pagina Sincronizzazione
+
+### Flusso 56 — Schede delle liste: solo scorrimento orizzontale (mobile e desktop)
+1. Con tante liste (almeno 5, in modo che le schede non stiano nello schermo): sul telefono (soprattutto iPhone) trascina le schede di lato: scorrono solo in orizzontale, senza il minimo movimento su e giù; trascinando verso l'alto/basso sulle schede scorre la pagina
+2. Lo stesso per la fila dei suggerimenti rapidi (chip) sotto il campo "Aggiungi un oggetto…"
+3. Desktop (1280 e 800 px): le schede delle liste con tante liste scorrono di lato senza barra verticale; le liste condivise con l'icona delle persone non cambiano l'altezza delle schede

@@ -192,7 +192,7 @@ export function DesktopListaScreen() {
       />
 
       {/* Schede delle liste */}
-      <div style={{ display: 'flex', alignItems: 'flex-end', gap: '24px', borderBottom: '1px solid var(--t-line7)', marginBottom: '24px', overflowX: 'auto' }}>
+      <div style={{ display: 'flex', alignItems: 'flex-end', gap: '24px', borderBottom: '1px solid var(--t-line7)', marginBottom: '24px', overflowX: 'auto', overflowY: 'hidden' }}>
         {tabs.map((l) => {
           const isActive = l.id === listId
           const store = l.supermarketId !== null ? supermarketNames[l.supermarketId] : undefined

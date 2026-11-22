@@ -23,7 +23,7 @@ export function ListTabs({
   return (
     <div
       data-tour="list-tabs"
-      className="flex items-end gap-5 overflow-x-auto -mt-2 mb-[18px] px-1.5 border-b border-t-line7 [scrollbar-width:none]"
+      className="flex items-end gap-5 overflow-x-auto overflow-y-hidden -mt-2 mb-[18px] px-1.5 border-b border-t-line7 [scrollbar-width:none]"
     >
       {lists.map((l) => {
         const active = l.id === activeId
