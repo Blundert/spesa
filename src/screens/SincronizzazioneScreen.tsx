@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { BackButton } from '../components/BackButton'
 import { BottomSheet } from '../components/BottomSheet'
 import { SyncDiffView } from '../components/sync/SyncDiffView'
+import { GithubConnect } from '../components/sync/GithubConnect'
 import { SyncGuide } from '../components/sync/SyncGuide'
 import { SyncBranches } from '../components/sync/SyncBranches'
 import { formatDateTime, historyDetail, historyTitle } from '../components/sync/historyText'
@@ -43,34 +44,7 @@ export function SincronizzazioneScreen() {
         {/* Collegamento */}
         <div className={SECTION_LABEL}>{t('syncPage.config')}</div>
         <p className="text-[13px] text-t-muted px-1.5 pb-[13px] leading-relaxed">{t('settings.syncHint')}</p>
-        <a
-          href="https://github.com/settings/personal-access-tokens/new"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="w-full flex items-center justify-between bg-t-surface rounded-[20px] px-5 py-[17px] mb-3 active:bg-t-surface2 transition-colors text-left"
-        >
-          <span className="text-base text-t-fg">{t('settings.syncCreateToken')}</span>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--t-muted)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M14 5h5v5M19 5l-8 8M11 5H6a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-5" />
-          </svg>
-        </a>
-        <div className="bg-t-surface2 rounded-[20px] px-5 py-4 mb-3">
-          <div className="text-[12px] font-normal tracking-[0.4px] text-t-muted uppercase pb-2.5">
-            {t('settings.syncStepsTitle')}
-          </div>
-          <ol className="space-y-2">
-            {[t('settings.syncStep1'), t('settings.syncStep2'), t('settings.syncStep3'), t('settings.syncStep4')].map(
-              (step, i) => (
-                <li key={i} className="flex gap-2.5 text-[13px] text-t-text2 leading-relaxed">
-                  <span className="flex-none w-[18px] h-[18px] mt-px rounded-full bg-t-line8 text-[11px] flex items-center justify-center tabular-nums">
-                    {i + 1}
-                  </span>
-                  <span>{step}</span>
-                </li>
-              ),
-            )}
-          </ol>
-        </div>
+        <GithubConnect s={s} />
         <div className="bg-t-surface rounded-[20px] overflow-hidden mb-3">
           {(
             [

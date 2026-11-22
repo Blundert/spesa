@@ -10,6 +10,7 @@ import { CommitModal } from '../components/CommitModal'
 import { useCommitGraph } from '../../hooks/useCommitGraph'
 import { SortableTable, type Column } from '../components/SortableTable'
 import { SyncDiffView } from '../../components/sync/SyncDiffView'
+import { GithubConnect } from '../../components/sync/GithubConnect'
 import { SyncGuide } from '../../components/sync/SyncGuide'
 import { SyncBranches } from '../../components/sync/SyncBranches'
 import { formatDateTime, historyDetail, historyTitle } from '../../components/sync/historyText'
@@ -67,26 +68,7 @@ export function DesktopSincronizzazioneScreen() {
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: '24px', alignItems: 'start' }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', minWidth: 0 }}>
         <Card title={t('syncPage.config')}>
-          <div style={{ background: 'var(--t-surface2)', borderRadius: '12px', padding: '14px 16px', marginBottom: '16px' }}>
-            <div style={{ fontSize: '12px', color: 'var(--t-muted)', textTransform: 'uppercase', letterSpacing: '0.4px', marginBottom: '8px' }}>
-              {t('settings.syncStepsTitle')}
-            </div>
-            <ol style={{ margin: 0, paddingLeft: '18px', fontSize: '13px', color: 'var(--t-text2)', lineHeight: 1.6 }}>
-              {[t('settings.syncStep1'), t('settings.syncStep2'), t('settings.syncStep3'), t('settings.syncStep4')].map(
-                (step, i) => (
-                  <li key={i}>{step}</li>
-                ),
-              )}
-            </ol>
-            <a
-              href="https://github.com/settings/personal-access-tokens/new"
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{ display: 'inline-block', marginTop: '10px', fontSize: '13px', color: 'var(--t-fg)' }}
-            >
-              {t('settings.syncCreateToken')} ↗
-            </a>
-          </div>
+          <GithubConnect s={s} />
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '16px' }}>
             {gitFields.map((row) => (
               <label

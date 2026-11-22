@@ -42,6 +42,7 @@ export default defineConfig({
         'src/lib/syncRunner.ts',
         'src/lib/csp.ts',
         'src/lib/sharedList.ts',
+        'src/lib/githubAccount.ts',
       ],
       all: true,
       thresholds: {

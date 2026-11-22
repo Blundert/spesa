@@ -22,7 +22,7 @@ import {
   syncPull,
 } from './gitSync'
 
-const CONFIG = { token: 't', owner: 'me', repo: 'spesa', branch: 'main', path: 'spesa-db.json' }
+const CONFIG = { token: 't', login: '', owner: 'me', repo: 'spesa', branch: 'main', path: 'spesa-db.json' }
 const PATH = 'spesa-db.json'
 
 let gh: FakeGithub
@@ -62,21 +62,22 @@ beforeEach(async () => {
 afterEach(() => vi.unstubAllGlobals())
 
 describe('configurazione', () => {
-  it('dimenticare il token lo cancella e tiene il resto', () => {
+  it('dimenticare il token cancella anche il login e tiene il resto', () => {
+    setGitConfig({ ...CONFIG, login: 'matteo' })
     forgetGitToken()
-    expect(getGitConfig()).toEqual({ ...CONFIG, token: '' })
+    expect(getGitConfig()).toEqual({ ...CONFIG, token: '', login: '' })
     expect(isGitConfigured(getGitConfig())).toBe(false)
   })
 
   it('senza nulla salvato dà i valori predefiniti', () => {
     store.clear()
-    expect(getGitConfig()).toEqual({ token: '', owner: '', repo: '', branch: 'main', path: 'spesa-db.json' })
+    expect(getGitConfig()).toEqual({ token: '', login: '', owner: '', repo: '', branch: 'main', path: 'spesa-db.json' })
     expect(isGitConfigured(getGitConfig())).toBe(false)
   })
 
   it('rilegge la configurazione e riempie i campi mancanti', () => {
     store.set('gitsync-config', JSON.stringify({ token: 'x', owner: 'o', repo: 'r' }))
-    expect(getGitConfig()).toEqual({ token: 'x', owner: 'o', repo: 'r', branch: 'main', path: 'spesa-db.json' })
+    expect(getGitConfig()).toEqual({ token: 'x', login: '', owner: 'o', repo: 'r', branch: 'main', path: 'spesa-db.json' })
     expect(isGitConfigured(getGitConfig())).toBe(true)
     store.set('gitsync-config', JSON.stringify({}))
     expect(getGitConfig().token).toBe('')

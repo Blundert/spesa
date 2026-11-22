@@ -7,6 +7,8 @@ import { backupPath, isInitialData, isValidBranchName, parseBackupPath, type Bac
 
 export interface GitConfig {
   token: string
+  /** Login GitHub del proprietario del token (letto da `/user` al collegamento). Vuoto se non verificato. */
+  login: string
   owner: string
   repo: string
   branch: string
@@ -25,6 +27,7 @@ export function getGitConfig(): GitConfig {
       const c = JSON.parse(raw) as Partial<GitConfig>
       return {
         token: c.token ?? '',
+        login: c.login ?? '',
         owner: c.owner ?? '',
         repo: c.repo ?? '',
         branch: c.branch || 'main',
@@ -34,16 +37,16 @@ export function getGitConfig(): GitConfig {
   } catch {
     /* ignora json corrotto */
   }
-  return { token: '', owner: '', repo: '', branch: 'main', path: 'spesa-db.json' }
+  return { token: '', login: '', owner: '', repo: '', branch: 'main', path: 'spesa-db.json' }
 }
 
 export function setGitConfig(c: GitConfig): void {
   localStorage.setItem(CONFIG_KEY, JSON.stringify(c))
 }
 
-/** Cancella il token salvato su questo dispositivo, lasciando intatti repo, branch e file. */
+/** Cancella il token (e il login che gli apparteneva) da questo dispositivo, lasciando intatti repo, branch e file. */
 export function forgetGitToken(): void {
-  setGitConfig({ ...getGitConfig(), token: '' })
+  setGitConfig({ ...getGitConfig(), token: '', login: '' })
 }
 
 export function isGitConfigured(c: GitConfig): boolean {
@@ -93,9 +96,9 @@ function isoStamp(): string {
   return new Date().toISOString()
 }
 
-const API = 'https://api.github.com'
+export const API = 'https://api.github.com'
 
-function authHeaders(token: string): Record<string, string> {
+export function authHeaders(token: string): Record<string, string> {
   return {
     Authorization: `Bearer ${token}`,
     Accept: 'application/vnd.github+json',

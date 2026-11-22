@@ -411,3 +411,15 @@ Va provato sul **build di produzione** (`npm run build && npm run preview`): in 
 5. Mobile (≈390 px): sotto "Salva configurazione" c'è "Dimentica il token su questo dispositivo"; toccandolo il campo Token si svuota, compare il toast "Token rimosso da questo dispositivo", owner/repo/branch/file restano e il pulsante si disattiva; senza token il pulsante è già disattivato
 6. Desktop (1280 px e 800 px): lo stesso pulsante è tra "Salva configurazione" e "Sincronizza ora", fa le stesse cose e non crea scroll orizzontale
 7. Dopo "Dimentica il token" "Sincronizza ora" dice di configurare owner, repo e token; incollando di nuovo il token e salvando tutto torna a funzionare
+
+### Flusso 46 — Collega GitHub: token e scelta del repo (mobile e desktop)
+Serve un account GitHub (anche di prova) e, per il passo 2, un repo privato. Su desktop la pagina è la stessa, con la scheda a sinistra.
+1. Pagina Sincronizzazione → in "Collegamento" c'è la scheda "Collega GitHub" con tre passi, "Crea token su GitHub ↗" e "Incolla il token dagli appunti", e in fondo l'avviso sul token. I vecchi passi per il token fine-grained non ci sono più
+2. "Crea token su GitHub" apre github.com/settings/tokens/new già compilato: nota "Spesa" e permesso `repo` spuntato. La scadenza NON è precompilata: lasciare i 30 giorni proposti. "Generate token" e copia
+3. Appunti con altro testo → "Incolla il token": toast "Negli appunti non c'è un token GitHub…" e niente cambia. Appunti con un token che non vale → toast "Token non valido o scaduto" e il token NON viene salvato (il campo Token resta com'era)
+4. Appunti con il token vero → "Controllo il token…", poi "Collegato come @tuo-login", toast "Configurazione salvata", il campo Token si riempie e compare "Repository dei backup" con i repo su cui puoi scrivere (non quelli di sola lettura). Se il browser nega l'accesso agli appunti il toast dice di incollare nel campo Token (che resta usabile a mano)
+5. Scegli un repo dall'elenco → toast "Repository salvato" e i campi Owner e Repo si riempiono da soli (branch `main` e file `spesa-db.json` restano); "Sincronizza ora" funziona
+6. Chiudi e riapri la pagina: senza fare nulla compare di nuovo "Collegato come @…" con il repo scelto già selezionato. Con un token scaduto compare "Token non valido o scaduto. Creane uno nuovo."
+7. "Dimentica il token su questo dispositivo" (Flusso 45): sparisce "Collegato come…" e l'elenco, il campo Token si svuota, owner e repo restano
+8. Mobile (≈390 px) e desktop (1280 e 800 px): la scheda sta nella colonna senza scroll orizzontale; i token funzionano anche con un tema scuro (colori dai token del tema)
+9. In produzione (`npm run build && npm run preview`) le chiamate a `api.github.com` non sono bloccate dalla CSP
