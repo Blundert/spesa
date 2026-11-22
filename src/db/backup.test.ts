@@ -118,6 +118,65 @@ describe('exportData', () => {
   })
 })
 
+const SHARED = {
+  uid: 'u-1',
+  owner: 'anna',
+  repo: 'spesa-casa',
+  branch: 'main',
+  path: 'lista.json',
+  me: 'matteo',
+  canWrite: true,
+  members: { anna: { label: 'Anna', kind: 'partner' as const } },
+  tombstones: { 'voce-1': 1234 },
+}
+
+describe('liste condivise nel backup', () => {
+  async function shareList(lastSha?: string) {
+    await db.shoppingLists.add({
+      id: 5,
+      name: 'Casa nostra',
+      supermarketId: null,
+      sortOrder: 1,
+      archivedAt: null,
+      shared: { ...SHARED, ...(lastSha ? { lastSha } : {}) },
+    })
+    await db.listItems.add({ id: 9, listId: 5, itemId: 1, quantity: 1, addedAt: 1, uid: 'v-1', updatedAt: 2, addedBy: 'anna', takenBy: null })
+  }
+
+  it('porta il collegamento ma non lo stato di sync (lastSha) né il token', async () => {
+    await seed()
+    await shareList('abc123')
+    const exported = await exportData()
+    const list = exported.shoppingLists?.find((l) => l.id === 5)
+    expect(list?.shared).toEqual(SHARED)
+    expect(list?.shared && 'lastSha' in list.shared).toBe(false)
+    expect(JSON.stringify(exported)).not.toMatch(/token/i)
+    expect(exported.listItems.find((li) => li.id === 9)).toMatchObject({ uid: 'v-1', addedBy: 'anna' })
+  })
+
+  it('non modifica le liste del database mentre esporta', async () => {
+    await shareList('abc123')
+    await exportData()
+    expect((await db.shoppingLists.get(5))?.shared?.lastSha).toBe('abc123')
+  })
+
+  it('un backup con lastSha lo perde all’import: la prima sync dovrà scaricare', async () => {
+    await seed()
+    await shareList()
+    const exported = await exportData()
+    const withSha = {
+      ...exported,
+      shoppingLists: exported.shoppingLists?.map((l) => (l.shared ? { ...l, shared: { ...l.shared, lastSha: 'vecchio' } } : l)),
+    }
+    await clearAll()
+    await importData(withSha)
+    const list = await db.shoppingLists.get(5)
+    expect(list?.shared).toEqual(SHARED)
+    expect(list?.shared?.lastSha).toBeUndefined()
+    expect((await db.listItems.get(9))?.uid).toBe('v-1')
+  })
+})
+
 describe('importData', () => {
   it('round-trip: export → clear → import ripristina dati, id e relazioni', async () => {
     await seed()

@@ -41,6 +41,7 @@ export default defineConfig({
         'src/lib/gitSync.ts',
         'src/lib/syncRunner.ts',
         'src/lib/csp.ts',
+        'src/lib/sharedList.ts',
       ],
       all: true,
       thresholds: {

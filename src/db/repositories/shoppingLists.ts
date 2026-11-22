@@ -1,5 +1,5 @@
 import { db } from '../db'
-import type { ShoppingList } from '../types'
+import type { SharedLink, ShoppingList } from '../types'
 
 /** Errore: l'ultima lista attiva non si può archiviare né eliminare. */
 export const LAST_ACTIVE_LIST = 'LAST_ACTIVE_LIST'
@@ -79,4 +79,15 @@ export async function getListItemCounts(): Promise<Record<number, number>> {
   const counts: Record<number, number> = {}
   for (const li of await db.listItems.toArray()) counts[li.listId] = (counts[li.listId] ?? 0) + 1
   return counts
+}
+
+/** Le liste condivise con altre persone (archiviate comprese), nell'ordine delle schede. */
+export async function getSharedLists(): Promise<Array<ShoppingList & { shared: SharedLink }>> {
+  const lists = await getShoppingLists()
+  return lists.filter((l): l is ShoppingList & { shared: SharedLink } => l.shared !== undefined)
+}
+
+/** Collega una lista a un repo condiviso; `null` la scollega e la lascia una lista normale. */
+export async function setSharedLink(id: number, link: SharedLink | null): Promise<void> {
+  await db.shoppingLists.update(id, { shared: link ?? undefined })
 }

@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach } from 'vitest'
 import { db } from '../db'
 import {
   addToList,
+  assignListItemUids,
   clearList,
   getListItems,
   removeFromList,
@@ -93,5 +94,31 @@ describe('clearList', () => {
     expect(await getListItems(A)).toEqual([])
     expect(await getListItems(B)).toHaveLength(1)
     expect(await db.items.count()).toBe(2)
+  })
+})
+
+describe('assignListItemUids', () => {
+  it('dà uid, autore e data di modifica alle voci senza e lascia stare le altre e le altre liste', async () => {
+    await db.listItems.bulkAdd([
+      { id: 1, listId: 1, itemId: A, quantity: 1, addedAt: 1000 },
+      { id: 2, listId: 1, itemId: B, quantity: 2, addedAt: 2000, uid: 'gia-mia', updatedAt: 5000, addedBy: 'anna' },
+      { id: 3, listId: 2, itemId: A, quantity: 1, addedAt: 3000 },
+    ])
+    await assignListItemUids(1, 'matteo')
+    const [one, two, three] = await db.listItems.orderBy('id').toArray()
+    expect(one.uid).toMatch(/^[0-9a-f-]{36}$/)
+    expect(one).toMatchObject({ updatedAt: 1000, addedBy: 'matteo' })
+    expect(two).toMatchObject({ uid: 'gia-mia', updatedAt: 5000, addedBy: 'anna' })
+    expect(three.uid).toBeUndefined()
+  })
+
+  it('è idempotente: una seconda chiamata non cambia gli uid', async () => {
+    await db.listItems.add({ listId: 1, itemId: A, quantity: 1, addedAt: 1000 })
+    await assignListItemUids(1, 'matteo')
+    const first = (await db.listItems.toArray())[0].uid
+    await assignListItemUids(1, 'altro')
+    const after = (await db.listItems.toArray())[0]
+    expect(after.uid).toBe(first)
+    expect(after.addedBy).toBe('matteo')
   })
 })

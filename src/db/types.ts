@@ -45,6 +45,43 @@ export const DEFAULT_BUONO_VALUE_CENTS = 800
 /** Nome della lista creata al primo avvio (e con la migrazione della lista unica). */
 export const DEFAULT_LIST_NAME = 'Spesa'
 
+/** Come conta, per il MIO budget, la spesa fatta da un altro: `partner` = buoni condivisi, `stranger` = no. */
+export type SharedMemberKind = 'partner' | 'stranger'
+
+/** Un altro utente di una lista condivisa, come lo vedo io (nome e tipo restano su questo dispositivo). */
+export interface SharedMember {
+  /** Nome visibile (es. "Anna"); se vuoto si mostra il login GitHub. */
+  label: string
+  kind: SharedMemberKind
+}
+
+/**
+ * Collegamento di una lista a un repo GitHub condiviso. Non contiene mai il token (quello sta solo
+ * nella configurazione del sync, su questo dispositivo).
+ */
+export interface SharedLink {
+  /** Identificatore stabile della lista condivisa: sta anche nel file del repo, non cambia mai. */
+  uid: string
+  owner: string
+  repo: string
+  branch: string
+  /** File della lista dentro il repo. */
+  path: string
+  /** Login GitHub di chi usa questo dispositivo. */
+  me: string
+  /** Permesso di scrittura sul repo all'ultimo controllo (false = sola lettura). */
+  canWrite: boolean
+  /** Gli altri utenti, per login GitHub. */
+  members: Record<string, SharedMember>
+  /** Voci eliminate (uid → quando): servono al merge perché un'eliminazione non ricompaia. */
+  tombstones: Record<string, number>
+  /**
+   * Sha del file remoto all'ultimo sync. Assente = non so cosa c'è nel repo: prima di scrivere
+   * si scarica sempre (è il caso dopo un ripristino da backup).
+   */
+  lastSha?: string
+}
+
 /** Lista della spesa tematica (es. "Settimanale", "Casa"). Una spesa parte da una lista. */
 export interface ShoppingList {
   id?: number
@@ -58,6 +95,8 @@ export interface ShoppingList {
   usualItemIds?: number[]
   /** Chip rapidi scelti a mano (id degli articoli, in ordine). Assente = automatici. */
   quickItemIds?: number[]
+  /** Presente solo se la lista è condivisa con altre persone tramite un repo GitHub. */
+  shared?: SharedLink
 }
 
 /**
@@ -70,6 +109,14 @@ export interface ListItem {
   itemId: number
   quantity: number
   addedAt: number // timestamp ms
+  /** Solo nelle liste condivise: identificatore stabile della voce (gli id locali sono diversi su ogni dispositivo). */
+  uid?: string
+  /** Solo nelle liste condivise: ultima modifica, ms (nel merge vince la più recente). */
+  updatedAt?: number
+  /** Solo nelle liste condivise: login GitHub di chi ha aggiunto la voce. */
+  addedBy?: string
+  /** Solo nelle liste condivise: login GitHub di chi l'ha già presa in negozio; null/assente = ancora da prendere. */
+  takenBy?: string | null
 }
 
 /** Sessione di spesa (una visita in un supermercato). */

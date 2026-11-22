@@ -1,15 +1,18 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import { db } from '../db'
+import type { SharedLink } from '../types'
 import {
   LAST_ACTIVE_LIST,
   archiveShoppingList,
   createShoppingList,
   deleteShoppingList,
   getListItemCounts,
+  getSharedLists,
   getShoppingLists,
   getUsualItems,
   reorderShoppingLists,
   restoreShoppingList,
+  setSharedLink,
   updateShoppingList,
 } from './shoppingLists'
 
@@ -158,5 +161,49 @@ describe('getListItemCounts', () => {
       { listId: 2, itemId: 1, quantity: 1, addedAt: 0 },
     ])
     expect(await getListItemCounts()).toEqual({ 1: 2, 2: 1 })
+  })
+})
+
+const LINK: SharedLink = {
+  uid: 'u-1',
+  owner: 'anna',
+  repo: 'spesa-casa',
+  branch: 'main',
+  path: 'lista.json',
+  me: 'matteo',
+  canWrite: true,
+  members: { anna: { label: 'Anna', kind: 'partner' } },
+  tombstones: {},
+}
+
+describe('liste condivise', () => {
+  it('collega una lista a un repo e la ritrova tra le condivise, nell’ordine delle schede', async () => {
+    const a = await createShoppingList('Casa', null)
+    const b = await createShoppingList('Weekend', null)
+    expect(await getSharedLists()).toEqual([])
+    await setSharedLink(b, LINK)
+    const shared = await getSharedLists()
+    expect(shared.map((l) => l.id)).toEqual([b])
+    expect(shared[0].shared).toEqual(LINK)
+    expect((await getShoppingLists()).find((l) => l.id === a)?.shared).toBeUndefined()
+  })
+
+  it('scollegare toglie il collegamento e lascia una lista normale', async () => {
+    const id = await createShoppingList('Casa', 2)
+    await setSharedLink(id, LINK)
+    await setSharedLink(id, null)
+    expect(await getSharedLists()).toEqual([])
+    const list = (await getShoppingLists())[0]
+    expect(list).toMatchObject({ id, name: 'Casa', supermarketId: 2 })
+    expect('shared' in list).toBe(false)
+  })
+
+  it('rinominare o archiviare non tocca il collegamento', async () => {
+    const id = await createShoppingList('Casa', null)
+    await createShoppingList('Altra', null)
+    await setSharedLink(id, LINK)
+    await updateShoppingList(id, { name: 'Casa nostra' })
+    await archiveShoppingList(id)
+    expect((await getSharedLists())[0]).toMatchObject({ name: 'Casa nostra', shared: LINK })
   })
 })

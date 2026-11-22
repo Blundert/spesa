@@ -36,6 +36,20 @@ export interface BackupData {
   settings?: { weekStartDay: number }
 }
 
+/**
+ * Toglie dalle liste lo stato di sync con il repo condiviso (`lastSha`): non è un dato della lista e
+ * cambierebbe l'impronta del backup a ogni sync. Soprattutto: dopo un ripristino la lista condivisa non
+ * sa cosa c'è nel repo, quindi la prima sync scarica e non sovrascrive mai il lavoro degli altri.
+ */
+function withoutSharedSyncState(lists: ShoppingList[]): ShoppingList[] {
+  return lists.map((l) => {
+    if (!l.shared) return l
+    const { lastSha, ...link } = l.shared
+    void lastSha
+    return { ...l, shared: link }
+  })
+}
+
 /** Serializza tutte le tabelle in un oggetto di backup (id inclusi → relazioni preservate). */
 export async function exportData(): Promise<BackupData> {
   const [
@@ -76,7 +90,7 @@ export async function exportData(): Promise<BackupData> {
     mealPlans,
     dishes,
     dishIngredients,
-    shoppingLists,
+    shoppingLists: withoutSharedSyncState(shoppingLists),
     settings: { weekStartDay: getWeekStartDay() },
   }
 }
@@ -135,7 +149,7 @@ export async function importData(data: BackupData): Promise<void> {
       ])
       // Backup senza liste: voci e spese vanno nella lista iniziale, come nella migrazione v9.
       let fallbackListId = 0
-      if (data.shoppingLists) await db.shoppingLists.bulkAdd(data.shoppingLists)
+      if (data.shoppingLists) await db.shoppingLists.bulkAdd(withoutSharedSyncState(data.shoppingLists))
       else fallbackListId = (await db.shoppingLists.add(newDefaultList())) as number
       await Promise.all([
         db.categories.bulkAdd(data.categories),
