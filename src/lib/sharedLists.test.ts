@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { db } from '../db/db'
 import type { ShoppingList, SharedLink } from '../db/types'
 import { FakeGithub } from './fakeGithub'
-import { setGitConfig } from './gitSync'
+import { getGitConfig, setGitConfig } from './gitSync'
 import {
   SharedListError,
   defaultRepoName,
@@ -139,11 +139,34 @@ describe('shareList', () => {
   it('senza collegamento a GitHub o con un nome non valido non fa niente', async () => {
     setGitConfig({ token: '', login: '', owner: '', repo: '', branch: 'main', path: 'spesa-db.json' })
     expect(await codeOf(shareList(1, { repoName: 'spesa-casa' }))).toBe('not-connected')
-    setGitConfig({ token: 't', login: '', owner: '', repo: '', branch: 'main', path: 'spesa-db.json' })
-    expect(await codeOf(shareList(1, { repoName: 'spesa-casa' }))).toBe('not-connected')
     setGitConfig({ token: 't', login: 'matteo', owner: '', repo: '', branch: 'main', path: 'spesa-db.json' })
     expect(await codeOf(shareList(1, { repoName: 'no no' }))).toBe('invalid-name')
     expect((await db.shoppingLists.get(1))?.shared).toBeUndefined()
+  })
+
+  it('con un token inserito a mano (senza login salvato) chiede il login a GitHub, lo ricorda e condivide', async () => {
+    setGitConfig({ token: 't', login: '', owner: '', repo: '', branch: 'main', path: 'spesa-db.json' })
+    api = (m, u) => {
+      if (u === 'https://api.github.com/user') return res({ login: 'matteo' })
+      if (m === 'POST' && u.endsWith('/user/repos')) return created()
+      if (u === 'https://api.github.com/repos/matteo/spesa-casa') return res({ permissions: { push: true } })
+      return undefined
+    }
+    await shareList(1, { repoName: 'spesa-casa' })
+    expect(getGitConfig().login).toBe('matteo')
+    expect((await db.shoppingLists.get(1))?.shared?.me).toBe('matteo')
+  })
+
+  it('un token senza login che GitHub non accetta (o un errore diverso) non condivide', async () => {
+    setGitConfig({ token: 't', login: '', owner: '', repo: '', branch: 'main', path: 'spesa-db.json' })
+    for (const status of [401, 403]) {
+      api = () => res({}, status)
+      expect(await codeOf(shareList(1, { repoName: 'spesa-casa' }))).toBe('not-connected')
+    }
+    api = () => res({}, 500)
+    await expect(shareList(1, { repoName: 'spesa-casa' })).rejects.toThrow('GitHub 500')
+    expect((await db.shoppingLists.get(1))?.shared).toBeUndefined()
+    expect(getGitConfig().login).toBe('')
   })
 
   it('traduce gli errori nella creazione del repo', async () => {

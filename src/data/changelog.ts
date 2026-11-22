@@ -2,6 +2,14 @@ export type ChangelogEntry = { it: string[]; en: string[] }
 
 // Ordine: più recente in cima. Aggiungere una entry ad ogni nuova versione.
 export const changelog: Record<string, ChangelogEntry> = {
+  '1.1.2': {
+    it: [
+      'Liste condivise: se il token GitHub l\'avevi già inserito a mano, "Condividi con altre persone" non ti chiede più di collegare GitHub. L\'app ricava da sola il tuo nome utente e lo ricorda',
+    ],
+    en: [
+      'Shared lists: if you had already entered the GitHub token by hand, "Share with other people" no longer asks you to connect GitHub. The app works out your username on its own and remembers it',
+    ],
+  },
   '1.1.1': {
     it: [
       'Sincronizzazione: risolto il "Confronta e unisci" che compariva di continuo senza niente da gestire. Succedeva con le liste condivise, perché i dati degli altri arrivano su ogni dispositivo per conto suo. Ora, se il contenuto è lo stesso, non ti viene chiesto niente',

@@ -17,10 +17,9 @@ function useRefreshLists() {
   }
 }
 
-/** Il token è collegato (token e login noti)? */
+/** C'è un token GitHub salvato? (Il login, se manca, si ricava da GitHub quando serve.) */
 export function isGithubConnected(): boolean {
-  const { token, login } = getGitConfig()
-  return token !== '' && login !== ''
+  return getGitConfig().token !== ''
 }
 
 export function useShareList() {

@@ -40,7 +40,13 @@ export function useGitSyncSettings() {
   const [pasting, setPasting] = useState(false)
   const account = useQuery({
     queryKey: ['github-connection', checkedToken],
-    queryFn: () => connectGithub(checkedToken),
+    queryFn: async () => {
+      const result = await connectGithub(checkedToken)
+      // Token inserito a mano in passato: ora che sappiamo chi è, ricordiamo il login.
+      const saved = getGitConfig()
+      if (saved.token === checkedToken && saved.login !== result.login) setGitConfig({ ...saved, login: result.login })
+      return result
+    },
     enabled: checkedToken !== '',
     retry: false,
     staleTime: 60_000,

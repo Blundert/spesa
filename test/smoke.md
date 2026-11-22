@@ -426,7 +426,7 @@ Serve un account GitHub (anche di prova) e, per il passo 2, un repo privato. Su 
 
 ### Flusso 47 — Condividere una lista e aggiungerne una condivisa (mobile e desktop)
 Serve il collegamento a GitHub con token classico (Flusso 46) e, per provare davvero, un secondo account GitHub. Stessi passi su mobile (scheda di modifica in basso) e desktop (finestra "Modifica lista").
-1. Senza collegamento: tocca la scheda attiva della lista → "Modifica lista" → in fondo "Condivisione" dice "Per condividere una lista collega prima GitHub" con il pulsante "Collega GitHub" che porta a Sincronizzazione (e chiude la scheda). Lo stesso testo compare in "Aggiungi una lista condivisa"
+1. Senza token GitHub salvato: tocca la scheda attiva della lista → "Modifica lista" → in fondo "Condivisione" dice "Per condividere una lista collega prima GitHub" con il pulsante "Collega GitHub" che porta a Sincronizzazione (e chiude la scheda). Lo stesso testo compare in "Aggiungi una lista condivisa"
 2. Collegato: "Condividi con altre persone" apre il modulo: nome del repository proposto (`spesa-` + nome della lista senza accenti), username da invitare (facoltativo; scritto, compare "Può modificare / Solo guarda") e "Condividi". Toast "Lista condivisa. Invito mandato a @…"; su GitHub c'è un nuovo repo privato con `lista.json` e l'invito in sospeso. Un nome di repo già usato dà "Esiste già un repository con questo nome"; un nome con spazi disattiva il pulsante
 3. La lista ha l'icona delle persone nella scheda (mobile e desktop), nella pagina Liste (mobile e tabella desktop). La sezione ora dice "Condivisa su owner/repo", "Puoi modificare", "Aggiorna ora", "Persone" e, solo per chi possiede il repo, "Invita un'altra persona" (dopo aver condiviso il campo invito è vuoto); "Invita" dà "Invito mandato a @…", un utente inesistente "Utente GitHub non trovato"
 4. Secondo account: nuova lista (+) → "Aggiungi una lista condivisa" → "Inviti ricevuti" elenca il repo con "da @…". "Accetta e aggiungi" accetta l'invito senza passare da github.com e aggiunge la lista con il nome e gli articoli dell'altro. In alternativa si incolla `owner/repo` o l'indirizzo GitHub e "Aggiungi"; un testo che non è un repo dà "Non è un repository GitHub valido", un repo che non si vede "Il repository non esiste o non hai accesso…"; aggiungere una lista già presente apre quella
@@ -472,3 +472,8 @@ Serve la sync del backup personale attiva (Sincronizzazione → Sync automatico)
 3. Se invece si cambia davvero qualcosa di personale su entrambi (es. una lista normale diversa) il conflitto compare ancora, con le scelte da fare in "Confronta e unisci"
 4. "Confronta e unisci" aperto a mano con dati uguali dice che non c'è niente da gestire
 5. Nel backup esportato non ci sono le voci delle liste condivise né le spese degli altri (si riconoscono dal campo `doneBy`)
+
+### Flusso 52 — Condividere con un token inserito a mano (mobile e desktop)
+1. Con un token salvato PRIMA di "Collega GitHub" (campo Token scritto a mano, nessun "Collegato come @…" mai mostrato): "Modifica lista" → "Condivisione" mostra "Condividi con altre persone", non "collega prima GitHub"; lo stesso per "Aggiungi una lista condivisa"
+2. Condividendo, l'app chiede a GitHub chi sei e lo ricorda: aprendo Sincronizzazione compare "Collegato come @…"
+3. Con un token scaduto o non valido compare "Collega prima GitHub…"; un token a repo singolo (fine-grained) non può creare repository e dà "Il token non ha il permesso di farlo: crea un token con il permesso repo"

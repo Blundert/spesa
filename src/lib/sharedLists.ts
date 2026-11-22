@@ -3,7 +3,8 @@ import type { ShoppingList, SharedLink, SharedMember } from '../db/types'
 import { createShoppingList, deleteShoppingList, setSharedLink } from '../db/repositories/shoppingLists'
 import { patchSharedLink } from '../db/repositories/sharedListData'
 import { recountSharedSessions } from '../db/repositories/sharedSessionsData'
-import { getGitConfig, getRemoteFile, type GitConfig } from './gitSync'
+import { getGitConfig, getRemoteFile, setGitConfig, type GitConfig } from './gitSync'
+import { fetchViewer } from './githubAccount'
 import {
   createPrivateRepo,
   fetchRepoMeta,
@@ -75,10 +76,22 @@ export function isValidRepoName(name: string): boolean {
   return parseRepoRef(`a/${name}`) !== null && !name.includes('/')
 }
 
-function connection(): { token: string; login: string } {
-  const { token, login } = getGitConfig()
-  if (!token || !login) throw new SharedListError('not-connected')
-  return { token, login }
+/**
+ * Token e login GitHub di questo dispositivo. Chi ha inserito il token a mano (prima di "Collega GitHub") non ha il
+ * login salvato: lo si chiede a GitHub una volta e lo si ricorda. Senza token, o con un token che non vale, serve collegare.
+ */
+async function connection(): Promise<{ token: string; login: string }> {
+  const config = getGitConfig()
+  if (!config.token) throw new SharedListError('not-connected')
+  if (config.login) return { token: config.token, login: config.login }
+  let login: string
+  try {
+    login = await fetchViewer(config.token)
+  } catch (e) {
+    throw translate(e, { '401': 'not-connected', '403': 'not-connected' })
+  }
+  setGitConfig({ ...getGitConfig(), login })
+  return { token: config.token, login }
 }
 
 /** Traduce gli errori di GitHub (testo "GitHub 4xx") nei codici di `SharedListError`; gli altri passano. */
@@ -97,7 +110,7 @@ export async function shareList(
   listId: number,
   opts: { repoName: string; invite?: { username: string; permission: SharePermission } },
 ): Promise<{ owner: string; repo: string; invite: InviteOutcome }> {
-  const { token, login } = connection()
+  const { token, login } = await connection()
   if (!isValidRepoName(opts.repoName)) throw new SharedListError('invalid-name')
 
   let created
@@ -143,7 +156,7 @@ export async function inviteToList(
   username: string,
   permission: SharePermission,
 ): Promise<'invited' | 'already'> {
-  const { token } = connection()
+  const { token } = await connection()
   const link = (await db.shoppingLists.get(listId))?.shared
   if (!link) throw new Error('Lista non condivisa')
   try {
@@ -158,7 +171,7 @@ export async function inviteToList(
  * sincronizzazione (che scarica e non scrive). Se qualcosa va storto la lista non viene creata.
  */
 export async function joinSharedList(ref: RepoRef): Promise<number> {
-  const { token, login } = connection()
+  const { token, login } = await connection()
 
   let meta: RepoMeta
   try {
