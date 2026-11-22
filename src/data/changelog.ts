@@ -2,6 +2,18 @@ export type ChangelogEntry = { it: string[]; en: string[] }
 
 // Ordine: più recente in cima. Aggiungere una entry ad ogni nuova versione.
 export const changelog: Record<string, ChangelogEntry> = {
+  '1.0.0': {
+    it: [
+      'Prima versione stabile: sincronizzazione GitHub con cronologia, ripristino, unione guidata, branch e grafo dei commit',
+      'Più sicurezza: l\'app pubblicata ammette solo script suoi e parla in rete soltanto con GitHub, così un token rubato non può essere spedito altrove. Il vecchio mockup di design non è più pubblicato',
+      'Sincronizzazione: nuovo pulsante "Dimentica il token su questo dispositivo", per togliere il token senza toccare repository e file',
+    ],
+    en: [
+      'First stable release: GitHub sync with history, restore, guided merge, branches and the commit graph',
+      'Safer: the published app only allows its own scripts and talks to the network only with GitHub, so a stolen token cannot be sent elsewhere. The old design mockup is no longer published',
+      'Sync: new "Forget the token on this device" button, to remove the token without touching the repository or the file',
+    ],
+  },
   '0.49.0': {
     it: [
       'Desktop, pagina Sincronizzazione: nuovo "Grafo dei commit", con tutti i branch e le loro versioni disegnati come in git (corsie colorate, unioni, branch in punta). Toccando un commit vedi cosa ha cambiato, con prima e dopo affiancati, rispetto al commit precedente o ai dati di adesso',
