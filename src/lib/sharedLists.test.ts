@@ -31,7 +31,7 @@ const rFile = (over: Partial<SharedListFile> = {}): SharedListFile => ({
 let gh: FakeGithub
 let store: Map<string, string>
 /** Risposte per gli endpoint che FakeGithub non conosce (repo, inviti). */
-let api: (method: string, url: string) => Response | undefined
+let api: (method: string, url: string) => Response | Error | undefined
 
 const codeOf = async (p: Promise<unknown>): Promise<SharedListErrorCode> => {
   try {
@@ -111,7 +111,7 @@ describe('shareList', () => {
       return undefined
     }
     const r = await shareList(1, { repoName: 'spesa-casa', invite: { username: ' anna ', permission: 'push' } })
-    expect(r).toEqual({ owner: 'matteo', repo: 'spesa-casa', invite: 'invited' })
+    expect(r).toEqual({ owner: 'matteo', repo: 'spesa-casa', invite: 'invited', pending: false })
     const list = await db.shoppingLists.get(1)
     expect(list?.shared).toMatchObject({ owner: 'matteo', repo: 'spesa-casa', path: 'lista.json', me: 'matteo', canWrite: true })
     expect(list?.shared?.sharedSince).toBeGreaterThan(0)
@@ -167,6 +167,50 @@ describe('shareList', () => {
     await expect(shareList(1, { repoName: 'spesa-casa' })).rejects.toThrow('GitHub 500')
     expect((await db.shoppingLists.get(1))?.shared).toBeUndefined()
     expect(getGitConfig().login).toBe('')
+  })
+
+  it('se la prima scrittura va in conflitto o manca la rete la lista resta condivisa e il lavoro lo finisce la sync dopo', async () => {
+    for (const fail of [new Response('{}', { status: 409 }), new TypeError('offline')]) {
+      await unlinkSharedList(1)
+      gh.files.clear()
+      api = (m, u) => {
+        if (m === 'POST' && u.endsWith('/user/repos')) return created()
+        if (u === 'https://api.github.com/repos/matteo/spesa-casa') return res({ permissions: { push: true } })
+        if (m === 'PUT' && u.includes('/contents/')) return fail
+        return undefined
+      }
+      const r = await shareList(1, { repoName: 'spesa-casa' })
+      expect(r.pending).toBe(true)
+      expect((await db.shoppingLists.get(1))?.shared).toBeDefined()
+    }
+  })
+
+  it('un repo con quel nome già mio e senza lista (resto di un tentativo a metà) si riusa', async () => {
+    api = (m, u) => {
+      if (m === 'POST' && u.endsWith('/user/repos')) return res({ message: 'name already exists' }, 422)
+      if (u === 'https://api.github.com/repos/matteo/spesa-casa') return res({ default_branch: 'main', permissions: { push: true } })
+      return undefined
+    }
+    const r = await shareList(1, { repoName: 'spesa-casa' })
+    expect(r).toMatchObject({ owner: 'matteo', repo: 'spesa-casa', pending: false })
+    expect(gh.files.get('lista.json')).toBeDefined()
+    expect((await db.shoppingLists.get(1))?.shared?.owner).toBe('matteo')
+  })
+
+  it('un repo con quel nome che non si può riusare dà "esiste già"', async () => {
+    const taken = (m: string, u: string) => (m === 'POST' && u.endsWith('/user/repos') ? res({}, 422) : undefined)
+    // senza permesso di scrittura
+    api = (m, u) => taken(m, u) ?? (u === 'https://api.github.com/repos/matteo/spesa-casa' ? res({ permissions: { push: false } }) : undefined)
+    expect(await codeOf(shareList(1, { repoName: 'spesa-casa' }))).toBe('name-taken')
+    // ha già una lista condivisa dentro
+    gh.files.set('lista.json', '{}')
+    api = (m, u) => taken(m, u) ?? (u === 'https://api.github.com/repos/matteo/spesa-casa' ? res({ permissions: { push: true } }) : undefined)
+    expect(await codeOf(shareList(1, { repoName: 'spesa-casa' }))).toBe('name-taken')
+    // il repo non si vede
+    gh.files.clear()
+    api = (m, u) => taken(m, u) ?? (u === 'https://api.github.com/repos/matteo/spesa-casa' ? res({}, 404) : undefined)
+    expect(await codeOf(shareList(1, { repoName: 'spesa-casa' }))).toBe('name-taken')
+    expect((await db.shoppingLists.get(1))?.shared).toBeUndefined()
   })
 
   it('traduce gli errori nella creazione del repo', async () => {

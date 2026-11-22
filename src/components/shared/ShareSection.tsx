@@ -91,7 +91,8 @@ export function ShareSection({ list, onNavigate }: { list: ShoppingList; onNavig
       { listId, repoName: repoName.trim(), invite: username ? { username, permission } : undefined },
       {
         onSuccess: (r) => {
-          if (r.invite === 'invited') toast(t('shared.sharedInvited', { user: username }))
+          if (r.pending) toast(t('shared.sharedPending'))
+          else if (r.invite === 'invited') toast(t('shared.sharedInvited', { user: username }))
           else if (r.invite === 'already') toast(t('shared.sharedAlready', { user: username }))
           else if (r.invite === 'failed') toast.error(t('shared.sharedInviteFailed'))
           else toast(t('shared.sharedOnly'))

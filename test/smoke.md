@@ -482,3 +482,8 @@ Serve la sync del backup personale attiva (Sincronizzazione → Sync automatico)
 1. Su iPhone/iPad (Safari o app installata): Sincronizzazione → "Collega GitHub". Il pulsante "Incolla il token dagli appunti" può dire "Il browser non lascia leggere gli appunti…" e porta il cursore sul campo "Oppure incolla qui il token"
 2. Tieni premuto nel campo → Incolla: il token viene controllato da solo ("Collegato come @…") e salvato, il campo torna vuoto. Un testo lungo che non è un token dà "Negli appunti non c'è un token GitHub…"; un token non valido "Token non valido o scaduto" e non viene salvato
 3. Su browser che lasciano leggere gli appunti (desktop, Android) il pulsante funziona come prima e il campo è un'alternativa
+
+### Flusso 54 — Condividere senza errori di conflitto (mobile e desktop)
+1. "Condividi" su una lista, senza invitare nessuno: toast "Lista condivisa" (o "finisce di sincronizzarsi tra poco"), mai "Un altro stava modificando la lista" a vuoto; su GitHub c'è un solo commit con `lista.json`
+2. Se un tentativo precedente è fallito lasciando un repository vuoto con lo stesso nome, ripetere la condivisione con quel nome lo riusa (nessun "Esiste già un repository con questo nome"); se il repo ha già una lista dentro, invece, lo dice
+3. Se compare davvero il messaggio sul conflitto, ora spiega cosa fare: toccare la riga sotto le schede per sincronizzare di nuovo

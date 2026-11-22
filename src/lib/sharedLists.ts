@@ -7,6 +7,7 @@ import { getGitConfig, getRemoteFile, setGitConfig, type GitConfig } from './git
 import { fetchViewer } from './githubAccount'
 import {
   createPrivateRepo,
+  type CreatedRepo,
   fetchRepoMeta,
   inviteCollaborator,
   type RepoMeta,
@@ -14,7 +15,7 @@ import {
 } from './githubRepos'
 import { SHARED_LIST_PATH, newUid, parseRepoRef, type RepoRef } from './sharedList'
 import { parseSharedFile } from './sharedListFile'
-import { syncSharedList } from './sharedSync'
+import { SharedSyncError, syncSharedList } from './sharedSync'
 
 /**
  * Cosa può andare storto nel condividere o aggiungere una lista:
@@ -103,21 +104,39 @@ function translate(e: unknown, map: Record<string, SharedListErrorCode>): unknow
 export type InviteOutcome = 'invited' | 'already' | 'failed' | 'none'
 
 /**
+ * Un repo con questo nome esiste già: se è mio, ci posso scrivere e non ha ancora una lista condivisa (resto di un
+ * tentativo andato a metà) lo riuso invece di bloccare l'utente con "esiste già".
+ */
+async function reusableRepo(token: string, login: string, name: string): Promise<CreatedRepo | null> {
+  try {
+    const meta = await fetchRepoMeta(token, login, name)
+    if (!meta.canPush) return null
+    const cfg: GitConfig = { token, login, owner: login, repo: name, branch: meta.defaultBranch, path: SHARED_LIST_PATH }
+    if (await getRemoteFile(cfg)) return null
+    return { owner: login, repo: name, defaultBranch: meta.defaultBranch }
+  } catch {
+    return null
+  }
+}
+
+/**
  * Condivide una lista: crea un repo privato dedicato, la collega e scrive il file. Se indicato, invita una persona.
  * Se qualcosa va storto prima che il file sia scritto la lista torna com'era (il repo resta su GitHub).
  */
 export async function shareList(
   listId: number,
   opts: { repoName: string; invite?: { username: string; permission: SharePermission } },
-): Promise<{ owner: string; repo: string; invite: InviteOutcome }> {
+): Promise<{ owner: string; repo: string; invite: InviteOutcome; pending: boolean }> {
   const { token, login } = await connection()
   if (!isValidRepoName(opts.repoName)) throw new SharedListError('invalid-name')
 
-  let created
+  let created: CreatedRepo | null
   try {
     created = await createPrivateRepo(token, opts.repoName)
   } catch (e) {
-    throw translate(e, { '422': 'name-taken', '403': 'no-permission', '401': 'not-connected' })
+    const status = e instanceof Error ? /^GitHub (\d{3})/.exec(e.message)?.[1] : undefined
+    created = status === '422' ? await reusableRepo(token, login, opts.repoName) : null
+    if (!created) throw translate(e, { '422': 'name-taken', '403': 'no-permission', '401': 'not-connected' })
   }
 
   await setSharedLink(listId, {
@@ -132,11 +151,17 @@ export async function shareList(
     tombstones: {},
     sharedSince: Date.now(),
   })
+  // Se la prima scrittura non va (conflitto, niente rete) il repo c'è già: la lista resta condivisa e la sync che si
+  // ripete da sola finisce il lavoro. Con altri errori si torna indietro.
+  let pending = false
   try {
     await syncSharedList(listId)
   } catch (e) {
-    await setSharedLink(listId, null)
-    throw e
+    if (e instanceof SharedSyncError && (e.code === 'conflict' || e.code === 'network')) pending = true
+    else {
+      await setSharedLink(listId, null)
+      throw e
+    }
   }
 
   let invite: InviteOutcome = 'none'
@@ -147,7 +172,7 @@ export async function shareList(
       invite = 'failed'
     }
   }
-  return { owner: created.owner, repo: created.repo, invite }
+  return { owner: created.owner, repo: created.repo, invite, pending }
 }
 
 /** Invita un'altra persona su una lista già condivisa (solo chi possiede il repo può farlo). */

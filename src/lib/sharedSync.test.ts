@@ -178,7 +178,7 @@ describe('syncSharedList: sync normali', () => {
     let puts = 0
     const base = gh.override
     gh.override = (m, u) => (m === 'PUT' && ++puts === 1 ? new Response('{}', { status: 409 }) : base?.(m, u))
-    const r = await syncSharedList(1, NOW + 10)
+    const r = await syncSharedList(1, NOW + 10, 0)
     expect(r.pushed).toBe(true)
     expect(puts).toBe(2)
   })
@@ -187,7 +187,7 @@ describe('syncSharedList: sync normali', () => {
     await addLocal('Latte', 'v1')
     const base = gh.override
     gh.override = (m, u) => (m === 'PUT' ? new Response('{}', { status: 422 }) : base?.(m, u))
-    expect(await codeOf(syncSharedList(1, NOW + 10))).toBe('conflict')
+    expect(await codeOf(syncSharedList(1, NOW + 10, 0))).toBe('conflict')
   })
 
   it('403 in scrittura: ricorda che è sola lettura', async () => {
@@ -230,6 +230,29 @@ describe('syncSharedList: spese concluse', () => {
   })
 })
 
+describe('syncSharedList: scritture contemporanee e pausa tra i tentativi', () => {
+  it('due richieste insieme sulla stessa lista fanno una sola sync (niente scritture in parallelo)', async () => {
+    await addLocal('Latte', 'v1')
+    const [a, b] = await Promise.all([syncSharedList(1, NOW), syncSharedList(1, NOW)])
+    expect(b).toBe(a)
+    expect(gh.calls.filter((c) => c.method === 'PUT')).toHaveLength(1)
+    // finita la prima, una nuova richiesta riparte normalmente
+    await syncSharedList(1, NOW + 5)
+    expect(gh.calls.filter((c) => c.method === 'GET' && c.url.includes('/contents/'))).toHaveLength(2) // una lettura per sync
+  })
+
+  it('dopo un conflitto aspetta (sempre di più) prima di riprovare', async () => {
+    await addLocal('Latte', 'v1')
+    const times: number[] = []
+    const base = gh.override
+    gh.override = (m, u) => (m === 'PUT' ? (times.push(Date.now()), new Response('{}', { status: 409 })) : base?.(m, u))
+    expect(await codeOf(syncSharedList(1, NOW, 40))).toBe('conflict')
+    expect(times).toHaveLength(3)
+    expect(times[1] - times[0]).toBeGreaterThanOrEqual(35) // ~40 ms
+    expect(times[2] - times[1]).toBeGreaterThanOrEqual(70) // ~80 ms
+  })
+})
+
 describe('syncSharedList: sola lettura', () => {
   it('la copia locale diventa quella del repo e non si scrive mai', async () => {
     push = false
@@ -256,7 +279,7 @@ describe('syncSharedList: collisione alla creazione', () => {
       }
       return base?.(m, u)
     }
-    const r = await syncSharedList(1, NOW)
+    const r = await syncSharedList(1, NOW, 0)
     expect(r.pushed).toBe(false) // seconda passata = prima sync con il file presente: solo unione
     expect(await localNames()).toEqual(['Latte', 'Uova'])
   })

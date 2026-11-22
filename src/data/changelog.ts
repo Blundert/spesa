@@ -2,6 +2,16 @@ export type ChangelogEntry = { it: string[]; en: string[] }
 
 // Ordine: più recente in cima. Aggiungere una entry ad ogni nuova versione.
 export const changelog: Record<string, ChangelogEntry> = {
+  '1.1.4': {
+    it: [
+      'Liste condivise: risolto "Un altro stava modificando la lista: riprova tra poco" che usciva subito dopo aver condiviso una lista anche senza aver invitato nessuno. Due sincronizzazioni partivano insieme e GitHub rifiutava la seconda; ora ce n\'è una sola alla volta e tra un tentativo e l\'altro c\'è una piccola pausa',
+      'Se la prima scrittura non riesce, la lista resta condivisa e finisce da sola invece di tornare indietro. Se un tentativo precedente aveva lasciato un repository vuoto con lo stesso nome, lo riusa invece di dire "esiste già"',
+    ],
+    en: [
+      'Shared lists: fixed "Someone else was editing the list: try again shortly" showing up right after sharing a list even with nobody invited. Two syncs started together and GitHub rejected the second; now there is only one at a time and a short pause between attempts',
+      'If the first write fails, the list stays shared and finishes on its own instead of being undone. If an earlier attempt left an empty repository with the same name, it is reused instead of saying "already exists"',
+    ],
+  },
   '1.1.3': {
     it: [
       'Collega GitHub su iPhone e iPad: dove il browser non lascia leggere gli appunti (iOS) c\'è ora un campo dove incollare il token con il tocco prolungato; viene controllato e salvato da solo',

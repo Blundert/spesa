@@ -47,6 +47,13 @@ export interface SharedSyncResult {
 }
 
 const MAX_ATTEMPTS = 3
+/** Pausa tra un tentativo e l'altro dopo un conflitto di scrittura (cresce a ogni tentativo). */
+export const RETRY_DELAY_MS = 400
+
+const pause = (ms: number) => (ms > 0 ? new Promise<void>((resolve) => setTimeout(resolve, ms)) : Promise.resolve())
+
+/** Sync in corso per lista: una seconda richiesta contemporanea si accoda alla stessa invece di scrivere in parallelo. */
+const inFlight = new Map<number, Promise<SharedSyncResult>>()
 
 const isConflict = (e: unknown) => e instanceof Error && /^GitHub (409|422)/.test(e.message)
 
@@ -89,15 +96,25 @@ function readRemote(text: string, uid: string): SharedListFile {
  * - Sola lettura: la copia locale diventa quella del repo.
  * - Se il repo è vuoto, la prima sync crea il file.
  */
-export async function syncSharedList(listId: number, now: number = Date.now()): Promise<SharedSyncResult> {
-  try {
-    return await run(listId, now)
-  } catch (e) {
-    throw translate(e)
-  }
+export function syncSharedList(
+  listId: number,
+  now: number = Date.now(),
+  retryDelayMs: number = RETRY_DELAY_MS,
+): Promise<SharedSyncResult> {
+  // Due sync insieme sulla stessa lista (es. subito dopo "Condividi") farebbero scritture contemporanee, che GitHub
+  // rifiuta con un conflitto: la seconda richiesta riceve il risultato della prima.
+  const running = inFlight.get(listId)
+  if (running) return running
+  const job = run(listId, now, retryDelayMs)
+    .catch((e: unknown) => {
+      throw translate(e)
+    })
+    .finally(() => inFlight.delete(listId))
+  inFlight.set(listId, job)
+  return job
 }
 
-async function run(listId: number, now: number): Promise<SharedSyncResult> {
+async function run(listId: number, now: number, retryDelayMs: number): Promise<SharedSyncResult> {
   const token = getGitConfig().token
   if (!token) throw new SharedSyncError('no-token')
 
@@ -117,7 +134,10 @@ async function run(listId: number, now: number): Promise<SharedSyncResult> {
         await patchSharedLink(listId, { lastSha: sha, canWrite: true })
         return { changed: false, pushed: true, canWrite: true }
       } catch (e) {
-        if (isConflict(e)) continue
+        if (isConflict(e)) {
+          await pause(retryDelayMs * (attempt + 1))
+          continue
+        }
         throw e
       }
     }
@@ -133,7 +153,10 @@ async function run(listId: number, now: number): Promise<SharedSyncResult> {
       try {
         sha = await putFile(cfg, serializeSharedFile(merged), message, remote.sha)
       } catch (e) {
-        if (isConflict(e)) continue
+        if (isConflict(e)) {
+          await pause(retryDelayMs * (attempt + 1))
+          continue
+        }
         // 403: il permesso di scrittura è stato tolto.
         if (e instanceof Error && /^GitHub 403/.test(e.message)) {
           await patchSharedLink(listId, { canWrite: false })
