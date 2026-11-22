@@ -1,6 +1,5 @@
 import { db } from '../db'
 import type { SharedLink } from '../types'
-import { normalizeName } from '../../lib/normalize'
 import {
   cleanText,
   MAX_CATEGORY,
@@ -12,7 +11,7 @@ import {
   type SharedListFile,
 } from '../../lib/sharedListFile'
 import { assignListItemUids } from './listItems'
-import { upsertItem } from './items'
+import { catalogResolver } from './sharedCatalog'
 import { exportSharedSessions, importSharedSessions } from './sharedSessionsData'
 
 async function sharedListOf(listId: number) {
@@ -62,23 +61,21 @@ export async function exportSharedFile(listId: number): Promise<SharedListFile> 
 
 /**
  * Porta su questo dispositivo il risultato del merge: nome, voci (nuove, cambiate, sparite), eliminazioni da
- * ricordare, persone e spese concluse. Gli articoli si collegano al catalogo per nome; se non esistono si creano,
- * nella categoria con lo stesso nome o in "Altro".
+ * ricordare, persone e spese concluse. Gli articoli si collegano al catalogo per nome (vedi `catalogResolver`: se qui
+ * non hanno una categoria vera prendono quella di chi li ha condivisi).
  */
 export async function applySharedFile(listId: number, file: SharedListFile): Promise<void> {
   const tables = [db.shoppingLists, db.listItems, db.items, db.categories, db.sessions, db.purchases, db.supermarkets]
   await db.transaction('rw', tables, async () => {
     const { link } = await sharedListOf(listId)
-    const categories = await db.categories.toArray()
-    const byName = new Map(categories.map((c) => [normalizeName(c.name), c.id as number]))
-    const fallback = (categories.find((c) => normalizeName(c.name) === 'altro') ?? categories[0]).id as number
+    const catalog = await catalogResolver()
 
     const rows = await db.listItems.where('listId').equals(listId).toArray()
     const byUid = new Map(rows.filter((r) => r.uid).map((r) => [r.uid as string, r]))
     const inFile = new Set(file.items.map((i) => i.uid))
 
     for (const fi of file.items) {
-      const itemId = await upsertItem(fi.name, byName.get(normalizeName(fi.categoryName)) ?? fallback)
+      const itemId = await catalog.item(fi.name, fi.categoryName)
       const fields = {
         itemId,
         quantity: fi.quantity,

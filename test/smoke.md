@@ -500,3 +500,11 @@ Cambia dove si trovano le cose dei Flussi 41 e 44: la cronologia, il ripristino 
 1. Con tante liste (almeno 5, in modo che le schede non stiano nello schermo): sul telefono (soprattutto iPhone) trascina le schede di lato: scorrono solo in orizzontale, senza il minimo movimento su e giù; trascinando verso l'alto/basso sulle schede scorre la pagina
 2. Lo stesso per la fila dei suggerimenti rapidi (chip) sotto il campo "Aggiungi un oggetto…"
 3. Desktop (1280 e 800 px): le schede delle liste con tante liste scorrono di lato senza barra verticale; le liste condivise con l'icona delle persone non cambiano l'altezza delle schede
+
+### Flusso 57 — Categoria delle voci ricevute da una lista condivisa (mobile e desktop)
+Serve una lista condivisa con un'altra persona (Flusso 47) che mette voci in categorie diverse.
+1. Lei aggiunge "Riso" in Dispensa, e tu non hai "Riso" nel catalogo: arriva nella tua lista già in Dispensa (non in "Altro")
+2. Tu hai già "Riso" ma in "Altro" (o senza una categoria che esista ancora): dopo la sync passa in Dispensa. Se invece avevi scelto tu una categoria vera (es. Frigo), resta la tua
+3. Lei usa una categoria che tu non hai (es. "Animali"): viene creata in fondo all'elenco delle categorie (una volta sola, anche con più voci) e le voci ci finiscono dentro; la trovi nel Catalogo
+4. Se lei non ha scelto nessuna categoria ("Altro"), a te non cambia nulla per gli articoli che già hai
+5. Lo stesso vale per gli articoli delle spese concluse dell'altra persona (nello Storico e nel Catalogo)

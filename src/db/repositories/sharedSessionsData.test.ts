@@ -97,7 +97,9 @@ describe('importSharedSessions', () => {
     expect(purchases.map((p) => [p.priceCents, p.quantity])).toEqual([[120, 2], [210, 1]])
     const latte = await db.items.where('normalizedName').equals('latte').first()
     expect(latte).toMatchObject({ categoryId: 1, lastPriceCents: 120, suggestedPriceCents: 120, purchaseCount: 2 })
-    expect((await db.items.where('normalizedName').equals('biscotti').first())?.categoryId).toBe(2) // categoria sconosciuta → Altro
+    const boh = (await db.categories.toArray()).find((c) => c.name === 'Boh')
+    expect(boh).toBeDefined() // categoria che qui non c'era: viene creata
+    expect((await db.items.where('normalizedName').equals('biscotti').first())?.categoryId).toBe(boh?.id)
   })
 
   it('di un estraneo (o di uno sconosciuto) segna la spesa come non conteggiata', async () => {
@@ -138,9 +140,9 @@ describe('importSharedSessions', () => {
     expect(await db.sessions.count()).toBe(1)
   })
 
-  it('con "Altro" assente ripiega sulla prima categoria', async () => {
+  it('con categoria sconosciuta ("?") e senza "Altro" ripiega sulla prima categoria', async () => {
     await db.categories.delete(2)
-    await importSharedSessions(1, LINK, [ss('s1')])
+    await importSharedSessions(1, LINK, [ss('s1', { purchases: [{ name: 'Biscotti', categoryName: '?', priceCents: 210, quantity: 1 }] })])
     expect((await db.items.where('normalizedName').equals('biscotti').first())?.categoryId).toBe(1)
   })
 })

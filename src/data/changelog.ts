@@ -2,6 +2,14 @@ export type ChangelogEntry = { it: string[]; en: string[] }
 
 // Ordine: più recente in cima. Aggiungere una entry ad ogni nuova versione.
 export const changelog: Record<string, ChangelogEntry> = {
+  '1.2.2': {
+    it: [
+      'Liste condivise: chi riceve una voce riceve anche la categoria. Se hai già quell\'articolo ma senza una categoria vera (è in "Altro"), prende quella di chi l\'ha condiviso; se hai già scelto tu la categoria resta la tua. Se l\'altro usa una categoria che non hai, viene creata. Vale anche per gli articoli delle spese condivise',
+    ],
+    en: [
+      'Shared lists: whoever receives an item also receives its category. If you already have that item but without a real category (it is in "Other"), it takes the sharer\'s category; if you already picked one it stays yours. If the other person uses a category you do not have, it is created. It also applies to the items of shared shopping trips',
+    ],
+  },
   '1.2.1': {
     it: [
       'Schede delle liste: scorrendo di lato non si muovono più anche in verticale (succedeva soprattutto su iPhone). Stessa correzione per la fila dei suggerimenti rapidi e per le schede su desktop',

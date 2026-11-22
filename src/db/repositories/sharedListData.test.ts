@@ -138,16 +138,66 @@ describe('applySharedFile', () => {
     const uova = await db.items.where('normalizedName').equals('uova').first()
     expect(uova?.categoryId).toBe(1)
     const sale = await db.items.where('normalizedName').equals('sale').first()
-    expect(sale?.categoryId).toBe(2) // categoria sconosciuta → "Altro"
+    const created = (await db.categories.toArray()).find((c) => c.name === 'Sconosciuta')
+    expect(created).toBeDefined() // categoria che qui non c'era: viene creata
+    expect(sale?.categoryId).toBe(created?.id)
     expect((await db.listItems.get(3))?.uid).toBe('altra-lista') // altre liste intatte
     expect((await db.shoppingLists.get(1))?.shared?.tombstones).toEqual({ 'v-pane': 99 })
   })
 
-  it('collega alle categorie per nome senza badare alle maiuscole e senza "Altro" ripiega sulla prima', async () => {
+  it('collega alle categorie per nome senza badare alle maiuscole e, con categoria sconosciuta ("?") e senza "Altro", ripiega sulla prima', async () => {
     await seed(false)
-    await applySharedFile(1, file({ items: [fi('a', 'Uova', { categoryName: 'frigo' }), fi('b', 'Sale', { categoryName: 'Boh' })] }))
+    await applySharedFile(1, file({ items: [fi('a', 'Uova', { categoryName: 'frigo' }), fi('b', 'Sale', { categoryName: '?' })] }))
     expect((await db.items.where('normalizedName').equals('uova').first())?.categoryId).toBe(1)
     expect((await db.items.where('normalizedName').equals('sale').first())?.categoryId).toBe(1)
+  })
+
+  describe('categoria degli articoli ricevuti', () => {
+    const item = (name: string, categoryId: number) => ({
+      name, normalizedName: name.toLowerCase(), categoryId, lastPriceCents: null, suggestedPriceCents: null,
+    })
+    const cat = async (name: string) => (await db.items.where('normalizedName').equals(name.toLowerCase()).first())?.categoryId
+
+    it('un articolo che qui è in "Altro" (o ha una categoria sparita) prende quella di chi lo condivide', async () => {
+      await seed()
+      await db.categories.add({ id: 3, name: 'Dispensa', sortOrder: 2 })
+      await db.items.bulkAdd([
+        { id: 10, ...item('Riso', 2) }, // in "Altro"
+        { id: 11, ...item('Farro', 99) }, // categoria che non esiste più
+        { id: 12, ...item('Latte di soia', 1) }, // ha già una categoria vera
+      ])
+      await applySharedFile(
+        1,
+        file({
+          items: [
+            fi('r', 'Riso', { categoryName: 'Dispensa' }),
+            fi('f', 'Farro', { categoryName: 'Dispensa' }),
+            fi('l', 'Latte di soia', { categoryName: 'Dispensa' }),
+          ],
+        }),
+      )
+      expect(await cat('Riso')).toBe(3)
+      expect(await cat('Farro')).toBe(3)
+      expect(await cat('Latte di soia')).toBe(1) // la categoria che hai scelto tu non si tocca
+    })
+
+    it('se chi condivide non ha una categoria vera ("Altro" o "?") non cambia niente a chi ha già l\'articolo', async () => {
+      await seed()
+      await db.items.bulkAdd([{ id: 10, ...item('Riso', 1) }, { id: 11, ...item('Pasta', 2) }])
+      await applySharedFile(1, file({ items: [fi('r', 'Riso', { categoryName: 'Altro' }), fi('p', 'Pasta', { categoryName: '?' })] }))
+      expect(await cat('Riso')).toBe(1)
+      expect(await cat('Pasta')).toBe(2)
+    })
+
+    it('crea la categoria che manca, in fondo all\'ordine, una sola volta anche se usata da più articoli', async () => {
+      await seed()
+      await applySharedFile(1, file({ items: [fi('a', 'Croccantini', { categoryName: 'Animali' }), fi('b', 'Lettiera', { categoryName: 'animali' })] }))
+      const animali = (await db.categories.toArray()).filter((c) => c.name.toLowerCase() === 'animali')
+      expect(animali).toHaveLength(1)
+      expect(animali[0].sortOrder).toBe(2) // dopo Frigo (0) e Altro (1)
+      expect(await cat('Croccantini')).toBe(animali[0].id)
+      expect(await cat('Lettiera')).toBe(animali[0].id)
+    })
   })
 
   it('il nome nuovo vince solo se più recente', async () => {

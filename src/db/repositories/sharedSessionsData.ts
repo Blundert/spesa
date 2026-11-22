@@ -13,7 +13,7 @@ import {
 } from '../../lib/sharedListFile'
 import { countsForMe, sessionWeek } from '../../lib/sharedSessions'
 import { getWeekStartDay } from '../../lib/weekSettings'
-import { upsertItem } from './items'
+import { catalogResolver } from './sharedCatalog'
 
 const MAX_CENTS = 100_000_000
 
@@ -82,9 +82,7 @@ export async function importSharedSessions(listId: number, link: SharedLink, ses
   const fresh = sessions.filter((s) => !known.has(s.uid))
   if (fresh.length === 0) return
 
-  const categories = await db.categories.toArray()
-  const categoryByName = new Map(categories.map((c) => [normalizeName(c.name), c.id as number]))
-  const fallback = (categories.find((c) => normalizeName(c.name) === 'altro') ?? categories[0]).id as number
+  const catalog = await catalogResolver()
   const supermarkets = new Map((await db.supermarkets.toArray()).map((m) => [m.normalizedName, m.id as number]))
   const weekStartDay = getWeekStartDay()
   const touched = new Set<number>()
@@ -111,7 +109,7 @@ export async function importSharedSessions(listId: number, link: SharedLink, ses
       ...(!mine && !countsForMe(link, ss.doneBy) ? { uncounted: true } : {}),
     })) as number
     for (const p of ss.purchases) {
-      const itemId = await upsertItem(p.name, categoryByName.get(normalizeName(p.categoryName)) ?? fallback)
+      const itemId = await catalog.item(p.name, p.categoryName)
       await db.purchases.add({ sessionId, itemId, priceCents: p.priceCents, quantity: p.quantity })
       touched.add(itemId)
     }
