@@ -2,6 +2,16 @@ export type ChangelogEntry = { it: string[]; en: string[] }
 
 // Ordine: più recente in cima. Aggiungere una entry ad ogni nuova versione.
 export const changelog: Record<string, ChangelogEntry> = {
+  '1.1.1': {
+    it: [
+      'Sincronizzazione: risolto il "Confronta e unisci" che compariva di continuo senza niente da gestire. Succedeva con le liste condivise, perché i dati degli altri arrivano su ogni dispositivo per conto suo. Ora, se il contenuto è lo stesso, non ti viene chiesto niente',
+      'Il backup personale non contiene più le voci delle liste condivise né le spese degli altri: vengono dal repository della lista e tornano da sole alla prima sincronizzazione',
+    ],
+    en: [
+      'Sync: fixed the "Compare and merge" prompt that kept showing up with nothing to handle. It happened with shared lists, because other people\'s data reaches each device on its own. Now, if the content is the same, you are not asked anything',
+      'The personal backup no longer contains the items of shared lists nor other people\'s shopping: they come from the list repository and return on their own at the first sync',
+    ],
+  },
   '1.1.0': {
     it: [
       'Liste condivise: puoi condividere una lista con altre persone. Dalla scheda di modifica della lista tocchi "Condividi con altre persone": l\'app crea su GitHub un repository privato solo per quella lista e, se vuoi, invita subito qualcuno (può modificare oppure solo guardare)',

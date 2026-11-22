@@ -151,13 +151,31 @@ describe('liste condivise nel backup', () => {
     expect(list?.shared).toEqual(SHARED)
     expect(list?.shared && 'lastSha' in list.shared).toBe(false)
     expect(JSON.stringify(exported)).not.toMatch(/token/i)
-    expect(exported.listItems.find((li) => li.id === 9)).toMatchObject({ uid: 'v-1', addedBy: 'anna' })
+    expect(exported.listItems.find((li) => li.id === 9)).toBeUndefined() // le voci vengono dal repo
   })
 
   it('non modifica le liste del database mentre esporta', async () => {
     await shareList('abc123')
     await exportData()
     expect((await db.shoppingLists.get(5))?.shared?.lastSha).toBe('abc123')
+  })
+
+  it('non include ciò che arriva dal repo condiviso: voci delle liste condivise, spese e acquisti degli altri', async () => {
+    await seed()
+    await shareList()
+    await db.sessions.bulkAdd([
+      { id: 7, isoWeek: 'w', supermarketId: 1, listId: 5, startedAt: 1, finishedAt: 2, confirmedTotalCents: 1, buoniSpent: 0, buoniValueCents: 800, doneBy: 'anna' },
+      { id: 8, isoWeek: 'w', supermarketId: 1, listId: 5, startedAt: 3, finishedAt: 4, confirmedTotalCents: 1, buoniSpent: 0, buoniValueCents: 800 }, // mia
+    ])
+    await db.purchases.bulkAdd([
+      { sessionId: 7, itemId: 1, priceCents: 10, quantity: 1 },
+      { sessionId: 8, itemId: 1, priceCents: 20, quantity: 1 },
+    ])
+    const exported = await exportData()
+    expect(exported.listItems.map((li) => li.id)).toEqual([1]) // resta solo la voce della lista normale
+    expect(exported.sessions.map((s) => s.id).sort()).toEqual([1, 8]) // la mia spesa condivisa resta, quella di Anna no
+    expect(exported.purchases.map((p) => p.sessionId).sort()).toEqual([1, 8])
+    expect(exported.shoppingLists?.find((l) => l.id === 5)?.shared).toBeDefined() // il collegamento resta
   })
 
   it('un backup con lastSha lo perde all’import: la prima sync dovrà scaricare', async () => {
@@ -173,7 +191,7 @@ describe('liste condivise nel backup', () => {
     const list = await db.shoppingLists.get(5)
     expect(list?.shared).toEqual(SHARED)
     expect(list?.shared?.lastSha).toBeUndefined()
-    expect((await db.listItems.get(9))?.uid).toBe('v-1')
+    expect(await db.listItems.get(9)).toBeUndefined() // si ripopola dal repo alla prima sync
   })
 })
 

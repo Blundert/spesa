@@ -77,6 +77,11 @@ export async function exportData(): Promise<BackupData> {
     db.dishIngredients.toArray(),
     db.shoppingLists.toArray(),
   ])
+  // Quello che arriva dal repo condiviso (voci delle liste condivise, spese degli altri) non è del backup
+  // personale: il repo comanda e dopo un ripristino si ripopola alla prima sync. Tenerlo qui farebbe
+  // risultare "diversi" i backup dei vari dispositivi (ognuno riceve i dati per conto suo, con id propri).
+  const sharedListIds = new Set(shoppingLists.filter((l) => l.shared).map((l) => l.id))
+  const foreignSessionIds = new Set(sessions.filter((s) => s.doneBy !== undefined).map((s) => s.id))
   return {
     version: BACKUP_VERSION,
     exportedAt: Date.now(),
@@ -84,9 +89,9 @@ export async function exportData(): Promise<BackupData> {
     items,
     supermarkets,
     weekBudgets,
-    listItems,
-    sessions,
-    purchases,
+    listItems: listItems.filter((li) => !sharedListIds.has(li.listId)),
+    sessions: sessions.filter((s) => s.doneBy === undefined),
+    purchases: purchases.filter((p) => !foreignSessionIds.has(p.sessionId)),
     mealPlans,
     dishes,
     dishIngredients,

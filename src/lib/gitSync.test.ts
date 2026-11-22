@@ -165,6 +165,22 @@ describe('autoSync', () => {
     expect(await db.items.count()).toBe(2)
   })
 
+  it('se entrambi sono cambiati ma solo negli id interni, non chiede niente e non scrive', async () => {
+    await addItem('Mele')
+    await autoSync()
+    await addItem('Pere')
+    const local = await exportData()
+    // stesso contenuto, id diversi (come dati arrivati in ordine diverso su un altro dispositivo)
+    const remote = { ...local, items: local.items.map((i) => ({ ...i, id: (i.id as number) + 100 })) }
+    gh.files.set(PATH, JSON.stringify(remote))
+    const before = gh.commits
+    expect(await autoSync()).toEqual({ status: 'noop' })
+    expect(gh.commits).toBe(before)
+    expect(await db.items.count()).toBe(2)
+    // dopo averlo riconosciuto uguale, il giro dopo è tranquillo
+    expect(await autoSync()).toEqual({ status: 'noop' })
+  })
+
   describe('dispositivo nuovo (solo dati iniziali)', () => {
     it('scarica il remoto invece di chiedere', async () => {
       gh.files.set(PATH, JSON.stringify(await remoteWith('Kiwi')))

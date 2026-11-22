@@ -1,4 +1,5 @@
 import { exportData, importData, isBackupData, type BackupData } from '../db/backup'
+import { planMerge } from './backupMerge'
 import { saveSafetySnapshot } from '../db/repositories/safetySnapshots'
 import type { GraphCommit } from './commitGraph'
 import { backupPath, isInitialData, isValidBranchName, parseBackupPath, type BackupSide } from './syncBackup'
@@ -308,6 +309,14 @@ export async function autoSync(opts?: { allowPull?: boolean }): Promise<SyncOutc
     await importData(parsed)
     rememberSynced(contentHash(parsed), remote.sha)
     return { status: 'pulled' }
+  }
+
+  // Cambiati entrambi, ma solo nei numeri interni (id diversi tra i dispositivi): il contenuto è lo stesso e non c'è
+  // niente da scegliere. Succede spesso con le liste condivise, dove i dati arrivano da ogni dispositivo per conto suo.
+  const remoteData: unknown = JSON.parse(remote.text)
+  if (isBackupData(remoteData) && planMerge(data, remoteData).length === 0) {
+    rememberSynced(localHash, remote.sha)
+    return { status: 'noop' }
   }
   return { status: 'conflict' }
 }

@@ -460,7 +460,15 @@ Serve una lista condivisa (Flusso 47) con un'altra persona che fa spese (o, per 
 
 ### Flusso 50 — Liste condivise: accesso perso, ripristino da backup, scollegamento (mobile e desktop)
 1. Con una lista condivisa aperta, togli all'altro dispositivo l'accesso al repo (o elimina il repo su GitHub): entro circa 15 secondi (o toccando la riga di stato) la riga diventa rossa con "Non hai più accesso a questa lista condivisa" e compare "Tieni come lista normale". La lista e i suoi articoli restano com'erano; il controllo ogni 15 secondi si ferma. Il pulsante scollega: icona e riga di stato spariscono e la lista è una normale, modificabile; il repo non viene toccato
-2. Esporta i dati (Impostazioni → Esporta) con una lista condivisa, cancella tutti i dati e reimporta: la lista torna con il suo collegamento (icona, persone con nome e tipo) ma senza il token: dopo aver ricollegato GitHub, la **prima** sincronizzazione scarica e unisce e NON scrive nel repo; solo dalla sync dopo partono le tue modifiche. Il file di backup non contiene il token né l'ultimo stato di sync
+2. Esporta i dati (Impostazioni → Esporta) con una lista condivisa, cancella tutti i dati e reimporta: la lista torna con il suo collegamento (icona, persone con nome e tipo) ma senza il token e senza le sue voci né le spese degli altri (si ripopolano dal repo alla prima sync; le tue spese su quella lista restano nel backup): dopo aver ricollegato GitHub, la **prima** sincronizzazione scarica e unisce e NON scrive nel repo; solo dalla sync dopo partono le tue modifiche. Il file di backup non contiene il token né l'ultimo stato di sync
 3. Scarica dal remoto ("Scarica da remoto" nel backup personale) con liste condivise: tornano com'erano nel backup e si riallineano con il repo alla sync dopo, senza sovrascrivere il lavoro degli altri
 4. Token scaduto: la riga dice "Il token non è più valido: creane uno nuovo in Sincronizzazione" e il controllo si ferma; dopo aver creato un nuovo token (Flusso 46) basta riaprire la lista
 5. Versione 1.1.0 nel badge dei README e in "Novità" (Impostazioni → versione): c'è una sola voce 1.1.0 con le liste condivise
+
+### Flusso 51 — Nessun "Confronta e unisci" a vuoto con le liste condivise (mobile e desktop)
+Serve la sync del backup personale attiva (Sincronizzazione → Sync automatico) su DUE dispositivi, entrambi con la stessa lista condivisa aperta, e un terzo utente (o uno script) che la modifica.
+1. L'altra persona aggiunge articoli e fa una spesa; lascia girare entrambi i dispositivi qualche minuto (la lista aperta si aggiorna da sola)
+2. Il backup personale si sincronizza tra i due dispositivi senza mai mostrare il toast "Rivedi e unisci" né richiedere la schermata di unione: se cambia solo l'ordine interno dei dati (id diversi) lo riconosce da solo e non chiede niente
+3. Se invece si cambia davvero qualcosa di personale su entrambi (es. una lista normale diversa) il conflitto compare ancora, con le scelte da fare in "Confronta e unisci"
+4. "Confronta e unisci" aperto a mano con dati uguali dice che non c'è niente da gestire
+5. Nel backup esportato non ci sono le voci delle liste condivise né le spese degli altri (si riconoscono dal campo `doneBy`)
