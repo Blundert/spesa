@@ -2,6 +2,26 @@ export type ChangelogEntry = { it: string[]; en: string[] }
 
 // Ordine: più recente in cima. Aggiungere una entry ad ogni nuova versione.
 export const changelog: Record<string, ChangelogEntry> = {
+  '1.1.0': {
+    it: [
+      'Liste condivise: puoi condividere una lista con altre persone. Dalla scheda di modifica della lista tocchi "Condividi con altre persone": l\'app crea su GitHub un repository privato solo per quella lista e, se vuoi, invita subito qualcuno (può modificare oppure solo guardare)',
+      'Chi riceve l\'invito lo accetta direttamente nell\'app, da "Nuova lista" → "Aggiungi una lista condivisa", senza passare da GitHub. Le liste condivise hanno una piccola icona di persone',
+      'Sempre aggiornate: con la lista aperta le modifiche partono dopo pochi secondi e quelle degli altri arrivano da sole in circa 15 secondi, senza schermate di conflitto. Funziona anche senza rete: le modifiche partono quando torna',
+      'In negozio vedi cosa hanno già preso gli altri ("preso da Anna") e loro vedono cosa hai preso tu',
+      'Persone: a ognuno dai un nome e dici se è un partner (buoni pasto in comune: le sue spese contano nel tuo budget) o un estraneo (le sue spese si vedono nello Storico ma non toccano budget, buoni e statistiche)',
+      'Collega GitHub in pochi tocchi: crei il token da un link già compilato, lo incolli con un tocco e scegli il repository da un elenco. Nuovo pulsante "Dimentica il token su questo dispositivo"',
+      'Più sicurezza: la versione pubblicata ammette solo script suoi e parla in rete soltanto con GitHub; le liste condivise sono lette con controlli rigidi. Il vecchio mockup di design non è più pubblicato',
+    ],
+    en: [
+      'Shared lists: you can share a list with other people. From the list edit sheet tap "Share with other people": the app creates a private GitHub repository just for that list and, if you like, invites someone right away (can edit or view only)',
+      'Whoever gets the invitation accepts it right in the app, from "New list" → "Add a shared list", without going through GitHub. Shared lists have a small people icon',
+      'Always up to date: with the list open your changes go out after a few seconds and other people\'s arrive on their own in about 15 seconds, with no conflict screens. It also works offline: changes go out when the network is back',
+      'In the shop you see what the others have already taken ("taken by Anna") and they see what you took',
+      'People: give each one a name and say whether they are a partner (shared meal vouchers: their shopping counts in your budget) or a stranger (their shopping shows in History but never touches budget, vouchers and statistics)',
+      'Connect GitHub in a few taps: create the token from a pre-filled link, paste it with one tap and pick the repository from a list. New "Forget the token on this device" button',
+      'Safer: the published app only allows its own scripts and talks to the network only with GitHub; shared lists are read with strict checks. The old design mockup is no longer published',
+    ],
+  },
   '1.0.0': {
     it: [
       'Prima versione stabile: sincronizzazione GitHub con cronologia, ripristino, unione guidata, branch e grafo dei commit',

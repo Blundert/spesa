@@ -451,6 +451,8 @@ export const en: typeof it = {
     sessionByOther: "{{name}}'s shopping: view only",
     notCounted: "doesn't count in your budget",
     madeBy: 'done by {{name}}',
+    lostAccess: 'You no longer have access to this shared list',
+    keepAsNormal: 'Keep as a normal list',
     errNotConnected: 'Connect GitHub first (Sync), or create a new token',
     errNameTaken: 'A repository with this name already exists: pick another one',
     errInvalidName: 'Invalid name: use letters, numbers, dashes and dots',

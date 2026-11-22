@@ -5,7 +5,7 @@
     Gestisci la spesa settimanale con i buoni pasto — tutto in locale, senza account.
   </p>
 
-  ![Version](https://img.shields.io/badge/version-1.0.0-2A2A2C?style=flat-square)
+  ![Version](https://img.shields.io/badge/version-1.1.0-2A2A2C?style=flat-square)
   ![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white)
   ![Vite](https://img.shields.io/badge/Vite-646CFF?style=flat-square&logo=vite&logoColor=white)
   ![Tailwind CSS](https://img.shields.io/badge/Tailwind-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white)
@@ -66,7 +66,8 @@ senza account né server. È installabile come app nativa su iOS, Android e desk
 - ✨ Carica la tua "spesa solita" in un tap
 - 🗓️ Pianificatore pasti settimanale
 - 🏪 Supermercati con tessera fedeltà
-- 🔄 Backup opzionale su GitHub (JSON in repo privata)
+- 🔄 Backup opzionale su GitHub (JSON in repo privata), con cronologia, ripristino, unione guidata e branch
+- 👥 Liste condivise con altre persone (partner o estranei), aggiornate dal vivo tramite un repo GitHub privato dedicato, senza server
 - 🖥️ Interfaccia desktop dedicata (da 768 px): menu laterale compattabile, tabelle ordinabili, grafici a colori; il passaggio da/verso mobile è immediato
 - 📱 PWA installabile — iOS · Android · Desktop
 - 🎨 Temi selezionabili: Chiaro, Scuro, Salvia, Oceano, Notte blu, Contrasto alto, o in automatico col sistema

@@ -449,6 +449,8 @@ export const it = {
     sessionByOther: 'Spesa di {{name}}: solo da consultare',
     notCounted: 'non conta nel tuo budget',
     madeBy: 'fatta da {{name}}',
+    lostAccess: 'Non hai più accesso a questa lista condivisa',
+    keepAsNormal: 'Tieni come lista normale',
     errNotConnected: 'Collega prima GitHub (Sincronizzazione), oppure crea un nuovo token',
     errNameTaken: 'Esiste già un repository con questo nome: scegline un altro',
     errInvalidName: 'Nome non valido: usa lettere, numeri, trattini e punti',

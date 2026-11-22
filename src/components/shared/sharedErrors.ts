@@ -36,5 +36,7 @@ export function syncOutcomeText(t: TFunction, outcome: SyncOutcome | undefined, 
     return t('shared.updatedAt', { time })
   }
   if (outcome.code === 'network') return t('shared.offline')
+  // Durante la sync (non nell'aggiunta) "no-access" vuol dire che l'accesso è stato tolto.
+  if (outcome.code === 'no-access') return t('shared.lostAccess')
   return outcome.code === 'unknown' ? t('shared.errGeneric') : MESSAGES[outcome.code](t)
 }
