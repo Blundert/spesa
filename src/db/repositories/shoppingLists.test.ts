@@ -206,12 +206,16 @@ describe('liste condivise', () => {
     const changed: number[] = []
     const off = onSharedChange((id) => changed.push(id))
     await updateShoppingList(shared, { supermarketId: 4 })
-    expect((await getSharedLists())[0].shared.nameUpdatedAt).toBeUndefined()
+    expect((await getSharedLists())[0].shared.nameUpdatedAt).toBeUndefined() // il supermercato non tocca il nome
+    expect((await getSharedLists())[0].shared.supermarketUpdatedAt).toBeGreaterThan(0)
     await updateShoppingList(shared, { name: 'Casa nostra' })
     await updateShoppingList(normal, { name: 'Mia 2' })
+    await updateShoppingList(normal, { supermarketId: 2 })
+    await updateShoppingList(shared, { quickItemIds: [1] }) // niente di condiviso: non avvisa
     expect((await getSharedLists())[0].shared.nameUpdatedAt).toBeGreaterThan(0)
     expect((await getShoppingLists()).find((l) => l.id === normal)?.shared).toBeUndefined()
-    expect(changed).toEqual([shared]) // avvisa solo per la condivisa, e solo per il cambio di nome
+    // avvisa solo per la lista condivisa e solo per nome o supermercato
+    expect(changed).toEqual([shared, shared])
     off()
   })
 

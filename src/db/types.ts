@@ -45,6 +45,18 @@ export const DEFAULT_BUONO_VALUE_CENTS = 800
 /** Nome della lista creata al primo avvio (e con la migrazione della lista unica). */
 export const DEFAULT_LIST_NAME = 'Spesa'
 
+/** Una spesa in corso (o appena finita) di una persona di una lista condivisa, con le impostazioni con cui è partita. */
+export interface ActiveShopping {
+  /** Login GitHub di chi ha iniziato la spesa. */
+  by: string
+  supermarketName: string
+  buoniSpent: number
+  buoniValueCents: number
+  startedAt: number
+  /** Quando è finita (o è stata annullata); null = ancora in corso. */
+  endedAt: number | null
+}
+
 /** Come conta, per il MIO budget, la spesa fatta da un altro: `partner` = buoni condivisi, `stranger` = no. */
 export type SharedMemberKind = 'partner' | 'stranger'
 
@@ -78,6 +90,12 @@ export interface SharedLink {
    * lo storico di prima resta mio. Assente = tutte (collegamenti vecchi).
    */
   sharedSince?: number
+  /** Quando è stato cambiato per l'ultima volta il supermercato della lista (ms): nel merge vince il più recente. */
+  supermarketUpdatedAt?: number
+  /** La mia spesa in corso (o l'ultima finita) su questa lista, da pubblicare nel repo. */
+  myShopping?: ActiveShopping
+  /** Le spese in corso delle altre persone, come arrivano dal repo. */
+  shopping?: ActiveShopping[]
   /** Gli altri utenti, per login GitHub. */
   members: Record<string, SharedMember>
   /** Voci eliminate (uid → quando): servono al merge perché un'eliminazione non ricompaia. */

@@ -508,3 +508,12 @@ Serve una lista condivisa con un'altra persona (Flusso 47) che mette voci in cat
 3. Lei usa una categoria che tu non hai (es. "Animali"): viene creata in fondo all'elenco delle categorie (una volta sola, anche con più voci) e le voci ci finiscono dentro; la trovi nel Catalogo
 4. Se lei non ha scelto nessuna categoria ("Altro"), a te non cambia nulla per gli articoli che già hai
 5. Lo stesso vale per gli articoli delle spese concluse dell'altra persona (nello Storico e nel Catalogo)
+
+### Flusso 58 — Supermercato condiviso e spesa iniziata da un altro (mobile e desktop)
+Serve una lista condivisa (Flusso 47) con un'altra persona. Tutto vale SOLO per le liste condivise: una lista normale non cambia.
+1. Lei imposta il supermercato della lista (Modifica lista → Supermercato): a te, se per quella lista non ne hai uno, dopo la sync compare accanto al nome della scheda ("Spesa · Esselunga") e nel Catalogo dei supermercati (creato se mancava). Se ne avevi già scelto uno tuo, resta il tuo. Se lo cambi tu, lo vede lei (se non ne ha uno suo)
+2. Lei inizia una spesa da quella lista: entro circa 15 secondi, nella Lista (mobile e desktop) compare una riga "anna ha iniziato la spesa da Esselunga · tocca per unirti" (con il nome che le hai dato in "Persone"). Con più persone in spesa, una riga ciascuna
+3. Pannello della pill (mobile) / finestra "Inizia la spesa" (desktop): scegliendo quella lista il pulsante diventa "Spesa iniziata da anna · Unisciti" e al posto di buoni e valore compare "anna ha iniziato la spesa da Esselunga, con 2 buoni da € 8,00. Premendo parti con le sue impostazioni."; desktop: anche il pulsante nella barra laterale dice "Spesa iniziata da anna". Scegliendo una lista normale resta "Inizia la spesa" con i buoni da impostare
+4. Toccare la riga o il pulsante apre la spesa con il negozio, i buoni e il valore del buono di lei (anche senza supermercato impostato sulla tua lista); se hai già una spesa in corso questa settimana si riprende quella senza crearne un'altra
+5. Quando tu inizi una spesa da una lista condivisa, lei vede la tua riga (e il suo pulsante cambia); a fine spesa (o se la annulli/elimini) la riga sparisce per lei. Una spesa lasciata aperta da più di 12 ore non si mostra più
+6. In una lista normale: nessuna riga, nessun cambio del pulsante, nessun dato pubblicato

@@ -2,6 +2,16 @@ import { db } from '../db'
 import type { Session } from '../types'
 import { emitSharedChange } from '../../lib/sharedChange'
 
+/** Segna come finita (o annullata) la mia spesa in corso pubblicata su una lista condivisa, se è questa. */
+async function endMyShopping(session: Session | undefined, now: number = Date.now()): Promise<void> {
+  if (!session || session.listId === undefined || session.doneBy !== undefined) return
+  const list = await db.shoppingLists.get(session.listId)
+  const mine = list?.shared?.myShopping
+  if (!list?.shared || !mine || mine.endedAt !== null || mine.startedAt !== session.startedAt) return
+  await db.shoppingLists.update(session.listId, { shared: { ...list.shared, myShopping: { ...mine, endedAt: now } } })
+  emitSharedChange(session.listId)
+}
+
 /**
  * Segna come eliminate le mie spese già pubblicate in una lista condivisa, perché il merge con il repo non le
  * faccia tornare. Le spese di altri non si eliminano mai (vedi sotto). Da chiamare nella stessa transazione che le
@@ -43,16 +53,25 @@ export async function createSession(
   buoniValueCents: number,
   listId: number,
 ): Promise<number> {
+  const startedAt = Date.now()
   const id = await db.sessions.add({
     isoWeek,
     supermarketId,
     listId,
-    startedAt: Date.now(),
+    startedAt,
     finishedAt: null,
     confirmedTotalCents: null,
     buoniSpent,
     buoniValueCents,
   })
+  // Lista condivisa: gli altri vedono che ho iniziato la spesa, con queste impostazioni.
+  const list = await db.shoppingLists.get(listId)
+  if (list?.shared) {
+    const store = await db.supermarkets.get(supermarketId)
+    const myShopping = { by: list.shared.me, supermarketName: store?.name ?? '?', buoniSpent, buoniValueCents, startedAt, endedAt: null }
+    await db.shoppingLists.update(listId, { shared: { ...list.shared, myShopping } })
+    emitSharedChange(listId)
+  }
   return id as number
 }
 
@@ -68,7 +87,9 @@ export async function finishSession(id: number, confirmedTotalCents: number): Pr
     }
   })
   // Lista condivisa: la spesa conclusa va nel repo (5 secondi dopo, insieme a eventuali altre modifiche).
-  const listId = (await db.sessions.get(id))?.listId
+  const done = await db.sessions.get(id)
+  await endMyShopping(done)
+  const listId = done?.listId
   if (listId !== undefined && (await db.shoppingLists.get(listId))?.shared) emitSharedChange(listId)
 }
 
@@ -77,6 +98,7 @@ export async function deleteWeek(isoWeek: string): Promise<void> {
     // Le spese di altre persone (liste condivise) restano: non sono mie da eliminare e tornerebbero alla prossima sync.
     const sessions = (await db.sessions.where('isoWeek').equals(isoWeek).toArray()).filter((s) => s.doneBy === undefined)
     await tombstoneSessions(sessions)
+    for (const s of sessions) if (s.finishedAt === null) await endMyShopping(s)
     const sessionIds = sessions.map((s) => s.id!)
     const allPurchases = sessionIds.length > 0
       ? await db.purchases.where('sessionId').anyOf(sessionIds).toArray()
@@ -115,6 +137,7 @@ export async function deleteSession(id: number): Promise<void> {
     // Le spese di altre persone (liste condivise) non si eliminano da qui.
     if (!session || session.doneBy !== undefined) return
     await tombstoneSessions([session])
+    if (session.finishedAt === null) await endMyShopping(session)
     const purchases = await db.purchases.where('sessionId').equals(id).toArray()
     const itemIds = [...new Set(purchases.map((p) => p.itemId))]
     await db.purchases.where('sessionId').equals(id).delete()

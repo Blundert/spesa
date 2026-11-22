@@ -11,7 +11,8 @@ import { currentWeek, formatWeekLabelWithYear } from '../../lib/date'
 import { formatCents, formatCentsPlain } from '../../lib/money'
 import { weekSpendSummary } from '../../lib/budgetSelectors'
 import { getDefaultBuonoValueCents } from '../../lib/buoniSettings'
-import { isReadOnly } from '../../lib/sharedLists'
+import { displayName, isReadOnly } from '../../lib/sharedLists'
+import { useJoinShopping } from '../../hooks/useSharedLists'
 import { activeLists } from '../../lib/activeList'
 import { useWeekBudget, useSessionsByWeek, useCreateSession } from '../../hooks/useShopping'
 import { useSupermarkets } from '../../hooks/useItems'
@@ -59,9 +60,25 @@ export function NewShoppingButton({ compact = false }: { compact?: boolean }) {
     setOpen(true)
   }
 
+  // Spesa già iniziata da un'altra persona su questa lista condivisa: si può partire con le sue impostazioni.
+  const joinShopping = useJoinShopping()
+  const chosenList = startableLists.find((l) => l.id === newListId) ?? startableLists[0]
+  const unfinished = sessions.some((s) => s.finishedAt === null)
+  const joining = unfinished ? undefined : chosenList?.shared?.shopping?.[0]
+  const joiningName = joining ? displayName(chosenList?.shared, joining.by) : ''
+  // Il pulsante nella barra laterale dice già che la spesa è iniziata, per la lista aperta.
+  const activeJoin = unfinished ? undefined : list?.shared?.shopping?.[0]
+  const sidebarLabel = activeJoin
+    ? t('shared.shoppingStartedShort', { name: displayName(list?.shared, activeJoin.by) })
+    : t('nav.startShopping')
+
   const startShopping = async () => {
     setOpen(false)
-    const chosen = startableLists.find((l) => l.id === newListId) ?? startableLists[0]
+    if (joining && chosenList?.id !== undefined) {
+      await joinShopping(joining, chosenList.id)
+      return
+    }
+    const chosen = chosenList
     const listId = chosen?.id
     // Lista con supermercato: la spesa parte subito lì (se non ce n'è già una in corso).
     const storeId = chosen?.supermarketId
@@ -82,8 +99,8 @@ export function NewShoppingButton({ compact = false }: { compact?: boolean }) {
     <div style={{ padding: compact ? '16px 10px 4px' : '16px 12px 4px' }}>
       <button
         onClick={openModal}
-        title={compact ? t('nav.startShopping') : undefined}
-        aria-label={t('nav.startShopping')}
+        title={compact ? sidebarLabel : undefined}
+        aria-label={sidebarLabel}
         style={{
           width: '100%',
           border: 'none',
@@ -105,7 +122,7 @@ export function NewShoppingButton({ compact = false }: { compact?: boolean }) {
             <path d="M1 1h4l2.7 13.4a2 2 0 002 1.6h9.7a2 2 0 002-1.6L23 6H6" />
           </svg>
         ) : (
-          t('nav.startShopping')
+          sidebarLabel
         )}
       </button>
       {!compact && (
@@ -140,6 +157,26 @@ export function NewShoppingButton({ compact = false }: { compact?: boolean }) {
         <div style={{ ...muted, letterSpacing: '0.5px', textTransform: 'uppercase', marginBottom: '10px' }}>
           {t('spesa.newTitle')}
         </div>
+        {joining ? (
+          <div style={{ marginBottom: '16px' }}>
+            <div style={{ marginBottom: '12px' }}>
+              <ListPickerRow
+              lists={startableLists}
+              value={newListId}
+              onChange={setNewListId}
+              supermarketNames={supermarketNames}
+            />
+            </div>
+            <p data-testid="shopping-join-info" style={{ fontSize: '14px', color: 'var(--t-text2)', lineHeight: 1.5, margin: 0 }}>
+              {t('shared.shoppingInfo', {
+                name: joiningName,
+                store: joining.supermarketName,
+                buoni: joining.buoniSpent,
+                value: formatCentsPlain(joining.buoniValueCents),
+              })}
+            </p>
+          </div>
+        ) : (
         <BuoniSteppers
           buoni={newBuoni}
           valueCents={newVal}
@@ -154,11 +191,12 @@ export function NewShoppingButton({ compact = false }: { compact?: boolean }) {
             />
           }
         />
+        )}
         <button
           onClick={() => void startShopping()}
           style={{ width: '100%', border: 'none', borderRadius: '12px', background: 'var(--t-accent)', color: 'var(--t-on)', padding: '14px', fontSize: '15px', cursor: 'pointer' }}
         >
-          {t('nav.startShopping')}
+          {joining ? t('shared.shoppingJoin', { name: joiningName }) : t('nav.startShopping')}
         </button>
       </Modal>
     </div>

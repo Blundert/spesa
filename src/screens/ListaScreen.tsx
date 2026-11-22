@@ -18,6 +18,7 @@ import { activeLists, setActiveListId } from '../lib/activeList'
 import { displayName, isReadOnly } from '../lib/sharedLists'
 import { useLiveSharedList } from '../hooks/useLiveSharedList'
 import { SharedSyncStatus } from '../components/shared/SharedSyncStatus'
+import { SharedShoppingBanner } from '../components/shared/SharedShoppingBanner'
 
 interface Suggestion {
   name: string
@@ -174,6 +175,7 @@ export function ListaScreen() {
       />
 
       {list?.shared && listId !== undefined && <SharedSyncStatus listId={listId} outcome={syncOutcome} />}
+      <SharedShoppingBanner list={list} />
 
       {readOnly && (
         <div className="bg-t-surface2 text-t-muted text-[13px] rounded-2xl px-[18px] py-3 mb-3">{t('shared.readOnlyBanner')}</div>

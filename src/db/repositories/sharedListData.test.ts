@@ -285,6 +285,77 @@ describe('applySharedFile', () => {
   })
 })
 
+describe('supermercato della lista e spese in corso', () => {
+  const NOW = 1_800_000_000_000
+  const mine = { by: 'matteo', supermarketName: 'Coop', buoniSpent: 2, buoniValueCents: 800, startedAt: NOW - 1000, endedAt: null }
+  const hers = { by: 'anna', supermarketName: 'Esselunga', buoniSpent: 1, buoniValueCents: 500, startedAt: NOW - 1000, endedAt: null }
+
+  it('esporta il supermercato della lista e la mia spesa in corso', async () => {
+    await seed()
+    await db.supermarkets.add({ id: 4, name: 'Coop', normalizedName: 'coop' })
+    await db.shoppingLists.update(1, { supermarketId: 4, shared: { ...LINK, supermarketUpdatedAt: 9, myShopping: { ...mine, supermarketName: 'Coop\u0000', buoniSpent: 5000, buoniValueCents: -3 } } })
+    const f = await exportSharedFile(1)
+    expect(f.supermarketName).toBe('Coop')
+    expect(f.supermarketUpdatedAt).toBe(9)
+    expect(f.shopping).toEqual([{ ...mine, supermarketName: 'Coop', buoniSpent: 1000, buoniValueCents: 0 }])
+    expect(() => parseSharedFile(serializeSharedFile(f))).not.toThrow()
+  })
+
+  it('senza supermercato né spesa in corso esporta null e nessuna spesa', async () => {
+    await seed()
+    const f = await exportSharedFile(1)
+    expect(f).toMatchObject({ supermarketName: null, supermarketUpdatedAt: 0, shopping: [] })
+  })
+
+  it('chi non ha un supermercato per la lista prende quello di chi condivide (creandolo se manca)', async () => {
+    await seed()
+    await applySharedFile(1, file({ supermarketName: 'Esselunga', supermarketUpdatedAt: 5 }), NOW)
+    const list = await db.shoppingLists.get(1)
+    const store = (await db.supermarkets.toArray()).find((m) => m.name === 'Esselunga')
+    expect(store).toBeDefined()
+    expect(list?.supermarketId).toBe(store?.id)
+    expect(list?.shared?.supermarketUpdatedAt).toBe(5)
+    // un negozio che c'è già con quel nome si riusa
+    await db.shoppingLists.update(1, { supermarketId: null })
+    await applySharedFile(1, file({ supermarketName: 'esselunga ' }), NOW)
+    expect((await db.supermarkets.toArray()).filter((m) => m.normalizedName === 'esselunga')).toHaveLength(1)
+  })
+
+  it('chi ha già scelto un supermercato per la lista lo tiene', async () => {
+    await seed()
+    await db.supermarkets.add({ id: 4, name: 'Coop', normalizedName: 'coop' })
+    await db.shoppingLists.update(1, { supermarketId: 4 })
+    await applySharedFile(1, file({ supermarketName: 'Esselunga', supermarketUpdatedAt: 5 }), NOW)
+    expect((await db.shoppingLists.get(1))?.supermarketId).toBe(4)
+    expect((await db.supermarkets.toArray()).some((m) => m.name === 'Esselunga')).toBe(false)
+  })
+
+  it('senza supermercato nel file non cambia niente (anche con file vecchi)', async () => {
+    await seed()
+    await applySharedFile(1, file(), NOW)
+    expect((await db.shoppingLists.get(1))?.supermarketId).toBeNull()
+  })
+
+  it('le spese in corso degli altri si salvano; la mia, le finite e le dimenticate no', async () => {
+    await seed()
+    await applySharedFile(
+      1,
+      file({
+        shopping: [
+          mine,
+          hers,
+          { ...hers, by: 'luca', endedAt: NOW - 10 },
+          { ...hers, by: 'sara', startedAt: NOW - 13 * 60 * 60 * 1000 },
+        ],
+      }),
+      NOW,
+    )
+    expect((await db.shoppingLists.get(1))?.shared?.shopping).toEqual([hers])
+    await applySharedFile(1, file(), NOW) // la spesa di Anna è sparita dal file: sparisce anche da qui
+    expect((await db.shoppingLists.get(1))?.shared?.shopping).toEqual([])
+  })
+})
+
 describe('patchSharedLink', () => {
   it('cambia solo i campi dati', async () => {
     await seed()

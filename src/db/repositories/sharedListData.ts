@@ -6,12 +6,14 @@ import {
   MAX_NAME,
   MAX_QUANTITY,
   SHARED_FORMAT,
+  SHOPPING_STALE_MS,
   SHARED_VERSION,
   type SharedItem,
   type SharedListFile,
 } from '../../lib/sharedListFile'
 import { assignListItemUids } from './listItems'
 import { catalogResolver } from './sharedCatalog'
+import { upsertSupermarket } from './supermarkets'
 import { exportSharedSessions, importSharedSessions } from './sharedSessionsData'
 
 async function sharedListOf(listId: number) {
@@ -47,12 +49,27 @@ export async function exportSharedFile(listId: number): Promise<SharedListFile> 
     })
   })
 
+  const supermarket = list.supermarketId !== null ? await db.supermarkets.get(list.supermarketId) : undefined
+  const mine = link.myShopping
   return {
     format: SHARED_FORMAT,
     version: SHARED_VERSION,
     uid: link.uid,
     name: cleanText(list.name, MAX_NAME),
     nameUpdatedAt: link.nameUpdatedAt ?? 0,
+    supermarketName: supermarket ? cleanText(supermarket.name, MAX_NAME) : null,
+    supermarketUpdatedAt: link.supermarketUpdatedAt ?? 0,
+    // La mia spesa in corso (o appena finita), con le impostazioni con cui è partita.
+    shopping: mine
+      ? [
+          {
+            ...mine,
+            supermarketName: cleanText(mine.supermarketName, MAX_NAME),
+            buoniSpent: Math.min(1000, Math.max(0, Math.round(mine.buoniSpent))),
+            buoniValueCents: Math.min(100_000, Math.max(0, Math.round(mine.buoniValueCents))),
+          },
+        ]
+      : [],
     items: out,
     tombstones: link.tombstones,
     sessions: await exportSharedSessions(listId, link),
@@ -64,10 +81,10 @@ export async function exportSharedFile(listId: number): Promise<SharedListFile> 
  * ricordare, persone e spese concluse. Gli articoli si collegano al catalogo per nome (vedi `catalogResolver`: se qui
  * non hanno una categoria vera prendono quella di chi li ha condivisi).
  */
-export async function applySharedFile(listId: number, file: SharedListFile): Promise<void> {
+export async function applySharedFile(listId: number, file: SharedListFile, now: number = Date.now()): Promise<void> {
   const tables = [db.shoppingLists, db.listItems, db.items, db.categories, db.sessions, db.purchases, db.supermarkets]
   await db.transaction('rw', tables, async () => {
-    const { link } = await sharedListOf(listId)
+    const { list, link } = await sharedListOf(listId)
     const catalog = await catalogResolver()
 
     const rows = await db.listItems.where('listId').equals(listId).toArray()
@@ -106,10 +123,26 @@ export async function applySharedFile(listId: number, file: SharedListFile): Pro
       if (!Object.prototype.hasOwnProperty.call(members, login)) members[login] = { label: '', kind: 'stranger' }
     }
 
-    const patch: SharedLink = { ...link, tombstones: file.tombstones, members }
+    // Le spese in corso degli altri (quelle finite o dimenticate da ore non si mostrano).
+    const shopping = (file.shopping ?? []).filter(
+      (x) => x.by !== link.me && x.endedAt === null && now - x.startedAt < SHOPPING_STALE_MS,
+    )
+    const patch: SharedLink = {
+      ...link,
+      tombstones: file.tombstones,
+      members,
+      shopping,
+      supermarketUpdatedAt: Math.max(link.supermarketUpdatedAt ?? 0, file.supermarketUpdatedAt ?? 0),
+    }
     const renamed = file.nameUpdatedAt > (link.nameUpdatedAt ?? 0)
     if (renamed) patch.nameUpdatedAt = file.nameUpdatedAt
-    await db.shoppingLists.update(listId, { ...(renamed ? { name: file.name } : {}), shared: patch })
+    // Il supermercato della lista lo prende chi non ne ha uno (se qui ce n'è già uno, resta quello scelto qui).
+    const adoptStore = list.supermarketId === null && file.supermarketName ? await upsertSupermarket(file.supermarketName) : null
+    await db.shoppingLists.update(listId, {
+      ...(renamed ? { name: file.name } : {}),
+      ...(adoptStore !== null ? { supermarketId: adoptStore } : {}),
+      shared: patch,
+    })
 
     // Le spese concluse degli altri (e le mie, su un dispositivo nuovo) entrano nello storico.
     await importSharedSessions(listId, patch, file.sessions)

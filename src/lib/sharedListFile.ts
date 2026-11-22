@@ -1,3 +1,4 @@
+import type { ActiveShopping } from '../db/types'
 import { normalizeName } from './normalize'
 
 /**
@@ -6,6 +7,12 @@ import { normalizeName } from './normalize'
  */
 export const SHARED_FORMAT = 'spesa-shared-list'
 export const SHARED_VERSION = 1
+
+/** Una spesa finita resta nel file ancora un po', perché gli altri vedano che è finita prima che sparisca. */
+export const SHOPPING_ENDED_TTL_MS = 24 * 60 * 60 * 1000
+/** Una spesa "in corso" iniziata da più di tanto si considera dimenticata e non si mostra. */
+export const SHOPPING_STALE_MS = 12 * 60 * 60 * 1000
+export const MAX_SHOPPING = 50
 
 /** Dopo quanto un'eliminazione smette di essere ricordata (ms). Un dispositivo fermo più a lungo può far ricomparire voci. */
 export const TOMBSTONE_TTL_MS = 30 * 24 * 60 * 60 * 1000
@@ -53,12 +60,19 @@ export interface SharedSession {
   purchases: SharedPurchase[]
 }
 
+export type SharedShopping = ActiveShopping
+
 export interface SharedListFile {
   format: typeof SHARED_FORMAT
   version: number
   uid: string
   name: string
   nameUpdatedAt: number
+  /** Supermercato preimpostato della lista (per nome); chi riceve la lista lo prende se non ne ha uno. */
+  supermarketName?: string | null
+  supermarketUpdatedAt?: number
+  /** Spese in corso (o appena finite) delle persone della lista, una per persona. */
+  shopping?: SharedShopping[]
   items: SharedItem[]
   /** Voci eliminate: uid → quando. */
   tombstones: Record<string, number>
@@ -126,6 +140,10 @@ function unique<T extends { uid: string }>(list: T[], field: string): T[] {
   return new Set(list.map((x) => x.uid)).size === list.length ? list : fail(`${field}: identificatore ripetuto`)
 }
 
+function uniqueBy(list: SharedShopping[], field: string): SharedShopping[] {
+  return new Set(list.map((x) => x.by)).size === list.length ? list : fail(`${field}: persona ripetuta`)
+}
+
 function parseItem(raw: unknown): SharedItem {
   const o = rec(raw, 'items')
   return {
@@ -137,6 +155,18 @@ function parseItem(raw: unknown): SharedItem {
     addedBy: login(o.addedBy, 'items.addedBy'),
     updatedAt: int(o.updatedAt, 'items.updatedAt', 0, MAX_TIME),
     takenBy: o.takenBy === null ? null : login(o.takenBy, 'items.takenBy'),
+  }
+}
+
+function parseShopping(raw: unknown): SharedShopping {
+  const o = rec(raw, 'shopping')
+  return {
+    by: login(o.by, 'shopping.by'),
+    supermarketName: text(o.supermarketName, 'shopping.supermarketName', MAX_NAME),
+    buoniSpent: int(o.buoniSpent, 'shopping.buoniSpent', 0, 1000),
+    buoniValueCents: int(o.buoniValueCents, 'shopping.buoniValueCents', 0, 100_000),
+    startedAt: int(o.startedAt, 'shopping.startedAt', 0, MAX_TIME),
+    endedAt: o.endedAt === null ? null : int(o.endedAt, 'shopping.endedAt', 0, MAX_TIME),
   }
 }
 
@@ -192,6 +222,10 @@ export function parseSharedFile(source: string): SharedListFile {
     uid: uid(o.uid, 'uid'),
     name: text(o.name, 'name', MAX_NAME),
     nameUpdatedAt: int(o.nameUpdatedAt, 'nameUpdatedAt', 0, MAX_TIME),
+    // Campi aggiunti dopo: un file più vecchio non li ha.
+    supermarketName: o.supermarketName == null ? null : text(o.supermarketName, 'supermarketName', MAX_NAME),
+    supermarketUpdatedAt: o.supermarketUpdatedAt === undefined ? 0 : int(o.supermarketUpdatedAt, 'supermarketUpdatedAt', 0, MAX_TIME),
+    shopping: uniqueBy(arr(o.shopping ?? [], 'shopping', MAX_SHOPPING).map(parseShopping), 'shopping'),
     items: unique(arr(o.items, 'items', MAX_ITEMS).map(parseItem), 'items'),
     tombstones,
     sessions: unique(arr(o.sessions, 'sessions', MAX_SESSIONS).map(parseSession), 'sessions'),
@@ -213,6 +247,9 @@ function canonical(f: SharedListFile): SharedListFile {
     uid: f.uid,
     name: f.name,
     nameUpdatedAt: f.nameUpdatedAt,
+    supermarketName: f.supermarketName ?? null,
+    supermarketUpdatedAt: f.supermarketUpdatedAt ?? 0,
+    shopping: [...(f.shopping ?? [])].sort((a, b) => (a.by < b.by ? -1 : 1)),
     items: [...f.items].sort(byAdded),
     tombstones,
     sessions: [...f.sessions].sort(bySession),
@@ -240,6 +277,7 @@ function newer<T extends { updatedAt: number }>(a: T, b: T): T {
  * - ogni voce è identificata dal suo uid; se due persone l'hanno cambiata vince la modifica più recente;
  * - un'eliminazione (tombstone) vince su una voce non più recente di lei; una modifica successiva la fa tornare;
  * - voci con lo stesso nome (aggiunte in parallelo da due persone) diventano una sola con le quantità sommate;
+ * - il supermercato della lista: vince il cambio più recente; le spese in corso: una per persona, la più recente;
  * - le spese concluse si uniscono per uid (non cambiano mai; una spesa eliminata, cioè con un tombstone, non torna);
  * - le eliminazioni più vecchie di 30 giorni si dimenticano.
  * È simmetrica: `merge(a, b)` e `merge(b, a)` danno lo stesso risultato.
@@ -294,6 +332,20 @@ export function mergeSharedFiles(a: SharedListFile, b: SharedListFile, now: numb
     sessions.set(s.uid, cur && JSON.stringify(cur) >= JSON.stringify(s) ? cur : s)
   }
 
+  // Supermercato della lista: il più recente; spese in corso: per persona, la più recente (iniziata o finita);
+  // quelle finite da più di un giorno si dimenticano.
+  const supA = a.supermarketUpdatedAt ?? 0
+  const supB = b.supermarketUpdatedAt ?? 0
+  const supWins = supA !== supB ? (supA > supB ? a : b) : (a.supermarketName ?? '') >= (b.supermarketName ?? '') ? a : b
+  const byPerson = new Map<string, SharedShopping>()
+  for (const x of [...(a.shopping ?? []), ...(b.shopping ?? [])]) {
+    const cur = byPerson.get(x.by)
+    const stamp = (v: SharedShopping) => v.endedAt ?? v.startedAt
+    const wins = !cur || stamp(x) > stamp(cur) || (stamp(x) === stamp(cur) && JSON.stringify(x) > JSON.stringify(cur))
+    if (wins) byPerson.set(x.by, x)
+  }
+  const shopping = [...byPerson.values()].filter((x) => x.endedAt === null || now - x.endedAt <= SHOPPING_ENDED_TTL_MS)
+
   const nameWins =
     a.nameUpdatedAt !== b.nameUpdatedAt ? (a.nameUpdatedAt > b.nameUpdatedAt ? a : b) : a.name >= b.name ? a : b
 
@@ -303,6 +355,9 @@ export function mergeSharedFiles(a: SharedListFile, b: SharedListFile, now: numb
     uid: a.uid,
     name: nameWins.name,
     nameUpdatedAt: Math.max(a.nameUpdatedAt, b.nameUpdatedAt),
+    supermarketName: supWins.supermarketName ?? null,
+    supermarketUpdatedAt: Math.max(supA, supB),
+    shopping,
     items,
     tombstones: kept,
     sessions: [...sessions.values()],

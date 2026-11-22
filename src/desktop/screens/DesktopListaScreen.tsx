@@ -21,6 +21,7 @@ import { activeLists, setActiveListId } from '../../lib/activeList'
 import { displayName, isReadOnly } from '../../lib/sharedLists'
 import { useLiveSharedList } from '../../hooks/useLiveSharedList'
 import { SharedSyncStatus } from '../../components/shared/SharedSyncStatus'
+import { SharedShoppingBanner } from '../../components/shared/SharedShoppingBanner'
 import { SharedIcon } from '../../components/shared/SharedIcon'
 import { PageHeader, SectionTitle } from '../components/PageHeader'
 import { Modal } from '../components/Modal'
@@ -234,6 +235,7 @@ export function DesktopListaScreen() {
       </div>
 
       {list?.shared && listId !== undefined && <SharedSyncStatus listId={listId} outcome={syncOutcome} />}
+      <SharedShoppingBanner list={list} />
 
       <div style={{ display: 'flex', gap: '24px', alignItems: 'flex-start', flexWrap: 'wrap' }}>
         {/* Colonna principale: aggiunta + voci */}

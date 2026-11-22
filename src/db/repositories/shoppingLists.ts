@@ -24,11 +24,18 @@ export async function updateShoppingList(
   patch: Partial<Pick<ShoppingList, 'name' | 'supermarketId' | 'usualItemIds' | 'quickItemIds'>>,
 ): Promise<void> {
   await db.shoppingLists.update(id, patch.name !== undefined ? { ...patch, name: patch.name.trim() } : patch)
-  if (patch.name === undefined) return
-  // Lista condivisa: il nome è anche nel repo, e vince il cambio più recente.
+  if (patch.name === undefined && patch.supermarketId === undefined) return
+  // Lista condivisa: nome e supermercato sono anche nel repo, e vince il cambio più recente.
   const list = await db.shoppingLists.get(id)
   if (!list?.shared) return
-  await db.shoppingLists.update(id, { shared: { ...list.shared, nameUpdatedAt: Date.now() } })
+  const now = Date.now()
+  await db.shoppingLists.update(id, {
+    shared: {
+      ...list.shared,
+      ...(patch.name !== undefined ? { nameUpdatedAt: now } : {}),
+      ...(patch.supermarketId !== undefined ? { supermarketUpdatedAt: now } : {}),
+    },
+  })
   emitSharedChange(id)
 }
 

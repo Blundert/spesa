@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it } from 'vitest'
 import { db } from '../db'
 import type { Session, SharedLink } from '../types'
 import { onSharedChange } from '../../lib/sharedChange'
-import { deleteSession, deleteWeek, finishSession } from './sessions'
+import { createSession, deleteSession, deleteWeek, finishSession } from './sessions'
 
 const LINK: SharedLink = {
   uid: 'l1', owner: 'anna', repo: 'spesa', branch: 'main', path: 'lista.json', me: 'matteo', canWrite: true,
@@ -84,5 +84,58 @@ describe('deleteWeek', () => {
   it('una settimana senza spese non fa niente', async () => {
     await deleteWeek('2030-01-01')
     expect(await db.sessions.count()).toBe(0)
+  })
+})
+
+describe('la mia spesa in corso su una lista condivisa', () => {
+  beforeEach(async () => {
+    await db.supermarkets.clear()
+    await db.supermarkets.add({ id: 1, name: 'Esselunga', normalizedName: 'esselunga' })
+  })
+  const mine = async () => (await db.shoppingLists.get(1))?.shared?.myShopping
+
+  it('iniziarla la pubblica con negozio, buoni e valore; finirla la segna finita', async () => {
+    await createSession('2026-11-16', 1, 2, 800, 1)
+    expect(await mine()).toMatchObject({ by: 'matteo', supermarketName: 'Esselunga', buoniSpent: 2, buoniValueCents: 800, endedAt: null })
+    expect(changed).toEqual([1])
+    const id = ((await db.sessions.toArray())[0].id) as number
+    await finishSession(id, 500)
+    expect((await mine())?.endedAt).toEqual(expect.any(Number))
+  })
+
+  it('annullarla (eliminarla) la segna finita; eliminare un\'altra non la tocca', async () => {
+    await createSession('2026-11-16', 1, 2, 800, 1)
+    const id = ((await db.sessions.toArray())[0].id) as number
+    await db.sessions.add(session(77, { startedAt: 1, finishedAt: null }))
+    await deleteSession(77) // un'altra spesa non finita, non è quella pubblicata
+    expect((await mine())?.endedAt).toBeNull()
+    await deleteSession(id)
+    expect((await mine())?.endedAt).toEqual(expect.any(Number))
+  })
+
+  it('eliminare la settimana con la spesa in corso la segna finita', async () => {
+    await createSession('2026-11-16', 1, 0, 800, 1)
+    await deleteWeek('2026-11-16')
+    expect((await mine())?.endedAt).toEqual(expect.any(Number))
+  })
+
+  it('una spesa già finita non viene segnata di nuovo; una lista normale non pubblica niente', async () => {
+    await createSession('2026-11-16', 1, 0, 800, 1)
+    const id = ((await db.sessions.toArray())[0].id) as number
+    await finishSession(id, 100)
+    const ended = (await mine())?.endedAt
+    await deleteSession(id)
+    expect((await mine())?.endedAt).toBe(ended)
+    await createSession('2026-11-16', 1, 3, 800, 2) // lista normale
+    expect((await db.shoppingLists.get(2))?.shared).toBeUndefined()
+  })
+
+  it('con un negozio che non esiste pubblica "?" e una spesa di altri non pubblica niente', async () => {
+    await createSession('2026-11-16', 404, 0, 800, 1)
+    expect((await mine())?.supermarketName).toBe('?')
+    await db.shoppingLists.update(1, { shared: { ...LINK, myShopping: undefined } })
+    await db.sessions.add(session(88, { startedAt: 5, finishedAt: null, doneBy: 'anna' }))
+    await finishSession(88, 1) // spesa di altri: niente di mio da chiudere
+    expect(await mine()).toBeUndefined()
   })
 })

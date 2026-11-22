@@ -1,8 +1,13 @@
+import { useNavigate } from '@tanstack/react-router'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { acceptInvitation, listInvitations, type SharePermission } from '../lib/githubRepos'
 import { getGitConfig } from '../lib/gitSync'
 import type { RepoRef } from '../lib/sharedList'
-import type { SharedMember } from '../db/types'
+import type { ActiveShopping, SharedMember } from '../db/types'
+import { db } from '../db/db'
+import { createSession } from '../db/repositories/sessions'
+import { upsertSupermarket } from '../db/repositories/supermarkets'
+import { currentWeek } from '../lib/date'
 import { qk } from '../db/queryKeys'
 import { inviteToList, joinSharedList, setMember, shareList, unlinkSharedList } from '../lib/sharedLists'
 import { syncSharedList } from '../lib/sharedSync'
@@ -83,4 +88,23 @@ export function useAcceptInvitation() {
     mutationFn: (id: number) => acceptInvitation(getGitConfig().token, id),
     onSuccess: () => void qc.invalidateQueries({ queryKey: ['github-invitations'] }),
   })
+}
+
+/**
+ * Unirsi alla spesa che un'altra persona ha iniziato su una lista condivisa: si parte con le sue impostazioni
+ * (negozio, buoni e valore del buono). Se ho già una spesa in corso si riprende quella.
+ */
+export function useJoinShopping() {
+  const qc = useQueryClient()
+  const navigate = useNavigate()
+  return async (entry: ActiveShopping, listId: number) => {
+    const week = currentWeek()
+    const unfinished = (await db.sessions.where('isoWeek').equals(week).toArray()).some((s) => s.finishedAt === null)
+    if (!unfinished) {
+      const supermarketId = await upsertSupermarket(entry.supermarketName)
+      await createSession(week, supermarketId, entry.buoniSpent, entry.buoniValueCents, listId)
+      await qc.invalidateQueries()
+    }
+    void navigate({ to: '/spesa', search: { buoni: entry.buoniSpent, val: entry.buoniValueCents, list: listId } })
+  }
 }

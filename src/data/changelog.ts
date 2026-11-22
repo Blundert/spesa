@@ -2,6 +2,16 @@ export type ChangelogEntry = { it: string[]; en: string[] }
 
 // Ordine: più recente in cima. Aggiungere una entry ad ogni nuova versione.
 export const changelog: Record<string, ChangelogEntry> = {
+  '1.3.0': {
+    it: [
+      'Liste condivise: il supermercato della lista arriva a chi la riceve, se per quella lista non ne ha già uno (e viene creato se manca)',
+      'Spesa iniziata da un\'altra persona: nella lista compare "Anna ha iniziato la spesa da Esselunga · tocca per unirti" e il pulsante "Inizia la spesa" diventa "Spesa iniziata da Anna · Unisciti". Toccandolo parti con le sue impostazioni: negozio, buoni e valore del buono. Vale solo per le liste condivise',
+    ],
+    en: [
+      'Shared lists: the list\'s supermarket reaches whoever receives it, if they don\'t already have one for that list (and it is created if missing)',
+      'Shopping started by someone else: the list shows "Anna started the shopping at Esselunga · tap to join" and the "Start shopping" button becomes "Shopping started by Anna · Join". Tapping it starts with their settings: store, vouchers and voucher value. Only for shared lists',
+    ],
+  },
   '1.2.2': {
     it: [
       'Liste condivise: chi riceve una voce riceve anche la categoria. Se hai già quell\'articolo ma senza una categoria vera (è in "Altro"), prende quella di chi l\'ha condiviso; se hai già scelto tu la categoria resta la tua. Se l\'altro usa una categoria che non hai, viene creata. Vale anche per gli articoli delle spese condivise',

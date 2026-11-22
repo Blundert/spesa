@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import {
   MAX_FILE_CHARS,
+  MAX_SHOPPING,
+  SHOPPING_ENDED_TTL_MS,
   MAX_QUANTITY,
   SHARED_FORMAT,
   SHARED_VERSION,
@@ -13,6 +15,7 @@ import {
   type SharedItem,
   type SharedListFile,
   type SharedSession,
+  type SharedShopping,
 } from './sharedListFile'
 
 const NOW = 1_800_000_000_000
@@ -39,6 +42,16 @@ const session = (uid: string, over: Partial<SharedSession> = {}): SharedSession 
   buoniSpent: 1,
   buoniValueCents: 800,
   purchases: [{ name: 'Latte', categoryName: 'Frigo', priceCents: 120, quantity: 2 }],
+  ...over,
+})
+
+const shopping = (by: string, over: Partial<SharedShopping> = {}): SharedShopping => ({
+  by,
+  supermarketName: 'Esselunga',
+  buoniSpent: 2,
+  buoniValueCents: 800,
+  startedAt: NOW - 1000,
+  endedAt: null,
   ...over,
 })
 
@@ -169,6 +182,82 @@ describe('ordine canonico', () => {
     const back = parseSharedFile(serializeSharedFile(f))
     expect(back.items.map((i) => i.uid)).toEqual(['a', 'b', 'c'])
     expect(back.sessions.map((x) => x.uid)).toEqual(['s1', 's2', 's3'])
+  })
+})
+
+describe('supermercato e spese in corso nel file', () => {
+  it('un file senza i campi nuovi (scritto prima) li ha vuoti', () => {
+    const old = { ...file() } as Record<string, unknown>
+    delete old.supermarketName
+    delete old.supermarketUpdatedAt
+    delete old.shopping
+    const back = parseSharedFile(json(old))
+    expect(back).toMatchObject({ supermarketName: null, supermarketUpdatedAt: 0, shopping: [] })
+  })
+
+  it('rilegge supermercato e spese in corso, in forma canonica', () => {
+    const f = file({
+      supermarketName: 'Coop',
+      supermarketUpdatedAt: 7,
+      shopping: [shopping('matteo'), shopping('anna', { endedAt: NOW })],
+    })
+    const back = parseSharedFile(serializeSharedFile(f))
+    expect(back.supermarketName).toBe('Coop')
+    expect(back.supermarketUpdatedAt).toBe(7)
+    expect(back.shopping?.map((x) => x.by)).toEqual(['anna', 'matteo'])
+    expect(back.shopping?.[0].endedAt).toBe(NOW)
+    expect(serializeSharedFile(back)).toBe(serializeSharedFile(f))
+  })
+
+  it('rifiuta valori sbagliati', () => {
+    const bad = (over: Record<string, unknown>) => invalid(json({ ...file(), ...over }))
+    expect(bad({ supermarketName: '' })).toBe('invalid')
+    expect(bad({ supermarketName: 'x'.repeat(121) })).toBe('invalid')
+    expect(bad({ supermarketUpdatedAt: -1 })).toBe('invalid')
+    expect(bad({ shopping: 'no' })).toBe('invalid')
+    expect(bad({ shopping: Array.from({ length: MAX_SHOPPING + 1 }, (_, i) => shopping(`u${i}`)) })).toBe('invalid')
+    expect(bad({ shopping: [shopping('anna'), shopping('anna')] })).toBe('invalid')
+    expect(bad({ shopping: [{ ...shopping('anna'), by: 'no spazi' }] })).toBe('invalid')
+    expect(bad({ shopping: [{ ...shopping('anna'), buoniSpent: 1001 }] })).toBe('invalid')
+    expect(bad({ shopping: [{ ...shopping('anna'), buoniValueCents: 1.5 }] })).toBe('invalid')
+    expect(bad({ shopping: [{ ...shopping('anna'), supermarketName: '' }] })).toBe('invalid')
+    expect(bad({ shopping: [{ ...shopping('anna'), endedAt: 'ieri' }] })).toBe('invalid')
+  })
+
+  it('merge: il supermercato più recente vince, a parità sempre lo stesso', () => {
+    const a = file({ supermarketName: 'Coop', supermarketUpdatedAt: 5 })
+    const b = file({ supermarketName: 'Esselunga', supermarketUpdatedAt: 9 })
+    expect(mergeSharedFiles(a, b, NOW)).toMatchObject({ supermarketName: 'Esselunga', supermarketUpdatedAt: 9 })
+    expect(mergeSharedFiles(b, a, NOW).supermarketName).toBe('Esselunga')
+    const x = file({ supermarketName: 'Alfa', supermarketUpdatedAt: 3 })
+    const y = file({ supermarketName: null, supermarketUpdatedAt: 3 })
+    expect(mergeSharedFiles(x, y, NOW)).toEqual(mergeSharedFiles(y, x, NOW))
+    // file vecchi (senza i campi): nessun problema
+    expect(mergeSharedFiles(file(), file(), NOW)).toMatchObject({ supermarketName: null, supermarketUpdatedAt: 0, shopping: [] })
+  })
+
+  it('merge: una spesa in corso per persona, la più recente (iniziata o finita), in qualunque ordine', () => {
+    const started = shopping('anna', { startedAt: NOW - 5000 })
+    const ended = shopping('anna', { startedAt: NOW - 5000, endedAt: NOW - 1000 })
+    const newer = shopping('anna', { startedAt: NOW - 500 }) // ne ha iniziata un'altra dopo
+    const m = (x: SharedShopping, y: SharedShopping) =>
+      mergeSharedFiles(file({ shopping: [x] }), file({ shopping: [y, shopping('luca')] }), NOW).shopping
+    expect(m(started, ended)?.find((s) => s.by === 'anna')?.endedAt).toBe(NOW - 1000)
+    expect(m(ended, started)?.find((s) => s.by === 'anna')?.endedAt).toBe(NOW - 1000)
+    expect(m(ended, newer)?.find((s) => s.by === 'anna')?.endedAt).toBeNull()
+    expect(m(started, ended)).toHaveLength(2)
+    // a parità di data sceglie sempre lo stesso
+    const t1 = shopping('anna', { buoniSpent: 1 })
+    const t2 = shopping('anna', { buoniSpent: 3 })
+    expect(m(t1, t2)).toEqual(m(t2, t1))
+  })
+
+  it('merge: le spese finite da più di un giorno si dimenticano, quelle in corso restano', () => {
+    const old = shopping('anna', { endedAt: NOW - SHOPPING_ENDED_TTL_MS - 1 })
+    const recent = shopping('luca', { endedAt: NOW - SHOPPING_ENDED_TTL_MS })
+    const active = shopping('sara')
+    const m = mergeSharedFiles(file({ shopping: [old, recent] }), file({ shopping: [active] }), NOW)
+    expect(m.shopping?.map((x) => x.by)).toEqual(['luca', 'sara'])
   })
 })
 

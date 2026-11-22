@@ -20,7 +20,8 @@ import { BottomSheet } from './BottomSheet'
 import { BuoniSteppers } from './BuoniSheet'
 import { WeekSummary } from './WeekSummary'
 import { ListPickerRow } from './ListPickerRow'
-import { isReadOnly } from '../lib/sharedLists'
+import { displayName, isReadOnly } from '../lib/sharedLists'
+import { useJoinShopping } from '../hooks/useSharedLists'
 import { activeLists } from '../lib/activeList'
 import { onTourPillSheet } from '../tutorial/tutorialStore'
 
@@ -89,11 +90,21 @@ export function AppShell() {
       }),
   )
 
+  // Spesa già iniziata da un'altra persona su questa lista condivisa: si può partire con le sue impostazioni.
+  const joinShopping = useJoinShopping()
+  const chosenList = startableLists.find((l) => l.id === newListId) ?? startableLists[0]
+  const joining = sessions.some((s) => s.finishedAt === null) ? undefined : chosenList?.shared?.shopping?.[0]
+  const joiningName = joining ? displayName(chosenList?.shared, joining.by) : ''
+
   const startShopping = async () => {
     setSheetOpen(false)
+    if (joining && chosenList?.id !== undefined) {
+      await joinShopping(joining, chosenList.id)
+      return
+    }
     const buoni = newBuoni
     const val = newVal
-    const chosen = startableLists.find((l) => l.id === newListId) ?? startableLists[0]
+    const chosen = chosenList
     const listId = chosen?.id
     // Lista con supermercato: la spesa parte subito lì (se non ce n'è già una in corso).
     const storeId = chosen?.supermarketId
@@ -181,6 +192,17 @@ export function AppShell() {
         onBuoni={setNewBuoni}
         onValue={setNewVal}
         onStart={() => void startShopping()}
+        joinInfo={
+          joining
+            ? t('shared.shoppingInfo', {
+                name: joiningName,
+                store: joining.supermarketName,
+                buoni: joining.buoniSpent,
+                value: formatCentsPlain(joining.buoniValueCents),
+              })
+            : undefined
+        }
+        startLabel={joining ? t('shared.shoppingJoin', { name: joiningName }) : undefined}
         listRow={
           <ListPickerRow
             lists={startableLists}
@@ -207,9 +229,14 @@ function NewShoppingSheet({
   onStart,
   summary,
   listRow,
+  joinInfo,
+  startLabel,
 }: {
   summary: ReactNode
   listRow: ReactNode
+  /** Spesa già iniziata da un'altra persona (lista condivisa): al posto dei buoni si mostra cosa ha scelto. */
+  joinInfo?: string
+  startLabel?: string
   open: boolean
   onClose: () => void
   buoni: number
@@ -226,12 +253,21 @@ function NewShoppingSheet({
         <div className="text-[12px] font-normal tracking-[1.4px] text-t-muted uppercase px-0.5 pb-[14px]">
           {t('spesa.newTitle')}
         </div>
-        <BuoniSteppers buoni={buoni} valueCents={valueCents} onBuoni={onBuoni} onValue={onValue} top={listRow} />
+        {joinInfo ? (
+          <div className="mb-3">
+            <div className="mb-3">{listRow}</div>
+            <p className="text-[14px] text-t-text2 leading-relaxed px-0.5" data-testid="shopping-join-info">
+              {joinInfo}
+            </p>
+          </div>
+        ) : (
+          <BuoniSteppers buoni={buoni} valueCents={valueCents} onBuoni={onBuoni} onValue={onValue} top={listRow} />
+        )}
         <button
           onClick={onStart}
           className="w-full bg-t-accent text-t-on text-[17px] font-normal py-[17px] rounded-[18px] flex items-center justify-center gap-2 active:scale-[.98] transition-transform"
         >
-          {t('nav.startShopping')}
+          {startLabel ?? t('nav.startShopping')}
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M5 12h14M13 6l6 6-6 6" />
           </svg>

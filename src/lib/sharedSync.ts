@@ -166,7 +166,7 @@ async function run(listId: number, now: number, retryDelayMs: number): Promise<S
       }
     }
 
-    await applySharedFile(listId, merged)
+    await applySharedFile(listId, merged, now)
     await patchSharedLink(listId, { lastSha: sha, canWrite })
     return { changed: !sameSharedContent(local, merged), pushed: needPush, canWrite }
   }
