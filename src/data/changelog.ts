@@ -2,6 +2,14 @@ export type ChangelogEntry = { it: string[]; en: string[] }
 
 // Ordine: più recente in cima. Aggiungere una entry ad ogni nuova versione.
 export const changelog: Record<string, ChangelogEntry> = {
+  '1.1.3': {
+    it: [
+      'Collega GitHub su iPhone e iPad: dove il browser non lascia leggere gli appunti (iOS) c\'è ora un campo dove incollare il token con il tocco prolungato; viene controllato e salvato da solo',
+    ],
+    en: [
+      'Connect GitHub on iPhone and iPad: where the browser does not allow reading the clipboard (iOS) there is now a field to paste the token into with a long press; it is checked and saved on its own',
+    ],
+  },
   '1.1.2': {
     it: [
       'Liste condivise: se il token GitHub l\'avevi già inserito a mano, "Condividi con altre persone" non ti chiede più di collegare GitHub. L\'app ricava da sola il tuo nome utente e lo ricorda',

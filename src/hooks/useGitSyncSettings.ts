@@ -59,20 +59,9 @@ export function useGitSyncSettings() {
     conn = { status: 'ok', login: account.data.login, repos: account.data.repos, error: null }
   }
 
-  /** Legge il token dagli appunti e lo collega. */
-  const pasteToken = async () => {
-    let text: string
-    try {
-      text = await navigator.clipboard.readText()
-    } catch {
-      toast.error(t('githubConnect.clipboardDenied'))
-      return
-    }
-    if (!looksLikeToken(text)) {
-      toast.error(t('githubConnect.noTokenInClipboard'))
-      return
-    }
-    const token = text.trim()
+  /** Controlla il token con GitHub e, se vale, lo salva (con il login). Un token non valido non viene salvato. */
+  const connectToken = async (raw: string) => {
+    const token = raw.trim()
     setPasting(true)
     try {
       const { login } = await qc.fetchQuery({
@@ -90,6 +79,26 @@ export function useGitSyncSettings() {
     } finally {
       setPasting(false)
     }
+  }
+
+  /**
+   * Legge il token dagli appunti e lo collega. Ritorna false se il browser non lascia leggere gli appunti
+   * (iOS Safari di solito no): in quel caso si incolla a mano nel campo apposito.
+   */
+  const pasteToken = async (): Promise<boolean> => {
+    let text: string
+    try {
+      text = await navigator.clipboard.readText()
+    } catch {
+      toast.error(t('githubConnect.clipboardDenied'))
+      return false
+    }
+    if (!looksLikeToken(text)) {
+      toast.error(t('githubConnect.noTokenInClipboard'))
+      return true
+    }
+    await connectToken(text)
+    return true
   }
 
   /** Sceglie il repo dei backup dall'elenco e lo salva subito. */
@@ -161,5 +170,5 @@ export function useGitSyncSettings() {
   /** Rilegge la configurazione salvata (dopo un cambio di branch fatto altrove). */
   const refresh = () => setGit(getGitConfig())
 
-  return { git, conn, pasteToken, pickRepo, refresh, setGitField, auto, toggleAuto, syncing, showPull, setShowPull, save, forgetToken, syncNow, pull }
+  return { git, conn, pasteToken, connectToken, pickRepo, refresh, setGitField, auto, toggleAuto, syncing, showPull, setShowPull, save, forgetToken, syncNow, pull }
 }

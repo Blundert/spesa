@@ -1,6 +1,8 @@
+import { useRef } from 'react'
 import { useTranslation } from 'react-i18next'
+import { toast } from 'sonner'
 import type { useGitSyncSettings } from '../../hooks/useGitSyncSettings'
-import { CLASSIC_TOKEN_URL, fullName } from '../../lib/githubAccount'
+import { CLASSIC_TOKEN_URL, fullName, looksLikeToken } from '../../lib/githubAccount'
 
 const BTN =
   'px-3 py-[9px] rounded-[10px] text-[13px] bg-t-surface text-t-fg active:opacity-60 disabled:opacity-50 text-center'
@@ -14,6 +16,7 @@ export function GithubConnect({ s }: { s: ReturnType<typeof useGitSyncSettings> 
   const { conn, git } = s
   const writable = conn.repos.filter((r) => r.canPush)
   const current = git.owner && git.repo ? `${git.owner}/${git.repo}` : ''
+  const pasteField = useRef<HTMLInputElement>(null)
 
   return (
     <div data-testid="github-connect" className="bg-t-surface2 rounded-[20px] px-5 py-4 mb-3">
@@ -32,10 +35,31 @@ export function GithubConnect({ s }: { s: ReturnType<typeof useGitSyncSettings> 
         <a href={CLASSIC_TOKEN_URL} target="_blank" rel="noopener noreferrer" className={BTN}>
           {t('githubConnect.create')} ↗
         </a>
-        <button className={BTN} disabled={conn.status === 'checking'} onClick={() => void s.pasteToken()}>
+        <button
+          className={BTN}
+          disabled={conn.status === 'checking'}
+          onClick={() => void s.pasteToken().then((readable) => !readable && pasteField.current?.focus())}
+        >
           {t('githubConnect.paste')}
         </button>
       </div>
+      {/* Dove il browser non lascia leggere gli appunti (iOS): si incolla qui con il tocco prolungato */}
+      <input
+        ref={pasteField}
+        type="text"
+        value=""
+        onChange={(e) => {
+          const v = e.target.value
+          if (looksLikeToken(v)) void s.connectToken(v)
+          else if (v.trim().length >= 20) toast.error(t('githubConnect.noTokenInClipboard'))
+        }}
+        placeholder={t('githubConnect.pasteField')}
+        autoCapitalize="off"
+        autoCorrect="off"
+        spellCheck={false}
+        data-testid="github-token-paste"
+        className="w-full mt-2 bg-t-surface text-t-fg text-[14px] rounded-[10px] px-3 py-2 outline-none placeholder:text-t-muted"
+      />
 
       {conn.status === 'checking' && <p className="text-[13px] text-t-muted pt-3">{t('githubConnect.checking')}</p>}
       {conn.status === 'error' && (

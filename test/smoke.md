@@ -477,3 +477,8 @@ Serve la sync del backup personale attiva (Sincronizzazione → Sync automatico)
 1. Con un token salvato PRIMA di "Collega GitHub" (campo Token scritto a mano, nessun "Collegato come @…" mai mostrato): "Modifica lista" → "Condivisione" mostra "Condividi con altre persone", non "collega prima GitHub"; lo stesso per "Aggiungi una lista condivisa"
 2. Condividendo, l'app chiede a GitHub chi sei e lo ricorda: aprendo Sincronizzazione compare "Collegato come @…"
 3. Con un token scaduto o non valido compare "Collega prima GitHub…"; un token a repo singolo (fine-grained) non può creare repository e dà "Il token non ha il permesso di farlo: crea un token con il permesso repo"
+
+### Flusso 53 — Incollare il token su iOS (mobile e desktop)
+1. Su iPhone/iPad (Safari o app installata): Sincronizzazione → "Collega GitHub". Il pulsante "Incolla il token dagli appunti" può dire "Il browser non lascia leggere gli appunti…" e porta il cursore sul campo "Oppure incolla qui il token"
+2. Tieni premuto nel campo → Incolla: il token viene controllato da solo ("Collegato come @…") e salvato, il campo torna vuoto. Un testo lungo che non è un token dà "Negli appunti non c'è un token GitHub…"; un token non valido "Token non valido o scaduto" e non viene salvato
+3. Su browser che lasciano leggere gli appunti (desktop, Android) il pulsante funziona come prima e il campo è un'alternativa
