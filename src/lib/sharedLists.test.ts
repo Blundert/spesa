@@ -6,6 +6,7 @@ import { setGitConfig } from './gitSync'
 import {
   SharedListError,
   defaultRepoName,
+  displayName,
   inviteToList,
   isReadOnly,
   isValidRepoName,
@@ -64,6 +65,16 @@ describe('isReadOnly', () => {
     expect(isReadOnly(base)).toBe(false)
     expect(isReadOnly({ ...base, shared: LINK })).toBe(false)
     expect(isReadOnly({ ...base, shared: { ...LINK, canWrite: false } })).toBe(true)
+  })
+})
+
+describe('displayName', () => {
+  it('usa il nome scelto, altrimenti il login', () => {
+    const link = { ...LINK, members: { anna: { label: 'Anna', kind: 'partner' as const }, luca: { label: '', kind: 'stranger' as const } } }
+    expect(displayName(link, 'anna')).toBe('Anna')
+    expect(displayName(link, 'luca')).toBe('luca')
+    expect(displayName(link, 'sconosciuto')).toBe('sconosciuto')
+    expect(displayName(undefined, 'anna')).toBe('anna')
   })
 })
 

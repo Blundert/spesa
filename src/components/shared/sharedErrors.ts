@@ -1,6 +1,7 @@
 import type { TFunction } from 'i18next'
 import { SharedListError, type SharedListErrorCode } from '../../lib/sharedLists'
 import { SharedSyncError, type SharedSyncCode } from '../../lib/sharedSync'
+import type { SyncOutcome } from '../../lib/sharedSyncScheduler'
 
 const MESSAGES: Record<SharedListErrorCode | SharedSyncCode, (t: TFunction) => string> = {
   'not-connected': (t) => t('shared.errNotConnected'),
@@ -25,4 +26,15 @@ const MESSAGES: Record<SharedListErrorCode | SharedSyncCode, (t: TFunction) => s
 export function sharedErrorText(t: TFunction, e: unknown): string {
   if (e instanceof SharedListError || e instanceof SharedSyncError) return MESSAGES[e.code](t)
   return t('shared.errGeneric')
+}
+
+/** Riga di stato della sync di una lista condivisa: in corso, aggiornata alle…, offline o l'errore. */
+export function syncOutcomeText(t: TFunction, outcome: SyncOutcome | undefined, locale: string): string {
+  if (!outcome) return t('shared.syncing')
+  if (outcome.ok) {
+    const time = new Date(outcome.at).toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' })
+    return t('shared.updatedAt', { time })
+  }
+  if (outcome.code === 'network') return t('shared.offline')
+  return outcome.code === 'unknown' ? t('shared.errGeneric') : MESSAGES[outcome.code](t)
 }

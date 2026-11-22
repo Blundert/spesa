@@ -13,7 +13,7 @@ import {
   updatePurchaseFull,
 } from '../db/repositories/purchases'
 import { updateItemPrices } from '../db/repositories/items'
-import { removePurchasedFromList } from '../db/repositories/listItems'
+import { removePurchasedFromList, setSessionItemTaken } from '../db/repositories/listItems'
 import { db } from '../db/db'
 import type { Purchase, Session } from '../db/types'
 
@@ -137,6 +137,8 @@ export function useAddPurchase(isoWeek: string) {
   return useMutation({
     mutationFn: async ({ sessionId, itemId, priceCents, quantity = 1 }: AddPurchaseArgs) => {
       await addPurchase(sessionId, itemId, priceCents, quantity)
+      // Spesa partita da una lista condivisa: gli altri vedono che l'articolo è già stato preso.
+      await setSessionItemTaken(sessionId, itemId, true)
 
       // Aggiorna prezzi sull'item: media mobile sugli ultimi acquisti
       const allPurchases: Purchase[] = await db.purchases
@@ -186,6 +188,8 @@ export function useRemovePurchase(sessionId: number) {
       const purchase = await db.purchases.get(id)
       await removePurchase(id)
       if (purchase) {
+        const stillBought = await db.purchases.where({ sessionId: purchase.sessionId, itemId: purchase.itemId }).count()
+        if (stillBought === 0) await setSessionItemTaken(purchase.sessionId, purchase.itemId, false)
         const remaining = await db.purchases.where('itemId').equals(purchase.itemId).toArray()
         if (remaining.length === 0) {
           await db.items.update(purchase.itemId, { lastPriceCents: null, suggestedPriceCents: null })

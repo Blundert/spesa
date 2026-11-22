@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from 'vitest'
+import { describe, it, expect, beforeEach, afterEach } from 'vitest'
 import { db } from '../db'
 import {
   addToList,
@@ -7,9 +7,12 @@ import {
   getListItems,
   removeFromList,
   removePurchasedFromList,
+  setItemTaken,
+  setSessionItemTaken,
   tombstoneListItems,
   updateListItemQuantity,
 } from './listItems'
+import { onSharedChange } from '../../lib/sharedChange'
 import { upsertItem } from './items'
 import type { SharedLink } from '../types'
 
@@ -216,5 +219,80 @@ describe('liste condivise: uid, data di modifica e tombstone', () => {
     ])
     expect((await db.shoppingLists.get(1))?.shared?.tombstones).toEqual({})
     expect((await db.shoppingLists.get(2))?.shared).toBeUndefined()
+  })
+})
+
+describe('liste condivise: avviso delle modifiche e voci prese', () => {
+  let changed: number[]
+  let off: () => void
+
+  beforeEach(async () => {
+    changed = []
+    off = onSharedChange((id) => changed.push(id))
+    await Promise.all([db.shoppingLists.clear(), db.sessions.clear()])
+    await db.shoppingLists.bulkAdd([
+      { id: 1, name: 'Condivisa', supermarketId: null, sortOrder: 0, archivedAt: null, shared: SHARED },
+      { id: 2, name: 'Mia', supermarketId: null, sortOrder: 1, archivedAt: null },
+    ])
+  })
+  afterEach(() => off())
+
+  it('aggiungere, cambiare quantità ed eliminare avvisano solo per le liste condivise', async () => {
+    await addToList(1, A)
+    await addToList(2, A)
+    expect(changed).toEqual([1])
+    const [shared, normal] = await db.listItems.toArray()
+    await updateListItemQuantity(shared.id as number, 3)
+    await updateListItemQuantity(normal.id as number, 3)
+    expect(changed).toEqual([1, 1])
+    await removeFromList(shared.id as number)
+    await removeFromList(normal.id as number)
+    expect(changed).toEqual([1, 1, 1])
+  })
+
+  it('segnare una voce come presa dice chi e quando, e la rimette da prendere', async () => {
+    await addToList(1, A)
+    changed.length = 0
+    await setItemTaken(1, A, true)
+    const row = (await db.listItems.toArray())[0]
+    expect(row.takenBy).toBe('matteo')
+    expect(changed).toEqual([1])
+    await db.listItems.update(row.id as number, { updatedAt: 1 })
+    await setItemTaken(1, A, false)
+    const after = (await db.listItems.toArray())[0]
+    expect(after.takenBy).toBeNull()
+    expect(after.updatedAt).toBeGreaterThan(1)
+  })
+
+  it('non fa niente per liste normali, voci senza uid o voci che non ci sono', async () => {
+    await addToList(2, A)
+    await db.listItems.add({ listId: 1, itemId: B, quantity: 1, addedAt: 1 }) // senza uid
+    await setItemTaken(2, A, true)
+    await setItemTaken(1, B, true)
+    await setItemTaken(1, 999, true)
+    await setItemTaken(404, A, true)
+    expect(changed).toEqual([])
+    expect((await db.listItems.toArray()).every((r) => r.takenBy === undefined)).toBe(true)
+  })
+
+  it('dalla spesa risale alla lista di partenza', async () => {
+    await addToList(1, A)
+    await db.sessions.bulkAdd([
+      { id: 1, isoWeek: '2026-W47', supermarketId: 1, listId: 1, startedAt: 1, finishedAt: null, confirmedTotalCents: null, buoniSpent: 0, buoniValueCents: 800 },
+      { id: 2, isoWeek: '2026-W47', supermarketId: 1, startedAt: 1, finishedAt: null, confirmedTotalCents: null, buoniSpent: 0, buoniValueCents: 800 },
+    ])
+    await setSessionItemTaken(1, A, true)
+    expect((await db.listItems.toArray())[0].takenBy).toBe('matteo')
+    await setSessionItemTaken(2, A, false) // spesa senza lista
+    await setSessionItemTaken(404, A, false) // spesa inesistente
+    expect((await db.listItems.toArray())[0].takenBy).toBe('matteo')
+  })
+
+  it('eliminare una voce condivisa avvisa una volta per lista (tombstone)', async () => {
+    await addToList(1, A)
+    await addToList(1, B)
+    changed.length = 0
+    await clearList(1)
+    expect(changed).toEqual([1])
   })
 })

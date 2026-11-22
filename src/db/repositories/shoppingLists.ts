@@ -1,5 +1,6 @@
 import { db } from '../db'
 import type { SharedLink, ShoppingList } from '../types'
+import { emitSharedChange } from '../../lib/sharedChange'
 
 /** Errore: l'ultima lista attiva non si può archiviare né eliminare. */
 export const LAST_ACTIVE_LIST = 'LAST_ACTIVE_LIST'
@@ -26,7 +27,9 @@ export async function updateShoppingList(
   if (patch.name === undefined) return
   // Lista condivisa: il nome è anche nel repo, e vince il cambio più recente.
   const list = await db.shoppingLists.get(id)
-  if (list?.shared) await db.shoppingLists.update(id, { shared: { ...list.shared, nameUpdatedAt: Date.now() } })
+  if (!list?.shared) return
+  await db.shoppingLists.update(id, { shared: { ...list.shared, nameUpdatedAt: Date.now() } })
+  emitSharedChange(id)
 }
 
 async function assertNotLastActive(id: number): Promise<void> {

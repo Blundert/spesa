@@ -18,7 +18,9 @@ import { pickQuickChips, pickUsualItemIds } from '../../lib/listSuggestions'
 import { BASE_ITEMS } from '../../lib/baseItems'
 import { useActiveList, useUsualItems } from '../../hooks/useShoppingLists'
 import { activeLists, setActiveListId } from '../../lib/activeList'
-import { isReadOnly } from '../../lib/sharedLists'
+import { displayName, isReadOnly } from '../../lib/sharedLists'
+import { useLiveSharedList } from '../../hooks/useLiveSharedList'
+import { SharedSyncStatus } from '../../components/shared/SharedSyncStatus'
 import { SharedIcon } from '../../components/shared/SharedIcon'
 import { PageHeader, SectionTitle } from '../components/PageHeader'
 import { Modal } from '../components/Modal'
@@ -67,6 +69,10 @@ export function DesktopListaScreen() {
   const listId = list?.id
   // Lista condivisa senza permesso di scrittura: solo da guardare.
   const readOnly = isReadOnly(list)
+  // Lista condivisa: si tiene aggiornata finché è aperta (sync subito, ogni 15 s, al ritorno e quando torna la rete).
+  const syncOutcome = useLiveSharedList(listId, list?.shared !== undefined)
+  const takenLabel = (login: string | null | undefined) =>
+    login ? t('shared.takenBy', { name: login === list?.shared?.me ? t('shared.you') : displayName(list?.shared, login) }) : null
   const { data: listItems = [] } = useListItems(listId)
   const { data: usualItems = [] } = useUsualItems(listId)
   const { data: supermarkets = [] } = useSupermarkets()
@@ -227,6 +233,8 @@ export function DesktopListaScreen() {
         </button>
       </div>
 
+      {list?.shared && listId !== undefined && <SharedSyncStatus listId={listId} outcome={syncOutcome} />}
+
       <div style={{ display: 'flex', gap: '24px', alignItems: 'flex-start', flexWrap: 'wrap' }}>
         {/* Colonna principale: aggiunta + voci */}
         <div style={{ flex: '1 1 520px', minWidth: 0 }}>
@@ -334,7 +342,7 @@ export function DesktopListaScreen() {
                         {li.itemName}
                       </div>
                       <div style={{ fontSize: '12px', color: 'var(--t-muted)', marginTop: '2px' }}>
-                        {li.suggestedPriceCents !== null ? `~ € ${formatCents(li.suggestedPriceCents)}` : t('lista.toGet')}
+                        {takenLabel(li.takenBy) ?? (li.suggestedPriceCents !== null ? `~ € ${formatCents(li.suggestedPriceCents)}` : t('lista.toGet'))}
                       </div>
                     </button>
                     {!readOnly && (

@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import { db } from '../db'
+import { onSharedChange } from '../../lib/sharedChange'
 import type { SharedLink } from '../types'
 import {
   LAST_ACTIVE_LIST,
@@ -202,12 +203,16 @@ describe('liste condivise', () => {
     const shared = await createShoppingList('Casa', null)
     const normal = await createShoppingList('Mia', null)
     await setSharedLink(shared, LINK)
+    const changed: number[] = []
+    const off = onSharedChange((id) => changed.push(id))
     await updateShoppingList(shared, { supermarketId: 4 })
     expect((await getSharedLists())[0].shared.nameUpdatedAt).toBeUndefined()
     await updateShoppingList(shared, { name: 'Casa nostra' })
     await updateShoppingList(normal, { name: 'Mia 2' })
     expect((await getSharedLists())[0].shared.nameUpdatedAt).toBeGreaterThan(0)
     expect((await getShoppingLists()).find((l) => l.id === normal)?.shared).toBeUndefined()
+    expect(changed).toEqual([shared]) // avvisa solo per la condivisa, e solo per il cambio di nome
+    off()
   })
 
   it('rinominare o archiviare non tocca il collegamento', async () => {

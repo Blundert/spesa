@@ -1,5 +1,5 @@
 import { db } from '../db/db'
-import type { ShoppingList, SharedMember } from '../db/types'
+import type { ShoppingList, SharedLink, SharedMember } from '../db/types'
 import { createShoppingList, deleteShoppingList, setSharedLink } from '../db/repositories/shoppingLists'
 import { patchSharedLink } from '../db/repositories/sharedListData'
 import { getGitConfig, getRemoteFile, type GitConfig } from './gitSync'
@@ -49,6 +49,11 @@ export class SharedListError extends Error {
 /** La lista è condivisa e io posso solo guardarla. */
 export function isReadOnly(list: ShoppingList | undefined): boolean {
   return list?.shared !== undefined && !list.shared.canWrite
+}
+
+/** Come mostrare una persona di una lista condivisa: il nome che ho scelto per lei, altrimenti il suo login. */
+export function displayName(link: SharedLink | undefined, login: string): string {
+  return link?.members[login]?.label || login
 }
 
 /** Nome proposto per il repo di una lista: `spesa-` + il nome senza accenti né simboli. */

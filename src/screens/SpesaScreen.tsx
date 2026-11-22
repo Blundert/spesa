@@ -1,4 +1,6 @@
 import { useState } from 'react'
+import { displayName } from '../lib/sharedLists'
+import { useLiveSharedList } from '../hooks/useLiveSharedList'
 import { useTranslation } from 'react-i18next'
 import { useNavigate, useSearch } from '@tanstack/react-router'
 import { useQueryClient } from '@tanstack/react-query'
@@ -112,6 +114,10 @@ export function SpesaScreen() {
   const listId = activeSession ? activeSession.listId : (searchListId ?? activeList?.id)
   const { data: listItems = [] } = useListItems(listId)
   const sessionList = lists.find((l) => l.id === listId)
+  // Spesa da una lista condivisa: si tiene aggiornata e si vede cosa hanno già preso gli altri.
+  useLiveSharedList(listId, sessionList?.shared !== undefined)
+  const takenByOther = (login: string | null | undefined) =>
+    login && login !== sessionList?.shared?.me ? t('shared.takenBy', { name: displayName(sessionList?.shared, login) }) : null
 
   const createSession = useCreateSession(isoWeek)
   const finishSession = useFinishSession(isoWeek)
@@ -413,7 +419,10 @@ export function SpesaScreen() {
                     className="flex flex-1 items-center gap-[13px] text-left active:opacity-60 transition-opacity"
                   >
                     <div className="w-6 h-6 flex-none rounded-full border-2 border-t-line2" />
-                    <div className="flex-1 text-base text-t-fg">{li.itemName}</div>
+                    <div className="flex-1 text-base text-t-fg">
+                      {li.itemName}
+                      {takenByOther(li.takenBy) && <div className="text-[12px] text-t-muted">{takenByOther(li.takenBy)}</div>}
+                    </div>
                     {li.suggestedPriceCents !== null && (
                       <span className="text-sm text-t-faint tabular-nums">
                         {t('spesa.about')} €{formatCentsPlain(li.suggestedPriceCents)}

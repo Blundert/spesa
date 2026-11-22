@@ -15,7 +15,9 @@ import { useActiveList, useUsualItems } from '../hooks/useShoppingLists'
 import { ListTabs } from '../components/ListTabs'
 import { ListEditSheet } from '../components/ListEditSheet'
 import { activeLists, setActiveListId } from '../lib/activeList'
-import { isReadOnly } from '../lib/sharedLists'
+import { displayName, isReadOnly } from '../lib/sharedLists'
+import { useLiveSharedList } from '../hooks/useLiveSharedList'
+import { SharedSyncStatus } from '../components/shared/SharedSyncStatus'
 
 interface Suggestion {
   name: string
@@ -38,6 +40,10 @@ export function ListaScreen() {
   const listId = list?.id
   // Lista condivisa senza permesso di scrittura: solo da guardare.
   const readOnly = isReadOnly(list)
+  // Lista condivisa: si tiene aggiornata finché è aperta (sync subito, ogni 15 s, al ritorno e quando torna la rete).
+  const syncOutcome = useLiveSharedList(listId, list?.shared !== undefined)
+  const takenLabel = (login: string | null | undefined) =>
+    login ? t('shared.takenBy', { name: login === list?.shared?.me ? t('shared.you') : displayName(list?.shared, login) }) : null
   const { data: listItems = [] } = useListItems(listId)
   const { data: usualItems = [] } = useUsualItems(listId)
   const { data: supermarkets = [] } = useSupermarkets()
@@ -166,6 +172,8 @@ export function ListaScreen() {
         onEdit={() => setListSheet('edit')}
         onCreate={() => setListSheet('new')}
       />
+
+      {list?.shared && listId !== undefined && <SharedSyncStatus listId={listId} outcome={syncOutcome} />}
 
       {readOnly && (
         <div className="bg-t-surface2 text-t-muted text-[13px] rounded-2xl px-[18px] py-3 mb-3">{t('shared.readOnlyBanner')}</div>
@@ -305,9 +313,8 @@ export function ListaScreen() {
                 <div className="flex-1 min-w-0">
                   <div className="text-base text-t-fg truncate">{li.itemName}</div>
                   <div className="text-[12px] text-t-muted mt-0.5">
-                    {li.suggestedPriceCents !== null
-                      ? `~ €${formatCentsPlain(li.suggestedPriceCents)}`
-                      : t('lista.toGet')}
+                    {takenLabel(li.takenBy) ??
+                      (li.suggestedPriceCents !== null ? `~ €${formatCentsPlain(li.suggestedPriceCents)}` : t('lista.toGet'))}
                   </div>
                 </div>
 

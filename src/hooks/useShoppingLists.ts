@@ -13,6 +13,7 @@ import {
   updateShoppingList,
 } from '../db/repositories/shoppingLists'
 import { getActiveListId, onActiveListChange, pickList } from '../lib/activeList'
+import type { SharedLink } from '../db/types'
 
 export function useShoppingLists() {
   return useQuery({
@@ -26,6 +27,12 @@ export function useActiveList() {
   const { data: lists = [] } = useShoppingLists()
   const preferredId = useSyncExternalStore(onActiveListChange, getActiveListId)
   return { lists, list: pickList(lists, preferredId) }
+}
+
+/** Il collegamento di una lista condivisa, `undefined` se la lista non è condivisa. */
+export function useSharedLink(listId: number | undefined): SharedLink | undefined {
+  const { data: lists = [] } = useShoppingLists()
+  return lists.find((l) => l.id === listId)?.shared
 }
 
 /** Prodotti più comprati con questa lista (base della spesa solita). */

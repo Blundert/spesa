@@ -1,6 +1,7 @@
 import { db } from '../db'
 import type { ListItem } from '../types'
 import { newUid } from '../../lib/sharedList'
+import { emitSharedChange } from '../../lib/sharedChange'
 
 export interface ListItemWithItem extends ListItem {
   itemName: string
@@ -40,6 +41,7 @@ export async function tombstoneListItems(rows: ListItem[], now: number = Date.no
     const tombstones = { ...list.shared.tombstones }
     for (const uid of uids) tombstones[uid] = now
     await db.shoppingLists.update(listId, { shared: { ...list.shared, tombstones } })
+    emitSharedChange(listId)
   }
 }
 
@@ -70,6 +72,7 @@ export async function addToList(listId: number, itemId: number): Promise<void> {
       ...(shared ? { uid: newUid(), updatedAt: now, addedBy: shared.me } : {}),
     })
   }
+  if (shared) emitSharedChange(listId)
 }
 
 async function deleteRows(rows: ListItem[]): Promise<void> {
@@ -92,6 +95,7 @@ export async function updateListItemQuantity(id: number, quantity: number): Prom
   const row = await db.listItems.get(id)
   if (!row) return
   await db.listItems.update(id, { quantity, ...(row.uid ? { updatedAt: Date.now() } : {}) })
+  if (row.uid) emitSharedChange(row.listId)
 }
 
 /**
@@ -125,4 +129,24 @@ export async function assignListItemUids(listId: number, me: string): Promise<vo
       .filter((li) => !li.uid)
       .map((li) => db.listItems.update(li.id as number, { uid: newUid(), updatedAt: li.addedAt, addedBy: me })),
   )
+}
+
+/**
+ * Segna una voce di una lista condivisa come presa (da me) o di nuovo da prendere, così gli altri lo vedono.
+ * Non fa niente se la lista non è condivisa o la voce non c'è.
+ */
+export async function setItemTaken(listId: number, itemId: number, taken: boolean): Promise<void> {
+  const [list, row] = await Promise.all([
+    db.shoppingLists.get(listId),
+    db.listItems.where('[listId+itemId]').equals([listId, itemId]).first(),
+  ])
+  if (!list?.shared || !row?.uid) return
+  await db.listItems.update(row.id as number, { takenBy: taken ? list.shared.me : null, updatedAt: Date.now() })
+  emitSharedChange(listId)
+}
+
+/** Come `setItemTaken`, partendo da una spesa: vale per la lista da cui è partita. */
+export async function setSessionItemTaken(sessionId: number, itemId: number, taken: boolean): Promise<void> {
+  const listId = (await db.sessions.get(sessionId))?.listId
+  if (listId !== undefined) await setItemTaken(listId, itemId, taken)
 }

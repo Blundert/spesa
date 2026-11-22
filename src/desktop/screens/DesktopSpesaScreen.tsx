@@ -1,4 +1,6 @@
 import { useState } from 'react'
+import { displayName } from '../../lib/sharedLists'
+import { useLiveSharedList } from '../../hooks/useLiveSharedList'
 import { useTranslation } from 'react-i18next'
 import { useNavigate, useSearch } from '@tanstack/react-router'
 import { useQueryClient } from '@tanstack/react-query'
@@ -58,6 +60,7 @@ interface TodoRow {
   itemId: number
   itemName: string
   suggestedPriceCents: number | null
+  takenBy?: string | null
 }
 
 interface CartRow {
@@ -165,6 +168,10 @@ export function DesktopSpesaScreen() {
   const listId = activeSession ? activeSession.listId : (searchListId ?? activeList?.id)
   const { data: listItems = [] } = useListItems(listId)
   const sessionList = lists.find((l) => l.id === listId)
+  // Spesa da una lista condivisa: si tiene aggiornata e si vede cosa hanno già preso gli altri.
+  useLiveSharedList(listId, sessionList?.shared !== undefined)
+  const takenByOther = (login: string | null | undefined) =>
+    login && login !== sessionList?.shared?.me ? t('shared.takenBy', { name: displayName(sessionList?.shared, login) }) : null
 
   const createSession = useCreateSession(isoWeek)
   const finishSession = useFinishSession(isoWeek)
@@ -346,7 +353,12 @@ export function DesktopSpesaScreen() {
     {
       key: 'name',
       label: t('desktop.spesa.colItem'),
-      render: (r) => r.itemName,
+      render: (r) => (
+        <>
+          {r.itemName}
+          {takenByOther(r.takenBy) && <span style={{ color: 'var(--t-muted)', fontSize: '12px' }}> · {takenByOther(r.takenBy)}</span>}
+        </>
+      ),
       sortValue: (r) => r.itemName,
     },
     {
