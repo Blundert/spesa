@@ -43,6 +43,9 @@ export default defineConfig({
         'src/lib/csp.ts',
         'src/lib/sharedList.ts',
         'src/lib/githubAccount.ts',
+        'src/lib/sharedListFile.ts',
+        'src/lib/sharedSync.ts',
+        'src/db/repositories/sharedListData.ts',
       ],
       all: true,
       thresholds: {

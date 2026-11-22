@@ -198,6 +198,18 @@ describe('liste condivise', () => {
     expect('shared' in list).toBe(false)
   })
 
+  it('rinominare una lista condivisa segna il momento del cambio, una normale no', async () => {
+    const shared = await createShoppingList('Casa', null)
+    const normal = await createShoppingList('Mia', null)
+    await setSharedLink(shared, LINK)
+    await updateShoppingList(shared, { supermarketId: 4 })
+    expect((await getSharedLists())[0].shared.nameUpdatedAt).toBeUndefined()
+    await updateShoppingList(shared, { name: 'Casa nostra' })
+    await updateShoppingList(normal, { name: 'Mia 2' })
+    expect((await getSharedLists())[0].shared.nameUpdatedAt).toBeGreaterThan(0)
+    expect((await getShoppingLists()).find((l) => l.id === normal)?.shared).toBeUndefined()
+  })
+
   it('rinominare o archiviare non tocca il collegamento', async () => {
     const id = await createShoppingList('Casa', null)
     await createShoppingList('Altra', null)

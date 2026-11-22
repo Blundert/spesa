@@ -1,6 +1,7 @@
 import { db } from '../db'
 import { normalizeName } from '../../lib/normalize'
 import type { Item } from '../types'
+import { tombstoneListItems } from './listItems'
 
 export async function getItems(): Promise<Item[]> {
   return db.items.toArray()
@@ -53,7 +54,9 @@ export async function updateItemPrices(
 }
 
 export async function deleteItem(id: number): Promise<void> {
-  await db.transaction('rw', [db.items, db.listItems, db.purchases], async () => {
+  await db.transaction('rw', [db.items, db.listItems, db.purchases, db.shoppingLists], async () => {
+    const rows = await db.listItems.where('itemId').equals(id).toArray()
+    await tombstoneListItems(rows)
     await db.listItems.where('itemId').equals(id).delete()
     await db.items.delete(id)
   })

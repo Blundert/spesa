@@ -7,9 +7,11 @@ import {
   getListItems,
   removeFromList,
   removePurchasedFromList,
+  tombstoneListItems,
   updateListItemQuantity,
 } from './listItems'
 import { upsertItem } from './items'
+import type { SharedLink } from '../types'
 
 const A = 1
 const B = 2
@@ -120,5 +122,99 @@ describe('assignListItemUids', () => {
     const after = (await db.listItems.toArray())[0]
     expect(after.uid).toBe(first)
     expect(after.addedBy).toBe('matteo')
+  })
+})
+
+const SHARED: SharedLink = {
+  uid: 'l1', owner: 'anna', repo: 'spesa', branch: 'main', path: 'lista.json',
+  me: 'matteo', canWrite: true, members: {}, tombstones: {},
+}
+
+describe('liste condivise: uid, data di modifica e tombstone', () => {
+  beforeEach(async () => {
+    await db.shoppingLists.clear()
+    await db.shoppingLists.bulkAdd([
+      { id: 1, name: 'Condivisa', supermarketId: null, sortOrder: 0, archivedAt: null, shared: SHARED },
+      { id: 2, name: 'Mia', supermarketId: null, sortOrder: 1, archivedAt: null },
+    ])
+  })
+
+  it('aggiungere dà uid e autore; aggiungere ancora aggiorna quantità e data', async () => {
+    await addToList(1, A)
+    const [row] = await db.listItems.toArray()
+    expect(row.uid).toMatch(/^[0-9a-f-]{36}$/)
+    expect(row).toMatchObject({ addedBy: 'matteo', quantity: 1 })
+    expect(row.updatedAt).toBe(row.addedAt)
+    await db.listItems.update(row.id as number, { updatedAt: 1 })
+    await addToList(1, A)
+    const after = (await db.listItems.toArray())[0]
+    expect(after.quantity).toBe(2)
+    expect(after.updatedAt).toBeGreaterThan(1)
+    expect(after.uid).toBe(row.uid)
+  })
+
+  it('in una lista normale non aggiunge niente di tutto questo', async () => {
+    await addToList(2, A)
+    await addToList(2, A)
+    const [row] = await db.listItems.toArray()
+    expect(row).toMatchObject({ quantity: 2 })
+    expect(row.uid).toBeUndefined()
+    expect(row.updatedAt).toBeUndefined()
+  })
+
+  it('cambiare la quantità aggiorna la data solo se la voce ha un uid', async () => {
+    await addToList(1, A)
+    await addToList(2, A)
+    const [shared, normal] = await db.listItems.toArray()
+    await db.listItems.update(shared.id as number, { updatedAt: 1 })
+    await updateListItemQuantity(shared.id as number, 5)
+    await updateListItemQuantity(normal.id as number, 5)
+    expect(await db.listItems.get(shared.id as number)).toMatchObject({ quantity: 5 })
+    expect((await db.listItems.get(shared.id as number))?.updatedAt).toBeGreaterThan(1)
+    expect((await db.listItems.get(normal.id as number))?.updatedAt).toBeUndefined()
+    await updateListItemQuantity(9999, 3) // inesistente: niente
+  })
+
+  it('eliminare una voce condivisa lascia un tombstone; una normale no', async () => {
+    await addToList(1, A)
+    await addToList(1, B)
+    await addToList(2, A)
+    const [a, , normal] = await db.listItems.toArray()
+    await removeFromList(a.id as number)
+    await removeFromList(normal.id as number)
+    await removeFromList(9999) // inesistente: niente
+    const list = await db.shoppingLists.get(1)
+    expect(Object.keys(list?.shared?.tombstones ?? {})).toEqual([a.uid])
+    expect((await db.shoppingLists.get(2))?.shared).toBeUndefined()
+    expect(await db.listItems.count()).toBe(1) // resta solo la voce B della lista condivisa
+  })
+
+  it('quantità zero elimina e lascia il tombstone', async () => {
+    await addToList(1, A)
+    const [row] = await db.listItems.toArray()
+    await updateListItemQuantity(row.id as number, 0)
+    expect(await db.listItems.count()).toBe(0)
+    expect(Object.keys((await db.shoppingLists.get(1))?.shared?.tombstones ?? {})).toEqual([row.uid])
+  })
+
+  it('fine spesa e svuota lista lasciano i tombstone solo delle voci tolte', async () => {
+    await addToList(1, A)
+    await addToList(1, B)
+    const [a, b] = await db.listItems.toArray()
+    await removePurchasedFromList(1, [A])
+    expect(Object.keys((await db.shoppingLists.get(1))?.shared?.tombstones ?? {})).toEqual([a.uid])
+    await clearList(1)
+    expect(Object.keys((await db.shoppingLists.get(1))?.shared?.tombstones ?? {}).sort()).toEqual([a.uid, b.uid].sort())
+    expect(await db.listItems.count()).toBe(0)
+  })
+
+  it('tombstoneListItems ignora voci senza uid o di liste che non esistono più', async () => {
+    await tombstoneListItems([
+      { listId: 1, itemId: A, quantity: 1, addedAt: 1 },
+      { listId: 404, itemId: A, quantity: 1, addedAt: 1, uid: 'x' },
+      { listId: 2, itemId: A, quantity: 1, addedAt: 1, uid: 'y' },
+    ])
+    expect((await db.shoppingLists.get(1))?.shared?.tombstones).toEqual({})
+    expect((await db.shoppingLists.get(2))?.shared).toBeUndefined()
   })
 })

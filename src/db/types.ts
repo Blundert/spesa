@@ -71,6 +71,8 @@ export interface SharedLink {
   me: string
   /** Permesso di scrittura sul repo all'ultimo controllo (false = sola lettura). */
   canWrite: boolean
+  /** Quando è stato cambiato per l'ultima volta il nome della lista (ms): nel merge vince il più recente. */
+  nameUpdatedAt?: number
   /** Gli altri utenti, per login GitHub. */
   members: Record<string, SharedMember>
   /** Voci eliminate (uid → quando): servono al merge perché un'eliminazione non ricompaia. */

@@ -116,7 +116,7 @@ interface RemoteFile {
 }
 
 /** GET di un file del repo (di default il file dei dati sul branch): sha + contenuto, o null se non esiste (404). */
-async function getRemoteFile(
+export async function getRemoteFile(
   c: GitConfig,
   path: string = c.path,
   ref: string = c.branch,
@@ -134,7 +134,7 @@ async function getRemoteFile(
 }
 
 /** PUT del file (= un commit). Passare lo sha corrente se il file esiste. Ritorna il nuovo sha. */
-async function putFile(
+export async function putFile(
   c: GitConfig,
   json: string,
   message: string,
