@@ -169,6 +169,34 @@ describe('applySharedFile', () => {
     await expect(applySharedFile(5, file())).rejects.toThrow('non condivisa')
   })
 
+  it('scopre le persone della lista: autori, chi ha preso una voce, chi ha fatto la spesa e il proprietario', async () => {
+    await seed()
+    await db.shoppingLists.update(1, { shared: { ...LINK, members: { luca: { label: 'Luca', kind: 'partner' } } } })
+    await applySharedFile(
+      1,
+      file({
+        items: [fi('a', 'Uova', { addedBy: 'matteo', takenBy: 'sara' }), fi('b', 'Sale', { addedBy: 'luca' })],
+        sessions: [
+          {
+            uid: 's1', doneBy: 'giorgio', supermarketName: 'Coop', startedAt: 1, finishedAt: 2,
+            confirmedTotalCents: null, buoniSpent: 0, buoniValueCents: 800, purchases: [],
+          },
+        ],
+      }),
+    )
+    const members = (await db.shoppingLists.get(1))?.shared?.members
+    expect(Object.keys(members ?? {}).sort()).toEqual(['anna', 'giorgio', 'luca', 'sara']) // me (matteo) escluso
+    expect(members?.luca).toEqual({ label: 'Luca', kind: 'partner' }) // chi c'era già non cambia
+    expect(members?.sara).toEqual({ label: '', kind: 'stranger' })
+    expect(members?.anna).toEqual({ label: '', kind: 'stranger' }) // proprietario del repo
+  })
+
+  it('un login che sembra una proprietà di oggetto viene trattato come gli altri', async () => {
+    await seed()
+    await applySharedFile(1, file({ items: [fi('a', 'Uova', { addedBy: 'constructor' })] }))
+    expect((await db.shoppingLists.get(1))?.shared?.members.constructor).toEqual({ label: '', kind: 'stranger' })
+  })
+
   it('esportare dopo aver applicato dà lo stesso contenuto', async () => {
     await seed()
     const f = file({ items: [fi('a', 'Uova'), fi('b', 'Sale', { quantity: 3 })], tombstones: { x: 5 } })

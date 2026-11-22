@@ -15,6 +15,7 @@ import { useActiveList, useUsualItems } from '../hooks/useShoppingLists'
 import { ListTabs } from '../components/ListTabs'
 import { ListEditSheet } from '../components/ListEditSheet'
 import { activeLists, setActiveListId } from '../lib/activeList'
+import { isReadOnly } from '../lib/sharedLists'
 
 interface Suggestion {
   name: string
@@ -35,6 +36,8 @@ export function ListaScreen() {
   const { lists, list } = useActiveList()
   const tabs = activeLists(lists)
   const listId = list?.id
+  // Lista condivisa senza permesso di scrittura: solo da guardare.
+  const readOnly = isReadOnly(list)
   const { data: listItems = [] } = useListItems(listId)
   const { data: usualItems = [] } = useUsualItems(listId)
   const { data: supermarkets = [] } = useSupermarkets()
@@ -148,7 +151,7 @@ export function ListaScreen() {
       {/* Header — menu button is in AppShell */}
       <div className="flex items-center justify-between px-1 pt-2 pb-[18px]">
         <SectionTitle active="lista" />
-        {listItems.length > 0 && (
+        {listItems.length > 0 && !readOnly && (
           <button onClick={() => setShowClear(true)} className="text-[15px] text-t-muted px-1 active:opacity-50">
             {t('lista.clear')}
           </button>
@@ -164,7 +167,12 @@ export function ListaScreen() {
         onCreate={() => setListSheet('new')}
       />
 
+      {readOnly && (
+        <div className="bg-t-surface2 text-t-muted text-[13px] rounded-2xl px-[18px] py-3 mb-3">{t('shared.readOnlyBanner')}</div>
+      )}
+
       {/* Add input */}
+      {!readOnly && (
       <div className="flex items-center gap-2.5 bg-t-surface rounded-2xl px-[18px] py-4 mb-3">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--t-muted)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
           <path d="M12 5v14M5 12h14" />
@@ -178,9 +186,10 @@ export function ListaScreen() {
           className="flex-1 border-none outline-none bg-transparent text-base text-t-fg placeholder:text-t-muted"
         />
       </div>
+      )}
 
       {/* Autocomplete (input non vuoto) */}
-      {addInput.trim() && (
+      {!readOnly && addInput.trim() && (
         <div className="bg-t-surface rounded-2xl overflow-hidden mb-3 divide-y divide-t-line shadow-[0_2px_12px_rgba(0,0,0,.05)]">
           {matches.map((p) => (
             <button
@@ -207,7 +216,7 @@ export function ListaScreen() {
       )}
 
       {/* Suggerimenti rapidi (input vuoto) */}
-      {quick.length > 0 && (
+      {!readOnly && quick.length > 0 && (
         <div className="flex gap-2 overflow-x-auto pb-4 -mx-5 px-5">
           {quick.map((p) => (
             <button
@@ -222,7 +231,7 @@ export function ListaScreen() {
       )}
 
       {/* Template spesa solita */}
-      {templateSuggestions.length > 0 && (
+      {!readOnly && templateSuggestions.length > 0 && (
         <div className="bg-t-surface rounded-[20px] px-[18px] py-[15px] mb-4 flex items-center justify-between gap-3">
           <div className="flex-1 min-w-0">
             <div className="text-[15px] font-normal text-t-fg mb-[3px]">{t('lista.templateTitle')}</div>
@@ -261,6 +270,7 @@ export function ListaScreen() {
               >
                 {/* Stepper quantità */}
                 <div className="flex items-center gap-1.5 flex-none">
+                  {!readOnly && (
                   <button
                     onClick={() => {
                       if (li.quantity <= 1) {
@@ -276,7 +286,9 @@ export function ListaScreen() {
                       <path d="M5 12h14" />
                     </svg>
                   </button>
+                  )}
                   <span className="text-[15px] text-t-fg min-w-[18px] text-center tabular-nums">{li.quantity}</span>
+                  {!readOnly && (
                   <button
                     onClick={() => { if (li.id !== undefined) updateListQuantity.mutate({ id: li.id, quantity: li.quantity + 1 }) }}
                     aria-label="+"
@@ -286,6 +298,7 @@ export function ListaScreen() {
                       <path d="M12 5v14M5 12h14" />
                     </svg>
                   </button>
+                  )}
                 </div>
 
                 {/* Name + sub */}

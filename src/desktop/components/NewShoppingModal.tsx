@@ -11,6 +11,7 @@ import { currentWeek, formatWeekLabelWithYear } from '../../lib/date'
 import { formatCents, formatCentsPlain } from '../../lib/money'
 import { weekSpendSummary } from '../../lib/budgetSelectors'
 import { getDefaultBuonoValueCents } from '../../lib/buoniSettings'
+import { isReadOnly } from '../../lib/sharedLists'
 import { activeLists } from '../../lib/activeList'
 import { useWeekBudget, useSessionsByWeek, useCreateSession } from '../../hooks/useShopping'
 import { useSupermarkets } from '../../hooks/useItems'
@@ -47,18 +48,20 @@ export function NewShoppingButton({ compact = false }: { compact?: boolean }) {
   const supermarketNames = Object.fromEntries(supermarkets.map((s) => [s.id ?? 0, s.name]))
   const createSession = useCreateSession(isoWeek)
   const summary = weekSpendSummary(sessions, purchases, budget?.buoniAvailable ?? 0)
+  // Una lista condivisa in sola lettura non può far partire una spesa.
+  const startableLists = activeLists(lists).filter((l) => !isReadOnly(l))
 
   // Buoni pre-compilati coi rimanenti, valore di default, lista attiva.
   const openModal = () => {
     setNewBuoni(summary.buoniRemaining)
     setNewVal(getDefaultBuonoValueCents())
-    setNewListId(list?.id)
+    setNewListId(startableLists.find((l) => l.id === list?.id)?.id ?? startableLists[0]?.id)
     setOpen(true)
   }
 
   const startShopping = async () => {
     setOpen(false)
-    const chosen = lists.find((l) => l.id === newListId) ?? list
+    const chosen = startableLists.find((l) => l.id === newListId) ?? startableLists[0]
     const listId = chosen?.id
     // Lista con supermercato: la spesa parte subito lì (se non ce n'è già una in corso).
     const storeId = chosen?.supermarketId
@@ -144,7 +147,7 @@ export function NewShoppingButton({ compact = false }: { compact?: boolean }) {
           onValue={setNewVal}
           top={
             <ListPickerRow
-              lists={activeLists(lists)}
+              lists={startableLists}
               value={newListId}
               onChange={setNewListId}
               supermarketNames={supermarketNames}

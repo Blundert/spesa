@@ -20,6 +20,7 @@ import { BottomSheet } from './BottomSheet'
 import { BuoniSteppers } from './BuoniSheet'
 import { WeekSummary } from './WeekSummary'
 import { ListPickerRow } from './ListPickerRow'
+import { isReadOnly } from '../lib/sharedLists'
 import { activeLists } from '../lib/activeList'
 import { onTourPillSheet } from '../tutorial/tutorialStore'
 
@@ -69,12 +70,14 @@ export function AppShell() {
   const createSession = useCreateSession(isoWeek)
 
   const summary = weekSpendSummary(sessions, purchases, budget?.buoniAvailable ?? 0)
+  // Una lista condivisa in sola lettura non può far partire una spesa.
+  const startableLists = activeLists(lists).filter((l) => !isReadOnly(l))
 
   // Init della config nuova spesa nel click di apertura (no effetto → no lint).
   const openNewShopping = () => {
     setNewBuoni(summary.buoniRemaining)
     setNewVal(getDefaultBuonoValueCents())
-    setNewListId(list?.id)
+    setNewListId(startableLists.find((l) => l.id === list?.id)?.id ?? startableLists[0]?.id)
     setSheetOpen(true)
   }
   // Il tour apre il pannello per mostrare buoni e "Inizia la spesa", poi lo richiude.
@@ -90,7 +93,7 @@ export function AppShell() {
     setSheetOpen(false)
     const buoni = newBuoni
     const val = newVal
-    const chosen = lists.find((l) => l.id === newListId) ?? list
+    const chosen = startableLists.find((l) => l.id === newListId) ?? startableLists[0]
     const listId = chosen?.id
     // Lista con supermercato: la spesa parte subito lì (se non ce n'è già una in corso).
     const storeId = chosen?.supermarketId
@@ -180,7 +183,7 @@ export function AppShell() {
         onStart={() => void startShopping()}
         listRow={
           <ListPickerRow
-            lists={activeLists(lists)}
+            lists={startableLists}
             value={newListId}
             onChange={setNewListId}
             supermarketNames={supermarketNames}

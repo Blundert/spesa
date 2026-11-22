@@ -45,6 +45,8 @@ export default defineConfig({
         'src/lib/githubAccount.ts',
         'src/lib/sharedListFile.ts',
         'src/lib/sharedSync.ts',
+        'src/lib/githubRepos.ts',
+        'src/lib/sharedLists.ts',
         'src/db/repositories/sharedListData.ts',
       ],
       all: true,

@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import type { ShoppingList } from '../db/types'
+import { SharedIcon } from './shared/SharedIcon'
 
 // Schede delle liste sotto il titolo: la attiva sottolineata con ⌄ (ritoccandola si modifica),
 // le altre grigie; il supermercato preimpostato accanto al nome, "+" per crearne una.
@@ -36,6 +37,11 @@ export function ListTabs({
               active ? 'text-t-fg border-b-2 border-t-fg -mb-px' : 'text-t-muted'
             }`}
           >
+            {l.shared && (
+              <span className="mr-1 text-t-muted">
+                <SharedIcon size={12} />
+              </span>
+            )}
             {l.name}
             {active && (
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--t-fg)" strokeWidth="2.4" strokeLinecap="round" className="inline-block ml-1 align-[-1px]">

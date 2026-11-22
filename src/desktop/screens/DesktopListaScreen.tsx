@@ -18,6 +18,8 @@ import { pickQuickChips, pickUsualItemIds } from '../../lib/listSuggestions'
 import { BASE_ITEMS } from '../../lib/baseItems'
 import { useActiveList, useUsualItems } from '../../hooks/useShoppingLists'
 import { activeLists, setActiveListId } from '../../lib/activeList'
+import { isReadOnly } from '../../lib/sharedLists'
+import { SharedIcon } from '../../components/shared/SharedIcon'
 import { PageHeader, SectionTitle } from '../components/PageHeader'
 import { Modal } from '../components/Modal'
 import { ListEditModal } from '../components/ListEditModal'
@@ -63,6 +65,8 @@ export function DesktopListaScreen() {
   const { lists, list } = useActiveList()
   const tabs = activeLists(lists)
   const listId = list?.id
+  // Lista condivisa senza permesso di scrittura: solo da guardare.
+  const readOnly = isReadOnly(list)
   const { data: listItems = [] } = useListItems(listId)
   const { data: usualItems = [] } = useUsualItems(listId)
   const { data: supermarkets = [] } = useSupermarkets()
@@ -173,7 +177,7 @@ export function DesktopListaScreen() {
         title={t('lista.title')}
         subtitle={list ? [list.name, list.supermarketId !== null ? supermarketNames[list.supermarketId] : undefined].filter(Boolean).join(' · ') : undefined}
         right={
-          listItems.length > 0 ? (
+          listItems.length > 0 && !readOnly ? (
             <button onClick={() => setShowClear(true)} style={btnSecondary}>
               {t('lista.clear')}
             </button>
@@ -203,6 +207,11 @@ export function DesktopListaScreen() {
                 whiteSpace: 'nowrap',
               }}
             >
+              {l.shared && (
+                <span style={{ marginRight: '4px' }}>
+                  <SharedIcon size={13} />
+                </span>
+              )}
               {l.name}
               {isActive && <span aria-hidden> ⌄</span>}
               {store && <span style={{ fontSize: '12px', color: 'var(--t-muted)' }}> · {store}</span>}
@@ -221,6 +230,12 @@ export function DesktopListaScreen() {
       <div style={{ display: 'flex', gap: '24px', alignItems: 'flex-start', flexWrap: 'wrap' }}>
         {/* Colonna principale: aggiunta + voci */}
         <div style={{ flex: '1 1 520px', minWidth: 0 }}>
+          {readOnly && (
+            <div style={{ ...card, padding: '12px 20px', marginBottom: '12px', fontSize: '13px', color: 'var(--t-muted)' }}>
+              {t('shared.readOnlyBanner')}
+            </div>
+          )}
+          {!readOnly && (
           <div style={{ ...card, padding: '16px 20px', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '10px' }}>
             <span aria-hidden style={{ color: 'var(--t-muted)', fontSize: '20px' }}>+</span>
             <input
@@ -232,8 +247,9 @@ export function DesktopListaScreen() {
               style={{ flex: 1, border: 'none', outline: 'none', background: 'transparent', fontSize: '15px', color: 'var(--t-fg)' }}
             />
           </div>
+          )}
 
-          {addInput.trim() && (
+          {!readOnly && addInput.trim() && (
             <div style={{ ...card, padding: 0, overflow: 'hidden', marginBottom: '12px', boxShadow: '0 2px 12px rgba(0,0,0,.05)' }}>
               {matches.map((p) => (
                 <button
@@ -254,7 +270,7 @@ export function DesktopListaScreen() {
             </div>
           )}
 
-          {quick.length > 0 && (
+          {!readOnly && quick.length > 0 && (
             <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '20px' }}>
               {quick.map((p) => (
                 <button key={p.name} onClick={() => handleAdd(p.name, p.categoryId)} style={chip}>
@@ -284,6 +300,7 @@ export function DesktopListaScreen() {
                     }}
                   >
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flex: 'none' }}>
+                      {!readOnly && (
                       <button
                         aria-label="-"
                         style={stepBtn}
@@ -295,7 +312,9 @@ export function DesktopListaScreen() {
                       >
                         −
                       </button>
+                      )}
                       <span style={{ minWidth: '20px', textAlign: 'center', fontSize: '14px', color: 'var(--t-fg)' }}>{li.quantity}</span>
+                      {!readOnly && (
                       <button
                         aria-label="+"
                         style={stepBtn}
@@ -305,6 +324,7 @@ export function DesktopListaScreen() {
                       >
                         +
                       </button>
+                      )}
                     </div>
                     <button
                       onClick={() => openItem(li.itemId)}
@@ -317,6 +337,7 @@ export function DesktopListaScreen() {
                         {li.suggestedPriceCents !== null ? `~ € ${formatCents(li.suggestedPriceCents)}` : t('lista.toGet')}
                       </div>
                     </button>
+                    {!readOnly && (
                     <button
                       aria-label={t('desktop.lista.remove')}
                       title={t('desktop.lista.remove')}
@@ -325,6 +346,7 @@ export function DesktopListaScreen() {
                     >
                       ×
                     </button>
+                    )}
                   </div>
                 ))}
               </div>
@@ -350,7 +372,7 @@ export function DesktopListaScreen() {
             </div>
           </div>
 
-          {templateSuggestions.length > 0 && (
+          {!readOnly && templateSuggestions.length > 0 && (
             <div style={card}>
               <div style={{ fontSize: '15px', color: 'var(--t-fg)', marginBottom: '6px' }}>{t('lista.templateTitle')}</div>
               <div style={{ fontSize: '12px', color: 'var(--t-muted)', marginBottom: '16px' }}>

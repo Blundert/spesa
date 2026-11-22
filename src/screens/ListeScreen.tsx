@@ -1,3 +1,4 @@
+import { SharedIcon } from '../components/shared/SharedIcon'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
@@ -59,7 +60,14 @@ export function ListeScreen() {
             style={{ borderBottom: i < active.length - 1 ? '1px solid var(--t-line)' : 'none' }}
           >
             <button onClick={() => setEditing(l)} className="flex-1 min-w-0 text-left active:opacity-50">
-              <div className="text-base text-t-fg truncate">{l.name}</div>
+              <div className="text-base text-t-fg truncate">
+                {l.shared && (
+                  <span className="mr-1.5 text-t-muted">
+                    <SharedIcon size={14} />
+                  </span>
+                )}
+                {l.name}
+              </div>
               <div className="text-[12px] text-t-muted mt-0.5 truncate">{subtitle(l)}</div>
             </button>
             <ArrowButton dir="up" disabled={i === 0} label={t('lists.moveUp', { name: l.name })} onClick={() => move(i, -1)} />

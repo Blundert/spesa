@@ -100,7 +100,22 @@ export async function applySharedFile(listId: number, file: SharedListFile): Pro
     const gone = rows.filter((r) => r.uid && !inFile.has(r.uid)).map((r) => r.id as number)
     await db.listItems.bulkDelete(gone)
 
-    const patch: SharedLink = { ...link, tombstones: file.tombstones }
+    // Chi compare nel file (autori, chi ha preso una voce, chi ha fatto la spesa) e chi possiede il repo è una
+    // persona della lista. Una persona nuova parte come "estraneo": le sue spese non toccano il mio budget
+    // finché non dico io che è un partner.
+    const logins = new Set<string>([link.owner])
+    for (const i of file.items) {
+      logins.add(i.addedBy)
+      if (i.takenBy) logins.add(i.takenBy)
+    }
+    for (const x of file.sessions) logins.add(x.doneBy)
+    logins.delete(link.me)
+    const members = { ...link.members }
+    for (const login of logins) {
+      if (!Object.prototype.hasOwnProperty.call(members, login)) members[login] = { label: '', kind: 'stranger' }
+    }
+
+    const patch: SharedLink = { ...link, tombstones: file.tombstones, members }
     const renamed = file.nameUpdatedAt > (link.nameUpdatedAt ?? 0)
     if (renamed) patch.nameUpdatedAt = file.nameUpdatedAt
     await db.shoppingLists.update(listId, { ...(renamed ? { name: file.name } : {}), shared: patch })

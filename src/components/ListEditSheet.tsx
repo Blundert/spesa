@@ -8,6 +8,8 @@ import { SuggestionPicker } from './SuggestionPicker'
 import { AUTO_USUAL_LIMIT } from '../lib/listSuggestions'
 import { setActiveListId } from '../lib/activeList'
 import { BottomSheet } from './BottomSheet'
+import { ShareSection } from './shared/ShareSection'
+import { JoinSharedList } from './shared/JoinSharedList'
 
 // Crea una lista (list null) o modifica quella passata: nome, supermercato facoltativo,
 // e in modifica "Archivia lista" (assente se è l'ultima attiva).
@@ -55,6 +57,7 @@ function ListForm({
   const createList = useCreateList()
   const updateList = useUpdateList()
   const archiveList = useArchiveList()
+  const [showJoin, setShowJoin] = useState(false)
 
   const handleSave = async () => {
     const trimmed = name.trim()
@@ -146,6 +149,8 @@ function ListForm({
         </>
       )}
 
+      {list && <ShareSection list={list} onNavigate={onDone} />}
+
       <button
         onClick={() => void handleSave()}
         disabled={!name.trim()}
@@ -153,6 +158,25 @@ function ListForm({
       >
         {list ? t('common.save') : t('lists.create')}
       </button>
+      {!list && (
+        <>
+          <button
+            onClick={() => setShowJoin((v) => !v)}
+            className="w-full bg-t-bg text-t-fg text-[17px] py-[18px] rounded-[20px] mb-3 active:scale-[.98] transition-transform"
+          >
+            {t('shared.join')}
+          </button>
+          {showJoin && (
+            <JoinSharedList
+              onNavigate={onDone}
+              onJoined={(id) => {
+                setActiveListId(id)
+                onDone()
+              }}
+            />
+          )}
+        </>
+      )}
       {list && canArchive && (
         <button
           onClick={() => void handleArchive()}

@@ -1,3 +1,4 @@
+import { SharedIcon } from '../../components/shared/SharedIcon'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
@@ -79,7 +80,16 @@ export function DesktopListeScreen() {
       render: (l) => active.findIndex((a) => a.id === l.id) + 1,
       sortValue: (l) => active.findIndex((a) => a.id === l.id),
     },
-    { key: 'name', label: t('desktop.liste.colName'), render: (l) => l.name, sortValue: (l) => l.name.toLowerCase() },
+    { key: 'name', label: t('desktop.liste.colName'), render: (l) => (
+      <>
+        {l.shared && (
+          <span style={{ marginRight: '6px', color: 'var(--t-muted)' }}>
+            <SharedIcon size={14} />
+          </span>
+        )}
+        {l.name}
+      </>
+    ), sortValue: (l) => l.name.toLowerCase() },
     {
       key: 'store',
       label: t('lists.supermarket'),

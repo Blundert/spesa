@@ -8,6 +8,8 @@ import { AUTO_USUAL_LIMIT } from '../../lib/listSuggestions'
 import { SuggestionPicker } from './SuggestionPicker'
 import { setActiveListId } from '../../lib/activeList'
 import { Modal } from './Modal'
+import { ShareSection } from '../../components/shared/ShareSection'
+import { JoinSharedList } from '../../components/shared/JoinSharedList'
 import { btnPrimary, btnSecondary } from './buttonStyles'
 
 /** Crea una lista (list null) o modifica quella passata: nome, supermercato facoltativo, archivia. */
@@ -55,6 +57,7 @@ function ListForm({
   const createList = useCreateList()
   const updateList = useUpdateList()
   const archiveList = useArchiveList()
+  const [showJoin, setShowJoin] = useState(false)
 
   const handleSave = async () => {
     const trimmed = name.trim()
@@ -154,7 +157,22 @@ function ListForm({
           />
         </>
       )}
+      {list && <ShareSection list={list} onNavigate={onDone} />}
+      {!list && showJoin && (
+        <JoinSharedList
+          onNavigate={onDone}
+          onJoined={(id) => {
+            setActiveListId(id)
+            onDone()
+          }}
+        />
+      )}
       <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
+        {!list && (
+          <button onClick={() => setShowJoin((v) => !v)} style={{ ...btnSecondary, marginRight: 'auto' }}>
+            {t('shared.join')}
+          </button>
+        )}
         {list && canArchive && (
           <button onClick={() => void handleArchive()} style={{ ...btnSecondary, marginRight: 'auto' }}>
             {t('lists.archive')}
