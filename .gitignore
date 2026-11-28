@@ -13,3 +13,6 @@ coverage
 # playwright
 .playwright-mcp
 test/e2e-screenshots
+
+# e2e sync: token GitHub degli account di test
+.env.e2e
