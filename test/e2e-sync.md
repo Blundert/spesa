@@ -11,7 +11,7 @@ gravità) e poi nel dump `docs/roadmap/<N>.md`. Che diventi un fix lo decide l'u
 
 ### Account e token
 - Due account GitHub di test dedicati (usa e getta, non quelli personali): **A** (`spesa-test-a`) e **B** (`spesa-test-b`).
-- Un token classico per account, con i permessi `repo` e `delete_repo`. Lo stesso token serve all'app (Sincronizzazione → campo Token) e a `gh`.
+- Un token classico per account, con il solo permesso `repo` (niente `delete_repo`: nessun repo viene cancellato). Lo stesso token serve all'app (Sincronizzazione → campo Token) e a `gh`.
   L'app ha UN solo token per dispositivo, usato per backup, creazione, inviti e sync delle liste condivise: non servono token per repo.
 - I token stanno in `.env.e2e` (ignorato da git, mai committato):
   ```
@@ -19,27 +19,47 @@ gravità) e poi nel dump `docs/roadmap/<N>.md`. Che diventi un fix lo decide l'u
   E2E_TOKEN_B=ghp_...
   E2E_LOGIN_A=spesa-test-a
   E2E_LOGIN_B=spesa-test-b
+  E2E_REPO_BACKUP_A=spesa-backup-a
+  E2E_REPO_BACKUP_B=spesa-backup-b
+  E2E_REPO_SHARED=spesa-condivisa
   ```
 - Nei log, negli screenshot e nei risultati si scrive "token A" / "token B", **mai il valore**. Il token si inserisce nell'app con `fill` nel campo Token,
   non dagli appunti.
 
 ### Repo
-- Creati a mano, vuoti: `spesa-backup-a` (account A) e `spesa-backup-b` (account B), privati.
-- `spesa-condivisa` NON si crea a mano: lo crea l'app (lista chiamata "condivisa" → repo proposto `spesa-condivisa`, Flusso 47).
+- Creati a mano, privati e **inizializzati con un README** (l'API dei commit non funziona su un repo senza commit): `spesa-backup-a` (account A) e `spesa-backup-b` (account B).
+- `spesa-condivisa` NON si crea a mano: al primo run lo crea l'app (lista chiamata "condivisa" → repo proposto `spesa-condivisa`, Flusso 47). Dai run successivi esiste già
+  e l'app lo riusa (errore 422 → `reusableRepo`): è il caso di chi ricondivide una lista con lo stesso nome. Per riprovare la creazione da zero si cancella a mano su GitHub.
 
 ### Reset prima di OGNI run
+Nessun repo viene cancellato: si riporta il branch a un commit vuoto (force) e si toglie ogni condivisione. Basta il permesso `repo`.
 ```bash
 set -a; source .env.e2e; set +a
-# 1. elimina la lista condivisa (se esiste)
-GH_TOKEN=$E2E_TOKEN_A gh api -X DELETE repos/$E2E_LOGIN_A/spesa-condivisa 2>/dev/null || true
-# 2. togli eventuali inviti pendenti di B (il repo non c'è più, quindi spariscono con lui)
-# 3. svuota i backup: elimina e ricrea (privati, vuoti)
-GH_TOKEN=$E2E_TOKEN_A gh api -X DELETE repos/$E2E_LOGIN_A/spesa-backup-a 2>/dev/null || true
-GH_TOKEN=$E2E_TOKEN_A gh repo create $E2E_LOGIN_A/spesa-backup-a --private
-GH_TOKEN=$E2E_TOKEN_B gh api -X DELETE repos/$E2E_LOGIN_B/spesa-backup-b 2>/dev/null || true
-GH_TOKEN=$E2E_TOKEN_B gh repo create $E2E_LOGIN_B/spesa-backup-b --private
+
+# riporta il branch di un repo a un commit senza file (token, proprietario, repo)
+reset_branch() {
+  local BR TREE C
+  BR=$(GH_TOKEN=$1 gh api repos/$2/$3 --jq .default_branch)
+  TREE=$(echo '{"tree":[]}' | GH_TOKEN=$1 gh api -X POST repos/$2/$3/git/trees --input - --jq .sha)
+  C=$(GH_TOKEN=$1 gh api -X POST repos/$2/$3/git/commits -f message="e2e reset" -f tree="$TREE" --jq .sha)
+  GH_TOKEN=$1 gh api -X PATCH repos/$2/$3/git/refs/heads/$BR -f sha="$C" -F force=true >/dev/null
+}
+
+# 1. backup: vuoti
+reset_branch $E2E_TOKEN_A $E2E_LOGIN_A $E2E_REPO_BACKUP_A
+reset_branch $E2E_TOKEN_B $E2E_LOGIN_B $E2E_REPO_BACKUP_B
+
+# 2. lista condivisa (se esiste): vuota, B non è più collaboratore, nessun invito pendente
+if GH_TOKEN=$E2E_TOKEN_A gh api repos/$E2E_LOGIN_A/$E2E_REPO_SHARED >/dev/null 2>&1; then
+  reset_branch $E2E_TOKEN_A $E2E_LOGIN_A $E2E_REPO_SHARED
+  GH_TOKEN=$E2E_TOKEN_A gh api -X DELETE repos/$E2E_LOGIN_A/$E2E_REPO_SHARED/collaborators/$E2E_LOGIN_B 2>/dev/null || true
+  for id in $(GH_TOKEN=$E2E_TOKEN_A gh api repos/$E2E_LOGIN_A/$E2E_REPO_SHARED/invitations --jq '.[].id'); do
+    GH_TOKEN=$E2E_TOKEN_A gh api -X DELETE repos/$E2E_LOGIN_A/$E2E_REPO_SHARED/invitations/$id
+  done
+fi
 ```
-Se la cancellazione risponde 403 il token non ha `delete_repo`. I token NON vanno mai stampati (niente `set -x`, niente `echo $E2E_TOKEN_*`).
+Da verificare al primo run: dopo il reset, `spesa-condivisa` senza `lista.json` deve poter essere riusata dall'app (se non lo è, è un problema da registrare).
+I token NON vanno mai stampati (niente `set -x`, niente `echo $E2E_TOKEN_*`).
 
 ### Server e browser
 - Build di produzione (prova anche la CSP, che ammette solo `api.github.com`): `npm run build && npx vite preview --host --port 4173`.
@@ -63,7 +83,7 @@ Se la cancellazione risponde 403 il token non ha `delete_repo`. I token NON vann
 - **Telefono spento/app chiusa**: `page.close()` e riapertura dello stesso indirizzo in una scheda nuova. IndexedDB resta, i timer in memoria spariscono.
 - **Tempi reali**, niente orologio finto: il push parte 5 s dopo l'ultima modifica, il controllo ogni 15 s (solo con lista aperta e app visibile).
   Misura i secondi (es. con `Date.now()` in `browser_evaluate`) e segnali un ritardo oltre ±2 s.
-- **Cosa c'è sul repo**: `GH_TOKEN=$E2E_TOKEN_A gh api repos/$E2E_LOGIN_A/spesa-condivisa/commits` (numero e ora dei commit) e
+- **Cosa c'è sul repo**: `GH_TOKEN=$E2E_TOKEN_A gh api repos/$E2E_LOGIN_A/$E2E_REPO_SHARED/commits` (numero e ora dei commit) e
   `gh api repos/.../contents/lista.json --jq .content | base64 -d` per lo stato. Un commit in più del dovuto o un `lista.json` diverso dall'app è un problema.
 
 ## Storia di fondo (il filo conduttore)
@@ -128,12 +148,12 @@ Atteso: nessun errore, nessun doppione, "Persone" mostra entrambi. Questo è lo 
 
 ## Scenario 7 — Accesso perso a metà sync
 1. B ha la lista aperta e sincronizza. A rimuove B dai collaboratori con
-   `GH_TOKEN=$E2E_TOKEN_A gh api -X DELETE repos/$E2E_LOGIN_A/spesa-condivisa/collaborators/$E2E_LOGIN_B`.
+   `GH_TOKEN=$E2E_TOKEN_A gh api -X DELETE repos/$E2E_LOGIN_A/$E2E_REPO_SHARED/collaborators/$E2E_LOGIN_B`.
 2. Entro ~15 s (o toccando la riga) la riga di B diventa rossa: "Non hai più accesso a questa lista condivisa" con "Tieni come lista normale". La lista e le voci restano; il controllo ogni 15 s si ferma.
 3. Rimuovi B **mentre B sta scrivendo** (rete lenta su B, push in corso): errore chiaro, nessun crash, nessuna voce persa localmente.
 4. "Tieni come lista normale": icona e riga spariscono, la lista è normale e modificabile; il repo non viene toccato e A continua a vederlo.
 5. A rinvita B come "Solo guarda": B riaggiunge la lista; non ci sono campo di aggiunta, suggerimenti, "Svuota", + − né ×; quella lista non è tra le scelte di "Nuova spesa"; "Aggiorna ora" funziona. Nessuna scrittura parte mai da B.
-6. A elimina il repo (`gh api -X DELETE`) mentre B ha la lista aperta: stesso errore di accesso perso, nessuna voce persa su B.
+6. A rende il repo irraggiungibile per B (rimuove B dai collaboratori e, se serve, lo cancella a mano su GitHub) mentre B ha la lista aperta: stesso errore di accesso perso, nessuna voce persa su B.
 7. Token B revocato (cancellalo da GitHub) o sbagliato: "Il token non è più valido…" e polling fermo; dopo un token nuovo basta riaprire la lista.
 
 ## Scenario 8 — Ciclo di vita del telefono (il caso reale)
@@ -158,5 +178,5 @@ Un problema per riga. Gravità: **dati persi**, **duplicato/incoerente**, **rita
 |   |          |                      |        |          |         |                |
 
 ## A fine run
-- Chiudi `vite preview`, lascia i repo `spesa-backup-*` (si ricreano col reset) e **non** lasciare token in nessun file tracciato.
+- Chiudi `vite preview`, lascia i repo (il reset li svuota al run dopo) e **non** lasciare token in nessun file tracciato.
 - Il dump `docs/roadmap/<N>.md` contiene la tabella compilata e l'elenco di ciò che NON è stato provato (e perché).
