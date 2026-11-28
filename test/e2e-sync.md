@@ -39,6 +39,8 @@ set -a; source .env.e2e; set +a
 # riporta il branch di un repo a un commit senza file (token, proprietario, repo)
 reset_branch() {
   local BR TREE C
+  # repo senza commit (appena creato, vuoto): niente da resettare, e l'API dei commit risponde 409
+  GH_TOKEN=$1 gh api repos/$2/$3/commits >/dev/null 2>&1 || return 0
   BR=$(GH_TOKEN=$1 gh api repos/$2/$3 --jq .default_branch)
   TREE=$(echo '{"tree":[]}' | GH_TOKEN=$1 gh api -X POST repos/$2/$3/git/trees --input - --jq .sha)
   C=$(GH_TOKEN=$1 gh api -X POST repos/$2/$3/git/commits -f message="e2e reset" -f tree="$TREE" --jq .sha)
@@ -71,6 +73,20 @@ I token NON vanno mai stampati (niente `set -x`, niente `echo $E2E_TOKEN_*`).
   Poi nome utente ("Collegato come @…") e scelta del repo di backup.
 - Viewport: ogni scenario gira due volte, **mobile 390×844** e **desktop 1280×800** (le due interfacce hanno gli stessi flussi). Un run per viewport,
   con le schede ridimensionate per tutti e due gli utenti.
+
+### Cose imparate al primo run (leggere prima di partire)
+- `gh` non è nel container: `apt-get install -y gh`.
+- **Il tool `browser_run_code_unsafe` stampa nell'output il codice eseguito**: un token scritto nel codice finisce in chiaro nella conversazione, e gli snapshot
+  (`.playwright-mcp/*.yml`) salvano il valore dei campi. Non scrivere mai il token nel codice: servirlo da un piccolo server locale
+  (`python3 -m http.server 8099 --bind 127.0.0.1` su una cartella con `token-A` e `token-B`) e leggerlo con `await (await page.request.get('http://127.0.0.1:8099/token-B')).text()`.
+  A fine run spegnere il server, cancellare la cartella e gli snapshot della sessione. Non fare snapshot con il campo Token riempito.
+- Playwright tiene aperta la scheda in secondo piano come "visibile" e con focus: il polling di entrambe le schede gira davvero.
+- **Cache HTTP del browser**: GitHub risponde con `max-age=60` e il codice non disattiva la cache (F2 del run 1), quindi i tempi misurati con la cache attiva sono
+  falsati. Per isolare gli altri problemi disattivarla per scheda: `const s = await ctx.newCDPSession(p); await s.send('Network.enable'); await s.send('Network.setCacheDisabled', {cacheDisabled: true})`
+  (da rifare per ogni scheda nuova). Misurare una volta con cache attiva (comportamento reale) e le altre senza.
+- Toccare la scheda della lista già attiva (quella con ⌄) apre "Modifica lista": non cliccarla per "selezionare" la lista.
+- Il repo `spesa-condivisa` può esistere già, vuoto: l'app lo riusa (422 → `reusableRepo`) e scrive `lista.json`. Funziona.
+- Pagine desktop: `/lista`, `/liste`, `/sincronizzazione` (non `/sync`).
 
 ### Tecniche per simulare il mondo reale
 - **Offline di UNA scheda** (non di tutto il browser): in `browser_run_code_unsafe`
