@@ -2,6 +2,18 @@ export type ChangelogEntry = { it: string[]; en: string[] }
 
 // Ordine: più recente in cima. Aggiungere una entry ad ogni nuova versione.
 export const changelog: Record<string, ChangelogEntry> = {
+  '1.4.0': {
+    it: [
+      'Condividi la lista: il pulsante Condividi (accanto a "Svuota") manda la lista in cui sei come testo, una voce per riga, con in coda un link per spuntarla online. Su telefono si apre il menu di condivisione (WhatsApp, Telegram, Note…); su desktop un testo da copiare, con WhatsApp e Telegram. C\'è anche "Copia solo il link". Funziona su tutte le liste, anche quelle condivise',
+      'Il link apre una pagina a sé, senza bisogno dell\'app e senza account: chi lo riceve vede la lista per reparti, spunta le voci (finiscono in "Nel carrello") e le spunte restano sul suo dispositivo. La lista sta tutta nel link, che non passa dal server, e se la rimandi aggiornata ritrova le spunte. Dopo 30 giorni senza aprirla sparisce, oppure la elimini da lì',
+      'In Note di Apple il testo si incolla come una riga per voce: seleziona le righe e tocca il pulsante della checklist per renderle spuntabili',
+    ],
+    en: [
+      'Share the list: the Share button (next to "Clear") sends the list you are on as text, one item per line, with a link at the end to tick it online. On a phone it opens the share menu (WhatsApp, Telegram, Notes…); on desktop it shows text to copy, with WhatsApp and Telegram. There is also "Copy link only". It works on every list, shared ones included',
+      'The link opens a page of its own, no app and no account needed: whoever receives it sees the list by aisle, ticks items (they move to "In cart") and the ticks stay on their device. The whole list is inside the link, which never goes through a server, and if you send it again updated it keeps their ticks. After 30 days without opening it, it disappears, or they can delete it from there',
+      'In Apple Notes the text pastes as one line per item: select the lines and tap the checklist button to make them tickable',
+    ],
+  },
   '1.3.0': {
     it: [
       'Liste condivise: il supermercato della lista arriva a chi la riceve, se per quella lista non ne ha già uno (e viene creato se manca)',

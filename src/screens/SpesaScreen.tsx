@@ -33,6 +33,7 @@ import { useActiveList } from '../hooks/useShoppingLists'
 import { compareNames, normalizeName } from '../lib/normalize'
 import { BASE_ITEMS } from '../lib/baseItems'
 import { PriceKeypad } from '../components/PriceKeypad'
+import { CheckedCircle, OpenCircle, ShopGroup, ShopRow } from '../components/shop/ShopGroup'
 import { BottomSheet } from '../components/BottomSheet'
 import { EditBuoniSheet } from '../components/BuoniSheet'
 
@@ -403,22 +404,14 @@ export function SpesaScreen() {
       <div className="flex-1 overflow-y-auto px-5 pb-[150px]">
         {/* Da prendere */}
         {todoGroups.map(([catId, items]) => (
-          <div key={catId} className="mb-4">
-            <div className="text-[12px] font-normal tracking-[1.2px] text-t-muted uppercase px-1.5 pb-[13px]">
-              {categoryLabelOf(catId)}
-            </div>
-            <div className="bg-t-surface rounded-[20px] overflow-hidden">
+          <ShopGroup key={catId} title={categoryLabelOf(catId)} className="mb-4">
               {items.map((li, i) => (
-                <div
-                  key={li.id}
-                  className="flex items-center px-[18px] py-[17px]"
-                  style={{ borderBottom: i < items.length - 1 ? '1px solid var(--t-line)' : 'none' }}
-                >
+                <ShopRow key={li.id} last={i === items.length - 1} padding="py-[17px]">
                   <button
                     onClick={() => setPriceTarget({ itemId: li.itemId, name: li.itemName, lastPriceCents: itemLastPriceMap[li.itemId] ?? null })}
                     className="flex flex-1 items-center gap-[13px] text-left active:opacity-60 transition-opacity"
                   >
-                    <div className="w-6 h-6 flex-none rounded-full border-2 border-t-line2" />
+                    <OpenCircle />
                     <div className="flex-1 text-base text-t-fg">
                       {li.itemName}
                       {takenByOther(li.takenBy) && <div className="text-[12px] text-t-muted">{takenByOther(li.takenBy)}</div>}
@@ -438,35 +431,21 @@ export function SpesaScreen() {
                       <path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6" />
                     </svg>
                   </button>
-                </div>
+                </ShopRow>
               ))}
-            </div>
-          </div>
+          </ShopGroup>
         ))}
 
         {/* Nel carrello */}
         {doneItems.length > 0 && (
-          <div className="mt-1.5">
-            <div className="text-[12px] font-normal tracking-[1.2px] text-t-muted uppercase px-1.5 pb-[13px]">
-              {t('spesa.inCart')}
-            </div>
-            <div className="bg-t-surface rounded-[20px] overflow-hidden">
+          <ShopGroup title={t('spesa.inCart')} className="mt-1.5">
               {doneItems.map((p, i) => (
-                <div
-                  key={p.id}
-                  className="flex items-center px-[18px] py-4"
-                  style={{ borderBottom: i < doneItems.length - 1 ? '1px solid var(--t-line)' : 'none' }}
-                >
+                <ShopRow key={p.id} last={i === doneItems.length - 1} padding="py-4">
                   {/* Spunta = depenna (rimette tra "da prendere") */}
-                  <button
+                  <CheckedCircle
                     onClick={() => p.id !== undefined && void uncheckCart(p.id, p.itemId)}
-                    aria-label={t('spesa.uncheck')}
-                    className="w-6 h-6 flex-none rounded-full bg-t-accent flex items-center justify-center active:opacity-50"
-                  >
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M5 12l4 4 10-10" />
-                    </svg>
-                  </button>
+                    label={t('spesa.uncheck')}
+                  />
                   {/* Voce = modifica prezzo/quantità */}
                   <button
                     onClick={() =>
@@ -497,10 +476,9 @@ export function SpesaScreen() {
                       <path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6" />
                     </svg>
                   </button>
-                </div>
+                </ShopRow>
               ))}
-            </div>
-          </div>
+          </ShopGroup>
         )}
       </div>
 

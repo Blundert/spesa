@@ -9,6 +9,8 @@ import { TutorialController } from './tutorial'
 import { UpdateNotifier } from './pwa/UpdateNotifier'
 import { LazyDesktopApp, preloadDesktopApp } from './desktop/LazyDesktopApp'
 import { DESKTOP_QUERY, translatePath, type ViewMode } from './lib/viewMode'
+import { parseShareHash } from './lib/shareLink'
+import { ReceivedListView } from './components/shop/ReceivedListView'
 
 // Desktop o mobile segue il viewport in tempo reale: niente refresh. Al cambio si traduce l'URL
 // corrente nel path equivalente dell'altra interfaccia (es. /stats ↔ /statistiche) e i dati
@@ -18,6 +20,8 @@ const mq = window.matchMedia(DESKTOP_QUERY)
 const currentHref = () => window.location.pathname + window.location.search + window.location.hash
 
 function syncUrl(mode: ViewMode, options?: { home?: boolean }) {
+  // Un link di lista spuntabile non è una pagina dell'app: l'URL resta com'è.
+  if (parseShareHash(window.location.hash) !== null) return
   const current = currentHref()
   const next = translatePath(current, mode, options)
   if (next !== current) window.history.replaceState(window.history.state, '', next)
@@ -123,6 +127,13 @@ function useRunOnce(fn: () => void) {
 }
 
 export function AppRoot() {
+  // Link "lista spuntabile" (#l=…): una pagina a sé, uguale su mobile e desktop, fuori dall'app.
+  const shared = parseShareHash(window.location.hash)
+  if (shared !== null) return <ReceivedListView encoded={shared} />
+  return <AppShellRoot />
+}
+
+function AppShellRoot() {
   const mode = useShownMode()
 
   // Dissolvenza leggera solo quando si cambia interfaccia (non al primo avvio).

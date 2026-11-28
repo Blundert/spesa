@@ -13,6 +13,7 @@ import type {
   ShoppingList,
   SafetySnapshot,
 } from './types'
+import type { ReceivedList } from '../lib/receivedList'
 import { DEFAULT_BUONO_VALUE_CENTS, DEFAULT_LIST_NAME } from './types'
 
 class SpesaDb extends Dexie {
@@ -28,6 +29,7 @@ class SpesaDb extends Dexie {
   dishIngredients!: EntityTable<DishIngredient, 'id'>
   shoppingLists!: EntityTable<ShoppingList, 'id'>
   safetySnapshots!: EntityTable<SafetySnapshot, 'id'>
+  receivedLists!: EntityTable<ReceivedList, 'id'>
 
   constructor() {
     super('spesa')
@@ -190,6 +192,12 @@ class SpesaDb extends Dexie {
     // v10: copie di sicurezza dei dati locali prima di sostituirli (ultime N, vedi safetySnapshots.ts).
     this.version(10).stores({
       safetySnapshots: '++id, createdAt',
+    })
+
+    // v11: liste ricevute con un link spuntabile (con le spunte di chi le apre). Restano sul dispositivo:
+    // non entrano nei backup.
+    this.version(11).stores({
+      receivedLists: 'id, openedAt',
     })
   }
 }

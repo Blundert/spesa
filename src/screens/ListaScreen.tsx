@@ -13,6 +13,7 @@ import { BottomSheet } from '../components/BottomSheet'
 import { SectionTitle } from '../components/SectionTitle'
 import { useActiveList, useUsualItems } from '../hooks/useShoppingLists'
 import { ListTabs } from '../components/ListTabs'
+import { ShareSheet } from '../components/share/ShareSheet'
 import { ListEditSheet } from '../components/ListEditSheet'
 import { activeLists, setActiveListId } from '../lib/activeList'
 import { displayName, isReadOnly } from '../lib/sharedLists'
@@ -35,6 +36,7 @@ export function ListaScreen() {
 
   // Pannello lista: 'new' crea, 'edit' modifica la lista aperta.
   const [listSheet, setListSheet] = useState<'new' | 'edit' | null>(null)
+  const [showShare, setShowShare] = useState(false)
 
   const { lists, list } = useActiveList()
   const tabs = activeLists(lists)
@@ -158,11 +160,24 @@ export function ListaScreen() {
       {/* Header — menu button is in AppShell */}
       <div className="flex items-center justify-between px-1 pt-2 pb-[18px]">
         <SectionTitle active="lista" />
-        {listItems.length > 0 && !readOnly && (
-          <button onClick={() => setShowClear(true)} className="text-[15px] text-t-muted px-1 active:opacity-50">
-            {t('lista.clear')}
-          </button>
-        )}
+        <div className="flex items-center gap-2">
+          {listItems.length > 0 && (
+            <button
+              onClick={() => setShowShare(true)}
+              aria-label={t('share.button')}
+              className="w-9 h-9 flex items-center justify-center text-t-muted active:opacity-50"
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 15V4M8 8l4-4 4 4M5 12v7a1 1 0 001 1h12a1 1 0 001-1v-7" />
+              </svg>
+            </button>
+          )}
+          {listItems.length > 0 && !readOnly && (
+            <button onClick={() => setShowClear(true)} className="text-[15px] text-t-muted px-1 active:opacity-50">
+              {t('lista.clear')}
+            </button>
+          )}
+        </div>
       </div>
 
       <ListTabs
@@ -341,6 +356,8 @@ export function ListaScreen() {
           {t('lista.empty')}
         </div>
       )}
+
+      <ShareSheet list={list} open={showShare} onClose={() => setShowShare(false)} />
 
       {/* Conferma svuota lista */}
       <BottomSheet open={showClear} onClose={() => setShowClear(false)}>

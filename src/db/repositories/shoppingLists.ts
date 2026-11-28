@@ -21,7 +21,7 @@ export async function createShoppingList(name: string, supermarketId: number | n
 
 export async function updateShoppingList(
   id: number,
-  patch: Partial<Pick<ShoppingList, 'name' | 'supermarketId' | 'usualItemIds' | 'quickItemIds'>>,
+  patch: Partial<Pick<ShoppingList, 'name' | 'supermarketId' | 'usualItemIds' | 'quickItemIds' | 'shareId'>>,
 ): Promise<void> {
   await db.shoppingLists.update(id, patch.name !== undefined ? { ...patch, name: patch.name.trim() } : patch)
   if (patch.name === undefined && patch.supermarketId === undefined) return

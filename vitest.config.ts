@@ -54,6 +54,10 @@ export default defineConfig({
         'src/db/repositories/sharedListData.ts',
         'src/db/repositories/sharedSessionsData.ts',
         'src/db/repositories/sharedCatalog.ts',
+        'src/lib/shareLink.ts',
+        'src/lib/shareText.ts',
+        'src/lib/receivedList.ts',
+        'src/db/repositories/receivedLists.ts',
       ],
       all: true,
       thresholds: {

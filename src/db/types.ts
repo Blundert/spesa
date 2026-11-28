@@ -122,6 +122,8 @@ export interface ShoppingList {
   quickItemIds?: number[]
   /** Presente solo se la lista è condivisa con altre persone tramite un repo GitHub. */
   shared?: SharedLink
+  /** Id con cui la lista viaggia nei link spuntabili: sempre lo stesso, così chi la riceve ritrova le sue spunte. */
+  shareId?: string
 }
 
 /**

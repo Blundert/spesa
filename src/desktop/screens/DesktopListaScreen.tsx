@@ -25,6 +25,7 @@ import { SharedShoppingBanner } from '../../components/shared/SharedShoppingBann
 import { SharedIcon } from '../../components/shared/SharedIcon'
 import { PageHeader, SectionTitle } from '../components/PageHeader'
 import { Modal } from '../components/Modal'
+import { ShareModal } from '../components/ShareModal'
 import { ListEditModal } from '../components/ListEditModal'
 import { btnDanger, btnSecondary } from '../components/buttonStyles'
 
@@ -63,6 +64,7 @@ export function DesktopListaScreen() {
   const inputRef = useRef<HTMLInputElement>(null)
   const [pendingListRemove, setPendingListRemove] = useState<number | null>(null)
   const [showClear, setShowClear] = useState(false)
+  const [showShare, setShowShare] = useState(false)
   const [listModal, setListModal] = useState<'new' | 'edit' | null>(null)
 
   const { lists, list } = useActiveList()
@@ -184,10 +186,17 @@ export function DesktopListaScreen() {
         title={t('lista.title')}
         subtitle={list ? [list.name, list.supermarketId !== null ? supermarketNames[list.supermarketId] : undefined].filter(Boolean).join(' · ') : undefined}
         right={
-          listItems.length > 0 && !readOnly ? (
-            <button onClick={() => setShowClear(true)} style={btnSecondary}>
-              {t('lista.clear')}
-            </button>
+          listItems.length > 0 ? (
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <button onClick={() => setShowShare(true)} style={btnSecondary}>
+                {t('share.button')}
+              </button>
+              {!readOnly && (
+                <button onClick={() => setShowClear(true)} style={btnSecondary}>
+                  {t('lista.clear')}
+                </button>
+              )}
+            </div>
           ) : undefined
         }
       />
@@ -401,6 +410,8 @@ export function DesktopListaScreen() {
           )}
         </div>
       </div>
+
+      <ShareModal list={list} open={showShare} onClose={() => setShowShare(false)} />
 
       <Modal
         open={showClear}
