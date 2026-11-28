@@ -529,3 +529,10 @@ Tutto è locale: nessun server. Il link ha la forma `https://<sito>/#l=…` (il 
 7. "Elimina questa lista": torna all'app (o alla home del sito) e riaprendo il link la lista riparte senza spunte. Una lista ricevuta non si apre da più di 30 giorni: sparisce al primo link aperto dopo
 8. Link rotto o troncato (es. `/#l=abc`): "Link non valido" con il suggerimento di farselo rimandare; l'app non si rompe. Le liste ricevute non compaiono nel backup/sync e non toccano le tue liste
 9. Un'app già installata che apre il link da browser vede la pagina del link; aprendo `/` normalmente l'app si comporta come sempre (nessuna regressione su Spesa in corso, Lista e Liste condivise)
+
+### Flusso 60 — Numero del giorno e "oggi" nei Pasti (mobile e desktop)
+1. Pasti, settimana corrente (mobile ~390 px e desktop 1280 e ~800 px): ogni giorno mostra sigla e numero (`LUN 29`, `MAR 30`, `MER 1`…, in inglese `MON 29`…), senza il mese anche quando la settimana attraversa due mesi; il giorno di oggi è in una pillola piena (sfondo `--t-accent`, testo `--t-on`)
+2. Cambia il giorno di inizio settimana in Impostazioni (es. sabato): i numeri seguono la settimana mostrata e la pillola resta sul giorno di oggi
+3. Vai alla settimana prima o dopo con le frecce: nessuna pillola, solo sigle e numeri
+4. Cambia tema (Chiaro, Scuro, Salvia, Oceano, Notte, Contrasto): la pillola resta ben leggibile e si stacca dalla scheda in tutti. Desktop a ~800 px: nessuno scroll orizzontale e `SAB 28` non va a capo
+5. Lascia la pagina aperta oltre la mezzanotte (o cambia la data del dispositivo e torna alla scheda): la pillola passa al giorno nuovo senza ricaricare; se la settimana mostrata non è più quella corrente la pillola sparisce

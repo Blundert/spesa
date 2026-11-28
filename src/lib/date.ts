@@ -45,6 +45,36 @@ export function toWeekKey(date: Date, startDay: number): string {
   return dateToKey(weekStart)
 }
 
+/** Giorno della settimana (0=Lun … 6=Dom) di una data "UTC-mezzanotte" come quelle delle chiavi di settimana. */
+function weekdayOf(d: Date): number {
+  return (d.getUTCDay() + 6) % 7
+}
+
+/** Numero del giorno del mese (1–31) del giorno `dayIndex` (0=Lun … 6=Dom) nella settimana `weekKey`. */
+export function dayOfMonth(weekKey: string, dayIndex: number): number {
+  const { start } = weekRange(weekKey)
+  const date = new Date(start)
+  date.setUTCDate(start.getUTCDate() + ((dayIndex - weekdayOf(start) + 7) % 7))
+  return date.getUTCDate()
+}
+
+/** `dayIndex` di oggi se `now` cade nella settimana `weekKey`, altrimenti `null` (data locale, non UTC). */
+export function todayDayIndex(weekKey: string, now: Date): number | null {
+  const { start } = weekRange(weekKey)
+  const today = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate())
+  const offset = Math.round((today - start.getTime()) / 86400000)
+  return offset >= 0 && offset <= 6 ? (weekdayOf(start) + offset) % 7 : null
+}
+
+/** Millisecondi da `now` alla prossima mezzanotte locale. */
+export function msUntilMidnight(now: Date): number {
+  return new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1).getTime() - now.getTime()
+}
+
+export function isSameLocalDay(a: Date, b: Date): boolean {
+  return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate()
+}
+
 /** Chiave della settimana corrente (rispetta il giorno di inizio configurato). */
 export function currentWeek(): string {
   return toWeekKey(new Date(), getWeekStartDay())

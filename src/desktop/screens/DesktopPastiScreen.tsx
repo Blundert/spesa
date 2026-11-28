@@ -4,7 +4,9 @@ import { useTranslation } from 'react-i18next'
 import { PageHeader } from '../components/PageHeader'
 import { Modal } from '../components/Modal'
 import { IngredientEditor, type EditorIngredient } from '../components/IngredientEditor'
-import { dayShort, dayFull, formatWeekLabelWithYear, shiftWeek } from '../../lib/date'
+import { dayFull, formatWeekLabelWithYear, shiftWeek } from '../../lib/date'
+import { DayLabel } from '../../components/DayLabel'
+import { useToday } from '../../hooks/useToday'
 import { useMealPlan, useSetMealSlotDish, useImportMealPlanToList } from '../../hooks/useMealPlan'
 import { useDishes, useSaveDish } from '../../hooks/useDishes'
 import { useActiveList } from '../../hooks/useShoppingLists'
@@ -80,6 +82,7 @@ export function DesktopPastiScreen() {
   // strict: false — l'id di rotta desktop (`/desktop-shell/pasti`) non coincide con quello del router mobile registrato per i tipi.
   const { week } = useSearch({ strict: false }) as { week: string }
   const { data: days = [] } = useMealPlan(week)
+  const today = useToday()
   const { data: dishes = [] } = useDishes()
   const { data: budget } = useWeekBudget(week)
   const setBuoni = useSetBuoniAvailable(week)
@@ -281,11 +284,8 @@ export function DesktopPastiScreen() {
         >
           <div />
           {days.map((day) => (
-            <div
-              key={`h-${day.dayIndex}`}
-              style={{ fontSize: '12px', fontWeight: 500, color: 'var(--t-muted)', letterSpacing: '0.5px', padding: '0 4px' }}
-            >
-              {dayShort(day.dayIndex).toUpperCase()}
+            <div key={`h-${day.dayIndex}`} style={{ padding: '0 4px' }}>
+              <DayLabel week={week} dayIndex={day.dayIndex} today={today} className="text-[12px] font-medium text-t-muted tracking-[0.5px]" />
             </div>
           ))}
           {meals.map((m) => (

@@ -1,7 +1,9 @@
 import { useState } from 'react'
 import { useNavigate, useSearch, Link } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
-import { dayShort, dayFull, formatWeekLabel, shiftWeek } from '../lib/date'
+import { dayFull, formatWeekLabel, shiftWeek } from '../lib/date'
+import { DayLabel } from '../components/DayLabel'
+import { useToday } from '../hooks/useToday'
 import { useMealPlan, useSetMealSlotDish, useImportMealPlanToList } from '../hooks/useMealPlan'
 import { useDishes, useSaveDish } from '../hooks/useDishes'
 import { useActiveList } from '../hooks/useShoppingLists'
@@ -42,6 +44,7 @@ export function PastiScreen() {
   const navigate = useNavigate()
   const { week } = useSearch({ from: '/shell/pasti' })
   const { data: days = [] } = useMealPlan(week)
+  const today = useToday()
   const { data: dishes = [] } = useDishes()
   const { data: categories = [] } = useCategories()
   const { data: items = [] } = useItems()
@@ -345,9 +348,7 @@ export function PastiScreen() {
             >
               {/* Day label row */}
               <div className="flex items-center px-[18px] pt-3 pb-0">
-                <span className="w-[42px] flex-none text-[13px] font-normal text-t-fg tracking-[.2px]">
-                  {dayShort(day.dayIndex).toUpperCase()}
-                </span>
+                <DayLabel week={week} dayIndex={day.dayIndex} today={today} className="text-[13px] font-normal text-t-fg tracking-[.2px]" />
               </div>
               {/* Pranzo */}
               <MealSlotRow

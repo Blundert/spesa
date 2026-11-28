@@ -13,6 +13,10 @@ import {
   toWeekKey,
   currentWeek,
   weekRange,
+  dayOfMonth,
+  todayDayIndex,
+  msUntilMidnight,
+  isSameLocalDay,
   shiftWeek,
   dayShort,
   dayFull,
@@ -277,5 +281,60 @@ describe('formatWeekLabelWithYear', () => {
 
   it('mostra entrambi gli anni a cavallo di capodanno', () => {
     expect(formatWeekLabelWithYear('2025-12-29')).toBe('29 dic 2025 – 4 gen 2026')
+  })
+})
+
+// ---------------------------------------------------------------------------
+// dayOfMonth / todayDayIndex / msUntilMidnight / isSameLocalDay
+// ---------------------------------------------------------------------------
+
+describe('dayOfMonth', () => {
+  it('settimana che parte di lunedì e cambia mese: 29, 30, 1, 2…', () => {
+    const days = [0, 1, 2, 3, 4, 5, 6].map((i) => dayOfMonth('2026-06-29', i))
+    expect(days).toEqual([29, 30, 1, 2, 3, 4, 5])
+  })
+  it('settimana che parte di sabato: il sabato è il primo giorno, il lunedì viene dopo', () => {
+    expect(dayOfMonth('2026-06-20', 5)).toBe(20)
+    expect(dayOfMonth('2026-06-20', 6)).toBe(21)
+    expect(dayOfMonth('2026-06-20', 0)).toBe(22)
+    expect(dayOfMonth('2026-06-20', 4)).toBe(26)
+  })
+  it('cambio d\'anno', () => {
+    // 28 dic 2026 è lunedì
+    expect([0, 3, 4].map((i) => dayOfMonth('2026-12-28', i))).toEqual([28, 31, 1])
+  })
+})
+
+describe('todayDayIndex', () => {
+  it('oggi nella settimana: il suo dayIndex', () => {
+    expect(todayDayIndex('2026-06-29', new Date(2026, 6, 1, 15, 0))).toBe(2) // mercoledì 1 lug
+    expect(todayDayIndex('2026-06-29', new Date(2026, 5, 29, 0, 0))).toBe(0) // lunedì, primo giorno
+    expect(todayDayIndex('2026-06-29', new Date(2026, 6, 5, 23, 59))).toBe(6) // domenica, ultimo giorno
+  })
+  it('settimana che parte di sabato: il lunedì è dayIndex 0 anche se è il terzo giorno', () => {
+    expect(todayDayIndex('2026-06-20', new Date(2026, 5, 22, 9, 0))).toBe(0)
+    expect(todayDayIndex('2026-06-20', new Date(2026, 5, 20, 9, 0))).toBe(5)
+  })
+  it('fuori dalla settimana: null', () => {
+    expect(todayDayIndex('2026-06-29', new Date(2026, 5, 28, 12, 0))).toBeNull()
+    expect(todayDayIndex('2026-06-29', new Date(2026, 6, 6, 0, 0))).toBeNull()
+  })
+})
+
+describe('msUntilMidnight', () => {
+  it('un minuto a mezzanotte', () => {
+    expect(msUntilMidnight(new Date(2026, 5, 29, 23, 59, 0, 0))).toBe(60_000)
+  })
+  it('a mezzanotte in punto manca un giorno intero', () => {
+    expect(msUntilMidnight(new Date(2026, 5, 29, 0, 0, 0, 0))).toBe(86_400_000)
+  })
+})
+
+describe('isSameLocalDay', () => {
+  it('stesso giorno a ore diverse sì, giorno dopo no, stesso giorno di un altro mese o anno no', () => {
+    expect(isSameLocalDay(new Date(2026, 5, 29, 0, 0), new Date(2026, 5, 29, 23, 59))).toBe(true)
+    expect(isSameLocalDay(new Date(2026, 5, 29, 23, 59), new Date(2026, 5, 30, 0, 0))).toBe(false)
+    expect(isSameLocalDay(new Date(2026, 5, 29), new Date(2026, 6, 29))).toBe(false)
+    expect(isSameLocalDay(new Date(2026, 5, 29), new Date(2027, 5, 29))).toBe(false)
   })
 })

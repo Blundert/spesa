@@ -2,6 +2,14 @@ export type ChangelogEntry = { it: string[]; en: string[] }
 
 // Ordine: più recente in cima. Aggiungere una entry ad ogni nuova versione.
 export const changelog: Record<string, ChangelogEntry> = {
+  '1.4.1': {
+    it: [
+      'Pasti: accanto alla sigla del giorno c\'è ora il numero (LUN 29, MAR 30, MER 1…) e oggi è in una pillola colorata, nella settimana corrente. Si aggiorna da sola a mezzanotte e funziona in tutti i temi, su telefono e desktop',
+    ],
+    en: [
+      'Meals: the day abbreviation now comes with the day number (MON 29, TUE 30, WED 1…) and today is in a coloured pill, in the current week. It updates by itself at midnight and works in every theme, on phone and desktop',
+    ],
+  },
   '1.4.0': {
     it: [
       'Condividi la lista: il pulsante Condividi (accanto a "Svuota") manda la lista in cui sei come testo, una voce per riga, con in coda un link per spuntarla online. Su telefono si apre il menu di condivisione (WhatsApp, Telegram, Note…); su desktop un testo da copiare, con WhatsApp e Telegram. C\'è anche "Copia solo il link". Funziona su tutte le liste, anche quelle condivise',
