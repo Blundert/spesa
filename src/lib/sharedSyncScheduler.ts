@@ -4,6 +4,8 @@ import { SharedSyncError, type SharedSyncCode, type SharedSyncResult } from './s
 export const PUSH_DELAY_MS = 5000
 /** Ogni quanto si controlla il repo per le novità degli altri, con l'app in primo piano. */
 export const POLL_INTERVAL_MS = 15000
+/** Ogni quanto si controllano le liste condivise NON aperte (la lista aperta resta a 15 s, in spesa a 5 s). */
+export const OTHER_LISTS_POLL_INTERVAL_MS = 30000
 /** Come sopra durante una spesa condivisa aperta: chi è al supermercato vuole vedere subito cosa hanno preso gli altri. */
 export const SPESA_POLL_INTERVAL_MS = 5000
 
@@ -27,7 +29,8 @@ export interface SchedulerDeps {
 /**
  * Decide quando sincronizzare le liste condivise:
  * - `begin()`: all'avvio dell'app sincronizza tutte le liste condivise (spedisce quello che era rimasto in sospeso,
- *   riceve le novità) e poi le controlla ogni 15 s finché l'app è in primo piano, qualunque schermata sia aperta;
+ *   riceve le novità) e poi le controlla finché l'app è in primo piano, qualunque schermata sia aperta: la lista
+ *   aperta ogni 15 s, le altre ogni 30 s;
  * - `start(listId)`: la lista è aperta: sync subito; con `fast` (spesa) i controlli sono ogni 5 s;
  * - `notifyChange(listId)`: dopo una modifica locale, sync 5 s dopo l'ultima (anche a lista chiusa);
  * - `setVisible(false)`: in background niente controlli e le modifiche in attesa partono SUBITO (il telefono può
@@ -48,6 +51,8 @@ export function createSharedSyncScheduler(deps: SchedulerDeps) {
   const running = new Set<number>()
   const again = new Set<number>()
   const halted = new Set<number>()
+  /** Quando è partita l'ultima sync di ogni lista (per i controlli più radi delle liste non aperte). */
+  const lastRun = new Map<number, number>()
 
   const stopPolling = () => {
     clearInterval(poll)
@@ -61,10 +66,19 @@ export function createSharedSyncScheduler(deps: SchedulerDeps) {
     await Promise.all([...ids].filter((id) => !halted.has(id)).map((id) => run(id)))
   }
 
+  /** Un giro di controlli: la lista aperta sempre, le altre solo se l'ultima sync è di almeno 30 s fa. */
+  async function pollTick(): Promise<void> {
+    const ids = new Set(await deps.sharedListIds())
+    if (current !== null) ids.add(current)
+    const t = Date.now()
+    const due = [...ids].filter((id) => !halted.has(id) && (id === current || t - (lastRun.get(id) ?? 0) >= OTHER_LISTS_POLL_INTERVAL_MS))
+    await Promise.all(due.map((id) => run(id)))
+  }
+
   const startPolling = () => {
     stopPolling()
     if (visible && (started || current !== null)) {
-      poll = setInterval(() => void syncAll(), current !== null && fast ? SPESA_POLL_INTERVAL_MS : POLL_INTERVAL_MS)
+      poll = setInterval(() => void pollTick(), current !== null && fast ? SPESA_POLL_INTERVAL_MS : POLL_INTERVAL_MS)
     }
   }
 
@@ -74,6 +88,7 @@ export function createSharedSyncScheduler(deps: SchedulerDeps) {
       return
     }
     running.add(listId)
+    lastRun.set(listId, Date.now())
     try {
       if (!(await deps.isShared(listId))) return
       try {

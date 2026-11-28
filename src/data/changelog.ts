@@ -2,6 +2,14 @@ export type ChangelogEntry = { it: string[]; en: string[] }
 
 // Ordine: più recente in cima. Aggiungere una entry ad ogni nuova versione.
 export const changelog: Record<string, ChangelogEntry> = {
+  '1.4.9': {
+    it: [
+      'Liste condivise: quelle che non hai aperta si controllano ogni 30 secondi (prima 15), per consumare meno batteria e dati; la lista aperta resta a 15 secondi (5 durante una spesa). Tornando all\'app o aprendo la lista la sincronizzazione parte subito',
+    ],
+    en: [
+      'Shared lists: the ones you do not have open are checked every 30 seconds (it used to be 15), to use less battery and data; the open list stays at 15 seconds (5 during a shopping trip). Coming back to the app or opening the list syncs right away',
+    ],
+  },
   '1.4.8': {
     it: [
       'Spesa di un\'altra persona in una lista condivisa: nel dettaglio non compaiono più i link "Modifica importo", "Modifica data" e "Modifica buoni" (si vedevano ma non funzionavano) e, su desktop, nemmeno la scheda "Di tasca tua", che mostrava la sua spesa come se fosse la tua',

@@ -251,12 +251,14 @@ describe('orologio predefinito', () => {
 })
 
 describe('avvio dell\'app (begin)', () => {
-  it('sincronizza subito tutte le liste condivise e le controlla ogni 15 secondi, senza nessuna lista aperta', async () => {
+  it('sincronizza subito tutte le liste condivise e le controlla ogni 30 secondi (nessuna è aperta)', async () => {
     listIds = [1, 2]
     const s = make()
     s.begin()
     await flush()
     expect(sync.mock.calls.map((c) => c[0]).sort()).toEqual([1, 2])
+    await vi.advanceTimersByTimeAsync(POLL_INTERVAL_MS)
+    expect(sync).toHaveBeenCalledTimes(2) // dopo 15 s non ancora: le liste non aperte hanno 30 s
     await vi.advanceTimersByTimeAsync(POLL_INTERVAL_MS)
     expect(sync).toHaveBeenCalledTimes(4)
     s.setVisible(false)
@@ -273,10 +275,11 @@ describe('avvio dell\'app (begin)', () => {
     await flush()
     expect(sync.mock.calls.filter((c) => c[0] === 1)).toHaveLength(2) // avvio + apertura
     await vi.advanceTimersByTimeAsync(POLL_INTERVAL_MS)
-    expect(sync.mock.calls.filter((c) => c[0] === 2)).toHaveLength(2)
+    expect(sync.mock.calls.filter((c) => c[0] === 1)).toHaveLength(3) // la lista aperta ogni 15 s
+    expect(sync.mock.calls.filter((c) => c[0] === 2)).toHaveLength(1) // l'altra ogni 30 s
     s.stop()
     await vi.advanceTimersByTimeAsync(POLL_INTERVAL_MS)
-    expect(sync.mock.calls.filter((c) => c[0] === 2)).toHaveLength(3)
+    expect(sync.mock.calls.filter((c) => c[0] === 2)).toHaveLength(2)
   })
 
   it('in background non parte niente finché non si torna visibili', async () => {
@@ -335,7 +338,7 @@ describe('spesa (controlli più frequenti)', () => {
     s.stop()
     await vi.advanceTimersByTimeAsync(SPESA_POLL_INTERVAL_MS * 2)
     expect(sync).toHaveBeenCalledTimes(5)
-    await vi.advanceTimersByTimeAsync(POLL_INTERVAL_MS)
+    await vi.advanceTimersByTimeAsync(POLL_INTERVAL_MS * 2) // chiusa la lista, ogni 30 s
     expect(sync).toHaveBeenCalledTimes(6)
   })
 
@@ -360,11 +363,11 @@ describe('errori fatali per lista', () => {
     s.begin()
     await flush()
     await vi.advanceTimersByTimeAsync(POLL_INTERVAL_MS * 2)
-    expect(sync.mock.calls.filter((c) => c[0] === 1)).toHaveLength(3)
+    expect(sync.mock.calls.filter((c) => c[0] === 1)).toHaveLength(2) // avvio + un controllo a 30 s
     expect(sync.mock.calls.filter((c) => c[0] === 2)).toHaveLength(1)
     sync.mockResolvedValue(OK)
     await s.syncNow(2)
-    await vi.advanceTimersByTimeAsync(POLL_INTERVAL_MS)
+    await vi.advanceTimersByTimeAsync(POLL_INTERVAL_MS * 2)
     expect(sync.mock.calls.filter((c) => c[0] === 2)).toHaveLength(3)
   })
 
