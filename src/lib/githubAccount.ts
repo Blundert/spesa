@@ -1,4 +1,4 @@
-import { API, authHeaders } from './gitSync'
+import { API, authHeaders, NO_CACHE } from './gitSync'
 
 /**
  * Link di creazione di un token classico con il permesso `repo` e il nome già compilati
@@ -26,7 +26,7 @@ export const fullName = (r: Pick<RepoInfo, 'owner' | 'repo'>): string => `${r.ow
 
 /** Login del proprietario del token. 401 = token non valido o scaduto. */
 export async function fetchViewer(token: string): Promise<string> {
-  const res = await fetch(`${API}/user`, { headers: authHeaders(token) })
+  const res = await fetch(`${API}/user`, { headers: authHeaders(token), cache: NO_CACHE })
   if (!res.ok) throw new Error(`GitHub ${res.status}`)
   const data = (await res.json()) as { login?: string }
   if (!data.login) throw new Error('GitHub: risposta senza login')
@@ -48,7 +48,7 @@ export async function listAccessibleRepos(token: string): Promise<RepoInfo[]> {
   const repos: RepoInfo[] = []
   for (let page = 1; page <= MAX_PAGES; page++) {
     const url = `${API}/user/repos?per_page=${PAGE}&page=${page}&sort=pushed&affiliation=owner,collaborator,organization_member`
-    const res = await fetch(url, { headers: authHeaders(token) })
+    const res = await fetch(url, { headers: authHeaders(token), cache: NO_CACHE })
     if (!res.ok) throw new Error(`GitHub ${res.status}`)
     const raw = (await res.json()) as RawRepo[]
     for (const r of raw) {

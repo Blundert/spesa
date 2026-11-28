@@ -99,6 +99,13 @@ function isoStamp(): string {
 
 export const API = 'https://api.github.com'
 
+/**
+ * GitHub risponde ai GET con `Cache-Control: private, max-age=60`: il browser riusa per un minuto la risposta di prima
+ * (contenuto e `sha` vecchi), e una modifica dell'altro arriva in ritardo o una scrittura fallisce con 409. Lo stato
+ * che si legge da GitHub va sempre chiesto di nuovo.
+ */
+export const NO_CACHE: RequestCache = 'no-store'
+
 export function authHeaders(token: string): Record<string, string> {
   return {
     Authorization: `Bearer ${token}`,
@@ -124,13 +131,14 @@ export async function getRemoteFile(
 ): Promise<RemoteFile | null> {
   const res = await fetch(`${contentsUrl({ ...c, path })}?ref=${encodeURIComponent(ref)}`, {
     headers: authHeaders(c.token),
+    cache: NO_CACHE,
   })
   if (res.status === 404) return null
   if (!res.ok) throw new Error(`GitHub ${res.status}`)
   const data = (await res.json()) as { sha?: string; content?: string; download_url?: string }
   let text = ''
   if (data.content) text = base64ToUtf8(data.content)
-  else if (data.download_url) text = await (await fetch(data.download_url)).text()
+  else if (data.download_url) text = await (await fetch(data.download_url, { cache: NO_CACHE })).text()
   return { sha: data.sha ?? '', text }
 }
 
@@ -175,6 +183,7 @@ class GithubError extends Error {
 async function githubJson<T>(c: GitConfig, url: string, method: string, body?: unknown): Promise<T> {
   const res = await fetch(url, {
     method,
+    cache: NO_CACHE,
     headers: {
       ...authHeaders(c.token),
       ...(body === undefined ? {} : { 'Content-Type': 'application/json' }),
@@ -389,6 +398,7 @@ export async function listRemoteHistory(): Promise<HistoryEntry[]> {
   // Senza cartella backups/ GitHub risponde 404: nessun backup, non è un errore.
   const res = await fetch(`${repo}/contents/backups?ref=${encodeURIComponent(c.branch)}`, {
     headers: authHeaders(c.token),
+    cache: NO_CACHE,
   })
   if (res.ok) {
     const files = (await res.json()) as Array<{ path: string; sha: string }>

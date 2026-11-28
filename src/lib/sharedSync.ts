@@ -1,6 +1,6 @@
 import { db } from '../db/db'
 import { applySharedFile, exportSharedFile, patchSharedLink } from '../db/repositories/sharedListData'
-import { API, authHeaders, getGitConfig, getRemoteFile, putFile, type GitConfig } from './gitSync'
+import { API, authHeaders, NO_CACHE, getGitConfig, getRemoteFile, putFile, type GitConfig } from './gitSync'
 import {
   mergeSharedFiles,
   parseSharedFile,
@@ -69,7 +69,7 @@ function translate(e: unknown): unknown {
 
 /** Il token può scrivere nel repo? Fallisce con `no-access` se il repo non esiste o non si vede. */
 async function repoCanPush(cfg: GitConfig): Promise<boolean> {
-  const res = await fetch(`${API}/repos/${cfg.owner}/${cfg.repo}`, { headers: authHeaders(cfg.token) })
+  const res = await fetch(`${API}/repos/${cfg.owner}/${cfg.repo}`, { headers: authHeaders(cfg.token), cache: NO_CACHE })
   if (!res.ok) throw new Error(`GitHub ${res.status}`)
   const data = (await res.json()) as { permissions?: { push?: boolean } }
   return data.permissions?.push === true

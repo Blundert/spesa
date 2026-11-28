@@ -339,3 +339,20 @@ describe('syncSharedList: errori', () => {
     expect(await localNames()).toEqual(['Uova'])
   })
 })
+
+describe('syncSharedList: niente cache del browser', () => {
+  it('anche il controllo del permesso di scrittura e la lettura del file chiedono il dato fresco', async () => {
+    const seen: Array<{ url: string; cache: RequestCache | undefined }> = []
+    const inner = gh.fetch
+    vi.stubGlobal('fetch', (input: string, init?: RequestInit) => {
+      if (!init?.method || init.method === 'GET') seen.push({ url: String(input), cache: init?.cache })
+      return inner(input, init)
+    })
+    await setup({ lastSha: undefined })
+    putRemote(rFile())
+    await syncSharedList(1, NOW, 0)
+    expect(seen.some((c) => c.url === REPO_URL)).toBe(true)
+    expect(seen.some((c) => c.url.includes('/contents/'))).toBe(true)
+    for (const c of seen) expect(c.cache, c.url).toBe('no-store')
+  })
+})

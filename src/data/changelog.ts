@@ -2,6 +2,14 @@ export type ChangelogEntry = { it: string[]; en: string[] }
 
 // Ordine: più recente in cima. Aggiungere una entry ad ogni nuova versione.
 export const changelog: Record<string, ChangelogEntry> = {
+  '1.4.2': {
+    it: [
+      'Liste condivise: le modifiche degli altri arrivano subito. Prima il browser teneva in memoria per un minuto le risposte di GitHub, quindi una voce nuova poteva comparire dopo mezzo minuto e la sincronizzazione riprovava a vuoto con errori di conflitto',
+    ],
+    en: [
+      'Shared lists: other people\'s changes arrive right away. Before, the browser kept GitHub\'s answers in memory for a minute, so a new item could show up half a minute late and syncing kept retrying with conflict errors',
+    ],
+  },
   '1.4.1': {
     it: [
       'Pasti: accanto alla sigla del giorno c\'è ora il numero (LUN 29, MAR 30, MER 1…) e oggi è in una pillola colorata, nella settimana corrente. Si aggiorna da sola a mezzanotte e funziona in tutti i temi, su telefono e desktop',

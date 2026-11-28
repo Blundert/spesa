@@ -1,4 +1,4 @@
-import { API, authHeaders } from './gitSync'
+import { API, authHeaders, NO_CACHE } from './gitSync'
 
 const json = (token: string) => ({ ...authHeaders(token), 'Content-Type': 'application/json' })
 
@@ -62,7 +62,7 @@ interface RawInvitation {
 
 /** Inviti a repo che aspettano di essere accettati. */
 export async function listInvitations(token: string): Promise<Invitation[]> {
-  const res = await fetch(`${API}/user/repository_invitations?per_page=100`, { headers: authHeaders(token) })
+  const res = await fetch(`${API}/user/repository_invitations?per_page=100`, { headers: authHeaders(token), cache: NO_CACHE })
   if (!res.ok) return fail(res)
   const raw = (await res.json()) as RawInvitation[]
   return raw.map((i) => ({
@@ -86,7 +86,7 @@ export interface RepoMeta {
 
 /** Branch di default e permesso di scrittura di un repo. 404/403 = non esiste o non si vede. */
 export async function fetchRepoMeta(token: string, owner: string, repo: string): Promise<RepoMeta> {
-  const res = await fetch(`${API}/repos/${owner}/${repo}`, { headers: authHeaders(token) })
+  const res = await fetch(`${API}/repos/${owner}/${repo}`, { headers: authHeaders(token), cache: NO_CACHE })
   if (!res.ok) return fail(res)
   const data = (await res.json()) as { default_branch?: string; permissions?: { push?: boolean } }
   return { defaultBranch: data.default_branch || 'main', canPush: data.permissions?.push === true }
