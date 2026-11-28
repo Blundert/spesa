@@ -1,5 +1,5 @@
 import { db } from '../db/db'
-import { applySharedFile, exportSharedFile, patchSharedLink } from '../db/repositories/sharedListData'
+import { applySharedFile, applySharedMerge, exportSharedFile, patchSharedLink } from '../db/repositories/sharedListData'
 import { API, authHeaders, NO_CACHE, getGitConfig, getRemoteFile, putFile, type GitConfig } from './gitSync'
 import {
   mergeSharedFiles,
@@ -166,7 +166,10 @@ async function run(listId: number, now: number, retryDelayMs: number): Promise<S
       }
     }
 
-    await applySharedFile(listId, merged, now)
+    // Con il permesso di scrittura si rifà l'unione con lo stato locale di adesso, così ciò che è stato cambiato mentre
+    // la sync era in corso non va perso (vedi `applySharedMerge`); in sola lettura la copia locale diventa quella del repo.
+    if (canWrite) await applySharedMerge(listId, file, now)
+    else await applySharedFile(listId, merged, now)
     await patchSharedLink(listId, { lastSha: sha, canWrite })
     return { changed: !sameSharedContent(local, merged), pushed: needPush, canWrite }
   }

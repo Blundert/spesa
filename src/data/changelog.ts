@@ -2,6 +2,14 @@ export type ChangelogEntry = { it: string[]; en: string[] }
 
 // Ordine: più recente in cima. Aggiungere una entry ad ogni nuova versione.
 export const changelog: Record<string, ChangelogEntry> = {
+  '1.4.3': {
+    it: [
+      'Liste condivise: una voce che aggiungi, cambi, prendi nel carrello o elimini mentre l\'app sta sincronizzando non va più persa. Capitava aprendo l\'app e aggiungendo subito qualcosa quando la connessione era lenta; ora la modifica resta e parte con la sincronizzazione successiva. Anche l\'avviso "preso da" degli altri non si perde più',
+    ],
+    en: [
+      'Shared lists: an item you add, change, put in the cart or remove while the app is syncing is no longer lost. It happened when you opened the app and added something right away on a slow connection; now the change stays and goes out with the next sync. The "taken by" notice for others is no longer lost either',
+    ],
+  },
   '1.4.2': {
     it: [
       'Liste condivise: le modifiche degli altri arrivano subito. Prima il browser teneva in memoria per un minuto le risposte di GitHub, quindi una voce nuova poteva comparire dopo mezzo minuto e la sincronizzazione riprovava a vuoto con errori di conflitto',

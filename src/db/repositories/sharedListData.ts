@@ -8,6 +8,7 @@ import {
   SHARED_FORMAT,
   SHOPPING_STALE_MS,
   SHARED_VERSION,
+  mergeSharedFiles,
   type SharedItem,
   type SharedListFile,
 } from '../../lib/sharedListFile'
@@ -76,14 +77,31 @@ export async function exportSharedFile(listId: number): Promise<SharedListFile> 
   }
 }
 
+const SHARED_TABLES = [db.shoppingLists, db.listItems, db.items, db.categories, db.sessions, db.purchases, db.supermarkets]
+
+/**
+ * Porta su questo dispositivo ciò che è arrivato dal repo, unendolo con i dati locali di ADESSO.
+ *
+ * Una sync dura il tempo di una richiesta di rete (anche qualche secondo) e nel frattempo si può aggiungere una voce,
+ * cambiare una quantità, prenderne una nel carrello o eliminarla. Applicare il risultato di un'unione fatta con i
+ * dati di prima le cancellerebbe (voce sparita, "preso da" perso): per questo l'unione si rifà qui, nella stessa
+ * transazione che scrive, con lo stato locale di questo momento. Ciò che è cambiato nel frattempo resta qui e parte
+ * con la sync successiva (la modifica ne ha già programmata una).
+ */
+export async function applySharedMerge(listId: number, remote: SharedListFile, now: number = Date.now()): Promise<void> {
+  await db.transaction('rw', SHARED_TABLES, async () => {
+    const local = await exportSharedFile(listId)
+    await applySharedFile(listId, mergeSharedFiles(local, remote, now), now)
+  })
+}
+
 /**
  * Porta su questo dispositivo il risultato del merge: nome, voci (nuove, cambiate, sparite), eliminazioni da
  * ricordare, persone e spese concluse. Gli articoli si collegano al catalogo per nome (vedi `catalogResolver`: se qui
  * non hanno una categoria vera prendono quella di chi li ha condivisi).
  */
 export async function applySharedFile(listId: number, file: SharedListFile, now: number = Date.now()): Promise<void> {
-  const tables = [db.shoppingLists, db.listItems, db.items, db.categories, db.sessions, db.purchases, db.supermarkets]
-  await db.transaction('rw', tables, async () => {
+  await db.transaction('rw', SHARED_TABLES, async () => {
     const { list, link } = await sharedListOf(listId)
     const catalog = await catalogResolver()
 

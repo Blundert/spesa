@@ -356,3 +356,84 @@ describe('syncSharedList: niente cache del browser', () => {
     for (const c of seen) expect(c.cache, c.url).toBe('no-store')
   })
 })
+
+/** Cosa cambia su questo dispositivo mentre la sync aspetta la risposta di GitHub (anche qualche secondo su un telefono). */
+describe('syncSharedList: modifiche fatte mentre la sync è in corso', () => {
+  /** Esegue `during` mentre la lettura del file nel repo è in corso (come una risposta lenta). */
+  function slowRead(during: () => Promise<void>) {
+    const inner = gh.fetch
+    let done = false
+    vi.stubGlobal('fetch', async (input: string, init?: RequestInit) => {
+      if (!done && /\/contents\//.test(String(input)) && !init?.method) {
+        done = true
+        await during()
+      }
+      return inner(input, init)
+    })
+  }
+  const row = async (name: string) => {
+    const rows = await db.listItems.where('listId').equals(1).toArray()
+    const items = await db.items.bulkGet(rows.map((r) => r.itemId))
+    const i = items.findIndex((it) => it?.name === name)
+    return i < 0 ? undefined : rows[i]
+  }
+
+  beforeEach(async () => {
+    await Promise.all([db.sessions.clear(), db.purchases.clear()])
+    await setup({ lastSha: undefined })
+    putRemote(rFile({ items: [rItem('a', 'Uova')] }))
+    await syncSharedList(1, NOW) // prima sync: scarica
+  })
+
+  it('una voce aggiunta durante la sync resta e parte con la sync dopo', async () => {
+    slowRead(() => addLocal('Latte', 'v1', NOW + 5))
+    const r = await syncSharedList(1, NOW + 10)
+    expect(r.pushed).toBe(false)
+    expect(await localNames()).toEqual(['Latte', 'Uova'])
+    vi.stubGlobal('fetch', gh.fetch)
+    expect(await syncSharedList(1, NOW + 20)).toMatchObject({ pushed: true })
+    expect(remote().items.map((i) => i.name).sort()).toEqual(['Latte', 'Uova'])
+  })
+
+  it('una voce presa nel carrello durante la sync resta presa (e gli altri la vedono dopo)', async () => {
+    slowRead(async () => {
+      const r = await row('Uova')
+      await db.listItems.update(r?.id as number, { takenBy: 'matteo', updatedAt: NOW + 5 })
+    })
+    await syncSharedList(1, NOW + 10)
+    expect((await row('Uova'))?.takenBy).toBe('matteo')
+    vi.stubGlobal('fetch', gh.fetch)
+    await syncSharedList(1, NOW + 20)
+    expect(remote().items[0]).toMatchObject({ name: 'Uova', takenBy: 'matteo' })
+  })
+
+  it('una quantità cambiata durante la sync resta', async () => {
+    slowRead(async () => {
+      const r = await row('Uova')
+      await db.listItems.update(r?.id as number, { quantity: 4, updatedAt: NOW + 5 })
+    })
+    await syncSharedList(1, NOW + 10)
+    expect((await row('Uova'))?.quantity).toBe(4)
+  })
+
+  it('una voce eliminata durante la sync resta eliminata', async () => {
+    slowRead(async () => {
+      const r = await row('Uova')
+      await db.listItems.delete(r?.id as number)
+      await db.shoppingLists.update(1, { shared: { ...(await link()), tombstones: { a: NOW + 5 } } })
+    })
+    await syncSharedList(1, NOW + 10)
+    expect(await localNames()).toEqual([])
+    vi.stubGlobal('fetch', gh.fetch)
+    await syncSharedList(1, NOW + 20)
+    expect(remote().items).toEqual([])
+    expect(remote().tombstones).toEqual({ a: NOW + 5 })
+  })
+
+  it('in sola lettura la copia locale resta quella del repo', async () => {
+    await db.shoppingLists.update(1, { shared: { ...(await link()), canWrite: false } })
+    putRemote(rFile({ items: [rItem('a', 'Uova'), rItem('b', 'Pane', { addedAt: 1500 })] }))
+    expect(await syncSharedList(1, NOW + 10)).toMatchObject({ canWrite: false, pushed: false })
+    expect(await localNames()).toEqual(['Pane', 'Uova'])
+  })
+})

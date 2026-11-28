@@ -449,6 +449,8 @@ Serve una lista condivisa (Flusso 47) e un secondo dispositivo o account che la 
 
 10. Le risposte di GitHub non vengono tenute in memoria dal browser: nella scheda Rete degli strumenti per sviluppatori le richieste a `api.github.com` (lista, controllo del permesso, inviti) non vengono mai servite "dalla cache del disco/memoria". Una modifica dell'altra persona arriva entro 5 s di push + 15 s di controllo (non fino a un minuto in più) e nella console non ci sono `409` ripetuti a ogni ciclo
 
+11. Modifiche durante la sync (mobile e desktop): con una connessione lenta (strumenti per sviluppatori → Rete → "Slow 3G", oppure offline→online), apri l'app, aspetta che la riga di stato dica "Sincronizzo…" e SUBITO aggiungi una voce, cambia una quantità, prendi una voce in una spesa e elimina un'altra: a sync finita tutto è ancora lì (nessuna voce sparita, "preso da" e quantità come li hai messi) e entro circa 5 secondi dopo la fine le tue modifiche sono nel repo
+
 ### Flusso 49 — Spese concluse condivise e budget (mobile e desktop)
 Serve una lista condivisa (Flusso 47) con un'altra persona che fa spese (o, per provare, una spesa scritta nel repo come `sessions` di `lista.json`). Usare il build di produzione.
 1. Una mia spesa partita da una lista condivisa, a fine spesa ("Conferma spesa"): dopo circa 5 secondi nel repo c'è la spesa con il tuo login, negozio, importi, buoni e gli acquisti; gli articoli acquistati escono dalla lista per tutti. Le spese fatte PRIMA di condividere la lista non vanno mai nel repo
