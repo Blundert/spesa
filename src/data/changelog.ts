@@ -2,6 +2,14 @@ export type ChangelogEntry = { it: string[]; en: string[] }
 
 // Ordine: più recente in cima. Aggiungere una entry ad ogni nuova versione.
 export const changelog: Record<string, ChangelogEntry> = {
+  '1.4.7': {
+    it: [
+      'Modifica lista: dopo "Condividi" (o "Invita", "Smetti di condividere") la finestra si aggiorna subito, anche quando l\'hai aperta dalla pagina Liste. Prima restava il pulsante "Condividi con altre persone" come se non fosse successo niente',
+    ],
+    en: [
+      'Edit list: after "Share" (or "Invite", "Stop sharing") the window updates right away, also when you opened it from the Lists page. Before, the "Share with other people" button stayed as if nothing had happened',
+    ],
+  },
   '1.4.6': {
     it: [
       'Condividere una lista: tolto il selettore "Solo guarda" quando inviti qualcuno. GitHub non permette la sola lettura sui repository di un account personale, quindi l\'invito non poteva funzionare e l\'app diceva per errore "Utente GitHub non trovato". Ora si invita sempre con il permesso di modifica, e se GitHub rifiuta un invito per un altro motivo (per esempio inviti te stesso) il messaggio lo dice',

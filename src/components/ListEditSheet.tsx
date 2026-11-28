@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import type { ShoppingList, Supermarket } from '../db/types'
-import { useArchiveList, useCreateList, useUpdateList, useUsualItems } from '../hooks/useShoppingLists'
+import { useArchiveList, useCreateList, useShoppingLists, useUpdateList, useUsualItems } from '../hooks/useShoppingLists'
 import { useItems } from '../hooks/useItems'
 import { SuggestionPicker } from './SuggestionPicker'
 import { AUTO_USUAL_LIMIT } from '../lib/listSuggestions'
@@ -54,6 +54,10 @@ function ListForm({
   const [usualIds, setUsualIds] = useState<number[] | undefined>(list?.usualItemIds)
   const { data: items = [] } = useItems()
   const { data: usual = [] } = useUsualItems(list?.id)
+  // Chi apre il modulo può averlo avuto da una copia della lista (Liste): la condivisione cambia mentre è aperto
+  // (Condividi, Invita, Smetti di condividere…), quindi quella sezione legge sempre la lista aggiornata.
+  const { data: allLists = [] } = useShoppingLists()
+  const liveList = list ? (allLists.find((l) => l.id === list.id) ?? list) : null
   const createList = useCreateList()
   const updateList = useUpdateList()
   const archiveList = useArchiveList()
@@ -149,7 +153,7 @@ function ListForm({
         </>
       )}
 
-      {list && <ShareSection list={list} onNavigate={onDone} />}
+      {liveList && <ShareSection list={liveList} onNavigate={onDone} />}
 
       <button
         onClick={() => void handleSave()}
