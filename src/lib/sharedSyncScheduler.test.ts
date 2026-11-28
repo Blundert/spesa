@@ -3,6 +3,7 @@ import { SharedSyncError, type SharedSyncCode, type SharedSyncResult } from './s
 import {
   POLL_INTERVAL_MS,
   PUSH_DELAY_MS,
+  SPESA_POLL_INTERVAL_MS,
   createSharedSyncScheduler,
   type SyncOutcome,
 } from './sharedSyncScheduler'
@@ -11,12 +12,15 @@ const OK: SharedSyncResult = { changed: false, pushed: false, canWrite: true }
 
 let sync: ReturnType<typeof vi.fn<(id: number) => Promise<SharedSyncResult>>>
 let isShared: ReturnType<typeof vi.fn<(id: number) => Promise<boolean>>>
+/** Le liste condivise di questo dispositivo. */
+let listIds: number[]
 let outcomes: Array<[number, SyncOutcome]>
 
 function make() {
   return createSharedSyncScheduler({
     sync,
     isShared,
+    sharedListIds: async () => listIds,
     onOutcome: (id, o) => outcomes.push([id, o]),
     now: () => 42,
   })
@@ -28,6 +32,7 @@ beforeEach(() => {
   vi.useFakeTimers()
   sync = vi.fn(async () => OK)
   isShared = vi.fn(async () => true)
+  listIds = []
   outcomes = []
 })
 afterEach(() => vi.useRealTimers())
@@ -239,8 +244,141 @@ describe('errori', () => {
 describe('orologio predefinito', () => {
   it('senza `now` usa l\'ora di sistema', async () => {
     vi.setSystemTime(777)
-    const s = createSharedSyncScheduler({ sync, isShared, onOutcome: (id, o) => outcomes.push([id, o]) })
+    const s = createSharedSyncScheduler({ sync, isShared, sharedListIds: async () => [], onOutcome: (id, o) => outcomes.push([id, o]) })
     await s.syncNow(1)
     expect(outcomes[0][1].at).toBe(777)
+  })
+})
+
+describe('avvio dell\'app (begin)', () => {
+  it('sincronizza subito tutte le liste condivise e le controlla ogni 15 secondi, senza nessuna lista aperta', async () => {
+    listIds = [1, 2]
+    const s = make()
+    s.begin()
+    await flush()
+    expect(sync.mock.calls.map((c) => c[0]).sort()).toEqual([1, 2])
+    await vi.advanceTimersByTimeAsync(POLL_INTERVAL_MS)
+    expect(sync).toHaveBeenCalledTimes(4)
+    s.setVisible(false)
+    await vi.advanceTimersByTimeAsync(POLL_INTERVAL_MS * 3)
+    expect(sync).toHaveBeenCalledTimes(4)
+  })
+
+  it('la lista aperta non si sincronizza due volte e la chiusura non ferma i controlli', async () => {
+    listIds = [1, 2]
+    const s = make()
+    s.begin()
+    await flush()
+    s.start(1)
+    await flush()
+    expect(sync.mock.calls.filter((c) => c[0] === 1)).toHaveLength(2) // avvio + apertura
+    await vi.advanceTimersByTimeAsync(POLL_INTERVAL_MS)
+    expect(sync.mock.calls.filter((c) => c[0] === 2)).toHaveLength(2)
+    s.stop()
+    await vi.advanceTimersByTimeAsync(POLL_INTERVAL_MS)
+    expect(sync.mock.calls.filter((c) => c[0] === 2)).toHaveLength(3)
+  })
+
+  it('in background non parte niente finché non si torna visibili', async () => {
+    listIds = [1]
+    const s = make()
+    s.setVisible(false)
+    s.begin()
+    await vi.advanceTimersByTimeAsync(POLL_INTERVAL_MS * 2)
+    expect(sync).not.toHaveBeenCalled()
+    s.setVisible(true)
+    await flush()
+    expect(sync).toHaveBeenCalledTimes(1)
+  })
+
+  it('syncAll (ritorno della rete) sincronizza tutte le liste', async () => {
+    listIds = [1, 2, 3]
+    const s = make()
+    await s.syncAll()
+    expect(sync).toHaveBeenCalledTimes(3)
+  })
+})
+
+describe('modifiche in attesa quando l\'app va in background', () => {
+  it('partono subito e il timer da 5 secondi non le rimanda', async () => {
+    const s = make()
+    s.notifyChange(1)
+    s.notifyChange(2)
+    await vi.advanceTimersByTimeAsync(2000)
+    expect(sync).not.toHaveBeenCalled()
+    s.setVisible(false)
+    await flush()
+    expect(sync.mock.calls.map((c) => c[0]).sort()).toEqual([1, 2])
+    await vi.advanceTimersByTimeAsync(PUSH_DELAY_MS * 3)
+    expect(sync).toHaveBeenCalledTimes(2)
+  })
+
+  it('senza modifiche in attesa andare in background non sincronizza', async () => {
+    const s = make()
+    s.setVisible(false)
+    await flush()
+    expect(sync).not.toHaveBeenCalled()
+  })
+})
+
+describe('spesa (controlli più frequenti)', () => {
+  it('con fast i controlli sono ogni 5 secondi; stop torna a 15', async () => {
+    listIds = [1]
+    const s = make()
+    s.begin()
+    await flush()
+    s.start(1, { fast: true })
+    await flush()
+    expect(sync).toHaveBeenCalledTimes(2)
+    await vi.advanceTimersByTimeAsync(SPESA_POLL_INTERVAL_MS * 3)
+    expect(sync).toHaveBeenCalledTimes(5)
+    s.stop()
+    await vi.advanceTimersByTimeAsync(SPESA_POLL_INTERVAL_MS * 2)
+    expect(sync).toHaveBeenCalledTimes(5)
+    await vi.advanceTimersByTimeAsync(POLL_INTERVAL_MS)
+    expect(sync).toHaveBeenCalledTimes(6)
+  })
+
+  it('senza fast restano 15 secondi', async () => {
+    const s = make()
+    s.start(1)
+    await flush()
+    await vi.advanceTimersByTimeAsync(SPESA_POLL_INTERVAL_MS * 2)
+    expect(sync).toHaveBeenCalledTimes(1)
+    s.stop()
+  })
+})
+
+describe('errori fatali per lista', () => {
+  it('una lista senza più accesso non si controlla più, le altre sì; riaprirla o "Aggiorna" riprova', async () => {
+    listIds = [1, 2]
+    sync.mockImplementation(async (id) => {
+      if (id === 2) throw new SharedSyncError('no-access')
+      return OK
+    })
+    const s = make()
+    s.begin()
+    await flush()
+    await vi.advanceTimersByTimeAsync(POLL_INTERVAL_MS * 2)
+    expect(sync.mock.calls.filter((c) => c[0] === 1)).toHaveLength(3)
+    expect(sync.mock.calls.filter((c) => c[0] === 2)).toHaveLength(1)
+    sync.mockResolvedValue(OK)
+    await s.syncNow(2)
+    await vi.advanceTimersByTimeAsync(POLL_INTERVAL_MS)
+    expect(sync.mock.calls.filter((c) => c[0] === 2)).toHaveLength(3)
+  })
+
+  it('riaprire la lista riprova', async () => {
+    listIds = [2]
+    sync.mockRejectedValueOnce(new SharedSyncError('auth'))
+    const s = make()
+    s.begin()
+    await flush()
+    await vi.advanceTimersByTimeAsync(POLL_INTERVAL_MS)
+    expect(sync).toHaveBeenCalledTimes(1)
+    s.start(2)
+    await flush()
+    expect(sync).toHaveBeenCalledTimes(2)
+    s.stop()
   })
 })

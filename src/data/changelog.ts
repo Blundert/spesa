@@ -2,6 +2,16 @@ export type ChangelogEntry = { it: string[]; en: string[] }
 
 // Ordine: più recente in cima. Aggiungere una entry ad ogni nuova versione.
 export const changelog: Record<string, ChangelogEntry> = {
+  '1.4.4': {
+    it: [
+      'Liste condivise più affidabili con l\'app che si apre e si chiude: se chiudi l\'app subito dopo una modifica, questa parte comunque (adesso appena l\'app va in secondo piano, oppure alla riapertura, su qualsiasi pagina). Le novità degli altri arrivano anche se non hai la lista aperta (per esempio la loro spesa nello Storico)',
+      'Durante una spesa condivisa l\'app controlla le novità ogni 5 secondi (prima 15), così vedi presto cosa hanno già preso gli altri',
+    ],
+    en: [
+      'Shared lists are more reliable when the app opens and closes: if you close the app right after a change, the change still goes out (now as soon as the app goes to the background, or on reopening, on any page). Other people\'s news arrives even if the list is not open (for example their shopping in History)',
+      'During a shared shopping trip the app checks for news every 5 seconds (it used to be 15), so you quickly see what the others have already taken',
+    ],
+  },
   '1.4.3': {
     it: [
       'Liste condivise: una voce che aggiungi, cambi, prendi nel carrello o elimini mentre l\'app sta sincronizzando non va più persa. Capitava aprendo l\'app e aggiungendo subito qualcosa quando la connessione era lenta; ora la modifica resta e parte con la sincronizzazione successiva. Anche l\'avviso "preso da" degli altri non si perde più',

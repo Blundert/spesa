@@ -13,6 +13,7 @@ import { setSyncStatus } from './sharedSyncStatus'
 export const liveSync = createSharedSyncScheduler({
   sync: (listId) => syncSharedList(listId),
   isShared: async (listId) => (await db.shoppingLists.get(listId))?.shared !== undefined,
+  sharedListIds: async () => (await db.shoppingLists.toArray()).filter((l) => l.shared !== undefined).map((l) => l.id as number),
   onOutcome: (listId, outcome) => {
     setSyncStatus(listId, outcome)
     // Novità degli altri, o permesso cambiato (sola lettura): si ricaricano liste e voci.
@@ -29,3 +30,12 @@ export const liveSync = createSharedSyncScheduler({
 
 // Ogni modifica a una lista condivisa su questo dispositivo parte 5 secondi dopo l'ultima.
 onSharedChange((listId) => liveSync.notifyChange(listId))
+
+// Visibilità, rete e avvio sono dell'app intera, non di una schermata: anche a lista chiusa (o su un'altra pagina) le
+// modifiche in sospeso partono, le novità degli altri arrivano e andando in background parte quello che è in attesa.
+if (typeof document !== 'undefined') {
+  document.addEventListener('visibilitychange', () => liveSync.setVisible(document.visibilityState === 'visible'))
+  window.addEventListener('online', () => void liveSync.syncAll())
+  if (document.visibilityState !== 'visible') liveSync.setVisible(false)
+  liveSync.begin()
+}

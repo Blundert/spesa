@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 import { AppRoot } from './AppRoot'
 import { initTheme } from './theme/themeStore'
 import './i18n'
+import './lib/sharedLive'
 import './index.css'
 
 initTheme()

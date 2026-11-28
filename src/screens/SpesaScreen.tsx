@@ -116,7 +116,7 @@ export function SpesaScreen() {
   const { data: listItems = [] } = useListItems(listId)
   const sessionList = lists.find((l) => l.id === listId)
   // Spesa da una lista condivisa: si tiene aggiornata e si vede cosa hanno già preso gli altri.
-  useLiveSharedList(listId, sessionList?.shared !== undefined)
+  useLiveSharedList(listId, sessionList?.shared !== undefined, true)
   const takenByOther = (login: string | null | undefined) =>
     login && login !== sessionList?.shared?.me ? t('shared.takenBy', { name: displayName(sessionList?.shared, login) }) : null
 
