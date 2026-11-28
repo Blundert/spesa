@@ -252,7 +252,7 @@ describe('inviteToList', () => {
   })
 
   it('traduce gli errori e rifiuta liste non condivise o senza collegamento', async () => {
-    for (const [status, code] of [[404, 'user-not-found'], [422, 'user-not-found'], [403, 'no-permission'], [401, 'not-connected']] as const) {
+    for (const [status, code] of [[404, 'user-not-found'], [422, 'cannot-invite'], [403, 'no-permission'], [401, 'not-connected']] as const) {
       api = () => res({}, status)
       expect(await codeOf(inviteToList(1, 'luca', 'push'))).toBe(code)
     }

@@ -2,6 +2,14 @@ export type ChangelogEntry = { it: string[]; en: string[] }
 
 // Ordine: più recente in cima. Aggiungere una entry ad ogni nuova versione.
 export const changelog: Record<string, ChangelogEntry> = {
+  '1.4.6': {
+    it: [
+      'Condividere una lista: tolto il selettore "Solo guarda" quando inviti qualcuno. GitHub non permette la sola lettura sui repository di un account personale, quindi l\'invito non poteva funzionare e l\'app diceva per errore "Utente GitHub non trovato". Ora si invita sempre con il permesso di modifica, e se GitHub rifiuta un invito per un altro motivo (per esempio inviti te stesso) il messaggio lo dice',
+    ],
+    en: [
+      'Sharing a list: removed the "View only" choice when you invite someone. GitHub does not allow read-only access on repositories of a personal account, so the invitation could not work and the app wrongly said "GitHub user not found". Invitations now always grant edit access, and if GitHub refuses an invitation for another reason (for example you invite yourself) the message says so',
+    ],
+  },
   '1.4.5': {
     it: [
       'Liste condivise: se perdi l\'accesso, tieni la lista come normale e poi ti invitano di nuovo, le spese già arrivate non compaiono più due volte (prima il budget e le statistiche si raddoppiavano)',

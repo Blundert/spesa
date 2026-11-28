@@ -3,7 +3,6 @@ import { Link } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import type { ShoppingList, SharedMember } from '../../db/types'
-import type { SharePermission } from '../../lib/githubRepos'
 import { defaultRepoName, isValidRepoName } from '../../lib/sharedLists'
 import {
   isGithubConnected,
@@ -18,17 +17,13 @@ import { sharedErrorText } from './sharedErrors'
 const LABEL = 'text-[12px] font-normal tracking-[1.4px] text-t-muted uppercase px-0.5 pb-2'
 const FIELD = 'w-full bg-t-surface text-t-fg text-[15px] rounded-[12px] px-3 py-2.5 outline-none placeholder:text-t-muted'
 const BTN = 'px-3.5 py-[9px] rounded-[12px] text-[14px] bg-t-surface text-t-fg active:opacity-60 disabled:opacity-40'
+/**
+ * Si invita sempre con il permesso di scrittura: l'app crea i repo nell'account di chi condivide e GitHub, sui repo di
+ * un account personale, non ammette collaboratori in sola lettura (risponde 422). La sola lettura resta per chi
+ * riceve un invito in sola lettura da un repo di un'organizzazione.
+ */
+const INVITE_PERMISSION = 'push' as const
 const BTN_ON = 'px-3.5 py-[9px] rounded-[12px] text-[14px] bg-t-accent text-t-on active:opacity-70 disabled:opacity-40'
-
-function PermissionSelect({ value, onChange }: { value: SharePermission; onChange: (v: SharePermission) => void }) {
-  const { t } = useTranslation()
-  return (
-    <select value={value} onChange={(e) => onChange(e.target.value as SharePermission)} className={FIELD}>
-      <option value="push">{t('shared.permWrite')}</option>
-      <option value="pull">{t('shared.permRead')}</option>
-    </select>
-  )
-}
 
 function MemberRow({ listId, login, member }: { listId: number; login: string; member: SharedMember }) {
   const { t } = useTranslation()
@@ -77,7 +72,6 @@ export function ShareSection({ list, onNavigate }: { list: ShoppingList; onNavig
   const [open, setOpen] = useState(false)
   const [repoName, setRepoName] = useState(() => defaultRepoName(list.name))
   const [invite, setInvite] = useState('')
-  const [permission, setPermission] = useState<SharePermission>('push')
   const [confirmUnlink, setConfirmUnlink] = useState(false)
   const share = useShareList()
   const inviteMore = useInviteToList()
@@ -88,7 +82,7 @@ export function ShareSection({ list, onNavigate }: { list: ShoppingList; onNavig
   const doShare = () => {
     const username = invite.trim().replace(/^@/, '')
     share.mutate(
-      { listId, repoName: repoName.trim(), invite: username ? { username, permission } : undefined },
+      { listId, repoName: repoName.trim(), invite: username ? { username, permission: INVITE_PERMISSION } : undefined },
       {
         onSuccess: (r) => {
           if (r.pending) toast(t('shared.sharedPending'))
@@ -148,7 +142,6 @@ export function ShareSection({ list, onNavigate }: { list: ShoppingList; onNavig
               className={FIELD}
             />
           </label>
-          {invite.trim() && <PermissionSelect value={permission} onChange={setPermission} />}
           <button onClick={doShare} disabled={share.isPending || !isValidRepoName(repoName.trim())} className={BTN_ON}>
             {share.isPending ? t('shared.sharing') : t('shared.shareNow')}
           </button>
@@ -195,14 +188,13 @@ export function ShareSection({ list, onNavigate }: { list: ShoppingList; onNavig
               spellCheck={false}
               className={FIELD}
             />
-            <PermissionSelect value={permission} onChange={setPermission} />
             <button
               className={BTN}
               disabled={!invite.trim() || inviteMore.isPending}
               onClick={() => {
                 const username = invite.trim().replace(/^@/, '')
                 inviteMore.mutate(
-                  { listId, username, permission },
+                  { listId, username, permission: INVITE_PERMISSION },
                   {
                     onSuccess: (r) => {
                       toast(t(r === 'invited' ? 'shared.inviteSent' : 'shared.inviteAlready', { user: username }))

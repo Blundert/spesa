@@ -23,6 +23,7 @@ import { SharedSyncError, syncSharedList } from './sharedSync'
  * - `name-taken`: esiste già un repo con quel nome; `invalid-name`: nome non valido per GitHub;
  * - `no-permission`: il token non può creare repo o invitare (serve il permesso `repo`);
  * - `user-not-found`: l'username da invitare non esiste;
+ * - `cannot-invite`: GitHub non accetta l'invito (per esempio sei tu il proprietario del repo);
  * - `no-access`: il repo non esiste o non si vede (invito non accettato?);
  * - `not-ready`: nel repo non c'è ancora la lista (chi l'ha condivisa non ha sincronizzato);
  * - `invalid`: il file nel repo non è una lista condivisa valida;
@@ -34,6 +35,7 @@ export type SharedListErrorCode =
   | 'invalid-name'
   | 'no-permission'
   | 'user-not-found'
+  | 'cannot-invite'
   | 'no-access'
   | 'not-ready'
   | 'invalid'
@@ -187,7 +189,7 @@ export async function inviteToList(
   try {
     return await inviteCollaborator(token, link.owner, link.repo, username.trim(), permission)
   } catch (e) {
-    throw translate(e, { '404': 'user-not-found', '403': 'no-permission', '422': 'user-not-found', '401': 'not-connected' })
+    throw translate(e, { '404': 'user-not-found', '403': 'no-permission', '422': 'cannot-invite', '401': 'not-connected' })
   }
 }
 

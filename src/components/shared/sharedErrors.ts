@@ -9,6 +9,7 @@ const MESSAGES: Record<SharedListErrorCode | SharedSyncCode, (t: TFunction) => s
   'invalid-name': (t) => t('shared.errInvalidName'),
   'no-permission': (t) => t('shared.errNoPermission'),
   'user-not-found': (t) => t('shared.errUserNotFound'),
+  'cannot-invite': (t) => t('shared.errCannotInvite'),
   'no-access': (t) => t('shared.errNoAccess'),
   'not-ready': (t) => t('shared.errNotReady'),
   invalid: (t) => t('shared.errInvalid'),
