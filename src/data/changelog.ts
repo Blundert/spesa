@@ -2,6 +2,14 @@ export type ChangelogEntry = { it: string[]; en: string[] }
 
 // Ordine: più recente in cima. Aggiungere una entry ad ogni nuova versione.
 export const changelog: Record<string, ChangelogEntry> = {
+  '1.4.5': {
+    it: [
+      'Liste condivise: se perdi l\'accesso, tieni la lista come normale e poi ti invitano di nuovo, le spese già arrivate non compaiono più due volte (prima il budget e le statistiche si raddoppiavano)',
+    ],
+    en: [
+      'Shared lists: if you lose access, keep the list as a normal one and are invited again, the shopping trips that already arrived no longer show up twice (before, the budget and statistics were doubled)',
+    ],
+  },
   '1.4.4': {
     it: [
       'Liste condivise più affidabili con l\'app che si apre e si chiude: se chiudi l\'app subito dopo una modifica, questa parte comunque (adesso appena l\'app va in secondo piano, oppure alla riapertura, su qualsiasi pagina). Le novità degli altri arrivano anche se non hai la lista aperta (per esempio la loro spesa nello Storico)',

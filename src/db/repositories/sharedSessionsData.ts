@@ -76,9 +76,10 @@ export async function exportSharedSessions(listId: number, link: SharedLink): Pr
  */
 export async function importSharedSessions(listId: number, link: SharedLink, sessions: SharedSession[]): Promise<void> {
   if (sessions.length === 0) return
-  const known = new Set(
-    (await db.sessions.where('listId').equals(listId).toArray()).map((s) => s.sharedUid).filter((u) => u !== undefined),
-  )
+  // L'identificatore di una spesa è unico: se c'è già, su QUALUNQUE lista di questo dispositivo, non si reimporta. Capita
+  // dopo "Tieni come lista normale" e un nuovo collegamento allo stesso repo (la lista locale è un'altra): senza questo
+  // le spese comparirebbero due volte e il budget si raddoppierebbe.
+  const known = new Set((await db.sessions.toArray()).map((s) => s.sharedUid).filter((u) => u !== undefined))
   const fresh = sessions.filter((s) => !known.has(s.uid))
   if (fresh.length === 0) return
 

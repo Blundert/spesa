@@ -123,6 +123,16 @@ describe('importSharedSessions', () => {
     expect(await db.purchases.count()).toBe(4)
   })
 
+  it('non reimporta una spesa che c\'è già su un\'altra lista di questo dispositivo (ricollegamento dopo "Tieni come lista normale")', async () => {
+    // La vecchia lista (ora normale) tiene le spese già arrivate; il nuovo collegamento è una lista diversa.
+    await db.shoppingLists.add({ id: 2, name: 'Casa (vecchia)', supermarketId: null, sortOrder: 1, archivedAt: null })
+    await importSharedSessions(2, LINK, [ss('s1'), ss('m', { doneBy: 'matteo' })])
+    expect(await db.sessions.count()).toBe(2)
+    await importSharedSessions(1, LINK, [ss('s1'), ss('m', { doneBy: 'matteo' }), ss('s3')])
+    expect((await db.sessions.toArray()).map((s) => s.sharedUid).sort()).toEqual(['m', 's1', 's3'])
+    expect((await db.sessions.toArray()).filter((s) => s.listId === 1).map((s) => s.sharedUid)).toEqual(['s3'])
+  })
+
   it('ricalcola prezzo medio e quantità sommando gli acquisti di tutti', async () => {
     await importSharedSessions(1, LINK, [
       ss('s1', { purchases: [{ name: 'Latte', categoryName: 'Frigo', priceCents: 100, quantity: 1 }] }),
