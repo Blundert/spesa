@@ -32,7 +32,7 @@ gravità) e poi nel dump `docs/roadmap/<N>.md`. Che diventi un fix lo decide l'u
   e l'app lo riusa (errore 422 → `reusableRepo`): è il caso di chi ricondivide una lista con lo stesso nome. Per riprovare la creazione da zero si cancella a mano su GitHub.
 
 ### Reset prima di OGNI run
-Nessun repo viene cancellato: si riporta il branch a un commit vuoto (force) e si toglie ogni condivisione. Basta il permesso `repo`.
+Nessun repo viene cancellato: si riporta il branch a un commit con il solo README segnaposto (force) e si toglie ogni condivisione. Basta il permesso `repo`.
 ```bash
 set -a; source .env.e2e; set +a
 
@@ -42,7 +42,8 @@ reset_branch() {
   # repo senza commit (appena creato, vuoto): niente da resettare, e l'API dei commit risponde 409
   GH_TOKEN=$1 gh api repos/$2/$3/commits >/dev/null 2>&1 || return 0
   BR=$(GH_TOKEN=$1 gh api repos/$2/$3 --jq .default_branch)
-  TREE=$(echo '{"tree":[]}' | GH_TOKEN=$1 gh api -X POST repos/$2/$3/git/trees --input - --jq .sha)
+  # GitHub rifiuta un albero vuoto ("Invalid tree info"): un solo file segnaposto, commit senza genitori
+  TREE=$(echo '{"tree":[{"path":"README.md","mode":"100644","type":"blob","content":"e2e reset"}]}' | GH_TOKEN=$1 gh api -X POST repos/$2/$3/git/trees --input - --jq .sha)
   C=$(GH_TOKEN=$1 gh api -X POST repos/$2/$3/git/commits -f message="e2e reset" -f tree="$TREE" --jq .sha)
   GH_TOKEN=$1 gh api -X PATCH repos/$2/$3/git/refs/heads/$BR -f sha="$C" -F force=true >/dev/null
 }
@@ -60,7 +61,7 @@ if GH_TOKEN=$E2E_TOKEN_A gh api repos/$E2E_LOGIN_A/$E2E_REPO_SHARED >/dev/null 2
   done
 fi
 ```
-Da verificare al primo run: dopo il reset, `spesa-condivisa` senza `lista.json` deve poter essere riusata dall'app (se non lo è, è un problema da registrare).
+Verificato nel run 2: dopo il reset `spesa-condivisa` (solo `README.md`) viene riusata dall'app, che scrive `lista.json`. Il reset va eseguito anche su ogni repo creato dai test (es. `spesa-mob2`, `spesa-desk-nuova`), e non tocca i collaboratori: toglierli con `DELETE …/collaborators/<login>` e gli inviti con `DELETE …/invitations/<id>` (già nel blocco).
 I token NON vanno mai stampati (niente `set -x`, niente `echo $E2E_TOKEN_*`).
 
 ### Server e browser
@@ -81,12 +82,19 @@ I token NON vanno mai stampati (niente `set -x`, niente `echo $E2E_TOKEN_*`).
   (`python3 -m http.server 8099 --bind 127.0.0.1` su una cartella con `token-A` e `token-B`) e leggerlo con `await (await page.request.get('http://127.0.0.1:8099/token-B')).text()`.
   A fine run spegnere il server, cancellare la cartella e gli snapshot della sessione. Non fare snapshot con il campo Token riempito.
 - Playwright tiene aperta la scheda in secondo piano come "visibile" e con focus: il polling di entrambe le schede gira davvero.
-- **Cache HTTP del browser**: GitHub risponde con `max-age=60` e il codice non disattiva la cache (F2 del run 1), quindi i tempi misurati con la cache attiva sono
-  falsati. Per isolare gli altri problemi disattivarla per scheda: `const s = await ctx.newCDPSession(p); await s.send('Network.enable'); await s.send('Network.setCacheDisabled', {cacheDisabled: true})`
+- **Cache HTTP del browser**: GitHub risponde con `max-age=60`. Dal 1.4.2 l'app non usa più la cache (`NO_CACHE`), quindi i tempi si misurano SENZA disattivarla (usare schede nuove, perché una scheda su cui si è fatto `Network.setCacheDisabled` la tiene disattivata). Solo per diagnosticare un problema vecchio si può disattivarla per scheda: `const s = await ctx.newCDPSession(p); await s.send('Network.enable'); await s.send('Network.setCacheDisabled', {cacheDisabled: true})`
   (da rifare per ogni scheda nuova). Misurare una volta con cache attiva (comportamento reale) e le altre senza.
 - Toccare la scheda della lista già attiva (quella con ⌄) apre "Modifica lista": non cliccarla per "selezionare" la lista.
 - Il repo `spesa-condivisa` può esistere già, vuoto: l'app lo riusa (422 → `reusableRepo`) e scrive `lista.json`. Funziona.
 - Pagine desktop: `/lista`, `/liste`, `/sincronizzazione` (non `/sync`).
+
+### Selettori utili (desktop 1280 / mobile 390)
+- Pagine: desktop `/lista`, `/liste`, `/storico`, `/stats`, `/sincronizzazione`, `/impostazioni`; mobile `/` (= Lista), `/liste`, `/storico`, `/sincronizzazione`, `/impostazioni`. Al primo avvio in modalità mobile compare l'onboarding: "Salta" (due volte).
+- Campo di aggiunta: `getByRole('textbox', {name: 'Aggiungi un oggetto…'})` + Invio. Desktop, voce: `getByRole('button', {name: '<nome> da prendere'})` con `xpath=preceding-sibling::div[1]` (quantità, pulsanti `+`/`−`) e `following-sibling::button[1]` (×, apre "Rimuovere dalla lista?" → "Rimuovi").
+- Mobile, voce: `getByText('<nome>', {exact:true}).locator('xpath=ancestor::div[.//a[starts-with(@href,"/item/")]][1]')` con i pulsanti `+` e `-`; `-` a quantità 1 apre la conferma di rimozione, a quantità >1 scala.
+- La scheda lista ATTIVA (con ⌄ / "Modifica <nome>") apre la modifica al clic: per selezionare una lista cliccare la scheda NON attiva. Se ci sono due liste con lo stesso nome (dopo "Tieni come lista normale" e un nuovo collegamento) usare `.last()` per quella ricollegata.
+- Spesa: desktop barra laterale "Inizia la spesa" → finestra → "Inizia la spesa"; mobile pill (`/Di tasca tua/`) → "Inizia la spesa". "Scegli supermercato" → "+ Aggiungi supermercato" o il negozio. Prendere una voce: clic sul nome (desktop cella, mobile pulsante) → importo (desktop campo "Importo", mobile tastierino a cifre in centesimi) → "Aggiungi al carrello". Carrello: ✓ = "Rimetti da prendere", ✕ = "Rimuovi" (elimina la voce!). Fine: desktop "Fine spesa", mobile "Fine" → "Conferma spesa". Chi non ha iniziato la spesa vede il banner "… ha iniziato la spesa da … · tocca per unirti".
+- Sola lettura simulata: in IndexedDB `spesa` → `shoppingLists` → `shared.canWrite = false` e ricarica.
 
 ### Tecniche per simulare il mondo reale
 - **Offline di UNA scheda** (non di tutto il browser): in `browser_run_code_unsafe`

@@ -1,30 +1,27 @@
-# E2E sync — punti NON testati nel run 1
+# E2E sync — punti non testati nel run 1: esito nel run 2
 
-Elenco dei punti di `test/e2e-sync.md` che nel run 1 (`docs/roadmap/122.md`) non sono stati provati, o provati solo in parte.
-Si spuntano quando vengono eseguiti nel run di verifica dopo i fix. Ogni riga dice dove manca la copertura e perché.
+I punti elencati dopo il run 1 (`docs/roadmap/122.md`) sono stati eseguiti nel run di verifica dopo i fix 1.4.2–1.4.8
+(`docs/roadmap/130.md`), con la cache del browser ATTIVA (comportamento reale), desktop 1280×800 e mobile 390×844.
 
-Legenda: ☐ da fare · ☑ fatto (con esito nel dump del run 2)
+Legenda: ☑ eseguito e superato · ➖ non applicabile (e perché) · ☐ ancora da fare
 
-## Mobile (390×844) non rifatto
-- ☐ **5** Esporta/importa dalle Impostazioni mobili con lista condivisa; "Scarica da remoto" dalla pagina Sincronizzazione mobile. (Solo desktop provato.)
-- ☐ **5.6** Il backup personale su mobile non chiede "Confronta e unisci" a vuoto dopo che l'altro modifica la lista.
-- ☐ **0.4** Invito a chi ha già accesso e a utente inesistente, dal foglio di modifica mobile.
-- ☐ **2.4** B mette in carrello una voce che A elimina (spesa mobile).
-- ☐ **4.7** A e B concludono insieme sul mobile con una scrittura rallentata.
-- ☐ **6** Passaggio Partner ↔ Estraneo da "Persone" nel foglio mobile e numeri (pill, Storico, Statistiche) prima/dopo.
-- ☐ **6.4** Eliminare una settimana dallo Storico mobile: le spese degli altri restano, le proprie già pubblicate non tornano.
-- ☐ **8.2** Chiusura a ~6 s (dopo il push) e riapertura. **8.3** sfondo con push in attesa. **8.4** raffica sfondo/primo piano. **8.5** chiusura durante il PUT. **8.7** spesa in corso e telefono spento. **8.9** offline + sfondo. **8.10** push e sync manuale insieme.
+## Mobile (390×844)
+- ☑ **5** Esporta/importa dalle Impostazioni mobili e "Scarica da remoto". **5.6** nessun "Confronta e unisci" a vuoto.
+- ☑ **0.4** Inviti a chi ha già accesso, a un utente inesistente e a se stessi (messaggio nuovo).
+- ☑ **2.4**, **4.7** nella spesa mobile; **F9** (presa immediata dopo l'ingresso nella spesa).
+- ☑ **6** Partner ↔ Estraneo dal foglio mobile (8,10 → 14,50 → 8,10). **6.4** Elimina settimana: le spese di B restano, le proprie non tornano.
+- ☑ **8.2, 8.3, 8.4, 8.5, 8.7, 8.9, 8.10** e **F3** (chiusura a 2 s, riapertura su Storico).
 
 ## Desktop
-- ☐ **6.4 / 6.6** Eliminare una settimana dallo Storico desktop (se non esiste il comando, dirlo); una lista normale resta senza etichette, senza pubblicazione e con budget invariato.
-- ☐ **3.5** Rete che cade durante un push: nel run 1 il PUT è passato comunque, quindi il caso non è stato provato davvero (serve far fallire davvero la richiesta in corso).
-- ☐ **F9** Riproduzione isolata su desktop: l'altro entra nella spesa e prende subito una voce; l'avviso "preso da" deve arrivare.
-- ☐ Rinomina di una voce e cambio categoria da due dispositivi (nelle liste attuali non ci sono comandi: dire se esistono altrove, es. pagina Catalogo, e provarli lì).
+- ☑ **6.4 / 6.6**: nello Storico desktop non esiste l'eliminazione per settimana (➖, solo mobile); lista normale invariata (nessuna etichetta, budget come prima).
+- ☑ **3.5** Rete che cade DAVVERO durante un push (PUT abortito dopo 3 s, due volte): la voce non si perde, arriva una sola volta.
+- ☑ **F9** su desktop; ☑ **F1**, **F5**, **F7**, **F8**.
+- ➖ Rinomina di una voce e cambio categoria: non esistono comandi nelle liste (né mobile né desktop).
 
 ## Non testabile con account personali
-- ☐ **"Solo guarda" reale** (permesso `pull` su GitHub): i repo di account personali non lo ammettono (F5). Va provato con un repo di un'organizzazione; finché non c'è resta coperto solo dalla simulazione locale (`canWrite:false`) e dal comportamento scelto per F5.
+- ☐ **"Solo guarda" reale** (permesso `pull` su GitHub): i repo di account personali non lo ammettono. L'app non lo offre più nell'invito (1.4.6); resta provata solo l'interfaccia in sola lettura simulata (`canWrite:false`), su desktop e mobile. Per provarlo davvero serve un repo di un'organizzazione.
 
 ## Infrastruttura del test
-- ☐ Il **reset dei repo** del piano (`reset_branch`) con la guardia sui repo vuoti, eseguito davvero su repo con commit.
-- ☐ Creazione del repo condiviso **da zero su desktop** (nel run 1 solo mobile; su desktop si è riusato un repo vuoto).
-- ☐ Verifica di tutti i tempi con la cache **attiva** (comportamento reale) dopo il fix di F2, senza disattivarla via CDP.
+- ☑ **Reset dei repo** del piano eseguito su repo con commit (correzione: GitHub rifiuta un albero vuoto, ora si usa un README segnaposto).
+- ☑ Creazione del repo condiviso **da zero** su desktop (`spesa-desk-nuova`) e su mobile (`spesa-mob2`).
+- ☑ Tempi con la cache attiva, senza CDP (A→B ≈ 11 s, prima 33 s).
