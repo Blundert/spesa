@@ -184,18 +184,22 @@ export function SessioneScreen() {
         {/* Summary card */}
         <div className="bg-t-surface rounded-[22px] px-6 pt-6 pb-4 mb-[14px] text-center">
           <div className="relative inline-block mb-2">
-            <span className="text-[13px] text-t-muted underline decoration-dotted underline-offset-2 select-none">
+            <span
+              className={`text-[13px] text-t-muted select-none ${foreign ? '' : 'underline decoration-dotted underline-offset-2'}`}
+            >
               {session ? formatShortDate(session.startedAt) : '—'}
             </span>
-            <input
-              type="date"
-              value={dateInputValue}
-              onChange={handleDateChange}
-              aria-label={t('sessione.editDate')}
-              className="absolute inset-0 opacity-0 cursor-pointer w-full"
-            />
+            {!foreign && (
+              <input
+                type="date"
+                value={dateInputValue}
+                onChange={handleDateChange}
+                aria-label={t('sessione.editDate')}
+                className="absolute inset-0 opacity-0 cursor-pointer w-full"
+              />
+            )}
           </div>
-          {isCompleted ? (
+          {isCompleted && !foreign ? (
             <button
               onClick={() => setShowEditTotal(true)}
               aria-label={t('sessione.editTotal')}
@@ -214,7 +218,12 @@ export function SessioneScreen() {
               </span>
             </div>
           )}
-          {session && (
+          {session && foreign && (
+            <div className="block mx-auto text-[13px] text-t-muted mt-2 tabular-nums">
+              {session.buoniSpent} {t('common.buoni')} · €{formatCentsPlain(session.buoniSpent * session.buoniValueCents)}
+            </div>
+          )}
+          {session && !foreign && (
             <button
               onClick={() => setShowEditBuoni(true)}
               aria-label={t('spesa.editBuoni')}

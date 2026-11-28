@@ -186,23 +186,25 @@ export function DesktopSessioneScreen() {
       <div style={{ display: 'flex', gap: '16px', marginBottom: '24px' }}>
         <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: '6px' }}>
           <StatCard label={t('desktop.sessione.total')} value={`€ ${formatCents(totalCents)}`} sub={session ? formatDate(session.startedAt) : '—'} />
-          <div style={{ display: 'flex', gap: '16px', padding: '0 4px' }}>
-            {isCompleted && (
-              <button onClick={() => setShowEditTotal(true)} aria-label={t('sessione.editTotal')} style={linkBtn}>
-                {t('sessione.editTotal')}
-              </button>
-            )}
-            <span style={{ position: 'relative' }}>
-              <span style={linkBtn}>{t('sessione.editDate')}</span>
-              <input
-                type="date"
-                value={dateInputValue}
-                onChange={handleDateChange}
-                aria-label={t('sessione.editDate')}
-                style={{ position: 'absolute', inset: 0, opacity: 0, width: '100%', cursor: 'pointer' }}
-              />
-            </span>
-          </div>
+          {!foreign && (
+            <div style={{ display: 'flex', gap: '16px', padding: '0 4px' }}>
+              {isCompleted && (
+                <button onClick={() => setShowEditTotal(true)} aria-label={t('sessione.editTotal')} style={linkBtn}>
+                  {t('sessione.editTotal')}
+                </button>
+              )}
+              <span style={{ position: 'relative' }}>
+                <span style={linkBtn}>{t('sessione.editDate')}</span>
+                <input
+                  type="date"
+                  value={dateInputValue}
+                  onChange={handleDateChange}
+                  aria-label={t('sessione.editDate')}
+                  style={{ position: 'absolute', inset: 0, opacity: 0, width: '100%', cursor: 'pointer' }}
+                />
+              </span>
+            </div>
+          )}
         </div>
         <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: '6px' }}>
           <StatCard
@@ -210,17 +212,22 @@ export function DesktopSessioneScreen() {
             value={`${buoniSpent} ${t('common.buoni')}`}
             sub={`€ ${formatCents(buoniSpent * buoniValue)}`}
           />
-          <div style={{ padding: '0 4px' }}>
-            {session && (
-              <button onClick={() => setShowEditBuoni(true)} aria-label={t('spesa.editBuoni')} style={linkBtn}>
-                {t('spesa.editBuoniTitle')}
-              </button>
-            )}
+          {!foreign && (
+            <div style={{ padding: '0 4px' }}>
+              {session && (
+                <button onClick={() => setShowEditBuoni(true)} aria-label={t('spesa.editBuoni')} style={linkBtn}>
+                  {t('spesa.editBuoniTitle')}
+                </button>
+              )}
+            </div>
+          )}
+        </div>
+        {/* "Di tasca tua" è il mio budget: nella spesa di un altro non c'è. */}
+        {!foreign && (
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <StatCard label={t('home.outOfPocket')} value={`€ ${formatCents(outOfPocketCents(totalCents, buoniSpent, buoniValue))}`} />
           </div>
-        </div>
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <StatCard label={t('home.outOfPocket')} value={`€ ${formatCents(outOfPocketCents(totalCents, buoniSpent, buoniValue))}`} />
-        </div>
+        )}
       </div>
 
       <div style={{ background: 'var(--t-surface)', borderRadius: '16px', padding: '24px' }}>

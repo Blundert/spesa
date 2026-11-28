@@ -2,6 +2,14 @@ export type ChangelogEntry = { it: string[]; en: string[] }
 
 // Ordine: più recente in cima. Aggiungere una entry ad ogni nuova versione.
 export const changelog: Record<string, ChangelogEntry> = {
+  '1.4.8': {
+    it: [
+      'Spesa di un\'altra persona in una lista condivisa: nel dettaglio non compaiono più i link "Modifica importo", "Modifica data" e "Modifica buoni" (si vedevano ma non funzionavano) e, su desktop, nemmeno la scheda "Di tasca tua", che mostrava la sua spesa come se fosse la tua',
+    ],
+    en: [
+      'Another person\'s shopping trip in a shared list: the detail no longer shows the "Edit amount", "Edit date" and "Edit vouchers" links (they showed but did not work) and, on desktop, no "Out of pocket" card either, which showed their spending as if it were yours',
+    ],
+  },
   '1.4.7': {
     it: [
       'Modifica lista: dopo "Condividi" (o "Invita", "Smetti di condividere") la finestra si aggiorna subito, anche quando l\'hai aperta dalla pagina Liste. Prima restava il pulsante "Condividi con altre persone" come se non fosse successo niente',
